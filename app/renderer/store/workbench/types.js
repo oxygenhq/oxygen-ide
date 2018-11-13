@@ -1,0 +1,27 @@
+/*
+ * Copyright (C) 2015-2018 CloudBeat Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+export const WB_OPEN_FOLDER = 'WB_OPEN_FOLDER';
+export const WB_LOAD_FOLDER_ERR = 'WB_LOAD_FOLDER_ERR';
+export const WB_OPEN_FILE = 'WB_OPEN_FILE';
+export const WB_CLOSE_ALL_FILES = 'WB_CLOSE_ALL_FILES';
+export const WB_RENAME_FILE = 'WB_RENAME_FILE';
+export const WB_SHOW_NEW_FILE_DIALOG = 'WB_SHOW_NEW_FILE_DIALOG';
+export const WB_DELETE_FILE = 'WB_DELETE_FILE';
+export const WB_SAVE_CURRENT_FILE = 'WB_SAVE_CURRENT_FILE';
+export const WB_CREATE_FILE = 'WB_CREATE_FILE';
+export const WB_CREATE_FOLDER = 'WB_CREATE_FOLDER';
+export const WB_CLOSE_FILE = 'WB_CLOSE_FILE';
+export const WB_INIT = 'WB_INIT';
+export const WB_ON_TAB_CHANGE = 'WB_ON_TAB_CHANGE';
+export const WB_ON_CONTENT_UPDATE = 'WB_ON_CONTENT_UPDATE';
+export const WB_SHOW_DIALOG = 'WB_SHOW_DIALOG';
+export const WB_HIDE_DIALOG = 'WB_HIDE_DIALOG';
+export const WB_START_RECORDER = 'WB_START_RECORDER';
+export const WB_STOP_RECORDER = 'WB_STOP_RECORDER';
+export const WB_SHOW_CONTEXT_MENU = 'WB_SHOW_CONTEXT_MENU';

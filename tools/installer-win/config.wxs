@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" 
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+     
+    <?define Vendor = "CloudBeat" ?>
+    <?if $(sys.BUILDARCH) = x64 ?>
+        <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+    <?else ?>
+        <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+    <?endif ?>
+
+    <Product Id="*" 
+             UpgradeCode="9E5A61D1-1F5A-4880-BD62-560DDEB466D5" 
+             Name="Oxygen IDE" 
+             Version="$(var.Version)"
+             Manufacturer="CloudBeat Ltd." Language="1033">
+        <Package InstallerVersion="500" Compressed="yes" />
+        <Media Id="1" Cabinet="product.cab" EmbedCab="yes" CompressionLevel="high" />
+        
+        <MajorUpgrade Schedule="afterInstallInitialize"
+                      DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." />
+        
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="$(var.PlatformProgramFilesFolder)">
+                <Directory Id="INSTALLFOLDER" Name="Oxygen" />
+            </Directory>
+            
+            <!-- desktop shortcut -->
+            <Directory Id="DesktopFolder" Name="Desktop">
+                <Component Id="ApplicationShortcutDesktop" Guid="8B115EC7-8DD9-44DE-B25B-96B5A13FCA3E">
+                    <Shortcut Id="ApplicationDesktopShortcut"
+                              Name="Oxygen IDE"
+                              Description="Oxygen automation framework for Web and Mobile"
+                              Target="[INSTALLFOLDER]oxygenide.exe" 
+                              WorkingDirectory="INSTALLDIR" />
+                    <RemoveFolder Id="DesktopFolder" On="uninstall" />
+                    <RegistryValue Root="HKCU" 
+                                   Key="Software\$(var.Vendor)\Oxygen"
+                                   Name="installed"
+                                   Type="integer"
+                                   Value="1"
+                                   KeyPath="yes" />
+                </Component>
+            </Directory>
+            
+            <!-- start menu entry -->
+            <Directory Id="ProgramMenuFolder">
+                <Component Id="ApplicationShortcut" Guid="6038B8D5-BBB7-4249-A870-04B1F0162749">
+                    <Shortcut Id="ApplicationStartMenuShortcut"
+                              Name="Oxygen"
+                              Description="Oxygen automation framework for Web and Mobile"
+                              Target="[INSTALLFOLDER]oxygenide.exe"
+                              WorkingDirectory="INSTALLFOLDER" />
+                    <RemoveFile Id="RemoveShortcut" On="uninstall" Name="Oxygen.lnk"/>
+                    <RegistryValue Root="HKCU" 
+                                   Key="Software\$(var.Vendor)\Oxygen"
+                                   Name="installed"
+                                   Type="integer"
+                                   Value="1"
+                                   KeyPath="yes" />
+                </Component>
+            </Directory>
+            
+            <!-- chrome extension -->
+            <Component Id="ChromeExt" Guid="BBD51E79-ADBE-4F66-9E2C-24670AE3FACD">
+                <!-- TODO: test x86 - Software\Wow6432Node\Google\Chrome\Extensions\nddikidjcckpefjbnnnpfokienpkondf -->
+                <RegistryKey Root="HKCU" Key="Software\Google\Chrome\Extensions\nddikidjcckpefjbnnnpfokienpkondf">
+                    <RegistryValue Type="string" Name="update_url" Value="http://clients2.google.com/service/update2/crx" />
+                </RegistryKey>
+            </Component>
+            
+            <!-- IE BHO and registry settings required by webdriver -->
+            <Component Id="IEExt" Guid="1732B734-D55B-4DEB-B525-17B4E03D987F">
+                <!-- disable Enhanced Protected Mode on Windows 8+ -->
+                <RegistryKey Root="HKCU" Key="Software\Microsoft\Internet Explorer\Main">
+                    <RegistryValue Type="string" Name="Isolation" Value="PMIL" />
+                </RegistryKey>
+                <!-- disable Protected Mode for all zones -->
+                <RegistryKey Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\1">
+                    <RegistryValue Type="integer" Name="2500" Value="3" />
+                </RegistryKey>
+                <RegistryKey Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\2">
+                    <RegistryValue Type="integer" Name="2500" Value="3" />
+                </RegistryKey>
+                <RegistryKey Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\3">
+                    <RegistryValue Type="integer" Name="2500" Value="3" />
+                </RegistryKey>
+                <RegistryKey Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones\4">
+                    <RegistryValue Type="integer" Name="2500" Value="3" />
+                </RegistryKey>
+                <!-- add FEATURE_BFCACHE key for IE 11 -->
+                <!-- TODO: check if it's actually IE>=11. what the effect of adding this key for IE 10? -->
+                <RegistryKey Root="HKCU" Key="Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BFCACHE">
+                    <RegistryValue Type="integer" Name="iexplore.exe" Value="0" />
+                </RegistryKey>
+            </Component>
+        </Directory>
+        
+        <Feature Id="Common"
+                 Title="Oxygen IDE"
+                 Level="1"
+                 AllowAdvertise="no"
+                 Absent="disallow"
+                 Display="hidden"
+                 Description="Common Files (Required).">
+            <ComponentGroupRef Id="ApplicationFiles" />
+            <ComponentRef Id="ApplicationShortcut" />
+            <ComponentRef Id="ApplicationShortcutDesktop" />
+        </Feature>
+        
+        <Feature Id="ChromeExt"
+                 Title="Chrome Extension"
+                 Level="1"
+                 AllowAdvertise="no"
+                 Description="Enables recording support for Chrome.">
+            <ComponentRef Id="ChromeExt" />
+        </Feature>
+        
+        <Feature Id="IEExt"
+                 Title="Internet Explorer add-on"
+                 Level="1"
+                 AllowAdvertise="no"
+                 Description="Enables recording support for IE 10-11.">
+            <ComponentGroupRef Id="IEAddonDLL" />
+            <ComponentRef Id="IEExt" />
+        </Feature>
+        
+        <!-- cannot install silently into user store with iis:Certificate hence this hack -->
+        <SetProperty Id="InstallCertificates"
+                     Value="&quot;[SystemFolder]certutil&quot; –addstore –f Root &quot;[INSTALLFOLDER]resources\app\main\services\RecorderService\CARoot.cer&quot;"
+                     Sequence="execute"
+                     Before="InstallCertificates" />
+        <CustomAction Id="InstallCertificates"
+                      BinaryKey="WixCA"
+                      DllEntry="WixQuietExec"
+                      Impersonate="no"
+                      Execute="deferred"
+                      Return="check" />
+        
+        <SetProperty Id="RemoveCertificates" 
+                     Value="&quot;[SystemFolder]certutil&quot; -delstore root &quot;DO_NOT_TRUST_CloudBeatRoot&quot;"
+                     Sequence="execute" Before="RemoveCertificates" />
+        <CustomAction Id="RemoveCertificates"
+                      BinaryKey="WixCA"
+                      DllEntry="WixQuietExec"
+                      Impersonate="no"
+                      Execute="deferred"
+                      Return="ignore" />
+        
+        <UIRef Id="WixUI_FeatureTree" />
+        <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
+        <WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
+        <WixVariable Id="WixUIDialogBmp" Value="dialog.bmp" />
+        <Icon Id="app.ico" SourceFile="..\..\resources\app.ico" />
+        <Property Id="ARPPRODUCTICON" Value="app.ico" />
+        <Property Id="MSIFASTINSTALL" Value="3" />
+        
+        <InstallExecuteSequence>
+            <Custom Action="InstallCertificates" After="InstallFiles"><![CDATA[&IEExt=3 OR &ChromeExt=3]]></Custom>
+            <Custom Action="RemoveCertificates" After="RemoveFiles" />
+        </InstallExecuteSequence>
+    </Product>
+</Wix>

@@ -1,0 +1,31 @@
+@import 'vars';
+
+.asidenav {
+  height: 100%;
+  background: $lightBg;
+}
+/*
+.ant-layout-sider-children {
+  height: calc(100vh - 43px);
+  overflow: hidden;
+}
+*/
+.asidenav a {
+  font-size: 25px;
+  padding: 13px 0;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  color: $asideLinkColor;
+  transition: all .3s;
+}
+
+.asidenav a:hover {
+  background: $asideLinkHover;
+  color: #fff;
+}
+
+.asidenav a.selected {
+  background: $asideLinkColor;
+  color: #fff;
+}

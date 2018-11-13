@@ -1,0 +1,120 @@
+@import 'vars';
+
+.sideNavClass {
+  min-width: 50px;
+}
+
+.breakpointStyle {
+	background: $danger;
+  border-radius: 100%;
+  width: 10px !important;
+  height: 10px !important;
+  left: 7px !important;
+  top: 3px;
+}
+
+.currentLineDecoratorStyle {
+  background: transparent !important;
+  border-left: 7px solid $success;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  width: 0 !important;
+  height: 0 !important;
+  left: 46px !important;
+  top: 4px;
+}
+
+.currLineOptHideMe {
+  opacity: 0.1;
+}
+
+.ps__rail-x, .ps__rail-y {
+  background: none !important;
+}
+
+.scroller {
+  position: relative;
+  overflow-x: hidden;
+
+  .ps__rail-y {
+    z-index: 20;
+    left: auto !important;
+    right: 2px !important;
+  
+    > div {
+      width: 5px !important;
+    }
+  }
+
+  .ps__rail-x {
+    > div {
+      top: 0;
+      height: 5px !important;
+    }
+  }  
+}
+
+.tree-wrapper {
+  position: relative;
+  overflow-x: hidden;
+  height: calc(100vh - 80px);
+
+  > ul.rc-tree {
+    display: block;
+    //width: calc(100% - 10px);
+    width: 100%;
+    padding: 0px !important;
+
+    > li {
+      padding: $nodePadding 0;
+    }    
+
+    //.rc-tree-node-content-wrapper,
+    .rc-tree-title1 {
+      > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
+        display: block;
+
+        font-size: $nodesFontSize;
+      }
+    }
+  }
+}
+
+.loggerContainer,
+.refedWrapper {
+  .ps__rail-y {
+    z-index: 20;
+    left: auto !important;
+    right: 2px !important;
+  
+    > div {
+      width: 5px !important;
+    }
+  }
+}
+
+.runtimesettings-modal {
+  .ant-divider {
+    &:before {
+      display: none !important;
+    }
+    > span {
+      padding-left: 0 !important;
+    }
+  }
+}
+/*
+.ant-modal .ant-form-item {
+  margin-bottom: 0 !important;
+}
+*/
+.ant-modal .ant-input-group-wrapper {
+  vertical-align: middle !important;
+}
+.ant-model .ant-modal-body .ant-row {
+  margin-bottom: 20px;
+}

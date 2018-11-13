@@ -1,0 +1,22 @@
+/*
+ * @NOTE: Prepend a `~` to css file paths that are in your node_modules
+ *        See https://github.com/webpack-contrib/sass-loader#imports
+ */
+@import "~font-awesome/css/font-awesome.css";
+@import "~firacode/distr/fira_code.css";
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+}
+
+html, body, #root, #root > div {
+  height: 100vh;
+  overflow: hidden;
+}
+
+#root > div > .ant-row {
+  height: calc(100vh - 43px);
+}

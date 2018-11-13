@@ -1,0 +1,255 @@
+/*
+ * Copyright (C) 2015-2018 CloudBeat Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+import { message } from 'antd';
+
+import * as ActionTypes from './types';
+import * as Const from '../../../const';
+import { success, failure } from '../../helpers/redux';
+
+const defaultState = {
+  isRunning: false,         // indicates if a test is currently running
+  isPaused: false,          // indicates if the current test is paused
+  isSeleniumReady: false,   // indicates if built-in Selenium server has been successfully started
+  isAppiumReady: false,     // indicates if built-in Appium server has been successfully started
+  breakpoints: {},          // holds all user-defined breakpoints per file, shall include file name and line number
+  mainFile: null,           // main test (script) file to be executed 
+  runtimeSettings: {
+    testMode: 'web',
+    testTarget: 'chrome',
+    stepDelay: 0,
+    seleniumPort: null,     // holds Selenium server port number
+    iterations: 1,
+    paramFilePath: null,
+    paramMode: 'sequencial',
+  },
+  browsers: [
+    {
+      name: 'Chrome',
+      id: 'chrome',
+    },
+    {
+      name: 'Firefox',
+      id: 'firefox',
+    },
+  ],
+  devices: [],
+  emulators: Const.CHROME_EMULATED_DEVICES,
+};
+
+if (process.platform === 'win32') {
+  defaultState.browsers.push({
+    name: 'Internet Explorer',
+    id: 'ie',
+  });
+}
+
+if (process.platform === 'darwin') {
+  defaultState.browsers.push({
+    name: 'Safari',
+    id: 'safari',
+  });
+}
+
+export default (state = defaultState, action) => {
+  const payload = action.payload || {};
+  const { value, settings, device, breakpoints, path, error } = payload;
+  let _newDevices = [];
+
+  switch (action.type) {
+    // TEST_START
+    case ActionTypes.TEST_START:
+      return {
+        ...state,
+        isRunning: true,
+        isPaused: false,
+      };
+    
+    // TEST_START_FAILURE
+    case failure(ActionTypes.TEST_START):
+      if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SAVED) {
+        message.error('The current file has been modified. Please save the file before running the test.')
+      }
+      else if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SELECTED) {
+        message.error('Please open a script file before you could run the test.')
+      }
+      else if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_IS_EMPTY) {
+        message.error('Test with empty script file cannot be started.')
+      }
+      return {
+        ...state,
+        isRunning: false,
+        isPaused: false,
+      };
+
+    // TEST_STOP
+    case ActionTypes.TEST_STOP:
+      return {
+        ...state,
+        isRunning: false,
+        isPaused: false,
+      };
+    // TEST_CONTINUE
+    case ActionTypes.TEST_CONTINUE:
+      return {
+        ...state,
+        isRunning: true,
+        isPaused: false,
+      };
+    // TEST_EVENT_ENDED
+    case ActionTypes.TEST_EVENT_ENDED:
+      return {
+        ...state,
+        isRunning: false,
+        isPaused: false,
+      };
+    // TEST_EVENT_BREAKPOINT
+    case ActionTypes.TEST_EVENT_BREAKPOINT:
+      return {
+        ...state,
+        isRunning: true,
+        isPaused: true,
+      };
+    // TEST_STOP
+    case ActionTypes.TEST_STOP:
+      return {
+        ...state,
+        isRunning: false,
+        isPaused: false,
+      };
+    // TEST_SET_MAIN
+    case ActionTypes.TEST_SET_MAIN:
+      return {
+        ...state,
+        mainFile: value,
+      };
+    // TEST_SET_TARGET
+    case ActionTypes.TEST_SET_TARGET:
+      return {
+        ...state,
+        runtimeSettings: {
+          ...state.runtimeSettings,
+          testTarget: value,
+        },
+      };
+    // TEST_SET_STEP_DELAY
+    case ActionTypes.TEST_SET_STEP_DELAY:
+      return {
+        ...state,
+        runtimeSettings: {
+          ...state.runtimeSettings,
+          stepDelay: value,
+        },
+      };
+    // TEST_SET_MODE
+    case ActionTypes.TEST_SET_MODE:
+      if (state.runtimeSettings.testMode === value) {
+        return state;
+      }
+      // determine new testTarget value, depending on the selected test mode
+      let newTestTarget = null;
+      if (value === 'web') {
+        newTestTarget = state.browsers.length > 0 ? state.browsers[0].id : null;
+      }
+      else if (value === 'mob') {
+        newTestTarget = state.devices.length > 0 ? state.devices[0].id : null;
+      }
+      else if (value === 'resp') {
+        newTestTarget = state.emulators.length > 0 ? state.emulators[0] : null;
+      }
+      return {
+        ...state,
+        runtimeSettings: {
+          ...state.runtimeSettings,
+          testMode: value,
+          testTarget: newTestTarget,
+        },
+      };
+
+    // TEST_SET_SELENIUM_READY
+    case ActionTypes.TEST_SET_SELENIUM_READY:
+      return {
+        ...state,
+        isSeleniumReady: value,
+      };
+
+    // TEST_SET_SELENIUM_PORT
+    case ActionTypes.TEST_SET_SELENIUM_PORT:
+      return {
+        ...state,
+        runtimeSettings: {
+          ...state.runtimeSettings,
+          seleniumPort: value,
+        },
+      };
+
+    // TEST_ADD_DEVICE
+    case ActionTypes.TEST_ADD_DEVICE:
+      if (!device || !device.id || state.devices.some(x => x.id === device.id)) {
+        return state; // ignore any device which do not have UUID assigned or the device is already in the list
+      }
+      // if we are in Mobile mode, and no device is selected, then pre-select the new device
+      const setTestTarget = state.runtimeSettings.testMode === 'mob' && !state.runtimeSettings.testTarget;
+      return {
+        ...state,
+        devices: [
+          ...state.devices,
+          {
+            id: device.id,
+            name: device.name || device.id,
+          },
+        ],
+        runtimeSettings: !setTestTarget ? state.runtimeSettings : {
+          ...state.runtimeSettings,
+          testTarget: device.id,
+        },
+      };
+
+    // TEST_REMOVE_DEVICE
+    case ActionTypes.TEST_REMOVE_DEVICE:
+      _newDevices = [];
+      for (var i = state.devices.length; i--;) {
+          if (state.devices[i].id !== device.id){
+            _newDevices.push(state.devices[i]);
+          }
+      }
+      const updateTestTarget = state.runtimeSettings.testMode === 'mob' && state.runtimeSettings.testTarget === device.id;
+
+      return {
+        ...state,
+        runtimeSettings: !updateTestTarget ? state.runtimeSettings : {
+          ...state.runtimeSettings,
+          testTarget: null,
+        },
+        devices: _newDevices,
+      };
+
+    // TEST_UPDATE_BREAKPOINTS
+    case ActionTypes.TEST_UPDATE_BREAKPOINTS:
+      return {
+        ...state,
+        breakpoints: {
+          ...state.breakpoints,
+          [path]: breakpoints,
+        },
+      };
+
+    // TEST_UPDATE_RUN_SETTINGS
+    case ActionTypes.TEST_UPDATE_RUN_SETTINGS:
+      return {
+        ...state,
+        runtimeSettings: {
+          ...state.runtimeSettings,
+          ...settings
+        },
+      };
+
+    default:
+      return state;
+  }
+};

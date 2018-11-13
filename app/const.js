@@ -1,0 +1,66 @@
+/*
+ * Copyright (C) 2015-2018 CloudBeat Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+export const OXY_ALLOWED_FILES = ['js', 'jsx', 'json', 'xml', 'yml', 'txt'];
+
+export const MENU_CMD_NEW_FILE = 'MENU_CMD_NEW_FILE';
+export const MENU_CMD_NEW_FOLDER = 'MENU_CMD_NEW_FOLDER';
+export const MENU_CMD_OPEN_FOLDER = 'MENU_CMD_OPEN_FOLDER';
+export const MENU_CMD_SAVE = 'MENU_CMD_SAVE';
+export const MENU_CMD_SAVE_AS = 'MENU_CMD_SAVE_AS';
+export const MENU_CMD_OPEN_RECENT_FILE = 'MENU_CMD_OPEN_RECENT_FILE';
+export const MENU_CMD_OPEN_RECENT_FOLDER = 'MENU_CMD_OPEN_RECENT_FOLDER';
+
+export const MENU_CMD_RENAME_FILE = 'MENU_CMD_RENAME_FILE';
+export const MENU_CMD_DELETE_FILE = 'MENU_CMD_DELETE_FILE';
+export const MENU_CMD_RENAME_FOLDER = 'MENU_CMD_RENAME_FOLDER';
+export const MENU_CMD_DELETE_FOLDER = 'MENU_CMD_DELETE_FOLDER';
+
+export const MENU_CMD_UNDO = 'MENU_CMD_UNDO';
+export const MENU_CMD_REDO = 'MENU_CMD_REDO';
+export const MENU_CMD_CUT = 'MENU_CMD_CUT';
+export const MENU_CMD_COPY = 'MENU_CMD_COPY';
+export const MENU_CMD_PASTE = 'MENU_CMD_PASTE';
+export const MENU_CMD_DELETE = 'MENU_CMD_DELETE';
+export const MENU_CMD_SELECT_ALL = 'MENU_CMD_SELECT_ALL';
+
+export const MENU_CMD_FIND = 'MENU_CMD_FIND';
+export const MENU_CMD_REPLACE = 'MENU_CMD_REPLACE';
+
+export const MENU_CMD_VIEW_EVENT_LOG = 'MENU_CMD_VIEW_EVENT_LOG';
+export const MENU_CMD_VIEW_DEVTOOLS = 'MENU_CMD_VIEW_DEVTOOLS';
+
+export const MENU_CMD_HELP_SHOW_ABOUT = 'MENU_CMD_HELP_SHOW_ABOUT';
+export const MENU_CMD_HELP_SHOW_DOCS = 'MENU_CMD_HELP_SHOW_DOCS';
+export const MENU_CMD_HELP_CHECK_UPDATES = 'MENU_CMD_HELP_CHECK_UPDATES';
+
+export const CHROME_EMULATED_DEVICES = [
+	'iPhone 5/SE',
+	'iPhone 6/7/8',
+	'iPhone 6/7/8 Plus',
+	'iPhone X',
+    'iPad Mini',
+    'iPad',
+    'iPad Pro',
+    'Nexus 4',
+	'Nexus 5',
+	'Nexus 5X',
+	'Nexus 6',
+    'Nexus 6P',
+    'Nexus 7',
+	'Pixel 2',
+	'Pixel 2 XL',    
+	'Galaxy S III',
+	'Galaxy S5',
+	'Galaxy Note 3',
+    'Galaxy Note II',
+    'Amazon Kindle Fire HDX',
+	'Laptop with touch',
+	'Laptop with HiDPI screen',
+    'Laptop with MDPI screen',
+];

@@ -1,0 +1,59 @@
+@import 'vars';
+
+.ide-editors {
+    max-width: 100% !important;
+    display: flex;
+    flex-direction: column;
+    // height: calc(100vh - 43px);
+    // overflow: hidden;
+}
+  
+.ide-main {
+    height: calc(100vh - 43px);
+    display: flex;
+    flex-flow: row nowrap;
+    width: auto;
+    max-width: 100%;
+
+  .tabs-container {
+      background-color: $panelHeaderBgColor;
+      height: auto;
+      line-height: initial;
+      padding-left: 0;
+      padding-right: 0;
+      border-top: 1px solid $panelBorderColor;
+      border-bottom: 1px solid $panelBorderColor;
+  }
+
+  .tabs-container > .ant-row {
+    height: 28px;
+    margin: 0;
+    display: flex;
+  }
+
+  .tabs-container .sidebar-trigger {
+    min-width: 40px;
+    max-width: 41px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    height: 100%;
+    z-index: 5;
+  }
+  .tabs-container .sidebar-trigger > i {
+    padding-left: 0 !important;
+  }
+
+  .tabs-container .tabs-bar-container {
+    width: calc(100% - 40px);
+    margin-left: 40px;
+    // display: flex;
+    // align-items: flex-end;
+  }
+}
+
+.ant-layout-content {
+  padding-top: 0;
+  background-color: $layoutBg;
+}

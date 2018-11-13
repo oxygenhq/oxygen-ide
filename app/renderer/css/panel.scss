@@ -1,0 +1,51 @@
+@import 'vars';
+
+.panel-header {
+  -webkit-user-select: none;
+  cursor: default;
+  height: 30px;
+  font-family: Helvetica;
+  font-size: 12px;
+  font-weight: bold;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #444444;
+  border-bottom: solid 1px $panelBorderColor;
+  border-top: solid 1px $panelBorderColor;
+  border-right: solid 1px $panelBorderColor;
+  border-left: solid 1px $panelBorderColor;
+  padding: 4px 8px;
+  background-color: $panelHeaderBgColor;
+}
+.panel-header > span {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 20px;
+}
+
+.panel-body {
+  border-right: solid 1px $panelBorderColor;
+  border-left: solid 1px $panelBorderColor;
+  padding-left: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  background-color: $panelBodyBgColor;
+  font-family: Helvetica;
+  font-size: 12px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #333333;
+  /*height: calc(100vh - 73px);*/
+  height:calc(100% - 30px);
+  height:-moz-calc(100% - 30px);
+  height:-webkit-calc(100% - 30px);
+  overflow: hidden; 
+}
+.panel-body:not(> .scroller) {
+  padding-right: 8px;
+}

@@ -1,0 +1,106 @@
+@import 'vars';
+
+.tabs-bar-wrapper {
+  display: flex;
+  align-items: flex-end;
+  box-sizing: border-box;
+  // width: calc(100% - 68px);
+  // overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 30px;
+
+  .ps__thumb-x {
+    height: 4px !important;
+    top: 2px !important;
+  }  
+  .ps__rail-x {
+    z-index: 999999;
+  }
+
+  > div:not([class*="ps__rail"]) {
+    display: inline-block;
+    height: 30px;
+    /*margin-left: 5px;*/
+  }
+
+  > div[draggable="true"]:nth-child(3) {
+    .tabItemElem {
+      border-left: 1px solid $panelBorderColor;
+    }
+  }
+
+  .tabItemElem {
+    /*background: $nonActiveTab;*/
+    border-right: 1px solid $panelBorderColor;
+    display: inline-block !important;
+    position: relative;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100%;
+    display: flex;
+    align-items: center;
+
+    > button > span {
+      display: inline-block;
+      white-space: nowrap;
+      vertical-align: baseline;
+      line-height: 100%;
+    }
+
+    &.activeTabitem {
+      background: $light;  
+    }
+    &.activeTabitem > button > span {
+      font-weight: 600 !important;
+    }
+  }
+
+  button {
+    padding: 0 28px 0 9px !important;
+    height: 100%;
+    width: 100%;
+    margin: 0 !important;
+    border: none;
+    background: none;
+    cursor: pointer;
+    outline: none;
+    text-align: left;
+  }
+}
+
+.tabs-bar-wrapper .tabItemElem.activeTabitem:after {
+  content: "";
+  position: absolute;
+  display: block;
+  left: 0;
+  bottom: -3px;
+  z-index: 9;
+  width: 100%;
+  height: 3px;
+  background-color: #4A90E2;
+  /*background-color: $light;*/
+}
+
+.tabs-bar-wrapper .close-icon {
+  position: absolute;
+  margin: 0;
+  right: 7px;
+  top: 9px;
+  cursor: pointer;
+
+  &:hover {
+    color: $hover;
+    font-weight: 800;
+
+    &:before {
+      content: "\E633" !important;
+    }
+  }
+}
+
+#stepDelay::-webkit-inner-spin-button {
+  opacity: 1;
+  margin-right: -5px;
+  margin-top: 2px;
+}

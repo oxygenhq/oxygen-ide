@@ -1,0 +1,29 @@
+@import 'vars';
+
+.property-list {
+    .property-item {
+        border-bottom: 1px solid #e4e4e4;
+        padding: 8px 0px;
+        display: flex;        
+        
+
+        .label {
+            color: #666666;
+            width: 100px;
+            padding-right: 16px;
+            flex: 0 0 100px;
+        }
+        .value {
+            color: #333333;
+            width:calc(100% - 100px);
+            width:-moz-calc(100% - 100px);
+            width:-webkit-calc(100% - 100px);
+            overflow: hidden; 
+            flex-direction: column;
+
+            input {
+                width: 90%;
+            }
+        }
+    }
+}

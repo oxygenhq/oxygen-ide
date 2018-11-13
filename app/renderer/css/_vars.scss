@@ -1,0 +1,41 @@
+// Common
+$light: #fafafa;
+$lightBg: rgb(216, 218, 219);
+$success: rgb(54, 197, 137);
+$danger: rgb(224, 99, 49);
+$active: rgb(15, 125, 168);
+$hover: #198cea;
+
+// Panel
+$panelHeaderBgColor: #e6e6e6;
+$panelBodyBgColor: #f2f2f2;
+$panelBorderColor: #D0D0D0;
+// Sidebar
+$sidebarBgColor: #f2f2f2;
+$asideLinkColor: rgb(43, 49, 56);
+$asideLinkHover: rgb(108, 120, 134);
+
+// Header Bar
+$headerBarBg: $lightBg;
+$layoutBg: $light;
+
+// Toolbar
+$appTollbarBorder: #aaaaaa;
+$stopButtonColor: rgba(0, 0, 0, 0.65);
+$stopButtonHover: rgb(56, 133, 126);
+$separator: #aeaeae;
+
+// Tabs
+$nonActiveTab: rgb(197, 200, 206);
+$closeTabIconColor: $active;
+
+// Logger
+$loggerHeaderBg: #e3e3e3;
+$loggerBackground: #fdfdfb;
+$loggerFontColor: rgba(0,0,0,0.65); // #c5c5c5;
+$logHeaderBorder: #a0a0a0;
+$logHeaderColor: #606060;
+
+// Sprint 6 vars
+$nodesFontSize: 9pt;
+$nodePadding: 1.3pt;

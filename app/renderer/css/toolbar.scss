@@ -1,0 +1,106 @@
+@import 'vars';
+
+.appTollbar {
+  background-image: url("../img/tb-background.png");
+  background-repeat: repeat-x;
+  background-color:rgba(0, 0, 0, 0.2);
+  border-top: 1px solid $appTollbarBorder;
+  border-bottom: 1px solid $appTollbarBorder;
+  height: 43px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  -webkit-user-select: none;
+}
+
+.appTollbar .control {
+  cursor: pointer;
+  display: inline-block;
+  margin-right: 8px;
+  margin-left: 8px;
+}
+.appTollbar .control.disabled {
+  -webkit-filter: grayscale(1);
+  opacity: 0.5;
+  pointer-events: none;
+}
+/* Patch Ant Select component, to narrow down a bit the component height to be in match with other toolbar controls */
+.appTollbar .control.select .ant-select-selection--single {
+  height: 30px !important;
+}
+.appTollbar .control.select .ant-select-selection__rendered {
+  line-height: 28px !important;
+}
+
+.appTollbar .control.button,
+.appTollbar .control.selectable
+{
+  font-size: 21px;
+}
+
+.appTollbar .control.selectable {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  padding: 3px 5px;
+  margin-right: 4px;
+  margin-left: 4px;
+}
+
+.appTollbar .control.selectable.active {
+  background-color: #fff;
+}
+
+.appTollbar button.control.button {
+  padding: 0;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  outline: none;
+  /*min-width: 68px;*/
+  font-size: inherit;
+}
+
+.appTollbar button.control.button > i {
+  font-size: 21px;
+}
+
+.appTollbar button.control.button > span {
+  padding-left: 6px;
+}
+
+.appTollbar button.control.button:hover,
+.appTollbar .control.selectable:hover,
+.appTollbar .control.button:hover {
+  color: $hover;
+}
+
+.appTollbar .separator {
+  height: 22px;
+  width: 1px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border-right: 1px solid $separator;
+  float:left;
+}
+
+.appTollbar select {
+  margin-top: 12px;
+  margin-left: 14px;
+}
+
+.appTollbar input {
+  margin-left: 10px;
+}
+
+.appTollbar button.control.button.stop {
+  color: $stopButtonColor;
+}
+
+.appTollbar button.control.button.stop:hover {
+  color: $hover;
+}

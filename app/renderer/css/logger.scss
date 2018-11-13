@@ -1,0 +1,129 @@
+/*
+ * General log
+ */
+@import 'vars';
+
+/*
+* Selenium log
+*/
+
+.ide-logger {
+  background: $loggerBackground;
+  min-height: 20px;
+  align-self: flex-end;
+  width: 100%;
+
+  .dragline {
+    position: relative;
+    z-index: 9;
+    margin-top: -1px;
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: none;
+    border: none;
+    cursor: row-resize;
+    outline: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .logger-header {
+    display: flex;
+    align-items: center;
+    -webkit-user-select: none;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-left: none !important;
+    border-right: none !important;
+    /*padding-top: 1px;
+    padding-bottom: 1px;
+    display: flex;
+    align-items: center;
+    background: $panelHeaderBgColor;
+    border-top: 1px solid $panelBorderColor;
+    border-bottom: 1px solid $panelBorderColor;
+    padding-left: 5px;
+    color: $logHeaderColor;
+    font: 12px "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
+    -webkit-user-select: none;*/
+  }
+
+  .logger-textarea {
+    font-size: $nodesFontSize;
+    font-family: "Fira Code";
+    font-size: 12px;
+  }
+
+  .ant-tabs {
+    margin-left: 10px;
+  
+    .ant-tabs-bar {
+      margin: inherit;
+      margin-bottom: -1px;
+    }
+    .ant-tabs-nav-container {
+      font-family: Helvetica;
+      font-size: 12px !important;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      letter-spacing: normal;
+      color: #666666;
+    }
+    .ant-tabs-nav .ant-tabs-tab {
+      padding: 6px 16px !important;
+      margin: inherit !important;
+      border-right: 1px solid $panelBorderColor;
+    }
+    .ant-tabs-nav .ant-tabs-tab:first-child {
+      border-left: 1px solid $panelBorderColor;
+    }
+    .ant-tabs-tab-active {
+      color: $active !important;
+      background-color: white;
+    }
+    .ant-tabs-ink-bar {
+      background-color: #4A90E2 !important;
+    }
+  }
+
+  .logs-container {
+    color: $loggerFontColor;
+    font-size: 15px;
+    line-height: 16px;
+    padding-left: 10px;
+    padding-top: 5px;
+    font-family: 'Fira Code';
+    font-variant-ligatures: contextual;
+    overflow: auto;
+  }
+  .logs-container:before,
+  .logs-container:after {
+    content: '';
+    display: table;
+  }
+  
+  .logs-container p {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+}
+
+.seleniumSelector {
+  margin-left: 10px;
+}
+
+.logClose {
+  opacity: 0.4;
+  display: inline-block;
+  margin-left: auto;
+  color: #000;
+  cursor: pointer;
+}
+
+.logClose:hover {
+  opacity: 1;
+}
+
+

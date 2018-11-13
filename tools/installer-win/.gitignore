@@ -1,0 +1,4 @@
+*.wixobj
+files.wxs
+ie_addon.wxs
+.DS_Store

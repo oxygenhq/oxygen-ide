@@ -1,0 +1,75 @@
+@import 'vars';
+
+.monaco-editor-container {
+  overflow: hidden !important;
+}
+
+.monaco-editor.enable-ligatures {
+  max-width: 100% !important;
+  > div {
+    max-width: 100% !important;
+  }
+}
+
+.editor-container {
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100%;
+  padding-top: 5px;
+  background-color: white;
+
+  > div {
+    display: flex;
+    height: 100%;
+    overflow: auto;
+  }
+}
+
+.regularSizeClass {
+  overflow: hidden !important;
+  // height: auto;
+  // flex-grow: 1;
+}
+
+.hiddenEditorClass {
+  opacity: 0;
+  height: 1px;
+  display: none !important;
+}
+
+.margin-view-overlays {
+  padding-left: 3px;
+}
+
+.extendedMarginEditor {
+  .margin-view-overlays {
+    padding-left: 10px;
+  }
+
+  .breakpointStyle {
+    left: -3px !important;
+  }
+}
+
+.noFilesPlaceholder {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden !important;
+
+  i {
+    font-size: 50px;
+    color: $active;
+  }
+
+  p {
+    margin-bottom: 5px;
+    font-style: italic;
+  }
+
+  > div {
+    // border: 1px solid $light;
+    text-align: center;
+  }
+}

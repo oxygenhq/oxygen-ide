@@ -1,0 +1,19 @@
+{
+  "base": "vs",
+  "inherit": true,
+  "rules": [
+    { "background": "fdfdfb" },
+    { "token": "comment", "foreground": "e6cd7e", "fontStyle": "italic" },
+    { "token": "keyword.js", "foreground": "a86f04" }
+  ],
+  "colors": {
+    "editor.foreground": "#3f3e31",
+    "editor.background": "#fdfdfb",
+    "editorCursor.foreground": "#584313",
+    "editor.lineHighlightBackground": "#f7f4ec",
+    "editorLineNumber.foreground": "#8f8874",
+    "editor.selectionBackground": "#bed3db",
+    "editor.inactiveSelectionBackground": "#faf9ed",
+    "keyword.control": "#e90ab8"
+  }
+}

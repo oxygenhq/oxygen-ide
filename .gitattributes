@@ -1,0 +1,6 @@
+* text=auto !eol
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.icns binary
