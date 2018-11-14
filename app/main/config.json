@@ -1,6 +1,6 @@
 {
   "selenium": {
-      "jar": "selenium-server-standalone-3.14.0.jar",
+      "jar": "selenium-server-standalone-3.141.5.jar",
       "args": [],
       "port": 4444
   },
