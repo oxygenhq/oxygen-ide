@@ -63,8 +63,8 @@
             
             <!-- chrome extension -->
             <Component Id="ChromeExt" Guid="BBD51E79-ADBE-4F66-9E2C-24670AE3FACD">
-                <!-- TODO: test x86 - Software\Wow6432Node\Google\Chrome\Extensions\nddikidjcckpefjbnnnpfokienpkondf -->
-                <RegistryKey Root="HKCU" Key="Software\Google\Chrome\Extensions\nddikidjcckpefjbnnnpfokienpkondf">
+                <!-- TODO: test x86 - Software\Wow6432Node\Google\Chrome\Extensions\ibbmgejonlmocgjnkmabigdgbolcomea -->
+                <RegistryKey Root="HKCU" Key="Software\Google\Chrome\Extensions\ibbmgejonlmocgjnkmabigdgbolcomea">
                     <RegistryValue Type="string" Name="update_url" Value="http://clients2.google.com/service/update2/crx" />
                 </RegistryKey>
             </Component>
