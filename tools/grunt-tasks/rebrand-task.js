@@ -31,7 +31,7 @@ module.exports = function(grunt) {
                                       '--set-product-version', cfg.version,
                                       '--set-version-string', 'LegalCopyright', 'Copyright (C) 2015-2017 CloudBeat Ltd.',
                                       '--set-version-string', 'ProductName', 'Oxygen IDE',
-                                      '--set-version-string', 'FileDescription', 'Oxygen IDE']);         
+                                      '--set-version-string', 'FileDescription', 'Oxygen IDE']);
             if (child.error) {
                 grunt.fail.fatal(child.error);
             }
@@ -49,7 +49,7 @@ module.exports = function(grunt) {
         } else if (os.platform() === 'darwin') {
             // remove unnecessary folders/files
             fs.unlinkSync(path.join(distPath, 'version'));
-            fs.unlinkSync(path.join(distPath, 'LICENSE'));  
+            fs.unlinkSync(path.join(distPath, 'LICENSE'));
 
             // rename
             fs.renameSync(cfg.dist + '/Electron.app/Contents/MacOS/' + electronExeDarwin, 
@@ -64,7 +64,7 @@ module.exports = function(grunt) {
                         '<plist version="1.0"><dict>' +
                             '<key>CFBundleExecutable</key><string>Oxygen</string>' +
                             '<key>CFBundleIconFile</key><string>app.icns</string>' +
-                            '<key>CFBundleIdentifier</key><string>io.cloudbeat.oxygen</string>' +
+                            '<key>CFBundleIdentifier</key><string>org.oxygen.ide</string>' +
                             '<key>CFBundleInfoDictionaryVersion</key><string>6.0</string>' +
                             '<key>CFBundleName</key><string>OxygenIDE</string>' +
                             '<key>CFBundlePackageType</key><string>APPL</string>' +

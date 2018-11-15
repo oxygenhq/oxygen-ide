@@ -223,8 +223,8 @@ module.exports = function(grunt) {
                 ],
                 format: 'UDBZ',
                 'code-sign': {
-                    'signing-identity': '',
-                    identifier: ''
+                    'signing-identity': '62CADA6FF6C358E1BC6023535D6A192B98390B76',
+                    identifier: 'org.oxygen.ide'
                 }
             },
             target: {
