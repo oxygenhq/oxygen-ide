@@ -12,9 +12,9 @@ module.exports = function(grunt) {
     grunt.registerTask('copy-files', 'Copy a folder recursivly', function() {
         var done = this.async();
         var cfg = grunt.config.get('copy-files');
-        copy(cfg.src, cfg.dest, function(error, results) {
-            if (error) {
-                grunt.fail.fatal('Error while copying files', err);
+        copy(cfg.src, cfg.dest, function(err, results) {
+            if (err) {
+                grunt.fail.fatal(err);
             } else {
                 grunt.log.writeln('Copied ' + results.length + ' files');
                 done(true);
@@ -22,4 +22,3 @@ module.exports = function(grunt) {
         });
     });
 };
-
