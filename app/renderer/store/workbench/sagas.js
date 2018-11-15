@@ -332,8 +332,7 @@ export function* closeAllFiles({ payload }) {
         return;     // no open files in editor to close
     }
     for (let filePath of Object.keys(openFiles)) {
-        yield putAndTake(wbActions.closeFile(path, force));
-        //yield closeFile({ payload: { path: filePath, force: force } });
+        yield putAndTake(wbActions.closeFile(filePath, force));
     }
 }
 
