@@ -19,7 +19,10 @@
  * @flow
  */
 import { app, BrowserWindow, globalShortcut } from 'electron';
+import Logger from './Logger';
 import MainProcess from './MainProcess';
+
+global.log = new Logger('debug', 'info');
 
 let mainWindow = null;
 let mainProc = null;
