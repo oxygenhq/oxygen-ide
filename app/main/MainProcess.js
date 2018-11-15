@@ -30,6 +30,7 @@ export default class MainProcess {
       //this.mainWindow.webContents.openDevTools();
       this.mainWindow.openDevTools();
     }
+    console.log('Main process has started -> ');
   }
 
   async dispose() {
@@ -63,9 +64,5 @@ export default class MainProcess {
     //     });
     //   }
     // });
-  }
-
-  debugLog() {
-    console.log('Main process has started -> ');
   }
 }

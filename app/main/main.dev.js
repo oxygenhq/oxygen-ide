@@ -62,7 +62,6 @@ app.on('window-all-closed', () => {
   //}
 });
 
-
 app.on('ready', async () => {
   /*
   if (
@@ -97,23 +96,17 @@ app.on('ready', async () => {
     mainWindow.focus();
   });
 
-
   mainWindow.on('closed', () => {
     disposeMainAndQuit();
   });
 
-  // All next actions will be here
   mainProc = new MainProcess(mainWindow);
-  // if (process.env.DEBUG_PROD === 'true') {
-  mainProc.debugLog();
-  // }
 });
 
 function disposeMainAndQuit() {
   if (mainProc) {
     // dispose main process and all its services
-    mainProc.dispose()
-      .then(() => app.quit());
+    mainProc.dispose().then(() => app.quit());
     // make sure we set mainProc to null to prevent duplicated calls to this function
     mainProc = null;
   }
