@@ -54,16 +54,20 @@ export function* handleServiceEvents({ payload }) {
         if (!file) {
             return;
         }
+
         // generated code
         const generatedCode = toOxygenCode([ step ]);
         // current code, before update (make sure to include new line at the end of the content)
-        let prevContent = (file.content || '');
-        if (!prevContent.endsWith('\n')) {
+        let prevContent = file.content;
+        if (!prevContent.endsWith('\n') && prevContent !== '') {
             prevContent += '\n';
+        }
+        // prepend web.init if it doesn't exist in the script
+        if (file.content.indexOf('web.init') === -1) {
+            prevContent += 'web.init();\n';
         }
         const newContent = `${prevContent}${generatedCode}`;
         // append newly recorded content
-        //yield put(fsActions.updateFileContent(currentOpenFile, newContent));
         yield put(wbActions.onContentUpdate(currentOpenFile, newContent));
     }
 }

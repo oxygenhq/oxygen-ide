@@ -62,14 +62,6 @@ export default class RecorderService extends ServiceBase {
             this.httpSrv.listen(PORT_HTTP, hostname, function(){ });
             this.httpsSrv.listen(PORT_HTTPS, hostname, function(){ });
         });
-
-        var self = this;
-        
-        // add 'web.init()' at the beginning of the recorded script
-        this._notify({
-            module: 'web',
-            cmd: 'init'
-        });
     }
 
     stop() {
