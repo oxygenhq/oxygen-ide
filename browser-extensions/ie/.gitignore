@@ -1,5 +1,4 @@
-bin
-!bin/Release
+bin/Debug
 obj
 .vs
 recorder.js
