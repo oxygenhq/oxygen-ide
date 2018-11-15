@@ -230,6 +230,7 @@ export default class Toolbar extends Component<Props> {
           <button
             onClick={ () => ::this.handleClickEvent(Controls.TEST_RUN) }
             className={ this._getControlClassNames(Controls.TEST_RUN, 'button') }
+            enabled={ this._isEnabled(Controls.TEST_RUN) }
           >
             <Icon 
               title="Run Test"

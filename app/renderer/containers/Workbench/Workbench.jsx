@@ -151,6 +151,7 @@ export default class Workbench extends Component<Props> {
     return {
       [Controls.TEST_RUN]: {
         visible: !test.isRunning,
+        enabled: !isRecording,
       },
       [Controls.TEST_STOP]: {
         visible: test.isRunning,

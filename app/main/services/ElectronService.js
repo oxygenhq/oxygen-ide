@@ -67,6 +67,6 @@ export default class ElectronService extends ServiceBase {
     }
 
     showErrorBox(title, message) {
-        this.dialog.showErrorBox(title, message);
+        dialog.showErrorBox(title, message);
     }
 }

@@ -72,6 +72,7 @@ export function* startRecorder({ payload }) {
     const currentOpenFile = yield select(state => state.editor.activeFile);
     // if no file is currently open (no open tabs), then ignore the recording
     if (!currentOpenFile) {
+        yield put(recorderActions._startRecorder_Failure(undefined, { code: 'NO_ACTIVE_FILE' }));
         return;
     }
     yield call(services.mainIpc.call, 'RecorderService', 'start', []);

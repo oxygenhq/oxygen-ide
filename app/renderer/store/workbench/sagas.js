@@ -425,7 +425,10 @@ export function* handleFileDelete({ payload }) {
 }
 
 export function* startRecorder({ payload }) {
-    yield put(recorderActions.startRecorder());
+    const { error } = yield putAndTake(recorderActions.startRecorder());
+    if (error && error.code && error.code === 'NO_ACTIVE_FILE') {
+        yield call(services.mainIpc.call, 'ElectronService', 'showErrorBox', ['Test Recorder', 'Please open or create a script file before starting the recorder.']);
+    }
 }
 
 export function* stopRecorder({ payload }) {

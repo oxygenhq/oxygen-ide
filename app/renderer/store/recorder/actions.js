@@ -12,12 +12,17 @@ import { success, failure } from '../../helpers/redux';
 // startRecorder
 export const startRecorder = () => ({
   type: ActionTypes.RECORDER_START,
-  payload: { },
+  payload: null,
 });
 
 export const _startRecorder_Success = (path) => ({
   type: success(ActionTypes.RECORDER_START),
   payload: { path },
+});
+
+export const _startRecorder_Failure = (path, error) => ({
+  type: failure(ActionTypes.RECORDER_START),
+  payload: { path, error },
 });
 
 // stopRecorder
