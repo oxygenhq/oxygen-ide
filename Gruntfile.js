@@ -15,7 +15,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-chmod');
-    grunt.loadNpmTasks('grunt-appdmg');
     
     grunt.loadTasks('./tools/grunt-tasks');
 
@@ -222,7 +221,11 @@ module.exports = function(grunt) {
                     {x: 442, y: 210, type: 'link', path: '/Applications'},
                     {x: 186, y: 210, type: 'file', path: path.join(OUTDIR, 'Oxygen.app')},
                 ],
-                format: 'UDBZ'
+                format: 'UDBZ',
+                'code-sign': {
+                    'signing-identity': '',
+                    identifier: ''
+                }
             },
             target: {
                 dest:  'dist/oxygen-' + pkg.version + '-osx-x64.dmg'
