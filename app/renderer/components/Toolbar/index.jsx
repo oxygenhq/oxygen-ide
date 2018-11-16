@@ -188,7 +188,7 @@ export default class Toolbar extends Component<Props> {
             style={ getOpacity(this._isEnabled(Controls.TEST_MODE_RESP)) }
             onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_RESP) }
             style={{ marginRight: 0 }}
-            title="Resp Mode"
+            title="Responsive Mode"
             type="scan"
           />
         </span>
@@ -299,7 +299,7 @@ export default class Toolbar extends Component<Props> {
           <Icon
             style={ getOpacity(this._isEnabled(Controls.TEST_SETTINGS)) }
             onClick={ () => ::this.handleClickEvent(Controls.TEST_SETTINGS) }
-            type="tool"
+            type="setting"
             title="Test Settings"
           />
         </span>

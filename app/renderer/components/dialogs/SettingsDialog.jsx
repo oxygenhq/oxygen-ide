@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import React, { PureComponent, Fragment } from 'react';
-import { Form, Input, Select, Modal, message, Divider, InputNumber, Switch } from 'antd';
+import { Form, Input, Select, Modal, InputNumber, Switch } from 'antd';
 import { capitalizeFirst } from '../../helpers/general';
 import FormItem from 'antd/lib/form/FormItem';
 
@@ -18,6 +18,7 @@ const { Option } = Select;
 const DEFAULT_STATE = {
   visible: false,
   iterations: 1,
+  reopenSession: false,
   useParams: false,
   paramFilePath: null,
   paramMode: 'sequential',
@@ -52,7 +53,8 @@ class SettingsDialog extends PureComponent<Props> {
         iterations: nextProps.settings.iterations || 1,
         paramMode: nextProps.settings.paramMode || 'sequential',
         paramFilePath: nextProps.settings.paramFilePath || null,
-        useParams: nextProps.settings.paramFilePath != null && typeof nextProps.settings.paramFilePath !== 'undefined',
+        reopenSession: nextProps.settings.reopenSession || false,
+        useParams: nextProps.settings.paramFilePath != null,
       }
     }
     // else, leave the previous state 
@@ -83,16 +85,23 @@ class SettingsDialog extends PureComponent<Props> {
     }
   }
 
-  onUseParams(value) {
+  onUseParamsChange(value) {
     this.setState({
       useParams: value,
       // make sure to set paramFilePath to null if use parameters switch is off
       paramFilePath: value == false ? null : this.state.paramFilePath,
     });
   }
+
+  onReopenSessionChange(value) {
+    this.setState({
+      reopenSession: value,
+    });
+  }
+  
   
   handleOk() {
-    const { iterations, useParams, paramMode, paramFilePath } = this.state;
+    const { iterations, useParams, paramMode, paramFilePath, reopenSession } = this.state;
     this.props.form.validateFields((err, values) => {
       if (err) {
         return;
@@ -100,6 +109,7 @@ class SettingsDialog extends PureComponent<Props> {
       this.props.onSubmit({
         iterations: iterations,
         paramMode: paramMode,
+        reopenSession: reopenSession,
         paramFilePath: useParams ? values.paramFilePath : null,
       });
     });    
@@ -116,10 +126,11 @@ class SettingsDialog extends PureComponent<Props> {
       paramFilePath,
       paramMode,
       useParams,
+      reopenSession,
     } = this.state;
     // form layout settings
     const formItemLayout = {
-      labelCol: { span: 6 },
+      labelCol: { span: 8 },
       wrapperCol: { span: 14 },
     };
     // file picker button
@@ -145,49 +156,53 @@ class SettingsDialog extends PureComponent<Props> {
         visible={visible}
         onOk={this.handleOk.bind(this)}
         onCancel={onCancel}
+        bodyStyle={ { overflow: 'hidden', overflowY: 'scroll', height: '350px' } }
       >
-        <Form>
-          <Form.Item label="Iterations" {...formItemLayout} >
-            <InputNumber
-              min={1}
-              value={ iterations }
-              onChange={ (e) => ::this.onChangeIterations(e) }
-            />
-          </Form.Item>
-          <Form.Item label="Test Parameters" {...formItemLayout} >
-            <Switch onChange={ ::this.onUseParams } />
-          </Form.Item>
-          { useParams && 
-            <Fragment>
-              <Form.Item label="Parameters File" {...formItemLayout} >            
-                { getFieldDecorator('paramFilePath', {
-                  rules: [{
-                    required: true,
-                    message: 'Please choose a file!',
-                  }],
-                  initialValue: paramFilePath,
-                })(
-                  <Input
-                    addonAfter={afterFilePicker}
-                    placeholder="Choose file..."
-                    style={{ width: '100%' }}
-                    required
-                    readOnly
-                  />
-                )}
-              </Form.Item>
-              <Form.Item label="Read Next Row" {...formItemLayout} >
-                <Select 
-                  defaultValue="sequential"
-                  onChange={ (e) => ::this.onChangeParamMode(e) }
-                >
-                  <Option value="random">Random</Option>
-                  <Option value="sequential">Sequentially</Option>
-                </Select>
-              </Form.Item>
-            </Fragment>
-          }
-        </Form>
+          <Form>
+            <Form.Item label="Iterations" {...formItemLayout} >
+              <InputNumber
+                min={1}
+                value={ iterations }
+                onChange={ (e) => ::this.onChangeIterations(e) }
+              />
+            </Form.Item>
+            <Form.Item label="Re-Open Session" {...formItemLayout} extra="Create (re-open) a new or use an existing Selenium session on next iteration." >
+              <Switch onChange={ ::this.onReopenSessionChange } checked={ reopenSession } />
+            </Form.Item>
+            <Form.Item label="Use Parameter File" {...formItemLayout} extra="Use parameter file (CSV or Excel) to run data-driven tests." >
+              <Switch onChange={ ::this.onUseParamsChange } checked={ useParams } />
+            </Form.Item>
+            { useParams && 
+              <Fragment>
+                <Form.Item label="Parameter File" {...formItemLayout} >            
+                  { getFieldDecorator('paramFilePath', {
+                    rules: [{
+                      required: true,
+                      message: 'Please choose a file!',
+                    }],
+                    initialValue: paramFilePath,
+                  })(
+                    <Input
+                      addonAfter={afterFilePicker}
+                      placeholder="Choose CSV or Excel file..."
+                      style={{ width: '100%' }}
+                      required
+                      readOnly
+                    />
+                  )}
+                </Form.Item>
+                <Form.Item label="Read Next Row" {...formItemLayout} >
+                  <Select 
+                    defaultValue="sequential"
+                    onChange={ (e) => ::this.onChangeParamMode(e) }
+                  >
+                    <Option value="random">Random</Option>
+                    <Option value="sequential">Sequentially</Option>
+                  </Select>
+                </Form.Item>
+              </Fragment>
+            }
+          </Form>
       </Modal>
     );
   }

@@ -61,7 +61,7 @@ export default class TestRunnerService extends ServiceBase {
         .then((testsuite) => {
             const {
                 iterations,
-                reinitBrowser,
+                reopenSession,
                 dbgPort,
                 testMode,
                 testTarget,
@@ -70,7 +70,6 @@ export default class TestRunnerService extends ServiceBase {
             } = testConfig;
 
             testsuite.testcases[0].iterationCount = iterations;
-            testsuite.testcases[0].ReopenBrowser = reinitBrowser;
 
             // prepare launch options
             const options = {};
@@ -80,6 +79,7 @@ export default class TestRunnerService extends ServiceBase {
               allow: true,
               allowGlobal: true
             };
+            options.reopenSession = reopenSession || false;
             
             // prepare module parameters
             const caps = {};
@@ -102,8 +102,6 @@ export default class TestRunnerService extends ServiceBase {
                 options.mode = 'web';
                 options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
                 options.browserName = testTarget;
-                options.initDriver = true;
-                options.reopenBrowser = (reinitBrowser || false);
                 // @FIXME: this option should be exposed in reports settings
                 options.screenshots = 'never';
             }

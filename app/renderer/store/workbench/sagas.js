@@ -115,6 +115,9 @@ export function* handleMainMenuEvents({ payload }) {
             yield put(settingsActions.setLoggerVisible(args[0]));
         }        
     }
+    else if (cmd === Const.MENU_CMD_VIEW_SETTINGS) {
+        yield put(wbActions.showDialog('DIALOG_SETTINGS'));
+    }
 }
 
 export function* handleServiceEvents({ payload }) {

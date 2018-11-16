@@ -23,6 +23,7 @@ const defaultState = {
     testMode: 'web',
     testTarget: 'chrome',
     stepDelay: 0,
+    reopenSession: false,   // indicates if Selenium session must be re-opened for each iteration
     seleniumPort: null,     // holds Selenium server port number
     iterations: 1,
     paramFilePath: null,

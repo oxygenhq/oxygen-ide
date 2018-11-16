@@ -143,6 +143,10 @@ export default (cmdHandler, settings) => {
     label: '&View',
     submenu: [
       {
+        label: 'Settings...',
+        click() { cmdHandler(Const.MENU_CMD_VIEW_SETTINGS) }
+      },
+      {
         label: 'Event Log',
         accelerator: 'CommandOrControl+Shift+L',
         type: 'checkbox',
