@@ -7,9 +7,11 @@
  * (at your option) any later version.
  */
 import MainIpcService from "./MainIpc";
+import UserHintsService from "./UserHints";
 
 const services = {
     mainIpc: new MainIpcService(),
+    userHints: new UserHintsService(),
 }
 export function configureServices(store, action$) {
     // bind all services to the store and action$ subject

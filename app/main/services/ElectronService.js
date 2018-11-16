@@ -69,4 +69,9 @@ export default class ElectronService extends ServiceBase {
     showErrorBox(title, message) {
         dialog.showErrorBox(title, message);
     }
+
+    shellOpenExternal(url, options = null) {
+        electron.shell.openExternal(url, options);
+    }
+    
 }

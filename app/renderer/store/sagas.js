@@ -15,16 +15,30 @@ import test from './test/sagas';
 import recorder from './recorder/sagas';
 import settings from './settings/sagas';
 
+// services
+import ServicesSingleton from '../services';
+const services = ServicesSingleton();
+
 /**
  * rootSaga
  */
 export default function* root() {
-  yield all([
+  const sagas = [
     fork(workbench),
     fork(fs),
     fork(editor),
     fork(test),
     fork(recorder),
     fork(settings),
-  ]);
+  ];
+  // check if any service has saga functions as well
+  if (services && Object.keys(services).length > 0) {
+    for (let serviceId of Object.keys(services)) {
+      const service = services[serviceId];
+      if (service.sagas && typeof service.sagas === 'function') {
+        sagas.push(fork(service.sagas.bind(service)));
+      }
+    }
+  }
+  yield all(sagas);
 }
