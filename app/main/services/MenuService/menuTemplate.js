@@ -22,6 +22,10 @@ export default (cmdHandler, settings) => {
       click() { cmdHandler(Const.MENU_CMD_NEW_FILE) }
     },
     {
+      label: '&Open File...',
+      click() { cmdHandler(Const.MENU_CMD_OPEN_FILE) }
+    },
+    {
       label: '&Open Folder...',
       accelerator: 'CommandOrControl+O',
       click() { cmdHandler(Const.MENU_CMD_OPEN_FOLDER) }

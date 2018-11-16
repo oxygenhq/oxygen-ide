@@ -92,6 +92,9 @@ export function* handleMainMenuEvents({ payload }) {
     else if (cmd === Const.MENU_CMD_OPEN_FOLDER) {
         yield put(wbActions.showDialog('OPEN_FOLDER'));
     }
+    else if (cmd === Const.MENU_CMD_OPEN_FILE) {
+        yield put(wbActions.showDialog('OPEN_FILE'));
+    }
     else if (cmd === Const.MENU_CMD_NEW_FILE) {
         yield showNewFileDialog({});
     }
@@ -343,6 +346,14 @@ export function* showDialog({ payload }) {
         const paths = yield call(services.mainIpc.call, 'ElectronService', 'showOpenFolderDialog', []);
         if (paths && Array.isArray(paths) && paths.length > 0) {
             yield openFolder({ payload: { path: paths[0] }});
+        }
+    }
+    else if (dialog === 'OPEN_FILE') {
+        const paths = yield call(services.mainIpc.call, 'ElectronService', 'showOpenFileDialog', []);
+        if (paths && Array.isArray(paths) && paths.length > 0) {
+            for (let path of paths) {
+                yield put(wbActions.openFile(path));
+            }            
         }
     }
     else {
