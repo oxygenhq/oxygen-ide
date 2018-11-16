@@ -17,12 +17,12 @@ export default (cmdHandler, settings) => {
 
   const fileMenu = [
     {
-      label: '&New File',
+      label: '&New File...',
       accelerator: 'CommandOrControl+N',
       click() { cmdHandler(Const.MENU_CMD_NEW_FILE) }
     },
     {
-      label: '&Open Folder',
+      label: '&Open Folder...',
       accelerator: 'CommandOrControl+O',
       click() { cmdHandler(Const.MENU_CMD_OPEN_FOLDER) }
     },
@@ -36,9 +36,8 @@ export default (cmdHandler, settings) => {
       click() { cmdHandler(Const.MENU_CMD_SAVE) }
     },
     {
-      label: 'Save As',
+      label: 'Save As...',
       accelerator: 'CommandOrControl+Shift+S',
-      // enabled: false, // disabled for temporary
       click() { cmdHandler(Const.MENU_CMD_SAVE_AS) }
     },
     {
@@ -154,15 +153,6 @@ export default (cmdHandler, settings) => {
       }
     ]
   });
-  /* template.push({
-        label: '&Settings',
-        submenu: [
-            {
-                label: '&Global Settings',
-                click: function() { webContents.send('global-settings'); }
-            }
-        ]
-    }); */
   template.push({
     //label: 'Help',
     role: 'help',
@@ -170,6 +160,21 @@ export default (cmdHandler, settings) => {
       {
         label: 'Documentation',
         click() { cmdHandler(Const.MENU_CMD_HELP_SHOW_DOCS) }
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Get Community Help',
+        click() { cmdHandler(Const.MENU_CMD_HELP_COMMUNITY) }
+      },
+      {
+        label: 'Report an Issue',
+        click() { cmdHandler(Const.MENU_CMD_HELP_REPORT_ISSUE) }
+      },
+      {
+        label: 'Contribute',
+        click() { cmdHandler(Const.MENU_CMD_HELP_CONTRIBUTE) }
       },
       {
         type: 'separator'

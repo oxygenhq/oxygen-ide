@@ -109,6 +109,18 @@ export default class MenuService extends ServiceBase {
             electron.shell.openExternal('http://docs.oxygenhq.org');
             notify = false;
         }
+        else if (cmd === Const.MENU_CMD_HELP_COMMUNITY) {
+            electron.shell.openExternal('http://discuss.oxygenhq.org');
+            notify = false;
+        }
+        else if (cmd === Const.MENU_CMD_HELP_REPORT_ISSUE) {
+            electron.shell.openExternal('https://github.com/oxygenhq/oxygen-ide/issues');
+            notify = false;
+        }
+        else if (cmd === Const.MENU_CMD_HELP_CONTRIBUTE) {
+            electron.shell.openExternal('https://github.com/oxygenhq/oxygen/blob/master/CONTRIBUTE.md');
+            notify = false;
+        }
         else if (cmd === Const.MENU_CMD_HELP_SHOW_ABOUT) {
             var oxVersion = pkgNativeInfo.dependencies['oxygen-cli'];
             var details = 'Oxygen: ' + (oxVersion.startsWith('git') ? oxVersion.substring(oxVersion.length - 40) : oxVersion) + '\n' +
