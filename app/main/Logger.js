@@ -29,7 +29,7 @@ export default class Logger {
 
         var transFile = new (winston.transports.File)({
             filename: this.logFilePath,
-            maxSize: 1024*1024*5,
+            maxSize: 1024*1024*3,
             maxFiles: 10,
             prepend: true,
             colorize: false,
