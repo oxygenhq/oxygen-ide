@@ -76,14 +76,14 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 });
             })
             .catch((e) => {
-                console.error(e);
+                console.debug(e);
                 return self._delay(CHECK_INTERVAL).then(function() {
                     return self._getConnectedDevices();
                 });
             })
         })
         .catch((e) => {
-            console.error(e);
+            console.debug(e);
             return self._delay(CHECK_INTERVAL).then(function() {
                 return self._getConnectedDevices();
             });
