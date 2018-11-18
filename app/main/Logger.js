@@ -12,10 +12,20 @@ import { default as cleanStack } from 'clean-stack';
 import moment from 'moment';
 import util from 'util';
 import path from 'path';
+import fs from 'fs';
 
 export default class Logger {
     constructor(levelConsole, levelFile) {
-        this.logFilePath = path.join(app.getPath('logs'), 'oxygenide.log');
+        try {
+            this.logFilePath = path.join(app.getPath('logs'), 'oxygenide.log');
+        } catch (err) {
+            // getPath('logs') fails on linux
+            const logsPath = path.join(app.getPath('userData'), 'logs');
+            if (!fs.existsSync(logsPath)) {
+                fs.mkdirSync(logsPath);
+            }
+            this.logFilePath = path.join(logsPath, 'oxygenide.log');
+        }
 
         var transFile = new (winston.transports.File)({
             filename: this.logFilePath,
