@@ -138,7 +138,7 @@ export function* saveFileContentAs({ payload }) {
     const { path, content } = payload;
     try {
         if (!path || !content) {
-            console.error('Invalid arguments - saga: FS, method: saveFileContentAs.');
+            console.warn('Invalid arguments - saga: FS, method: saveFileContentAs.');
             return;
         }
         yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  content]);
@@ -154,7 +154,7 @@ export function* saveFileContentAs({ payload }) {
 export function* renameFileOrFolder({ payload }) {
     const { path, newName } = payload;
     if (!path || !newName) {
-        console.error('Invalid arguments - saga: FS, method: renameFileOrFolder.');
+        console.warn('Invalid arguments - saga: FS, method: renameFileOrFolder.');
         return;
     }
     try {
@@ -175,7 +175,7 @@ export function* renameFileOrFolder({ payload }) {
 export function* deleteFileOrFolder({ payload }) {
     const { path } = payload;
     if (!path) {
-        console.error('Invalid arguments - saga: FS, method: deleteFileOrFolder.');
+        console.warn('Invalid arguments - saga: FS, method: deleteFileOrFolder.');
         return;
     }
     try {
@@ -191,7 +191,7 @@ export function* deleteFileOrFolder({ payload }) {
 export function* createFolder({ payload }) {
     const { path, name } = payload;
     if (!path || !name) {
-        console.error('Invalid arguments - saga: FS, method: createFolder.');
+        console.warn('Invalid arguments - saga: FS, method: createFolder.');
         return;
     }
     try {
@@ -211,7 +211,7 @@ export function* createFolder({ payload }) {
 export function* createFile({ payload }) {
     const { path, name } = payload;
     if (!path || !name) {
-        console.error('Invalid arguments - saga: FS, method: createFile.');
+        console.warn('Invalid arguments - saga: FS, method: createFile.');
         return;
     }
     try {

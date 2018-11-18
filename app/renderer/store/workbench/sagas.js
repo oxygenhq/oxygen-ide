@@ -300,7 +300,7 @@ export function* createFolder({ payload }) {
 export function* deleteFile({ payload }) {
     const { path } = payload;
     if (!path) {
-        console.error('Invalid arguments - saga: Workbench, method: deleteFile.');
+        console.warn('Invalid arguments - saga: Workbench, method: deleteFile.');
         return;
     }
     yield put(fsActions.deleteFile(path));
@@ -581,7 +581,7 @@ export function* getOrFetchFileInfo(path) {
         fsActions.fetchFileInfo(path)
     );
     if (error || !response) {
-        console.error(`Cannot fetch file information: ${path}`, error);
+        console.warn(`Cannot fetch file information: ${path}`, error);
         return null;
     }
     return response;
