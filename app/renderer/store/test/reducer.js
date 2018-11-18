@@ -27,7 +27,7 @@ const defaultState = {
     seleniumPort: null,     // holds Selenium server port number
     iterations: 1,
     paramFilePath: null,
-    paramMode: 'sequencial',
+    paramMode: 'sequential',
   },
   browsers: [
     {
