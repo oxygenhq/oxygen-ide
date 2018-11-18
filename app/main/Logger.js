@@ -17,14 +17,14 @@ import fs from 'fs';
 export default class Logger {
     constructor(levelConsole, levelFile) {
         try {
-            this.logFilePath = path.join(app.getPath('logs'), 'oxygenide.log');
+            this.logFilePath = path.resolve(app.getPath('logs'), 'oxygenide.log');
         } catch (err) {
             // getPath('logs') fails on linux
             const logsPath = path.join(app.getPath('userData'), 'logs');
             if (!fs.existsSync(logsPath)) {
                 fs.mkdirSync(logsPath);
             }
-            this.logFilePath = path.join(logsPath, 'oxygenide.log');
+            this.logFilePath = path.resolve(logsPath, 'oxygenide.log');
         }
 
         var transFile = new (winston.transports.File)({
