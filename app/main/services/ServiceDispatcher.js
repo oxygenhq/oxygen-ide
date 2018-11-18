@@ -35,12 +35,12 @@ export default class ServiceDispatcher {
                 await service.dispose();
             }
             catch (e) { // ignore any dispose errors
-                console.error(`Error occured while disposing service: "${serviceKey}"`, e);
+                console.warn(`Error occured while disposing service: "${serviceKey}"`, e);
             }
         }
     }
 
-    _handleServiceCall(e, call) {        
+    _handleServiceCall(e, call) {
         const { service, method, args } = call;
 
         let serviceRef = this.servicesHash[service];

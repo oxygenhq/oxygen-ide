@@ -54,7 +54,7 @@ export default (cmdHandler, settings) => {
         try {
           app.quit();
         } catch (e) {
-          console.error(e.message);
+          console.warn(e.message);
         }
       }
     },

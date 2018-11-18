@@ -138,7 +138,7 @@ export function* saveFileContentAs({ payload }) {
     const { path, content } = payload;
     try {
         if (!path || !content) {
-            console.error('');
+            console.error('Invalid arguments - saga: FS, method: saveFileContentAs.');
             return;
         }
         yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  content]);
