@@ -194,6 +194,8 @@ export function* openFolder({ payload }) {
     yield put(wbActions.closeAllFiles(true));
     // clear all files from FS cache (just to free up some memory)
     yield put(fsActions.clearAllFiles());
+    // clear File Explorer tree
+    yield put(fsActions.clearTree());
     // then call File Explorer's treeOpenFolder method
     yield put(fsActions.treeOpenFolder(path));
     let action = yield take(successOrFailure(ActionTypes.FS_TREE_OPEN_FOLDER));

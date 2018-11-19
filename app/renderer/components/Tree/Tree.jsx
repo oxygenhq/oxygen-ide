@@ -177,7 +177,6 @@ class Tree extends React.Component {
 
     // ================== Tree Node ==================
     let treeNode = null;
-
     // Check if `treeData` or `children` changed and save into the state.
     if (needSync('treeData')) {
       treeNode = convertDataToTree(props.treeData);
@@ -199,7 +198,11 @@ class Tree extends React.Component {
     const keyEntities = newState.keyEntities || prevState.keyEntities;
 
     // ================ expandedKeys =================
-    if (needSync('expandedKeys') || (prevProps && needSync('autoExpandParent'))) {
+    // FIXED BY ndimer - make sure to clear expandedKeys if treeNode is empty
+    if (Array.isArray(treeNode) && treeNode.length == 0) {
+      newState.expandedKeys = [];
+    }
+    else if (needSync('expandedKeys') || (prevProps && needSync('autoExpandParent'))) {
       newState.expandedKeys = (props.autoExpandParent || (!prevProps && props.defaultExpandParent)) ?
         conductExpandParent(props.expandedKeys, keyEntities) : props.expandedKeys;
     } else if (!prevProps && props.defaultExpandAll) {
@@ -211,7 +214,10 @@ class Tree extends React.Component {
 
     // ================ selectedKeys =================
     if (props.selectable) {
-      if (needSync('selectedKeys')) {
+      if (Array.isArray(treeNode) && treeNode.length == 0) {
+        newState.selectedKeys = [];
+      }
+      else if (needSync('selectedKeys')) {
         newState.selectedKeys = calcSelectedKeys(props.selectedKeys, props);
       } else if (!prevProps && props.defaultSelectedKeys) {
         newState.selectedKeys = calcSelectedKeys(props.defaultSelectedKeys, props);
@@ -222,7 +228,10 @@ class Tree extends React.Component {
     if (props.checkable) {
       let checkedKeyEntity;
 
-      if (needSync('checkedKeys')) {
+      if (Array.isArray(treeNode) && treeNode.length == 0) {
+        checkedKeyEntity = null;
+      }
+      else if (needSync('checkedKeys')) {
         checkedKeyEntity = parseCheckedKeys(props.checkedKeys) || {};
       } else if (!prevProps && props.defaultCheckedKeys) {
         checkedKeyEntity = parseCheckedKeys(props.defaultCheckedKeys) || {};
@@ -248,10 +257,12 @@ class Tree extends React.Component {
       }
     }
     // ================= loadedKeys ==================
-    if (needSync('loadedKeys')) {
+    if (Array.isArray(treeNode) && treeNode.length == 0) {
+      newState.loadedKeys = [];
+    }
+    else if (needSync('loadedKeys')) {
       newState.loadedKeys = props.loadedKeys;
     }
-
     return newState;
   }
 

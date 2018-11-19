@@ -248,3 +248,9 @@ export const clearAllFiles = () => ({
   type: TYPES.FS_CLEAR_ALL_FILES,
   payload: null,
 });
+
+/* clearTree */
+export const clearTree = () => ({
+  type: TYPES.FS_TREE_CLEAR,
+  payload: null,
+});

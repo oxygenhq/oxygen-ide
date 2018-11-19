@@ -296,6 +296,16 @@ export default (state = defaultState, action, dispatch) => {
         files: {},  // reset files cache
       };
 
+    // TREE_CLEAR
+    case ActionTypes.FS_TREE_CLEAR:
+    return {
+      ...state,
+      tree: {     // reset File Explorer tree
+        data: null,
+        activeNode: null,
+      },
+    };
+
     // SAVE_FILE_SUCCESS
     case success(ActionTypes.FS_SAVE_FILE):
     // SAVE_FILE__AS_SUCCESS
