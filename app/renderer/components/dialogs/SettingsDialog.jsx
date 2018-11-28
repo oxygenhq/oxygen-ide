@@ -140,7 +140,7 @@ class SettingsDialog extends PureComponent<Props> {
           border: 'none',
           background: 'transparent',
           outline: 'none',
-          cursor: 'poiter'
+          cursor: 'pointer'
         }}
         onClick={ ::this.onBrowseFile }
       >Browse...
