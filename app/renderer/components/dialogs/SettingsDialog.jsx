@@ -156,7 +156,7 @@ class SettingsDialog extends PureComponent<Props> {
         visible={visible}
         onOk={this.handleOk.bind(this)}
         onCancel={onCancel}
-        bodyStyle={ { overflow: 'hidden', overflowY: 'scroll', height: '350px' } }
+        bodyStyle={ { overflow: 'hidden', overflowY: 'hidden', height: '425px' } }
       >
           <Form>
             <Form.Item label="Iterations" {...formItemLayout} >
