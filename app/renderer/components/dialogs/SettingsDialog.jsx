@@ -74,7 +74,11 @@ class SettingsDialog extends PureComponent<Props> {
   }
 
   async onBrowseFile() {
-    const paths = await services.mainIpc.call('ElectronService', 'showOpenFileDialog');
+    const paths = await services.mainIpc.call('ElectronService', 'showOpenFileDialog', [[
+      {name: 'Excel Files', extensions: ['xlsx']},
+      {name: 'Text Files', extensions: ['csv', 'txt']},
+      {name: 'All Files', extensions: ['*']}
+    ]]);
     if (Array.isArray(paths) && paths.length > 0) {
       this.props.form.setFieldsValue({
         paramFilePath: paths[0]

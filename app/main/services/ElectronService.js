@@ -44,7 +44,7 @@ export default class ElectronService extends ServiceBase {
             );
         });
     }
-    showOpenDialog(dialogType = 'openFile', multiSelections = false) {
+    showOpenDialog(dialogType = 'openFile', multiSelections = false, filters = null) {
         return new Promise((resolve, reject) => {
             dialog.showOpenDialog(this.mainWindow, 
                 {
@@ -52,14 +52,15 @@ export default class ElectronService extends ServiceBase {
                         dialogType,
                         multiSelections ? 'multiSelections' : null,
                     ],
-                }, 
+                    filters: filters
+                },
                 (selectedPaths) => resolve(selectedPaths)
             );
         });
     }
 
-    showOpenFileDialog() {
-        return this.showOpenDialog('openFile', true);
+    showOpenFileDialog(filters = null) {
+        return this.showOpenDialog('openFile', true, filters);
     }
 
     showOpenFolderDialog() {
@@ -73,5 +74,4 @@ export default class ElectronService extends ServiceBase {
     shellOpenExternal(url, options = null) {
         electron.shell.openExternal(url, options);
     }
-    
 }
