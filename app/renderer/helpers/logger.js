@@ -21,6 +21,11 @@ export default function loggerSetup() {
     log.debug = (...args) => { prefix(args); return _log.debug.apply(log, args); }
 
     process.on('uncaughtException', error => {
+        // ignore Monaco Editor error related to jsonMode.js
+        if (error.message && error.name && error.name === 'ReferenceError' && error.message === 'exports is not defined') {
+            console.warn(`Ignoring error: ${error.name}: ${error.message}`);
+            return;
+        }
         log.error('Unhandled Error.', util.inspect(error));
     });
 
