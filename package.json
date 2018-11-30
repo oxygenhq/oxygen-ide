@@ -24,6 +24,7 @@
     "test": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./internals/scripts/RunTests.js",
     "test1": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./node_modules/.bin/jest test/main/services/",
     "test2": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./app/main/test.js",
+    "test-renderer-store": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./node_modules/.bin/jest test/unit/renderer/store/",
     "test-all": "npm run lint && npm run flow && npm run build && npm run test && npm run test-e2e",
     "test-e2e": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./internals/scripts/RunTests.js e2e",
     "test-watch": "npm test -- --watch"
@@ -44,8 +45,8 @@
   "homepage": "https://github.com/oxygenhq/oxygen-ide",
   "jest": {
     "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
-      "\\.(css|less|sass|scss)$": "identity-obj-proxy"
+      "\\.(css|less)$": "identity-obj-proxy",
+      "electron": "<rootDir>/test/__mocks__/electron.js"
     },
     "moduleFileExtensions": [
       "js"
@@ -55,11 +56,18 @@
       "app/node_modules"
     ],
     "transform": {
+      "^.+\\.jsx$": "babel-jest",
       "^.+\\.js$": "babel-jest"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(antd)/)"
+    ],
     "setupFiles": [
       "./internals/scripts/CheckBuiltsExist.js"
-    ]
+    ],
+    "testURL": "file:/",
+    "verbose": true,
+    "useStderr": true
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -113,6 +121,7 @@
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-compress": "^1.4.3",
     "grunt-contrib-copy": "^1.0.0",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^22.1.4",
     "mini-css-extract-plugin": "^0.4.3",
     "modclean": "^2.1.2",

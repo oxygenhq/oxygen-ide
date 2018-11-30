@@ -25,6 +25,13 @@
           "annotate": true
         }]
       ]
+    },
+    "test": {
+      "plugins": [
+        "transform-class-properties",
+        "transform-es2015-classes"
+      ],
+      "presets": ["react"]
     }
   }
 }
