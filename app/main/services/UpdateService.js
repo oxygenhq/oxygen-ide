@@ -72,7 +72,7 @@ export default class UpdateService extends ServiceBase {
                 }
             } else {
                 const errMsg = response && response.message ? response.message : (response && response.Error ? response.Error : '');
-                console.warn(`Failure checking for updates: ${errMsg}`);
+                console.info(`Failure checking for updates: ${errMsg}`);
             }
         });
 
