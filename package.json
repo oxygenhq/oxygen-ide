@@ -16,6 +16,7 @@
     "lint-fix": "npm run lint -- --fix",
     "lint-styles": "stylelint app/*.css app/components/*.css --syntax scss",
     "lint-styles-fix": "stylefmt -r app/*.css app/components/*.css",
+    "package": "npm install && npm run build && grunt",
     "postinstall": "node -r babel-register internals/scripts/CheckNativeDep.js && npm run flow-typed && npm run build-dll && node node_modules/fbjs-scripts/node/check-dev-engines.js package.json && cd app && npm install",
     "prestart": "npm run build",
     "start": "cross-env process.env._TESTING=1 NODE_ENV=production electron ./app/",
