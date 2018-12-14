@@ -22,6 +22,7 @@ import * as testActions from '../test/actions';
 import * as dialogActions from '../dialog/actions';
 import * as recorderActions from '../recorder/actions';
 import * as settingsActions from '../settings/actions';
+import * as orActions from '../obj-repo/actions';
 
 import { success, failure, successOrFailure } from '../../helpers/redux';
 
@@ -247,6 +248,14 @@ export function* openFile({ payload }) {
         yield put(wbActions._openFile_Failure(path, { message: 'File type is not supported.' }));
         return;
     }
+    // check if this is an object repository file and handle it separately
+    if (file.name.endsWith('.repo.js') || file.name.endsWith('.repo.json')) {
+        yield openObjectRepositoryFile(file);
+        yield put(wbActions._openFile_Success(path));
+        return;
+    }
+    // if we are here, it means we are trying to open a regular file (not object repository)
+
     // add new tab or make the existing one active
     yield put(tabActions.addTab(path, file.name));
     yield put(tabActions.setActiveTab(path));
@@ -263,6 +272,12 @@ export function* openFile({ payload }) {
         yield put(testActions.setMainFile(path));
         yield put(wbActions._openFile_Success(path));
     }
+}
+
+export function* openObjectRepositoryFile(file) {
+    yield put(orActions.openFile(file.path));
+    yield put(settingsActions.setSidebarComponent('right', 'obj-repo'));
+    yield put(settingsActions.setSidebarVisible('right', true));
 }
 
 export function* renameFile({ payload }) {

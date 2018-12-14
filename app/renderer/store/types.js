@@ -17,6 +17,7 @@ import * as TEST_TYPES from './test/types';
 import * as LOG_TYPES from './logger/types';
 import * as DIALOG_TYPES from './dialog/types';
 import * as RECORDER_TYPES from './recorder/types';
+import * as OR_TYPES from './obj-repo/types';
 
 export default {
     ...FS_TYPES,
@@ -27,6 +28,7 @@ export default {
     ...LOG_TYPES,
     ...DIALOG_TYPES,
     ...RECORDER_TYPES,
+    ...OR_TYPES,
 };
 
 

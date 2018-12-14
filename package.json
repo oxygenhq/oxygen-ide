@@ -143,6 +143,8 @@
     "webpack-merge": "^4.1.1"
   },
   "dependencies": {
+    "@emotion/core": "^10.0.5",
+    "@emotion/styled": "^10.0.5",
     "antd": "^3.4.1",
     "appium-adb": "^6.25.0",
     "clean-stack": "^2.0.0",

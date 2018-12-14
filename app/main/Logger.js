@@ -135,9 +135,9 @@ export default class Logger {
         this.warn = (...args) => {
             prepError(args);
             const ret = _log.warn.apply(this, args);
-            if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+            /*if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
                 showDialog(args[0], args.length === 2 ? args[1] : '', 'warning');
-            }
+            }*/
             return ret;
         }
     }

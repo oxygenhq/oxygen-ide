@@ -19,6 +19,7 @@ import logger from './logger/reducer';
 import dialog from './dialog/reducer';
 import wb from './workbench/reducer';
 import recorder from './recorder/reducer';
+import objrepo from './obj-repo/reducer';
 
 const rootReducer = combineReducers({
   router,
@@ -32,6 +33,7 @@ const rootReducer = combineReducers({
   dialog,
   wb,
   recorder,
+  objrepo,
 });
 
 export default rootReducer;

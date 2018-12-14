@@ -25,6 +25,7 @@ import Toolbar from '../../components/Toolbar';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import Settings from '../Settings';
+import ObjectRepository from '../ObjectRepository';
 import * as Controls from '../../components/Toolbar/controls';
 // Styles
 import '../../css/common.scss';
@@ -152,7 +153,8 @@ export default class Workbench extends Component<Props> {
   }
 
   getToolbarControlsState() {
-    const { test, isRecording, settings } = this.props;
+    const { test, isRecording, settings, dialog } = this.props;
+    const settingsDialogVisible = dialog.DIALOG_SETTINGS.visible;
     return {
       [Controls.TEST_RUN]: {
         visible: !test.isRunning,
@@ -168,7 +170,7 @@ export default class Workbench extends Component<Props> {
         selected: isRecording,
       },
       [Controls.TEST_SETTINGS]: {
-        selected: settings.sidebars.right.visible,
+        selected: settingsDialogVisible,
       },
     };
   }
@@ -243,6 +245,8 @@ export default class Workbench extends Component<Props> {
     const leftSidebarVisible = settings.sidebars.left.visible;
     const rightSidebarSize = settings.sidebars.right.size;
     const rightSidebarVisible = settings.sidebars.right.visible;
+    const rightSidebarComponent = settings.sidebars.right.component;
+    // logger state
     const loggerVisible = settings.logger.visible;
 
     return (
@@ -331,7 +335,8 @@ export default class Workbench extends Component<Props> {
                 visible={ rightSidebarVisible } 
                 onResize={ (size) => ::this.handleSidebarResize('right', size) }
               >
-                <Settings />
+                { rightSidebarComponent === 'settings' && <Settings /> } 
+                { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
               </Sidebar>
             </Layout>
           </Col>
