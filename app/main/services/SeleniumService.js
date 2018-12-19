@@ -84,7 +84,7 @@ export default class SeleniumService extends ServiceBase {
             try {
                 cp.execSync(`wmic process where "CommandLine like '%java%%-jar -Dwebdriver.ie.driver=${pltfm}/IEDriverServer_x86.exe -Dwebdriver.gecko.driver=${pltfm}/geckodriver.exe -Dwebdriver.chrome.driver=${pltfm}/chromedriver.exe ${selSettings.jar} -port%'" Call Terminate`, { stdio: 'pipe' });
             } catch (e) {
-                console.error('Failed to kill selenium: ' + e);
+                console.warn('Failed to kill selenium: ' + e);
             }
         } else {
           try {
