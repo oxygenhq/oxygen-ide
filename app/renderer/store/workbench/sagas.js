@@ -160,7 +160,7 @@ export function* initialize({ payload }) {
     }
     // if last session includes previously open tabs, reopen tabs for files which still exist 
     if (allSettings && allSettings.lastSession && allSettings.lastSession.tabs) {
-        for (let tab of allSettings.lastSession.tabs) {
+        for (let tab of allSettings.lastSession.tabs) {            
             yield put(tabActions.addTab(tab.key, tab.title));
             const { error } = yield putAndTake(
                 editorActions.openFile(tab.key)
@@ -169,7 +169,7 @@ export function* initialize({ payload }) {
             if (error) {
                 yield put(tabActions.removeTab(tab.key));
             }
-            else {
+            else {                
                 yield put(testActions.setMainFile(tab.key));
             }
         }
@@ -197,10 +197,11 @@ export function* openFolder({ payload }) {
     // clear File Explorer tree
     yield put(fsActions.clearTree());
     // then call File Explorer's treeOpenFolder method
-    yield put(fsActions.treeOpenFolder(path));
-    let action = yield take(successOrFailure(ActionTypes.FS_TREE_OPEN_FOLDER));
-    if (action.type === failure(ActionTypes.FS_TREE_OPEN_FOLDER)) {
-        yield put(failure(ActionTypes.WB_OPEN_FOLDER));
+    const { error } = yield putAndTake(
+        fsActions.treeOpenFolder(path)
+    );
+    if (error) {
+        yield put(wbActions._openFile_Failure(path, error));
         return;
     }
     // store new root folder in the App Settings
@@ -209,9 +210,7 @@ export function* openFolder({ payload }) {
     // persiste settings in the Electron store
     yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
     // report success
-    yield put({
-        type: success(ActionTypes.WB_OPEN_FOLDER),
-    });
+    yield put(wbActions._openFile_Success(path));
 }
 
 export function* changeTab({ payload }) {

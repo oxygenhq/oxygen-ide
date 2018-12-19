@@ -49,7 +49,7 @@ export default (state = defaultState, action, dispatch) => {
         isLoading: false,
       };
     case failure(ActionTypes.FS_TREE_OPEN_FOLDER):
-      message.error(`Error occured while loading File Explorer tree: ${error}`);
+      message.error(`Error occured while opening a folder '${path}': ${error}`);
       return { 
         ...state, 
         rootPath: null,

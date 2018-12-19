@@ -54,7 +54,13 @@ export function* treeLoadNodeChildren({ payload }) {
 
 export function* treeOpenFolder({ payload }) {
     const { path } = payload;
-    yield _fetchFolderContent(path);
+    try {
+        yield _fetchFolderContent(path);
+    }
+    catch (e) {
+        yield put(fsActions._treeOpenFolder_Failure(path, e.message));
+        return;    
+    }
     const folder = yield select(state => state.fs.files[path]);  
     yield put(fsActions._treeOpenFolder_Success(path, folder.children));
 }
