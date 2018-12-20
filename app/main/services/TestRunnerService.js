@@ -152,12 +152,17 @@ export default class TestRunnerService extends ServiceBase {
 
     async stop() {
         if (this.oxRunner) {
-            await this.oxRunner.kill();
-            await this.oxRunner.dispose();
+            try {
+                await this.oxRunner.kill();
+                await this.oxRunner.dispose();
+            }
+            catch (e) {
+                // ignore any errors
+            }            
             this.oxRunner = null;
             this.isRunning = false;
             this.mainFilePath = null;
-            this._emitLogEvent(SEVERITY_INFO, 'Finished with status --> CANCELED');
+            this._emitLogEvent(SEVERITY_INFO, 'Test finished with status --> CANCELED');
         }
     }
 
@@ -258,8 +263,11 @@ export default class TestRunnerService extends ServiceBase {
         });
 
         this.oxRunner.on('iteration-end', (result) => {
+            if (result.hasOwnProperty('killed') && result.killed == true) {
+                return;
+            }
             const status = result.status ? result.status.toUpperCase() : 'UNKOWN';
-            this._emitLogEvent(SEVERITY_INFO, `Finished with status --> ${status}`);
+            this._emitLogEvent(SEVERITY_INFO, `Test finished with status --> ${status}`);
         });
     }
     /**
