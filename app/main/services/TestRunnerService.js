@@ -27,6 +27,7 @@ const SEVERITY_INFO = 'INFO';
 
 export default class TestRunnerService extends ServiceBase {
     isRunning = false;
+    isStopping = false;
     oxRunner = null;
     mainFilePath = null;
 
@@ -38,11 +39,12 @@ export default class TestRunnerService extends ServiceBase {
      * @param  {Object} toolbarState | toolbar buttons params
      * @param  {Object} mainWindow | renderer window
      */
-    start(mainFilePath, breakpoints, runtimeSettings) {
+    async start(mainFilePath, breakpoints, runtimeSettings) {
         if (this.oxRunner) {
             throw Error('Previous test is still running. Stop the previous test before calling "start" method.');
         }
         this.isRunning = true;
+        this.isStopping = false;
         this.oxRunner = new Runner();
         this._hookToOxygenEvents();
         // store mainFilePath for later, so when we receive LINE_UPDATE event from Oxygen, 
@@ -54,104 +56,102 @@ export default class TestRunnerService extends ServiceBase {
             ...runtimeSettings,             // selenium port can also come from runtime setttings (over)
         };
         const {
-            paramFilePath, paramMode
+            paramFilePath, 
+            paramMode,
+            iterations,
+            reopenSession,
+            dbgPort,
+            testMode,
+            testTarget,
+            seleniumPort,
+            stepDelay,
         } = testConfig;
+        let testsuite = null;
 
-        oxutil.generateTestSuiteFromJSFile(mainFilePath, paramFilePath, paramMode)
-        .then((testsuite) => {
-            const {
-                iterations,
-                reopenSession,
-                dbgPort,
-                testMode,
-                testTarget,
-                seleniumPort,
-                stepDelay,
-            } = testConfig;
-
-            testsuite.testcases[0].iterationCount = iterations;
-
-            // prepare launch options
-            const options = {};
-            options.debugPort = dbgPort;
-            options.debugPortIde = dbgPort;
-            options.require = {
-              allow: true,
-              allowGlobal: true
+        try {
+            testsuite = await oxutil.generateTestSuiteFromJSFile(mainFilePath, paramFilePath, paramMode);
+        }
+        catch (e) {
+            this._emitLogEvent(SEVERITY_ERROR, `Cannot generate test suite from JS file: ${e.message}`);
+            return;
+        }
+        // set iterations count
+        testsuite.testcases[0].iterationCount = iterations;
+        // prepare launch options
+        const options = {};
+        options.debugPort = dbgPort;
+        options.debugPortIde = dbgPort;
+        options.require = {
+            allow: true,
+            allowGlobal: true
+        };
+        options.reopenSession = reopenSession || false;
+        
+        // prepare module parameters
+        const caps = {};
+        if (testMode === 'resp') {
+            options.mode = 'web';
+            caps.browserName = 'chrome';
+            caps.version = '*';
+            caps['goog:chromeOptions'] = {
+                mobileEmulation: {
+                deviceName: testTarget
+                }
             };
-            options.reopenSession = reopenSession || false;
-            
-            // prepare module parameters
-            const caps = {};
-            if (testMode === 'resp') {
-                options.mode = 'web';
-                caps.browserName = 'chrome';
-                caps.version = '*';
-                caps['goog:chromeOptions'] = {
-                    mobileEmulation: {
-                    deviceName: testTarget
-                    }
-                };
-            }
-            else if (testMode === 'mob') {
-                options.mode = 'mob';
-                caps.deviceName = testTarget;
-                caps.deviceOS = 'Android';
-            }
-            else if (testMode === 'web') {
-                options.mode = 'web';
-                options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
-                options.browserName = testTarget;
-                // @FIXME: this option should be exposed in reports settings
-                options.screenshots = 'never';
-            }
+        }
+        else if (testMode === 'mob') {
+            options.mode = 'mob';
+            caps.deviceName = testTarget;
+            caps.deviceOS = 'Android';
+        }
+        else if (testMode === 'web') {
+            options.mode = 'web';
+            options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
+            options.browserName = testTarget;
+            // @FIXME: this option should be exposed in reports settings
+            options.screenshots = 'never';
+        }
 
-            if (stepDelay) {
-                options.delay = stepDelay;
-            }
-            
-            try {
-                this._emitLogEvent(SEVERITY_INFO, 'Initializing...');
+        if (stepDelay) {
+            options.delay = stepDelay;
+        }
+        
+        try {
+            this._emitLogEvent(SEVERITY_INFO, 'Initializing...');
 
-                this.oxRunner
-                .init(options)
-                .then(() => {
-                    this._emitTestStarted();    
-                    // assign user-set breakpoints
-                    testsuite.testcases[0].breakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
-                    return this.oxRunner.run(testsuite, null, caps);
-                })
-                .then((tr) => { 
-                    // eslint-disable-line
-                    this._emitTestEnded(tr);                        
-                    // @TODO: update UI elements
-                    return this.dispose();
-                })
-                .catch((e) => {
-                    if (e.line) {
-                        this._emitLogEvent(SEVERITY_ERROR, `${e.message} at line ${e.line}`);
-                    } else {
-                        this._emitLogEvent(SEVERITY_ERROR, `ERROR: ${e.message}. ${e.stack || ''}`);
-                    }
-                    this._emitLogEvent(SEVERITY_FATAL, 'Test Failed!');
-                    this._emitTestEnded(null, e);
-                    return this.dispose();
-                });
-            } catch (e) {
+            await this.oxRunner.init(options);
+            this._emitTestStarted();    
+            // assign user-set breakpoints
+            testsuite.testcases[0].breakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
+            return this.oxRunner.run(testsuite, null, caps).then((result) => {
+                // eslint-disable-line
+                this._emitTestEnded(result);                        
+                // @TODO: update UI elements
+                return this.dispose();
+            })
+            .catch((e) => {
+                if (e.line) {
+                    this._emitLogEvent(SEVERITY_ERROR, `${e.message} at line ${e.line}`);
+                } else {
+                    this._emitLogEvent(SEVERITY_ERROR, `ERROR: ${e.message}. ${e.stack || ''}`);
+                }
+                this._emitLogEvent(SEVERITY_FATAL, 'Test Failed!');
+                this._emitTestEnded(null, e);
+                return this.dispose();
+            });
+        } catch (e) {
+            // the error at .init stage can be cause by parallel call to .kill() method
+            // make sure in case we are in the middle of stopping the test to ignore any error at this stage
+            if (!this.isStopping) {
                 this._emitLogEvent(SEVERITY_ERROR, 'Test Failed!');
                 return this.dispose();
-            }
-
-            return true;
-        })
-        .catch((err) => {
-            this._emitLogEvent(SEVERITY_ERROR, `Test Suite Error: Cant run init ${err}`);
-            return this.dispose();
-        });
+            }            
+        }
     }
 
     async stop() {
         if (this.oxRunner) {
+            this.isStopping = true;
             try {
                 await this.oxRunner.kill();
                 await this.oxRunner.dispose();
@@ -263,9 +263,6 @@ export default class TestRunnerService extends ServiceBase {
         });
 
         this.oxRunner.on('iteration-end', (result) => {
-            if (result.hasOwnProperty('killed') && result.killed == true) {
-                return;
-            }
             const status = result.status ? result.status.toUpperCase() : 'UNKOWN';
             this._emitLogEvent(SEVERITY_INFO, `Test finished with status --> ${status}`);
         });
