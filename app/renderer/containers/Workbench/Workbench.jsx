@@ -8,7 +8,7 @@
  */
 // @flow
 import React, { Component, Fragment } from 'react';
-import { Modal, Layout, Icon, Row, Col, Tooltip } from 'antd';
+import { Modal, Layout, Icon, Row, Col, Tooltip, message } from 'antd';
 /* eslint-disable react/no-did-update-set-state */
 import updateModals from '../../components/updateModals';
 // Dialogs
@@ -35,6 +35,11 @@ const { Header } = Layout;
 type Props = {
   settings: Object,
 };
+
+// set global message position
+message.config({
+  top: 65
+});
 
 export default class Workbench extends Component<Props> {
   props: Props;
