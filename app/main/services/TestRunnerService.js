@@ -157,6 +157,7 @@ export default class TestRunnerService extends ServiceBase {
             this.oxRunner = null;
             this.isRunning = false;
             this.mainFilePath = null;
+            this._emitLogEvent(SEVERITY_INFO, 'Finished with status --> CANCELED');
         }
     }
 
