@@ -39,7 +39,7 @@ export function addBreakpointMarker(editor, line) {
     const columnNum = editor.getModel().getLineFirstNonWhitespaceColumn(line);
     const newset = editor.deltaDecorations(
       [], [{
-        range: new monaco.Range(line, columnNum, line, columnNum + 1),
+        range: new monaco.Range(line, columnNum, line, columnNum),
         options: {
           isWholeLine: true,
           className: 'myContentClass',
@@ -104,8 +104,7 @@ export function updateActiveLine(editor, line) {
         options: {
           isWholeLine: true,
           className: 'myContentClass',
-          linesDecorationsClassName: 'currentLineDecoratorStyle',
-          someCustomProp: true,
+          linesDecorationsClassName: 'currentLineDecoratorStyle'
         }
     } : null;
     // build new decorators array, excluding the previous active line marker and including the new one with the update line number
