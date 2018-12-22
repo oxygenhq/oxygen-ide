@@ -36,7 +36,10 @@ export default class UserHintsService {
     }
 
     *_analyzeTestRunnerLogs(message, severity) {
-        if (message.indexOf('ECONNREFUSED') > -1 && message.indexOf('RuntimeError') > -1) {
+        if (
+            (message.indexOf('ECONNREFUSED') > -1 && message.indexOf('RuntimeError') > -1)
+            || message.indexOf('APPIUM_UNREACHABLE_ERROR') > -1
+        ) {
             // get test mode 
             const testMode = yield select(state => state.test.runtimeSettings.testMode);
             if (testMode && testMode === 'mob') {
