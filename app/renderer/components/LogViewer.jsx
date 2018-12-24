@@ -41,7 +41,9 @@ export default class LogViewer extends PureComponent<Props> {
                             }}
                         >
                             { lines.map((line, index) => 
-                                <Fragment key={ `log-${category}-line-${index}`}><span>{line}</span><br/></Fragment>
+                                <Fragment key={ `log-${category}-line-${index}`}>
+                                    <pre style={{marginBottom:'0px',whiteSpace:'pre-wrap'}}>{line}</pre>
+                                </Fragment>
                             )}
                         </div>
                     )}
