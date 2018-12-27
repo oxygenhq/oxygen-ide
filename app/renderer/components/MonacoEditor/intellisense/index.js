@@ -10,8 +10,6 @@ import docs from './doc';
 
 const intellisenseJson = docs.init();
 
-// console.log(intellisenseJson);
-
 const createModuleAndMethods = (jsonData) => { // eslint-disable-line
   let methodArr = [];
   if (Object.keys(jsonData).length === 0) {
@@ -44,7 +42,7 @@ const createModuleAndMethods = (jsonData) => { // eslint-disable-line
           paramsInBrackets = `${paramsInBrackets} ${param.name} `;
           paramsDescription = [
             ...paramsDescription,
-            `@param  {${param.type}} [${param.name}] ${param.description}`
+            `@param  {${param.type}} **${param.name}** ${param.description}`
           ];
         });
       }
@@ -52,10 +50,10 @@ const createModuleAndMethods = (jsonData) => { // eslint-disable-line
       methodArr = [
         ...methodArr,
         '/**',
-        mDescription ? ` * ${mDescription}` : '',
-        mSummary ? ` * Summary ${mSummary}` : '',
-        mReturn ? ` * @return ${mReturn}` : '',
+        mSummary ? ` * ${mSummary}` : '',
+        mDescription ? ` * @description ${mDescription}` : '',
         ...paramsDescription,
+        mReturn ? ` * @return ${mReturn}` : '',
         ' */',
         `function ${mName}(${paramsInBrackets}){}`,
       ];
@@ -89,4 +87,3 @@ export default function () {
     // , 'filename/webfunc.d.ts'
   );
 }
-
