@@ -37,35 +37,29 @@ export function addBreakpointMarker(editor, line) {
       return false;
     }
     const columnNum = editor.getModel().getLineFirstNonWhitespaceColumn(line);
-    const newset = editor.deltaDecorations(
-      [], [{
+    const newDecorators = [{
         range: new monaco.Range(line, columnNum, line, columnNum),
         options: {
           isWholeLine: true,
           className: 'myContentClass',
           linesDecorationsClassName: 'breakpointStyle',
-          stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+          stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
         }
-      }]);
-    return newset;
+    }];
+
+    return editor.deltaDecorations([], newDecorators);
 }
 
 export function removeBreakpointMarker(editor, lineOrMarker) {
-    const allMarkers = getAllMarkers(editor);
     // lineOrMarker parameter can either be a line number (integer) or a reference to decorator object
     const markerToRemove = (typeof lineOrMarker === 'object') ? lineOrMarker : getBreakpointMarker(editor, lineOrMarker);
     // if breakpoint marker wasn't found at the provided line, then return null
     if (!markerToRemove) {
         return null;
     }
-    const remainingMarkers = allMarkers.filter(marker => marker.id !== markerToRemove.id);
-    return editor.deltaDecorations(
-      //allMarkers, remainingMarkers
-      decoratorsToFlat(allMarkers), remainingMarkers
-    );
-    return retval;
-}
 
+    return editor.deltaDecorations([markerToRemove.id], []);
+}
 
 export function getBreakpointMarker(editor, line) {
     let firstMatch = getAllMarkers(editor).find((marker) => {
@@ -98,7 +92,7 @@ export function breakpointMarkersToLineNumbers(editor) {
 }
 
 export function updateActiveLine(editor, line) {
-    // line value can be null, if we want to remove the active cursor completely - handle this accordingly
+    // line value can be null, if we want to remove the active cursor completely
     const updatedLineDecorator = Number.isInteger(line) ? {
         range: new monaco.Range(line, 1, line, 1),
         options: {
@@ -107,17 +101,17 @@ export function updateActiveLine(editor, line) {
           linesDecorationsClassName: 'currentLineDecoratorStyle'
         }
     } : null;
-    // build new decorators array, excluding the previous active line marker and including the new one with the update line number
+
     const allMarkers = getAllMarkers(editor);
-    const newDecoratorsArray = [
-        ...allMarkers.filter((item) => item.options.linesDecorationsClassName !== 'currentLineDecoratorStyle'),
+    
+    const decoratorsToRemove = [
+        ...allMarkers.filter((item) => item.options.linesDecorationsClassName === 'currentLineDecoratorStyle'),
     ];
+
+    const newDecorators = [];
     if (updatedLineDecorator) {
-        newDecoratorsArray.push(updatedLineDecorator);
+        newDecorators.push(updatedLineDecorator);
     }
-    // call Monaco to update the decorators
-    editor.deltaDecorations(
-        decoratorsToFlat(allMarkers),
-        newDecoratorsArray
-    );
+
+    editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
 }
