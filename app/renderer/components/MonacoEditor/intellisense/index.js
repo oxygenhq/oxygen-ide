@@ -23,7 +23,7 @@ const createModuleAndMethods = (jsonData) => { // eslint-disable-line
     methodArr = [
       ...methodArr,
       '/**',
-      `* ${theEntity.description.replace(/<\/?[^>]+(>|$)/g, '')}`,
+      `* ${theEntity.description}`,
       '*/',
       `declare var ${item} = (function(){`,
     ];
@@ -39,12 +39,15 @@ const createModuleAndMethods = (jsonData) => { // eslint-disable-line
       let paramsDescription = [];
       if (mParams.length > 0) {
         mParams.forEach((param) => {
-          paramsInBrackets = `${paramsInBrackets} ${param.name} `;
+          paramsInBrackets += `, ${param.name}: ${param.type}`;
           paramsDescription = [
             ...paramsDescription,
-            `@param  {${param.type}} **${param.name}** ${param.description}`
+            `@param  **${param.name}** ${param.description}`
           ];
         });
+        if (paramsInBrackets.length > 1) {
+          paramsInBrackets = paramsInBrackets.substring(2);
+        }
       }
 
       methodArr = [
@@ -53,9 +56,9 @@ const createModuleAndMethods = (jsonData) => { // eslint-disable-line
         mSummary ? ` * ${mSummary}` : '',
         mDescription ? ` * @description ${mDescription}` : '',
         ...paramsDescription,
-        mReturn ? ` * @return ${mReturn}` : '',
+        mReturn ? ` * @return ${mReturn.description}` : '',
         ' */',
-        `function ${mName}(${paramsInBrackets}){}`,
+        `declare function ${mName}(${paramsInBrackets}): ` + (mReturn ? mReturn.type : 'void') + ';',
       ];
     });
 
@@ -82,8 +85,5 @@ const createModuleAndMethods = (jsonData) => { // eslint-disable-line
 const arrdata = createModuleAndMethods(intellisenseJson);
 
 export default function () {
-  monaco.languages.typescript.javascriptDefaults.addExtraLib(
-    arrdata.join('\n'),
-    // , 'filename/webfunc.d.ts'
-  );
+  monaco.languages.typescript.javascriptDefaults.addExtraLib(arrdata.join('\n'));
 }
