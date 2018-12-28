@@ -12,6 +12,7 @@ import React from 'react';
 import path from 'path';
 
 import oxygenIntellisense from './intellisense';
+import { language as jsTokenizer } from './tokenizers/javascript'; 
 import * as helpers from './helpers';
 import onDidChangeModelContent from './onDidChangeModelContent';
 import onDidChangeCursorSelection from './onDidChangeCursorSelection';
@@ -44,6 +45,7 @@ const MONACO_DEFAULT_OPTIONS = {
   minimap: {
 		enabled: false,
 	},
+  theme: 'oxygen-theme'
 };
 
 export default class MonacoEditor extends React.Component {
@@ -173,6 +175,24 @@ export default class MonacoEditor extends React.Component {
     if (this.editorContainer) {
       // Before initializing monaco editor
       this.editorWillMount();
+
+      // workaround for not being able to override or extend existing tokenziers
+      // https://github.com/Microsoft/monaco-editor/issues/252
+      monaco.languages.onLanguage('javascript', () => {
+          // waits til after monaco tries to register things itself
+          setTimeout(() => {
+            monaco.languages.setMonarchTokensProvider('javascript', jsTokenizer);
+          }, 1000);
+      });
+
+      monaco.editor.defineTheme('oxygen-theme', {
+        base: 'vs', // can also be vs-dark or hc-black
+        inherit: true,
+        rules: [
+          { token: 'ox.transaction', foreground: '314496', fontStyle: 'bold' }
+        ]
+      });
+
       this.editor = monaco.editor.create(this.editorContainer, {
         value,
         language,
@@ -262,7 +282,7 @@ MonacoEditor.propTypes = {
     value: PropTypes.string,
     defaultValue: PropTypes.string,
     language: PropTypes.string,
-    theme: PropTypes.object,
+    theme: PropTypes.string,
     options: PropTypes.object,
     editorDidMount: PropTypes.func,
     editorWillMount: PropTypes.func,
@@ -278,7 +298,7 @@ MonacoEditor.defaultProps = {
     value: null,
     defaultValue: '',
     language: 'javascript',
-    theme: null,
+    theme: 'oxygen-theme',
     options: {},
     editorDidMount: noop,
     editorWillMount: noop,
