@@ -42,7 +42,7 @@ const createModuleAndMethods = (jsonData) => { // eslint-disable-line
           paramsInBrackets += `, ${param.name}: ${param.type}`;
           paramsDescription = [
             ...paramsDescription,
-            `@param  **${param.name}** ${param.description}`
+            `@param {} **${param.name}** ${param.description}`
           ];
         });
         if (paramsInBrackets.length > 1) {
@@ -58,7 +58,7 @@ const createModuleAndMethods = (jsonData) => { // eslint-disable-line
         ...paramsDescription,
         mReturn ? ` * @return ${mReturn.description}` : '',
         ' */',
-        `declare function ${mName}(${paramsInBrackets}): ` + (mReturn ? mReturn.type : 'void') + ';',
+        `declare function ${mName}(${paramsInBrackets}): ${mReturn ? mReturn.type : 'void'};`,
       ];
     });
 
