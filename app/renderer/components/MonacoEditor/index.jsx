@@ -108,7 +108,7 @@ export default class MonacoEditor extends React.Component {
     if (prevProps.language !== this.props.language) {
       monaco.editor.setModelLanguage(this.editor.getModel(), this.props.language);
     }
-    if (prevProps.activeLine !== this.props.activeLine) {
+    if (prevProps.activeLine !== this.props.activeLine && prevProps.activeLine < this.props.activeLine) {
       helpers.updateActiveLine(this.editor, this.props.activeLine);
     }
     if (prevProps.theme !== this.props.theme) {

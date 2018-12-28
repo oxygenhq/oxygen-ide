@@ -32,6 +32,10 @@ export default (state = DEFAULT_STATE, action) => {
       if (!state.openFiles.hasOwnProperty(path)) {
         return state;
       }
+      // update line only if it's higher (events can come out-of-order)
+      if (state.openFiles[path].activeLine >= line) {
+        return state;
+      }
       return { 
         ...state, 
         openFiles: {

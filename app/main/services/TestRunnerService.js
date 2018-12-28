@@ -210,8 +210,6 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _hookToOxygenEvents() {
-        // @TODO: line highlight
-        // @TODO: ask about breakpoints
         this.oxRunner.on('line-update', (line) => {
             this.notify({
                 type: EVENT_LINE_UPDATE,
