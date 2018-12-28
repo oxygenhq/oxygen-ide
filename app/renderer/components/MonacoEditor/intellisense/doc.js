@@ -65,7 +65,15 @@
                   for (var tag of this.tags)
                   {
                       if (tag.title === 'description') {
-                          return tag.description.replace(/(\r\n|\n)/gm,''); 
+                          // make sure we don't remove line breaks if preceded by a double space
+                          // in order not to lose markdown formatting
+                          // (regex with negative look-behind doesn't work for some reason)
+                          tag.description = tag.description.replace(/(  \r\n|  \n)/gm, '  LINEBR')
+                          // remove line breaks
+                          tag.description = tag.description.replace(/(\r\n|\n)/gm, '')
+                          // restore line breaks
+                          tag.description = tag.description.replace(/  LINEBR/gm, '  \n')
+                          return tag.description;
                       }
                   }
               };
