@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v1.3.1 (2019-01-03)
+* Bump Oxygen 0.39.0.
+* Colorize transaction commands.
+* Fix active line not always pointing to the correct line on bp events.
+* Fix breakpoints disappearing in certain situations.
+* Fix method descriptions in intellisense suggestions.
+* Show formated text in logs.
+
 ## v1.3.0 (2018-12-23)
 * Bump Oxygen 0.38.0.
 * Bump ChromeDriver 2.45.
