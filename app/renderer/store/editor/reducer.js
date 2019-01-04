@@ -19,10 +19,11 @@ const DEFAULT_STATE = {
 
 const DEFAULT_OPEN_FILE_STATE = {
   activeLine: null,
+  activeLineUpdateTime: null,
 }
 
 export default (state = DEFAULT_STATE, action) => {
-  const { file, path, newPath, line } = action.payload || {};
+  const { file, path, newPath, line, time } = action.payload || {};
   let _openFilesClone, _newActiveFile;
 
   switch (action.type) {
@@ -32,8 +33,9 @@ export default (state = DEFAULT_STATE, action) => {
       if (!state.openFiles.hasOwnProperty(path)) {
         return state;
       }
-      // update line only if it's higher (events can come out-of-order)
-      if (state.openFiles[path].activeLine >= line) {
+      // prevent from updating activeLine if received message is older than the one we previously provided
+      // we need this check to prevent updating current active line due to async misordered messages received from Oxygen
+      if (state.openFiles[path].activeLineUpdateTime && state.openFiles[path].activeLineUpdateTime > time) {
         return state;
       }
       return { 
@@ -43,6 +45,7 @@ export default (state = DEFAULT_STATE, action) => {
           [path]: {
             ...state.openFiles[path],
             activeLine: line,
+            activeLineUpdateTime: time,
           },
         },
       };

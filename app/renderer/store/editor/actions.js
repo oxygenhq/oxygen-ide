@@ -6,6 +6,8 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
+import moment from 'moment';
+
 import * as ActionTypes from './types';
 import { success, failure } from '../../helpers/redux';
 
@@ -44,9 +46,9 @@ export const setActiveFile = (path) => ({
 });
 
 /* setActiveLine */
-export const setActiveLine = (path, line) => ({
+export const setActiveLine = (time, path, line) => ({
   type: ActionTypes.EDITOR_SET_ACTIVE_LINE,
-  payload: { path, line },
+  payload: { time: time || moment.utc().unix(), path, line },
 });
 
 /* setActiveLine */

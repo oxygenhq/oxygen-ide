@@ -319,9 +319,11 @@ export function* closeFile({ payload }) {
     yield put(tabActions.removeTab(path));
     yield put(editorActions.closeFile(path));
     yield put(fsActions.resetFileContent(path));
+    yield put(testActions.removeBreakpoints(path));
+    // retrieve new active tab, if there are more files open
     const activeTab = yield select(state => state.tabs.active);
     // make sure to update main test file, when current tab is closed
-    // either set main file to a new active tab, if any tab is still open
+    // set main file to a new active tab, if any tab is still open
     if (activeTab) {
         yield put(testActions.setMainFile(activeTab));
     }

@@ -91,10 +91,17 @@ export function breakpointMarkersToLineNumbers(editor) {
     return bpMarkers.map(bpMarker => getMarkerLine(bpMarker));
 }
 
-export function updateActiveLine(editor, line) {
+export function updateActiveLineMarker(editor, line) {
+    // try to convert string value of line to number if possible (line support to be integer)
+    if (line && !Number.isInteger(line) && typeof line === 'string' && !isNaN(line)) {
+        try { line = parseInt(line); }
+        // ignore this call if line is not null and not a number
+        catch (e) { return; }
+    }
+    const columnNum = Number.isInteger(line) ? editor.getModel().getLineFirstNonWhitespaceColumn(line) : null;
     // line value can be null, if we want to remove the active cursor completely
     const updatedLineDecorator = Number.isInteger(line) ? {
-        range: new monaco.Range(line, 1, line, 1),
+        range: new monaco.Range(line, columnNum, line, columnNum),
         options: {
           isWholeLine: true,
           className: 'myContentClass',
@@ -112,6 +119,5 @@ export function updateActiveLine(editor, line) {
     if (updatedLineDecorator) {
         newDecorators.push(updatedLineDecorator);
     }
-
     editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
 }

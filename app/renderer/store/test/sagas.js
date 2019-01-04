@@ -12,6 +12,7 @@ import { putAndTake } from '../../helpers/saga';
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import * as testActions from './actions';
 import * as editorActions from '../editor/actions';
+import * as tabActions from '../tabs/actions';
 import * as loggerActions from '../logger/actions';
 import ActionTypes from '../types';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
@@ -24,6 +25,7 @@ export default function* root() {
       takeLatest(ActionTypes.TEST_STOP, stopTest),
       takeLatest(ActionTypes.TEST_CONTINUE, continueTest),
       takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
+      takeLatest(ActionTypes.TEST_EVENT_LINE_UPDATE, handleOnLineUpdate)
     ]);
 }
 
@@ -51,7 +53,7 @@ function* handleTestRunnerServiceEvent(event) {
         yield put(testActions.onTestEnded());
     }
     else if (event.type === 'LINE_UPDATE') {
-        yield put(editorActions.setActiveLine(event.file, event.line));
+        yield put(testActions.onLineUpdate(event.time, event.file, event.line, event.primary));
     }
     else if (event.type === 'BREAKPOINT') {
         yield put(testActions.onBreakpoint(event.file, event.line));
@@ -169,3 +171,16 @@ export function* continueTest({ payload }) {
     }
 }
 
+export function* handleOnLineUpdate ({ payload }) {
+    const { file, line, primary, time } = payload || {};
+    // check if this is the primary file and if yes, make sure to make its tab active
+    if (primary) {
+        const openFiles = yield select(state => state.editor.openFiles);
+        // check if we have this file open in one of the editors
+        if (openFiles[file]) {
+            yield put(tabActions.setActiveTab(file));
+            yield put(editorActions.setActiveFile(file));
+        }
+    }
+    yield put(editorActions.setActiveLine(time, file, line));
+}

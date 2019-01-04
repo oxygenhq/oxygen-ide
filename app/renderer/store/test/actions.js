@@ -28,9 +28,14 @@ export const onTestEnded = () => ({
   payload: null,
 });
 
-export const onBreakpoint = () => ({
+export const onBreakpoint = (file, line) => ({
   type: ActionTypes.TEST_EVENT_BREAKPOINT,
-  payload: null,
+  payload: { file, line },
+});
+
+export const onLineUpdate = (time, file, line, primary) => ({
+  type: ActionTypes.TEST_EVENT_LINE_UPDATE,
+  payload: { time, file, line, primary },
 });
 
 export const setTestTarget = (value) => ({
@@ -76,6 +81,11 @@ export const removeDevice = (device) => ({
 export const updateBreakpoints = (filePath, breakpoints) => ({
   type: ActionTypes.TEST_UPDATE_BREAKPOINTS,
   payload: { path: filePath, breakpoints },
+});
+
+export const removeBreakpoints = (path) => ({
+  type: ActionTypes.TEST_REMOVE_BREAKPOINTS,
+  payload: { path },
 });
 
 export const updateRunSettings = (settings) => ({

@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 import { util, Runner } from 'oxygen-cli';
+import moment from 'moment';
 import cfg from '../config.json';
 import ServiceBase from "./ServiceBase";
 
@@ -210,29 +211,56 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _hookToOxygenEvents() {
-        this.oxRunner.on('line-update', (line) => {
-            this.notify({
-                type: EVENT_LINE_UPDATE,
-                file: this.mainFilePath,
-                line: line,
-            });
+        this.oxRunner.on('line-update', (line, stack, time) => {
+            // send LINE_UPDATE event for each file in the stack
+            if (stack && Array.isArray(stack)) {
+                const primaryFile  = stack.length > 0 ? stack[0].file : null;
+                for (const call of stack) {
+                    this.notify({
+                        type: EVENT_LINE_UPDATE,
+                        time: time,
+                        file: call.file,
+                        line: call.line,
+                        // determine if this stack call is the top (primary) one in the stack (so we can open the relevant tab)
+                        primary: primaryFile === call.file, 
+                    });
+                }
+            }
+            else {
+                this.notify({
+                    type: EVENT_LINE_UPDATE,
+                    time: time,
+                    file: this.mainFilePath,
+                    line: line,
+                    primary: true,
+                });
+            }            
         });
 
         // @params breakpoint, testcase
         this.oxRunner.on('breakpoint', (breakpoint) => {
-            const { lineNumber } = breakpoint;
+            const { lineNumber, fileName } = breakpoint;
             const { getScriptContentLineOffset } = this.oxRunner;
-            const editorLine = lineNumber - getScriptContentLineOffset;
-
+            // if no fileName is received from the debugger (not suppose to happen), assume we are in the main script file
+            const editorFile = fileName ? fileName : this.mainFilePath;
+            // if we are in the main script file, adjust line number according to script boilerplate offset
+            let editorLine = editorFile !== this.mainFilePath ? lineNumber : lineNumber - getScriptContentLineOffset;
+            // set event time
+            const time = moment.utc().unix();
+            // make sure to mark breakpoint line with current line mark
             this.notify({
                 type: EVENT_LINE_UPDATE,
-                file: this.mainFilePath,
+                time,
+                file: editorFile,
                 line: editorLine,
+                // alway open the tab (make it active) in which breakpoint occured
+                primary: true,
             });
-            // bubble the breakpoint event further up
+            // notify GUI that we hit a breakpoint
             this.notify({
                 type: EVENT_BREAKPOINT,
-                file: this.mainFilePath,
+                time,
+                file: editorFile,
                 line: editorLine,
             });
         });

@@ -108,8 +108,14 @@ export default class MonacoEditor extends React.Component {
     if (prevProps.language !== this.props.language) {
       monaco.editor.setModelLanguage(this.editor.getModel(), this.props.language);
     }
-    if (prevProps.activeLine !== this.props.activeLine && prevProps.activeLine < this.props.activeLine) {
-      helpers.updateActiveLine(this.editor, this.props.activeLine);
+    if (prevProps.activeLine !== this.props.activeLine) {
+      const { activeLine } = this.props;
+      // scroll view into the current active line
+      if (activeLine && Number.isInteger(activeLine)) {
+        this.editor.revealLineInCenter(activeLine);
+      }      
+      // set current line marker or clear it if activeLine is null
+      helpers.updateActiveLineMarker(this.editor, activeLine);
     }
     if (prevProps.theme !== this.props.theme) {
       monaco.editor.setTheme(this.props.theme);

@@ -61,6 +61,7 @@ export default (state = defaultState, action) => {
   const payload = action.payload || {};
   const { value, settings, device, breakpoints, path, error } = payload;
   let _newDevices = [];
+  let _newBreakpoints = {};
 
   switch (action.type) {
     // TEST_START
@@ -238,6 +239,19 @@ export default (state = defaultState, action) => {
           ...state.breakpoints,
           [path]: breakpoints,
         },
+      };
+    
+    // TEST_REMOVE_BREAKPOINTS
+    case ActionTypes.TEST_REMOVE_BREAKPOINTS:
+      // make sure the file with breakpoints is on the list
+      if (!state.breakpoints || !state.breakpoints.hasOwnProperty(path)) {
+        return state;
+      }
+      // clone all breakpoints except the one that needs to be removed (refered by path)
+      _newBreakpoints = Object.keys(state.breakpoints).reduce((acc, cur) => cur === path ? acc : {...acc, [cur]: state.breakpoints[cur]}, {});
+      return {
+        ...state,
+        breakpoints: _newBreakpoints,
       };
 
     // TEST_UPDATE_RUN_SETTINGS
