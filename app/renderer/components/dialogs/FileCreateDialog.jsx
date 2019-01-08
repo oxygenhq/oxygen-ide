@@ -74,7 +74,7 @@ export default class FileCreateDialog extends PureComponent<Props> {
   handleOk() {
     const { name, ext } = this.state;
     if (!name || name.length == 0) {
-      message.error(`${capitalizeFirst(selectedFile.type)} name cannot be blank!`);
+      message.error(`Filename cannot be blank!`);
       return;
     }
     if (this.props.type === 'file') {
