@@ -21,6 +21,7 @@ const ON_SELENIUM_LOG_ENTRY = 'ON_SELENIUM_LOG_ENTRY';
 
 export default class SeleniumService extends ServiceBase {
     seleniumProc = null;
+    availablePort = null;
 
     constructor() {
         super();
@@ -35,9 +36,9 @@ export default class SeleniumService extends ServiceBase {
         detectPort(selSettings.port, (err, availablePort) => {
             if (err) {
                 console.error(`Port "${port}" on "localhost" is already in use. Please set another port in config.json file.`, err);
-            }
-            else {
+            } else {
                 this._startProcess(availablePort);
+                this.availablePort = availablePort;
             }
         });
     }
@@ -82,13 +83,13 @@ export default class SeleniumService extends ServiceBase {
         const pltfm = process.platform;
         if (pltfm === 'win32') {
             try {
-                cp.execSync(`wmic process where "CommandLine like '%java%%-jar -Dwebdriver.ie.driver=${pltfm}/IEDriverServer_x86.exe -Dwebdriver.gecko.driver=${pltfm}/geckodriver.exe -Dwebdriver.chrome.driver=${pltfm}/chromedriver.exe ${selSettings.jar} -port%'" Call Terminate`, { stdio: 'pipe' });
+                cp.execSync(`wmic process where "CommandLine like '%java%%-jar -Dwebdriver.ie.driver=${pltfm}/IEDriverServer_x86.exe -Dwebdriver.gecko.driver=${pltfm}/geckodriver.exe -Dwebdriver.chrome.driver=${pltfm}/chromedriver.exe ${selSettings.jar} -port ${this.availablePort}%'" Call Terminate`, { stdio: 'pipe' });
             } catch (e) {
                 console.warn('Failed to kill selenium: ' + e);
             }
         } else {
           try {
-            cp.execSync(`pkill -f "java -jar -Dwebdriver.gecko.driver=${pltfm}/geckodriver -Dwebdriver.chrome.driver=${pltfm}/chromedriver ${selSettings.jar} -port"`, { stdio: 'pipe' });
+            cp.execSync(`pkill -f "java -jar -Dwebdriver.gecko.driver=${pltfm}/geckodriver -Dwebdriver.chrome.driver=${pltfm}/chromedriver ${selSettings.jar} -port ${this.availablePort}"`, { stdio: 'pipe' });
           } catch (e) {
             // ignore. pkill returns 1 status if process doesn't exist
           }
@@ -96,9 +97,6 @@ export default class SeleniumService extends ServiceBase {
     }
 
     _startProcess(port) {
-        // kill any hanging selenium process (sometimes it doesn't die properly when exiting the IDE)
-        this._killSelenium();
-
         // initialize Selenium server
         const selArgs = [selSettings.jar].concat(selSettings.args);
     
