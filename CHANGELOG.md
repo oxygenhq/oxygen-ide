@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v1.4.0 (2019-xx-xx)
+* Bump Oxygen 0.41.1.
+* Allow to set and pause on breakpoints in module files (called by require from the main script).
+* Fix crash in create file dialog when filename is not specified.
+* Add more user hints for some script execution errors.
+* Fix selenium process getting killed when opening two instances of the IDE.
+* Show message about unsaved file as a warning instead of error.
+* Improve welcome message.
+* Add 'go professional' menu entry.
+* Print more error details on 'Test Failed' errors.
+
 ## v1.3.1 (2019-01-03)
 * Bump Oxygen 0.39.0.
 * Colorize transaction commands.
