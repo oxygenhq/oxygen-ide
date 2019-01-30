@@ -185,6 +185,10 @@ export default (cmdHandler, settings) => {
         click() { cmdHandler(Const.MENU_CMD_HELP_CONTRIBUTE) }
       },
       {
+        label: 'Go Professional',
+        click() { cmdHandler(Const.MENU_CMD_HELP_GO_PRO) }
+      },
+      {
         type: 'separator'
       },
       {
