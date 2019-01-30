@@ -119,12 +119,19 @@ export default class TextEditor extends Component<Props> {
           <div>
             <Icon type="inbox" />
             <p>You have no active opened files</p>
-            <p>Just pick one from your sidebar or open new one</p>
-            <p><b>Ctrl/Command + O</b> - Open folder</p>
-            <p><b>Ctrl/Command + N</b> - New file</p>
-            <p><b>Ctrl/Command + Shift + L</b> - Toggle logger</p>
+            <p>Open a folder first, then select a file or create a new file</p>
+            { process.platform === 'win32' || process.platform === 'linux' ?
+              <div>
+                <p><b>Ctrl + O</b> - Open folder</p>
+                <p><b>Ctrl + N</b> - New file</p>
+              </div>
+            : 
+              <div>
+                <p><b>Command + O</b> - Open folder</p>
+                <p><b>Command + N</b> - New file</p>
+              </div>
+            }
           </div>
-
         </div>
           )}
       </Fragment>
