@@ -75,7 +75,7 @@ export default (state = defaultState, action) => {
     // TEST_START_FAILURE
     case failure(ActionTypes.TEST_START):
       if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SAVED) {
-        message.error('The current file has been modified. Please save the file before running the test.')
+        message.warning('The current file has been modified. Please save the file before running the test.')
       }
       else if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SELECTED) {
         message.error('Please open a script file before you could run the test.')
