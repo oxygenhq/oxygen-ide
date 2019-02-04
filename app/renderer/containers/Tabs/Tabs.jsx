@@ -12,9 +12,9 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { Icon, Tooltip, Modal, Button } from 'antd';
-
-import DraggableTab from './DraggableTab';
+import _ from 'lodash';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
+import DraggableTab from './DraggableTab';
 import '../../css/tabs.scss';
 
 function noop() {}
@@ -23,7 +23,7 @@ type Props = {
   active: null | string,
   tabs: Array,
   onChange: (string) => void,
-  onClose: (string) => void,
+  onClose: (string) => void
 };
 
 class Tabs extends Component<Props, void> {
@@ -35,8 +35,7 @@ class Tabs extends Component<Props, void> {
   ps = null
 
   state = {
-    closeTabAsk: false,
-    currentOperatedTab: {},
+    closeTabAsk: false
   }
 
   componentDidMount() {
@@ -44,6 +43,22 @@ class Tabs extends Component<Props, void> {
       suppressScrollY: true,
       useBothWheelAxes: true,
     });
+
+    window.addEventListener('resize', _.debounce((e) => {
+      e.preventDefault();
+      if (this.ps) {
+        this.ps.destroy();
+        this.ps = new PerfectScrollbar(this.tabsRef, {
+          suppressScrollY: true,
+          useBothWheelAxes: true,
+        });
+      } else {
+        this.ps = new PerfectScrollbar(this.tabsRef, {
+          suppressScrollY: true,
+          useBothWheelAxes: true,
+        });
+      }
+    }, 150), false);
   }
 
   // nextProps, nextState
