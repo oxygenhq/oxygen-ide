@@ -9,7 +9,9 @@
 // @flow
 /* eslint-disable react/no-unused-state */
 /* eslint-disable ident */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { PureComponent, Fragment } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import _ from 'lodash';
 import { type LogEntry } from '../types/LogEntry';
 import ScrollContainer from './ScrollContainer';
@@ -23,21 +25,92 @@ type Props = {
 export default class LogViewer extends PureComponent<Props> {
   constructor(props: Props) {
     super(props: Props);
+
+    this.loggerRef = React.createRef();
+    this.buttonRef = React.createRef();
+
     this.state = {
-      refreshScroll: false
+      refreshScroll: false,
+      keyKeys: [],
+      selected: false,
+      copyValue: ''
     };
+  }
+
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
   }
 
   componentWillReceiveProps(nextProps) {
     const diff = _.difference(nextProps.logs, this.props.logs);
     if (diff && diff.length) {
-      this.setState({ refreshScroll: !this.state.refreshScroll });
+      this.setState({
+        refreshScroll: !this.state.refreshScroll,
+        keyKeys: [],
+        selected: false,
+        copyValue: ''
+      });
+    }
+  }
+
+  componentDidUpdate() {
+    const { keyKeys } = this.state;
+    if (keyKeys && keyKeys.length > 1 && keyKeys[keyKeys.length - 1] === 'c') {
+      this.buttonRef.current.click();
+    }
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  onKeyPressed = e => {
+    if (e.key === 'Meta') {
+      this.setState({
+        keyKeys: ['Meta']
+      });
+    }
+
+    if (e.key.toLowerCase() === 'a' && this.state.keyKeys[0] === 'Meta') {
+      const keys = [...this.state.keyKeys];
+      keys.push('a');
+      this.setState({
+        keyKeys: [...keys],
+        selected: true
+      });
+    }
+
+    if (e.key.toLowerCase() === 'c' && this.state.keyKeys[0] === 'Meta') {
+      const keys = [...this.state.keyKeys];
+      keys.push('c');
+      this.setState({
+        keyKeys: [...keys],
+        copyValue: this.loggerRef.current.innerText
+      });
+    }
+  }
+
+  handleClickOutside = (event) => {
+    if (this.state.selected && this.loggerRef && !this.loggerRef.current.contains(event.target)) {
+      this.setState({
+        keyKeys: [],
+        selected: false
+      });
+    }
+  }
+
+  copyClicked = () => {
+    if (!this.state.copyValue) {
+      this.setState({
+        keyKeys: ['Meta', 'c'],
+        copyValue: this.loggerRef.current.innerText
+      });
     }
   }
 
   render() {
     const { height, logs, category } = this.props;
-    const { refreshScroll } = this.state;
+    const { refreshScroll, selected, copyValue } = this.state;
     const lines = logs ? logs.map(log => {
       return {
         message: log.message,
@@ -53,7 +126,10 @@ export default class LogViewer extends PureComponent<Props> {
         >
           {() => (
             <div
-              className="logger-textarea"
+              ref={this.loggerRef}
+              className={`logger-textarea ${selected ? 'selected' : ''} `}
+              onKeyDown={this.onKeyPressed}
+              tabIndex="1"
               style={{
                 height: height - 40,
                 minHeight: height - 39,
@@ -61,29 +137,22 @@ export default class LogViewer extends PureComponent<Props> {
             >
               { lines.map((line) => (
                 <Fragment key={`log-${category}-line-${line.timestamp}`}>
-                  <pre style={{ marginBottom: '0px', whiteSpace: 'pre-wrap' }}>{line.message}</pre>
+                  <pre style={{ marginBottom: '0px', whiteSpace: 'pre-wrap' }}><span>{line.message}</span></pre>
                 </Fragment>
               ))}
             </div>
           )}
         </ScrollContainer>
+        <CopyToClipboard text={copyValue}>
+          <button
+            className="copy-btn"
+            ref={this.buttonRef}
+            onClick={this.copyClicked}
+          >
+            Copy
+          </button>
+        </CopyToClipboard>
       </div>
     );
   }
 }
-/*
-<textarea
-                                style={{
-                                    width: '98%',
-                                    height: height,
-                                    minHeight: '98%',
-                                    border: 'none',
-                                    resize: 'none',
-                                    outline: 'none',
-                                }}
-                                className="logger-textarea"
-                                value={ lines.join('\n') }
-                                onChange={() => {}}
-                                ref={(consoleRef) => { this.consoleRef = consoleRef; }}
-                            />
-                            */
