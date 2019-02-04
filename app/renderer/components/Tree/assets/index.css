@@ -51,6 +51,12 @@
   vertical-align: top;
 }
 
+.rc-tree li .rc-tree-node-content-wrapper:hover {
+  background-color: rgba(218, 216, 208, 0.5);
+  padding: 1px 5px !important;
+  margin: 0px -5px !important;
+}
+
 .rc-tree-title {
   width: calc(100% - 16px);
   display: inline-block;
