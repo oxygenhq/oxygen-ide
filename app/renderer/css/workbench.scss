@@ -37,7 +37,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    position: absolute;
     height: 100%;
     z-index: 5;
   }
@@ -47,7 +46,8 @@
 
   .tabs-container .tabs-bar-container {
     width: calc(100% - 40px);
-    margin-left: 40px;
+    overflow: hidden;
+    position: relative;
     // display: flex;
     // align-items: flex-end;
   }
