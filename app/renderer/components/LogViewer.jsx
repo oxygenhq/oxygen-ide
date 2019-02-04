@@ -10,7 +10,7 @@
 /* eslint-disable react/no-unused-state */
 /* eslint-disable ident */
 import React, { PureComponent, Fragment } from 'react';
-import _ from 'underscore';
+import _ from 'lodash';
 import { type LogEntry } from '../types/LogEntry';
 import ScrollContainer from './ScrollContainer';
 

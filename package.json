@@ -153,6 +153,7 @@
     "firacode": "^1.205.0",
     "font-awesome": "^4.7.0",
     "junk": "^2.1.0",
+    "lodash": "^4.17.11",
     "moment": "^2.24.0",
     "perfect-scrollbar": "^1.4.0",
     "react": "^16.2.0",
@@ -171,7 +172,6 @@
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.2",
     "source-map-support": "^0.5.3",
-    "underscore": "^1.9.1",
     "uniqid": "^5.0.3",
     "winston": "^2.4.4"
   },
