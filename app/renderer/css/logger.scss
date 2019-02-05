@@ -54,6 +54,17 @@
     font-family: "Fira Code";
     font-size: 12px;
   }
+  .logger-textarea.selected span {
+    background: #4286f4;
+    color: white;
+  }
+
+  .copy-btn {    
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    opacity: 0.9;
+  }
 
   .ant-tabs {
     margin-left: 10px;
@@ -97,6 +108,7 @@
     font-family: 'Fira Code';
     font-variant-ligatures: contextual;
     overflow: auto;
+    position: relative;
   }
   .logs-container:before,
   .logs-container:after {
