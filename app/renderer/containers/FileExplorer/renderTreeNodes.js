@@ -6,8 +6,8 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import Tree from '../../components/Tree';
 import React from 'react';
+import Tree from '../../components/Tree';
 
 function handleContextMenuEvent(e, node, menuName) {
   e.preventDefault();
@@ -25,15 +25,18 @@ function renderTreeNodes(nodes) {
         ? 'hidden-node' : element.type;
 
       let theTitle = element.name;
+      let onIconContextMenu = () => {};
       if (element.type === 'file' && element.name !== '.emptyfile') {
         theTitle = (
-          <span title={ element.name } style={{ userSelect: 'none' }} onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FILE') }>{element.name}</span>
+          <span className="tree-row-title" title={ element.name } style={{ userSelect: 'none' }} onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FILE') }>{element.name}</span>
         );
+        onIconContextMenu = (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FILE');
       }
       else if (element.type === 'folder' && element.name !== '.emptyfile') {
         theTitle = (
-          <span title={ element.name } style={{ userSelect: 'none' }} onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FOLDER') }>{element.name}</span>
+          <span className="tree-row-title" title={ element.name } style={{ userSelect: 'none' }} onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FOLDER') }>{element.name}</span>
         );
+        onIconContextMenu = (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FOLDER');
       }
 
       if (element.type === 'folder') { // && element.children && element.children.length > 0
@@ -41,6 +44,7 @@ function renderTreeNodes(nodes) {
           <Tree.TreeNode
             nodeInfo={element}
             key={element.path}
+            onIconContextMenu={onIconContextMenu}
             title={theTitle}
             className={resolveClassName}
             dataRef={element}
@@ -55,6 +59,7 @@ function renderTreeNodes(nodes) {
       return (
         <Tree.TreeNode
           nodeInfo={element}
+          onIconContextMenu={onIconContextMenu}
           title={theTitle}
           key={element.path}
           className={resolveClassName}
