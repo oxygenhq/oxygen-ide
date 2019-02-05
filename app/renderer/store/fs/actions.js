@@ -6,9 +6,26 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
+/* eslint-disable */
 import * as TYPES from './types';
 import dispatchAsync from '../../helpers/dispatchAsync';
 import { success, failure } from '../../helpers/redux';
+
+/* set tree rootPath */
+export const setTreeRootPath = (path) => {
+  return {
+    type: TYPES.FS_SET_TREE_ROOT_PATH,
+    payload: { path },
+  };
+}
+
+/* Add file or folder */
+export const addFileOrFolder = (fileOrFolder) => {
+  return {
+    type: TYPES.FS_ADD_FILE_OR_FOLDER,
+    payload: { fileOrFolder },
+  };
+}
 
 /* fetchFolderContent */
 export const fetchFolderContent = (path) => {

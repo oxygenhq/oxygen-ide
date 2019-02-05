@@ -13,6 +13,7 @@ import * as fsActions from './actions';
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import { putAndTake } from '../../helpers/saga';
 import fileSubjects from '../../store/fs/subjects';
+import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
@@ -22,18 +23,54 @@ const services = ServicesSingleton();
  */
 export default function* root() {
     yield all([
-      takeLatest(ActionTypes.FS_FETCH_FOLDER_CONTENT, fetchFolderContent),
-      takeLatest(ActionTypes.FS_FETCH_FILE_CONTENT, fetchFileContent),
-      takeLatest(ActionTypes.FS_FETCH_FILE_INFO, fetchFileInfo),
-      takeLatest(ActionTypes.FS_CREATE_FOLDER, createFolder),
-      takeLatest(ActionTypes.FS_CREATE_FILE, createFile),
-      takeLatest(ActionTypes.FS_RENAME, renameFileOrFolder),
-      takeLatest(ActionTypes.FS_DELETE, deleteFileOrFolder),
-      takeLatest(ActionTypes.FS_SAVE_FILE, saveFileContent),
-      takeLatest(ActionTypes.FS_SAVE_FILE_AS, saveFileContentAs),
-      takeLatest(ActionTypes.FS_TREE_OPEN_FOLDER, treeOpenFolder),      
-      takeLatest(ActionTypes.FS_TREE_LOAD_NODE_CHILDREN, treeLoadNodeChildren),
+        takeLatest(ActionTypes.FS_FETCH_FOLDER_CONTENT, fetchFolderContent),
+        takeLatest(ActionTypes.FS_FETCH_FILE_CONTENT, fetchFileContent),
+        takeLatest(ActionTypes.FS_FETCH_FILE_INFO, fetchFileInfo),
+        takeLatest(ActionTypes.FS_CREATE_FOLDER, createFolder),
+        takeLatest(ActionTypes.FS_CREATE_FILE, createFile),
+        takeLatest(ActionTypes.FS_RENAME, renameFileOrFolder),
+        takeLatest(ActionTypes.FS_DELETE, deleteFileOrFolder),
+        takeLatest(ActionTypes.FS_SAVE_FILE, saveFileContent),
+        takeLatest(ActionTypes.FS_SAVE_FILE_AS, saveFileContentAs),
+        takeLatest(ActionTypes.FS_TREE_OPEN_FOLDER, treeOpenFolder),
+        takeLatest(ActionTypes.FS_TREE_LOAD_NODE_CHILDREN, treeLoadNodeChildren),
+        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents)
     ]);
+}
+
+export function* handleServiceEvents({ payload }) {
+    const {
+        service,
+        event,
+        type,
+        data,
+        path
+    } = payload;
+    if (!event) {
+        return;
+    }
+
+    if (service === 'FileService' && event === 'filesWatcher') {
+        if (['dirAdd', 'fileAdd', 'dirAddDeep', 'fileAddDeep'].includes(type)) {
+            yield addFileOrFolder(data);
+        }
+        if (['dirUnlink', 'fileUnlink', 'dirUnlinkDeep', 'fileUnlinkDeep'].includes(type)) {
+            yield unlinkFile(path);
+        }
+    }
+}
+
+function* addFileOrFolder(fileOrFolder) {
+    if (fileOrFolder) {
+        yield put(fsActions.addFileOrFolder(fileOrFolder));
+    }
+}
+
+
+function* unlinkFile(path) {
+    if (path) {
+        yield put(fsActions._delete_Success(path));
+    }
 }
 
 export function* treeLoadNodeChildren({ payload }) {
@@ -65,9 +102,16 @@ export function* treeOpenFolder({ payload }) {
     yield put(fsActions._treeOpenFolder_Success(path, folder.children));
 }
 
+export function* watchOnFiles(path) {
+    yield call(services.mainIpc.call, 'FileService', 'createWatchOnFilesChannel', [path]);
+}
+
 export function* _fetchFolderContent(path) {
     try {
-        let folder = yield call(services.mainIpc.call, 'FileService', 'getFolderContent', [ path ]);
+        let folder = yield call(services.mainIpc.call, 'FileService', 'getFolderContent', [path]);
+        if (folder && path) {
+            yield watchOnFiles(path);
+        }
         yield put({
             type: success(ActionTypes.FS_FETCH_FOLDER_CONTENT),
             payload: { path, response: folder },
