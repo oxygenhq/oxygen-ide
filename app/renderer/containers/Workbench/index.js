@@ -25,7 +25,7 @@ const mapStoreToProps = (state) => {
     dialog: state.dialog,
     treeActiveFile: activeNode && state.fs.files.hasOwnProperty(activeNode) ? state.fs.files[activeNode] : null,
     editorActiveFile: editorActiveFile && state.fs.files.hasOwnProperty(editorActiveFile) ? state.fs.files[editorActiveFile] : null,
-    rootPath: rootPath,
+    rootPath: rootPath
   };
 };
   
