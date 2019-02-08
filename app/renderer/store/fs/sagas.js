@@ -51,11 +51,18 @@ export function* handleServiceEvents({ payload }) {
     }
 
     if (service === 'FileService' && event === 'filesWatcher') {
-        if (['dirAdd', 'fileAdd', 'dirAddDeep', 'fileAddDeep'].includes(type)) {
+        if (['dirAdd', 'fileAdd'].includes(type)) {
             yield addFileOrFolder(data);
         }
-        if (['dirUnlink', 'fileUnlink', 'dirUnlinkDeep', 'fileUnlinkDeep'].includes(type)) {
+        if (['dirUnlink', 'fileUnlink'].includes(type)) {
             yield unlinkFile(path);
+        }
+        if (type === 'fileChangeContent') {
+            const activeNode = yield select(state => state.fs.tree.activeNode);
+            if (activeNode && path && activeNode === path) {
+                const localPayload = { path };
+                yield fetchFileContent({ payload: localPayload });
+            }
         }
     }
 }
@@ -132,26 +139,27 @@ export function* fetchFolderContent({ payload }) {
     const { path } = payload;
     try {
         yield _fetchFolderContent(path);
-    }
-    catch (err) {
-
+    } catch (err) {
+        console.warn('Problem when fetching folder content whith payload:', payload);
     }
 }
 
 export function* fetchFileContent({ payload }) {
-    const { path } = payload;
-    try {
-        let file = yield select(state => state.fs.files[path]);
-        if (!file) {
-            const { response, error } = yield putAndTake(fsActions.fetchFileInfo(path));
-            let file = yield select(state => state.fs.files[path]);
+    if (payload && payload.path) {
+        const { path } = payload;
+        try {
+            const file = yield select(state => state.fs.files[path]);
+            if (!file) {
+                yield putAndTake(fsActions.fetchFileInfo(path));
+            }
+            const content = yield call(services.mainIpc.call, 'FileService', 'getFileContent', [path]);
+            yield put(fsActions._fetchFileContent_Success(path, content));
+        } catch (err) {
+            /* istanbul ignore next */
+            yield put(fsActions._fetchFileContent_Failure(path, err));
         }
-        const content = yield call(services.mainIpc.call, 'FileService', 'getFileContent', [ path ]);
-        yield put(fsActions._fetchFileContent_Success(path, content));
-    }
-    catch (err) {
-        /* istanbul ignore next */
-        yield put(fsActions._fetchFileContent_Failure(path, err));
+    } else {
+        yield put(fsActions._fetchFileContent_Failure('', 'No file path in payload'));
     }
 }
 

@@ -52,23 +52,23 @@ const processChange = (eventPath, folderPath, type) => {
     if (filePart && filePart[1]) {
         // anylize file location
         if (eventPath) {
-            //  file or folder in the deep folders structure was deleted or renamed
-            //  dirUnlinkDeep or fileUnlinkDeep
-            if (['dirUnlink', 'fileUnlink'].includes(type)) {
+            //  file or folder was deleted or renamed
+            //  dirUnlink or fileUnlink
+            if (['dirUnlink', 'fileUnlink', 'fileChangeContent'].includes(type)) {
                 send({
                     service: 'FileService',
                     event: 'filesWatcher',
-                    type: `${type}Deep`,
+                    type: type,
                     path: eventPath
                 });
             } else {
-                //  file or folder in the deep folders structure was added
-                // dirAddDeep or fileAddDeep
+                //  file or folder was added
+                // dirAdd or fileAdd
                 const fileInfo = getFileInfo(eventPath);
                 send({
                     service: 'FileService',
                     event: 'filesWatcher',
-                    type: `${type}Deep`,
+                    type: type,
                     data: fileInfo
                 });
             }
@@ -94,7 +94,7 @@ export default class FileService extends ServiceBase {
                 interval: 1000,
                 binaryInterval: 1000,
                 useFsEvents: false
-            }).on('all', (event, eventPath) => {
+            }).on('all', (event, eventPath, third) => {
                 if (event === 'add') {
                     // file add
                     processChange(eventPath, folderPath, 'fileAdd');
@@ -106,9 +106,13 @@ export default class FileService extends ServiceBase {
                     processChange(eventPath, folderPath, 'dirAdd');
                 } else if (event === 'unlinkDir') {
                     // dir unlink(part of rename or delete)
-                    console.log('[dir] unlink (part of rename or delete)', eventPath);
                     processChange(eventPath, folderPath, 'dirUnlink');
-                } else {
+                } else if (event === 'change') {
+                    // change file content
+                    processChange(eventPath, folderPath, 'fileChangeContent');
+                }
+
+                else {
                     // console.log('event', event);
                     // console.log('eventPath', eventPath);
                 }
