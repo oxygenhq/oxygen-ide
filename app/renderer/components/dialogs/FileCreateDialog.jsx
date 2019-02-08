@@ -6,25 +6,24 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent } from 'react';
-import { Form, Input, Select, Modal, message } from 'antd';
+import React, { PureComponent, Fragment } from 'react';
+import { Form, Input, Select, Modal, message, Button } from 'antd';
 import { capitalizeFirst } from '../../helpers/general';
-import FormItem from 'antd/lib/form/FormItem';
 
 const { Option } = Select;
+const DEFAULT_EXT = '.js';
 const DEFAULT_STATE = {
   name: '',
-  ext: null,
+  ext: DEFAULT_EXT,
   type: null,
 };
-const DEFAULT_EXT = '.js';
 
 type Props = {
   visible: boolean,
   type?: string,
   path?: string,
   onSubmit: () => void,
-  onCancel: () => void,
+  onCancel: () => void
 };
 
 export default class FileCreateDialog extends PureComponent<Props> {
@@ -36,19 +35,19 @@ export default class FileCreateDialog extends PureComponent<Props> {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    let newState = {};
-    if (nextProps.visible == false) {
+    const newState = {};
+    if (nextProps.visible === false) {
       return {
         ...DEFAULT_STATE,
       };
     }
-    if (nextProps.type != prevState.type) {
+    if (nextProps.type !== prevState.type) {
       newState.type = nextProps.type;
       if (nextProps.type === 'file') {
         newState.ext = DEFAULT_EXT;
       }
     }
-    if (nextProps.visible != prevState.visible) {
+    if (nextProps.visible !== prevState.visible) {
       newState.visible = nextProps.visible;
     }
     // see if new state is not empty
@@ -73,24 +72,27 @@ export default class FileCreateDialog extends PureComponent<Props> {
 
   handleOk() {
     const { name, ext } = this.state;
-    if (!name || name.length == 0) {
-      message.error(`Filename cannot be blank!`);
+    if (!name || name.length === 0) {
+      message.error('Filename cannot be blank!');
       return;
     }
     if (this.props.type === 'file') {
       const fullName = name + (ext || '');
       this.props.onSubmit(fullName, this.props.type, this.props.path);
-    }
-    else {
+    } else {
       this.props.onSubmit(name, this.props.type, this.props.path);
     }
+  }
+
+  formSubmit = (e) => {
+    e.preventDefault();
+    this.handleOk();
   }
 
   render() {
     const {
       visible,
       type,
-      onSubmit,
       onCancel,
     } = this.props;
 
@@ -101,11 +103,11 @@ export default class FileCreateDialog extends PureComponent<Props> {
       name,
       ext,
     } = this.state;
-    const addonAfter = (type === 'file') ? 
+    const addonAfter = (type === 'file') ?
       (
         <Select
           onChange={this.onChangeExt.bind(this)}
-          value={ ext }
+          value={ext}
           style={{ width: 100 }}
         >
           <Option value=".js">.js</Option>
@@ -113,34 +115,53 @@ export default class FileCreateDialog extends PureComponent<Props> {
           <Option value=".txt">.txt</Option>
           <Option value=".csv">.csv</Option>
           <Option value=".xml">.xml</Option>
-          <Option value=".yml">.yml</Option>          
+          <Option value=".yml">.yml</Option>
         </Select>
       )
       : null;
     return (
-      <Modal
-        title={`Create New ${capitalizeFirst(type)}`}
-        okText="Create"
-        width={700}
-        visible={visible}
-        onOk={this.handleOk.bind(this)}
-        onCancel={onCancel}
+      <Form
+        onSubmit={this.formSubmit}
+        id="createDialogForm"
       >
-        <Input
-          onChange={this.onChangeName.bind(this)}
-          style={{ marginBottom: 15 }}
-          value={ name }
-          placeholder={`Enter new ${type} name...`}
-          addonAfter={addonAfter}
-        />
-        <Form.Item label="Destination">
+        <Modal
+          title={`Create New ${capitalizeFirst(type)}`}
+          width={700}
+          visible={visible}
+          footer={(
+            <Fragment>
+              <Button
+                onClick={onCancel}
+              >
+                Cancel
+              </Button>
+              <Button
+                form="createDialogForm"
+                key="submit"
+                htmlType="submit"
+                type="primary"
+              >
+                Create
+              </Button>
+            </Fragment>
+          )}
+        >
           <Input
+            onChange={this.onChangeName.bind(this)}
             style={{ marginBottom: 15 }}
-            value={this.props.path}
-            readOnly
+            value={name}
+            placeholder={`Enter new ${type} name...`}
+            addonAfter={addonAfter}
           />
-        </Form.Item>
-      </Modal>
+          <Form.Item label="Destination">
+            <Input
+              style={{ marginBottom: 15 }}
+              value={this.props.path}
+              readOnly
+            />
+          </Form.Item>
+        </Modal>
+      </Form>
     );
   }
 }
