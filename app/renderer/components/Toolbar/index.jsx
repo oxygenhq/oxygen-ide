@@ -25,9 +25,9 @@ import { type DeviceInfo } from '../../types/DeviceInfo';
 import { type BrowserInfo } from '../../types/BrowserInfo';
 
 type ControlState = {
-  visible?: boolean, 
-  enabled?: boolean,
-}
+  visible?: boolean,
+  enabled?: boolean
+};
 type Props = {
   stepDelay: number,
   testMode: string,
@@ -37,7 +37,7 @@ type Props = {
   emulators: Array<string>,
   controlsState: { [string]: ControlState },
   onValueChange: (string, string) => void,
-  onButtonClick: (string) => void,
+  onButtonClick: (string) => void
 };
 
 const { Option } = Select;
@@ -232,7 +232,7 @@ export default class Toolbar extends Component<Props> {
             className={ this._getControlClassNames(Controls.TEST_RUN, 'button') }
             enabled={ this._isEnabled(Controls.TEST_RUN) }
           >
-            <Icon 
+            <Icon
               title="Run Test"
               type="play-circle"
               theme="filled"

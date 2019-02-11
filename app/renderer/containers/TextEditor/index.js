@@ -19,6 +19,7 @@ const mapStoreToProps = (state) => {
   }));
 
   return {
+    editorReadOnly: state.test.isRunning,
     activeFile: state.editor.activeFile,
     openFiles: openFiles, //state.editor.openFiles,
   };

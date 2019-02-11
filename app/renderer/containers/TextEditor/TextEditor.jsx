@@ -23,6 +23,7 @@ import editorSubjects from '../../store/editor/subjects';
 import fileSubjects from '../../store/fs/subjects';
 
 type Props = {
+  editorReadOnly: boolean,
   activeFile: null | object,
   openFiles: null | {[key: string]: object},
   onBreakpointsUpdate: (Array<any>) => void,
@@ -86,7 +87,7 @@ export default class TextEditor extends Component<Props> {
   }
 
   render() {
-    const { activeFile, openFiles } = this.props;
+    const { activeFile, openFiles, editorReadOnly } = this.props;
     const self = this;
 
     return (
@@ -100,17 +101,19 @@ export default class TextEditor extends Component<Props> {
 
           const language = SupportedExtensions[file.ext] || DEFAULT_EDITOR_LANGUAGE;
           // file.language
+
           return (
-            <MonacoEditor 
+            <MonacoEditor
               ref={(ref) => { self.editors[file.path] = ref; }}
-              key={ file.path }
-              value={ file.content }
-              language={ language }
-              activeLine={ file.activeLine }
-              visible={ file.path === activeFile }
-              onBreakpointsUpdate={ (bps) => this.props.onBreakpointsUpdate(file.path, bps) }
-              onValueChange={ (bps) => ::this.handleValueChange(file.path, bps) }
-              onSelectionChange={ (bps) => ::this.handleSelectionChange(file.path, bps) }
+              key={file.path}
+              value={file.content}
+              language={language}
+              activeLine={file.activeLine}
+              visible={file.path === activeFile}
+              editorReadOnly={editorReadOnly}
+              onBreakpointsUpdate={(bps) => this.props.onBreakpointsUpdate(file.path, bps)}
+              onValueChange={(bps) => ::this.handleValueChange(file.path, bps)}
+              onSelectionChange={(bps) => ::this.handleSelectionChange(file.path, bps)}
             />
           );
         })}

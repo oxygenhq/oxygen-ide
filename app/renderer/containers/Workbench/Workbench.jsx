@@ -273,7 +273,7 @@ export default class Workbench extends Component<Props> {
         </Fragment>
         }
         {updateModals.call(this)}
-        <Toolbar 
+        <Toolbar
           testMode={ runtimeSettings.testMode }
           testTarget={ runtimeSettings.testTarget }
           stepDelay={ runtimeSettings.stepDelay }
@@ -321,8 +321,14 @@ export default class Workbench extends Component<Props> {
                   </Row>
                 </Header>
                 <div className="editor-container">
-                  <TextEditor onBreakpointsUpdate={ ::this.handleBreakpointsUpdate } onContentUpdate={ ::this.handleFileContentUpdate } />
-                  <Logger visible={ loggerVisible } onHide={ ::this.logger_onHide } />
+                  <TextEditor
+                    onBreakpointsUpdate={::this.handleBreakpointsUpdate}
+                    onContentUpdate={::this.handleFileContentUpdate}
+                  />
+                  <Logger
+                    visible={loggerVisible}
+                    onHide={::this.logger_onHide}
+                  />
                 </div>
               </Layout>
               <Sidebar 
