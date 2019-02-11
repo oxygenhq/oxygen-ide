@@ -7,32 +7,31 @@
  * (at your option) any later version.
  */
 import path from 'path';
-import fileFolderSorter from '../../main/helpers/fileFolderSorter';
 import _ from 'lodash';
+import fileFolderSorter from '../../main/helpers/fileFolderSorter';
 
-export function checkEmpty(data){
-    if(data && data.length){
+export function checkEmpty(data) {
+    if (data && data.length) {
         return data;
-    } else {
-        return null;
     }
+    return null;
 }
 
-export function clearEmptyChildArray(element){
-    if(element && typeof element.children !== 'undefined'){
-        if((element.children && element.children.length === 0) || element.children === null){
+export function clearEmptyChildArray(element) {
+    if (element && typeof element.children !== 'undefined') {
+        if ((element.children && element.children.length === 0) || element.children === null) {
             delete element.children;
         }
     }
     return element;
 }
 
-export function clearDublicatesInChildArray(element){
-    if(element && element.children && element.children.length > 1){
+export function clearDublicatesInChildArray(element) {
+    if (element && element.children && element.children.length > 1) {
         return {
             ...element,
-            children: _.uniq(element.children)
-        }
+            children: _.uniqWith(element.children, _.isEqual)
+        };
     }
     return element;
 }
@@ -53,8 +52,7 @@ export function wrap(rawNodes) {
 export function mergeChildren(prevChildren, nextChildren) {
     if (!prevChildren) {
         return nextChildren;
-    }
-    else if (!nextChildren) {
+    } else if (!nextChildren) {
         return null;
     }
     let merged = [];
@@ -91,7 +89,7 @@ export function findTreeNode(root, nodePath) {
 
 export function addTreeNode(root, fsInfo, rootPath) {
     if (!root || !root.length) {
-        return [ fsInfo ];
+        return [fsInfo];
     }
     const { parentPath } = fsInfo;
     // make sure that node path ends with '/' (path separator)
@@ -99,18 +97,18 @@ export function addTreeNode(root, fsInfo, rootPath) {
     const safeNodePath = parentPath.endsWith(path.sep) ? parentPath : parentPath + path.sep;
     let newRoot = [];
 
-    if(safeRootPath === safeNodePath){
-        newRoot = [ ...root ];
+    if (safeRootPath === safeNodePath) {
+        newRoot = [...root];
         if (
             newRoot &&
             newRoot.length
-          ) {
+        ) {
             newRoot.push(fsInfo);
             newRoot.sort(fileFolderSorter);
-            newRoot = _.uniq(newRoot);
-          } else {
-            newRoot = [ fsInfo ];
-          }
+            newRoot = _.uniqWith(newRoot, _.isEqual);
+        } else {
+            newRoot = [fsInfo];
+        }
     } else {
         root.forEach(elm => {
             const elmPath = elm.path.endsWith(path.sep) ? elm.path : elm.path + path.sep;
@@ -121,6 +119,7 @@ export function addTreeNode(root, fsInfo, rootPath) {
                         childrenClone = [...elm.children];
                     }
                     childrenClone.push(fsInfo);
+                    childrenClone = [..._.uniqWith(childrenClone, _.isEqual)];
                     childrenClone.sort(fileFolderSorter);
                     newRoot.push(clearDublicatesInChildArray({
                         ...elm,
