@@ -65,8 +65,18 @@ export default class FileCreateDialog extends PureComponent<Props> {
   }
 
   onChangeName(e) {
+      const illegalCharacters = /(\\)|(\/)|(\:)|(\;)|(\*)|(\?)|(")|(')|(,)|(\.)|(\<)|(\>)|(\|)|( )/gi;
+      let result = e.target.value.match( illegalCharacters );
+      if(result){
+        result = result.map(
+            item => item.replace(/( )/gi, 'space')
+        );
+        result = _.uniq(result);
+        const srt = `Char${result.length > 1 ? 's': ''} ${result.join(', ')} is not allowed`;
+        message.error(srt);
+      }
       this.setState({
-          name: e.target.value,
+          name: (e.target.value+'').replace(illegalCharacters, ''),
       });
   }
 
