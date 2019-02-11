@@ -6,6 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
+/* eslint-disable */
 // import uniqid from 'uniqid';
 import { message } from 'antd';
 import * as ActionTypes from './types';
@@ -13,6 +14,8 @@ import subjects from './subjects';
 import * as treeHelpers from '../../helpers/tree';
 import * as fsHelpers from '../../helpers/fs';
 import { success, failure } from '../../helpers/redux';
+import fileFolderSorter from '../../../main/helpers/fileFolderSorter';
+import _ from 'lodash';
 
 const defaultState = {
   isLoading: false,
@@ -27,10 +30,32 @@ const defaultState = {
 
 export default (state = defaultState, action, dispatch) => {
   const payload = action.payload || {};
-  const { path, node, name, response, content, error } = payload;
+  const { path, node, name, response, content, error, fileOrFolder } = payload;
   let _newActiveNode, _filesClone, _node, _treeDataClone;
 
   switch (action.type) {
+    case ActionTypes.FS_ADD_FILE_OR_FOLDER: {
+      if(!fileOrFolder){
+        return state;
+      }
+      return { 
+        ...state, 
+        tree: {
+          data: treeHelpers.addTreeNode(state.tree.data, fileOrFolder, state.rootPath),
+        }
+      };
+    }
+
+    case ActionTypes.FS_SET_TREE_ROOT_PATH:
+      if(path){
+        return {
+          ...state, 
+          rootPath: path,
+        }
+      } else {
+        return state;
+      }
+
     // FS_TREE_OPEN_FOLDER
     case ActionTypes.FS_TREE_OPEN_FOLDER:
       return { 
@@ -89,21 +114,24 @@ export default (state = defaultState, action, dispatch) => {
         isLoading: true,
       };
     case success(ActionTypes.FS_DELETE):
+      if(!path){
+        return state;
+      }
       _newActiveNode = state.tree.activeNode === path ? null : state.tree.activeNode;
-      _filesClone = {};
+      let filesClons = {};
       // clone all files except the one we just renamed
       for (let filePath of Object.keys(state.files)) {
         if (path !== filePath) {
-          _filesClone[filePath] = state.files[filePath];
+          filesClons[filePath] = state.files[filePath];
         }
       }
       return { 
         ...state, 
         tree: {
           activeNode: _newActiveNode,
-          data: treeHelpers.removeTreeNode(state.tree.data, path),
+          data: treeHelpers.clearEmptyChildArray(treeHelpers.checkEmpty(treeHelpers.removeTreeNode(state.tree.data, path)))
         },
-        files: _filesClone,
+        files: filesClons,
         isLoading: false,
       };
     case failure(ActionTypes.FS_DELETE):

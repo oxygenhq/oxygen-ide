@@ -16,8 +16,8 @@ function handleContextMenuEvent(e, node, menuName) {
 }
 
 function renderTreeNodes(nodes) {
-    if (!nodes || !nodes.length || nodes.length == 0) {
-      return null;
+    if (!nodes || !nodes.length || nodes.length === 0) {
+        return null;
     }
     handleContextMenuEvent = handleContextMenuEvent.bind(this);
     return nodes.map(element => {

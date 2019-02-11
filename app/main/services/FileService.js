@@ -6,11 +6,14 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
+
+/* eslint-disable class-methods-use-this */
 import fs from 'fs';
 import path from 'path';
 import rimraf from 'rimraf';
 import junk from 'junk';
-
+import chokidar from 'chokidar';
+import { webContents } from 'electron';
 import ServiceBase from './ServiceBase';
 import fileFolderSorter from '../helpers/fileFolderSorter';
 import isUnixHiddenPath from '../helpers/isUnixHiddenPath';
@@ -23,10 +26,96 @@ const FS_ERRORS = {
     EPERM: 'Operation not permitted'
 };
 
-export default class FileService extends ServiceBase {
-    constructor() {
-        super();
+const getFileInfo = (filePath) => {
+    // this function accepts either fs.Stats object or path as string
+    const stats = fs.lstatSync(filePath);
+    const type = stats.isDirectory() ? 'folder' : (stats.isFile() ? 'file' : 'other');
+    const parentPath = path.dirname(filePath);
+    return {
+        name: path.basename(filePath),
+        path: filePath,
+        parentPath,
+        type,
+        ext: path.extname(filePath),
+    };
+};
+
+const send = data => {
+    const allWebContents = webContents.getAllWebContents();
+    allWebContents.forEach((contents) => {
+        contents.send('MAIN_SERVICE_EVENT', data);
+    });
+};
+
+const processChange = (eventPath, folderPath, type) => {
+    const filePart = eventPath.split(folderPath);
+    if (filePart && filePart[1]) {
+        // anylize file location
+        if (eventPath) {
+            //  file or folder in the deep folders structure was deleted or renamed
+            //  dirUnlinkDeep or fileUnlinkDeep
+            if (['dirUnlink', 'fileUnlink'].includes(type)) {
+                send({
+                    service: 'FileService',
+                    event: 'filesWatcher',
+                    type: `${type}Deep`,
+                    path: eventPath
+                });
+            } else {
+                //  file or folder in the deep folders structure was added
+                // dirAddDeep or fileAddDeep
+                const fileInfo = getFileInfo(eventPath);
+                send({
+                    service: 'FileService',
+                    event: 'filesWatcher',
+                    type: `${type}Deep`,
+                    data: fileInfo
+                });
+            }
+        } else {
+            console.warn(`bad eventPath: ${eventPath}`);
+        }
+    } else {
+        console.warn(`bad split result wirh eventPath: ${eventPath} and folderPath: ${folderPath}`);
     }
+};
+
+export default class FileService extends ServiceBase {
+    watcherOn = false;
+
+    createWatchOnFilesChannel(folderPath) {
+        if (!this.watcherOn) {
+            this.watcherOn = true;
+            chokidar.watch(folderPath, {
+                ignored: ['**/node_modules/**/*', '**/node_modules/**/**/*', '**/.git/**/*', '*.gz'],
+                ignoreInitial: true,
+                ignorePermissionErrors: true,
+                followSymlinks: true,
+                interval: 1000,
+                binaryInterval: 1000,
+                useFsEvents: false
+            }).on('all', (event, eventPath) => {
+                if (event === 'add') {
+                    // file add
+                    processChange(eventPath, folderPath, 'fileAdd');
+                } else if (event === 'unlink') {
+                    // file unlink(part of rename or delete)
+                    processChange(eventPath, folderPath, 'fileUnlink');
+                } else if (event === 'addDir') {
+                    // dir add
+                    processChange(eventPath, folderPath, 'dirAdd');
+                } else if (event === 'unlinkDir') {
+                    // dir unlink(part of rename or delete)
+                    console.log('[dir] unlink (part of rename or delete)', eventPath);
+                    processChange(eventPath, folderPath, 'dirUnlink');
+                } else {
+                    // console.log('event', event);
+                    // console.log('eventPath', eventPath);
+                }
+            });
+        }
+    }
+
     getFolderContent(folderPath) {
         let stats = fs.lstatSync(folderPath);
         if (!stats.isDirectory()) {
@@ -74,7 +163,7 @@ export default class FileService extends ServiceBase {
     }
 
     getFileContent(filePath) {
-        var data = fs.readFileSync(filePath, 'utf8');
+        const data = fs.readFileSync(filePath, 'utf8');
         return data;
     }
 

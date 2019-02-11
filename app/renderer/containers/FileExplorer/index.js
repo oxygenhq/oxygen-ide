@@ -8,23 +8,28 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import _ from 'lodash';
 import FileExplorer from './FileExplorer';
 import * as actions from '../../store/fs/actions';
 import { showContextMenu } from '../../store/workbench/actions';
 
 const mapStoreToProps = (state) => {
-  return {
-    rootPath: state.fs.rootPath,
-    rootName: state.fs.rootPath && state.fs.files.hasOwnProperty(state.fs.rootPath) ? state.fs.files[state.fs.rootPath].name : null,
-    treeData: state.fs.tree.data,
-    activeNodePath: state.fs.tree.activeNode,
-    expandedKeys: state.fs.tree.expandedKeys,
-    refreshScroll: state.fs.refreshScroll,
-  };
+    return {
+        rootPath: state.fs.rootPath,
+        rootName: state.fs.rootPath &&
+        state.fs.files.hasOwnProperty(state.fs.rootPath)
+            ? state.fs.files[state.fs.rootPath].name
+            : null,
+        treeData: _.uniq(state.fs.tree.data),
+        activeNodePath: state.fs.tree.activeNode,
+        expandedKeys: state.fs.tree.expandedKeys,
+        refreshScroll: state.fs.refreshScroll,
+        forceUpdate: Symbol()
+    };
 };
-  
+
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...actions, showContextMenu } , dispatch)
+    bindActionCreators({ ...actions, showContextMenu }, dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(FileExplorer);

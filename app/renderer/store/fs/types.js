@@ -6,18 +6,19 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-export const FS_RENAME = "FS_RENAME";
-export const FS_CREATE_FOLDER = "FS_CREATE_FOLDER";
-export const FS_CREATE_FILE = "FS_CREATE_FILE";
-export const FS_SAVE_FILE = "FS_SAVE_FILE";
-export const FS_SAVE_FILE_AS = "FS_SAVE_FILE_AS";
-export const FS_DELETE = "FS_DELETE";
-
+export const FS_RENAME = 'FS_RENAME';
+export const FS_CREATE_FOLDER = 'FS_CREATE_FOLDER';
+export const FS_CREATE_FILE = 'FS_CREATE_FILE';
+export const FS_SAVE_FILE = 'FS_SAVE_FILE';
+export const FS_SAVE_FILE_AS = 'FS_SAVE_FILE_AS';
+export const FS_DELETE = 'FS_DELETE';
+export const FS_ADD_FILE_OR_FOLDER = 'FS_ADD_FILE_OR_FOLDER';
+export const FS_SET_TREE_ROOT_PATH = 'FS_SET_TREE_ROOT_PATH';
 export const FS_TREE_OPEN_FOLDER = 'FS_TREE_OPEN_FOLDER';
 export const FS_TREE_OPEN_FOLDER_SUCCESS = 'FS_TREE_OPEN_FOLDER_SUCCESS';
 export const FS_TREE_OPEN_FOLDER_ERROR = 'FS_TREE_OPEN_FOLDER_ERROR';
 
-export const FS_TREE_LOAD_NODE_CHILDREN = "FS_TREE_LOAD_NODE_CHILDREN";
+export const FS_TREE_LOAD_NODE_CHILDREN = 'FS_TREE_LOAD_NODE_CHILDREN';
 
 export const FS_TREE_SET_ACTIVE_NODE = 'FS_TREE_SET_ACTIVE_NODE';
 export const FS_TREE_CLEAR = 'FS_TREE_CLEAR';

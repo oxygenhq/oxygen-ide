@@ -15,15 +15,15 @@ import { polyfill } from 'react-lifecycles-compat';
 
 import { treeContextTypes } from './contextTypes';
 import {
-  convertTreeToEntities, convertDataToTree,
-  getDataAndAria,
-  getPosition, getDragNodesKeys,
-  parseCheckedKeys,
-  conductExpandParent, calcSelectedKeys,
-  calcDropPosition,
-  arrAdd, arrDel, posToArr,
-  mapChildren, conductCheck,
-  warnOnlyTreeNode,
+    convertTreeToEntities, convertDataToTree,
+    getDataAndAria,
+    getPosition, getDragNodesKeys,
+    parseCheckedKeys,
+    conductExpandParent, calcSelectedKeys,
+    calcDropPosition,
+    arrAdd, arrDel, posToArr,
+    mapChildren, conductCheck,
+    warnOnlyTreeNode,
 } from './util';
 
 class Tree extends React.Component {
