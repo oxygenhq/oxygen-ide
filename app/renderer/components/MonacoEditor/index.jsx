@@ -10,12 +10,44 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import path from 'path';
-
+import { remote } from 'electron';
 import oxygenIntellisense from './intellisense';
-import { language as jsTokenizer } from './tokenizers/javascript'; 
+import { language as jsTokenizer } from './tokenizers/javascript';
 import * as helpers from './helpers';
 import onDidChangeModelContent from './onDidChangeModelContent';
 import onDidChangeCursorSelection from './onDidChangeCursorSelection';
+
+
+const buildEditorContextMenu = remote.require('electron-editor-context-menu');
+
+window.addEventListener('customcontextmenu', (e) => {
+  const { actions } = e.detail;
+
+  const menuActions = actions.map((action, index) => {
+    let menuItem = { ...action };
+    if (action._id === 'vs.actions.separator') {
+      menuItem = {
+        type: 'separator'
+      };
+    } else {
+      menuItem.label = menuItem._label;
+      menuItem.click = () => {
+        try {
+          const menu = document.querySelector('.context-view');
+          menu.getElementsByTagName('li')[index].click();
+        } catch (err) {
+          console.warn('err', err);
+        }
+      };
+    }
+    return menuItem;
+  });
+
+  const menu = buildEditorContextMenu({}, menuActions);
+  setTimeout(() => {
+    menu.popup(remote.getCurrentWindow());
+  }, 30);
+}, false);
 
 // load Monaco Editor module
 function uriFromPath(_path) {
@@ -27,7 +59,7 @@ function uriFromPath(_path) {
 }
 amdRequire.config({
   ignoreDuplicateModules: 'vs/editor/editor.main',
-  baseUrl: uriFromPath(path.join(__dirname, '../node_modules/monaco-editor/min'))
+  baseUrl: uriFromPath(path.join(__dirname, '../node_modules/monaco-editor/dev'))
 });
 
 function noop() {}
@@ -203,7 +235,8 @@ export default class MonacoEditor extends React.Component {
         value,
         language,
         ...MONACO_DEFAULT_OPTIONS,
-        ...options
+        ...options,
+        contextmenu: true
       });
       oxygenIntellisense();
       if (theme) {
