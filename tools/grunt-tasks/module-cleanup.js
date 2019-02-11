@@ -23,7 +23,7 @@ module.exports = function(grunt) {
                                 'authors.txt',
                                 'gruntfile.js',
                                 'quick-test.js', 'build.js',
-                                '*.html', '*.htm', '*.png', '*.min.js', '*.map'],
+                                '*.html', '*.htm', '*.png', '*.map'],
             test: true
         }, function(err, results) {
             if (err) {
