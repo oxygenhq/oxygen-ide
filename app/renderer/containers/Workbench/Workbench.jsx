@@ -323,10 +323,12 @@ export default class Workbench extends Component<Props> {
                   </Row>
                 </Header>
                 <div className="editor-container">
-                  <TextEditor
-                    onBreakpointsUpdate={::this.handleBreakpointsUpdate}
-                    onContentUpdate={::this.handleFileContentUpdate}
-                  />
+                  <div id="editors-container-wrap">
+                    <TextEditor
+                      onBreakpointsUpdate={::this.handleBreakpointsUpdate}
+                      onContentUpdate={::this.handleFileContentUpdate}
+                    />
+                  </div>
                   <Logger
                     visible={loggerVisible}
                     onHide={::this.logger_onHide}

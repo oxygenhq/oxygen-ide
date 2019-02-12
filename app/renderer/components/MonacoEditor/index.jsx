@@ -58,12 +58,18 @@ export default class MonacoEditor extends React.Component {
     super(props);
     this.editorContainer = undefined;
     this.__current_value = props.value;
+    this.elem = null;
+    this.on = 0;
   }
 
   componentDidMount() {
     amdRequire(['vs/editor/editor.main'], () => {
       this.initMonaco();
     });
+
+    this.elem = document.getElementById('editors-container-wrap');
+    this.elem.addEventListener("keydown", this.keydownCallback);
+    this.elem.addEventListener("keyup", this.keyupCallback);
   }
 
   shouldComponentUpdate(nextProps, nextState) {    
@@ -74,6 +80,19 @@ export default class MonacoEditor extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+    const RATIO = 1.58;
+    if (prevProps.fontSize !== this.props.fontSize && this.editor) {
+
+      // update editor
+      this.editor.updateOptions({ 
+        fontSize: this.props.fontSize,
+        lineHeight: this.props.fontSize*RATIO
+      });
+
+      // save electron settings
+      this.props.saveSettings();
+
+    }
     if (this.props.value !== this.__current_value) {
       // Always refer to the latest value
       this.__current_value = this.props.value;
@@ -117,6 +136,42 @@ export default class MonacoEditor extends React.Component {
 
   componentWillUnmount() {
     this.destroyMonaco();
+    this.elem.removeEventListener("keydown", this.keydownCallback);
+    this.elem.removeEventListener("keyup", this.keyupCallback);
+  }
+  
+  wheelCallback = (e) => {
+    e.stopPropagation()
+    if(e && e.deltaY && e.deltaY < 0){
+      //up
+      if(this.props.zoomIn){
+        this.props.zoomIn();
+      }
+    }
+    if(e && e.deltaY && e.deltaY > 0){
+      //down
+      if(this.props.zoomOut){
+        this.props.zoomOut();
+      }
+    }
+  }
+  
+  keydownCallback = (e) => {
+    if(e.key === 'Control'){
+      if(!this.on){
+        e.stopPropagation()
+        this.elem.addEventListener('wheel', this.wheelCallback , true);
+        this.on = true;
+      }
+    }
+  }
+  
+  keyupCallback = (e) => {
+    if(e.key === 'Control'){
+      e.stopPropagation()
+      this.elem.removeEventListener('wheel',  this.wheelCallback , true)
+      this.on = 0;
+    }
   }
 
   determineUpdatedProps(diffProps) {
@@ -139,7 +194,9 @@ export default class MonacoEditor extends React.Component {
       visible:
         this.props.visible !== diffProps.visible,
       editorReadOnly:
-        diffProps.editorReadOnly !== this.props.editorReadOnly
+        diffProps.editorReadOnly !== this.props.editorReadOnly,
+      fontSize:
+          diffProps.fontSize !== this.props.fontSize
     };
   }
 
@@ -292,6 +349,7 @@ export default class MonacoEditor extends React.Component {
 MonacoEditor.propTypes = {
     visible: PropTypes.bool,
     editorReadOnly: PropTypes.bool,
+    fontSize: PropTypes.number,
     width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     value: PropTypes.string,
@@ -309,6 +367,7 @@ MonacoEditor.propTypes = {
 MonacoEditor.defaultProps = {
     visible: true,
     editorReadOnly: false,
+    fontSize: 12,
     width: '100%',
     height: '100%',
     value: null,

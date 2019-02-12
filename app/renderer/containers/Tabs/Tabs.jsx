@@ -39,24 +39,30 @@ class Tabs extends Component<Props, void> {
   }
 
   componentDidMount() {
-    this.ps = new PerfectScrollbar(this.tabsRef, {
-      suppressScrollY: true,
-      useBothWheelAxes: true,
-    });
+    if(this.tabsRef){
+      this.ps = new PerfectScrollbar(this.tabsRef, {
+        suppressScrollY: true,
+        useBothWheelAxes: true,
+      });
+    }
 
     window.addEventListener('resize', _.debounce((e) => {
       e.preventDefault();
       if (this.ps) {
         this.ps.destroy();
-        this.ps = new PerfectScrollbar(this.tabsRef, {
-          suppressScrollY: true,
-          useBothWheelAxes: true,
-        });
+        if(this.tabsRef){
+          this.ps = new PerfectScrollbar(this.tabsRef, {
+            suppressScrollY: true,
+            useBothWheelAxes: true,
+          });
+        }
       } else {
-        this.ps = new PerfectScrollbar(this.tabsRef, {
-          suppressScrollY: true,
-          useBothWheelAxes: true,
-        });
+        if(this.tabsRef){
+          this.ps = new PerfectScrollbar(this.tabsRef, {
+            suppressScrollY: true,
+            useBothWheelAxes: true,
+          });
+        }
       }
     }, 150), false);
   }
