@@ -12,6 +12,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { PureComponent, Fragment } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { message } from 'antd';
 import _ from 'lodash';
 import { type LogEntry } from '../types/LogEntry';
 import ScrollContainer from './ScrollContainer';
@@ -43,7 +44,7 @@ export default class LogViewer extends PureComponent<Props> {
 
   componentWillReceiveProps(nextProps) {
     const diff = _.difference(nextProps.logs, this.props.logs);
-    if (diff && diff.length) {
+    if ((this.props.category !== nextProps.category) || diff && diff.length) {
       this.setState({
         refreshScroll: !this.state.refreshScroll,
         keyKeys: [],
@@ -99,12 +100,28 @@ export default class LogViewer extends PureComponent<Props> {
     }
   }
 
+
+  getCopyValue = () => {
+    let result = '';
+
+    if(this.loggerRef && this.loggerRef.current && this.loggerRef.current.innerText){
+      result = this.loggerRef.current.innerText
+    }
+
+    return result;
+  }
+
   copyClicked = () => {
     if (!this.state.copyValue) {
-      this.setState({
-        keyKeys: ['Meta', 'c'],
-        copyValue: this.loggerRef.current.innerText
-      });
+      const copyValue = this.getCopyValue();
+      if(copyValue){
+        this.setState({
+          keyKeys: ['Meta', 'c'],
+          copyValue: copyValue
+        });
+      } else {
+        message.error('Nothing to copy');
+      }
     }
   }
 
