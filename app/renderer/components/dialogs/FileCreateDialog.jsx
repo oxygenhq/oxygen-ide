@@ -27,11 +27,15 @@ type Props = {
 };
 
 export default class FileCreateDialog extends PureComponent<Props> {
-  props: Props;
+  constructor(props: Props) {
+    super(props: Props);
 
-  state = {
-      ...DEFAULT_STATE,
-      type: this.props.type ? this.props.type : 'file',
+    this.textInput = null;
+
+    this.state = {
+        ...DEFAULT_STATE,
+        type: this.props.type ? this.props.type : 'file',
+    }
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -58,6 +62,23 @@ export default class FileCreateDialog extends PureComponent<Props> {
       return null;
   }
 
+  componentDidMount(){
+      this.focusTextInput();
+  }
+
+  focusTextInput = () => {
+    if (this.textInput && this.textInput.focus) this.textInput.focus();
+  };
+
+  setTextInputRef = element => {
+    if(element){
+        this.textInput = element;
+        if(this.textInput && this.textInput.focus){
+            this.textInput.focus();
+        }
+    }
+  };
+
   onChangeExt(value) {
       this.setState({
           ext: value,
@@ -65,12 +86,9 @@ export default class FileCreateDialog extends PureComponent<Props> {
   }
 
   onChangeName(e) {
-      const illegalCharacters = /(\\)|(\/)|(\:)|(\;)|(\*)|(\?)|(")|(')|(,)|(\.)|(\<)|(\>)|(\|)|( )/gi;
+      const illegalCharacters = /(\\)|(\/)|(\:)|(\;)|(\*)|(\?)|(")|(')|(,)|(\.)|(\<)|(\>)|(\|)/gi;
       let result = e.target.value.match( illegalCharacters );
       if(result){
-        result = result.map(
-            item => item.replace(/( )/gi, 'space')
-        );
         result = _.uniq(result);
         const srt = `Char${result.length > 1 ? 's': ''} ${result.join(', ')} is not allowed`;
         message.error(srt);
@@ -168,6 +186,7 @@ export default class FileCreateDialog extends PureComponent<Props> {
             )}
             >
             <Input
+                ref={this.setTextInputRef}
                 onKeyPress={this.handleKeyPress}
                 onChange={this.onChangeName.bind(this)}
                 style={{ marginBottom: 15 }}
