@@ -249,11 +249,13 @@ export default class Workbench extends Component<Props> {
       <div>
         { dialog && 
         <Fragment>
-          <FileCreateDialog 
-            { ...dialog['DIALOG_FILE_CREATE'] }
-            onSubmit={ ::this.fileCreateDialog_onSubmit }
-            onCancel={ ::this.fileCreateDialog_onCancel } 
-          />
+          { dialog.DIALOG_FILE_CREATE && dialog.DIALOG_FILE_CREATE.visible &&
+            <FileCreateDialog 
+              { ...dialog['DIALOG_FILE_CREATE'] }
+              onSubmit={ ::this.fileCreateDialog_onSubmit }
+              onCancel={ ::this.fileCreateDialog_onCancel } 
+            />
+          }
           <FileRenameDialog 
             { ...dialog['DIALOG_FILE_RENAME'] } 
             onSubmit={ ::this.fileRenameDialog_onSubmit }
