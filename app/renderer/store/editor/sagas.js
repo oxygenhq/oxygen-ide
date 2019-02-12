@@ -22,8 +22,14 @@ import ActionTypes from '../types';
 export default function* root() {
     yield all([
       takeLatest(ActionTypes.EDITOR_OPEN_FILE, openFile),
+      takeLatest(ActionTypes.SAVE_SETTINGS, saveSettings),
       takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
     ]);
+}
+
+export function* saveSettings() {
+    const settings = yield select(state => state.settings);
+    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
 }
 
 export function* openFile({ payload }) {

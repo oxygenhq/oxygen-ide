@@ -8,6 +8,28 @@
  */
 import * as types from './types';
 
+/* zoomIn */
+export const zoomIn = () => ({
+  type: types.EDITOR_ZOOM_IN
+});
+
+/* zoomOut */
+export const zoomOut = () => ({
+  type: types.EDITOR_ZOOM_OUT
+});
+
+/* zoomToDefault */
+export const zoomToDefault = () => ({
+  type: types.EDITOR_ZOOM_TO_DEFAULT
+});
+
+/* zoomToDefault */
+export const setZoom = (zoom) => ({
+  type: types.EDITOR_SET_ZOOM,
+  payload: { zoom }
+});
+
+
 export const setSidebarVisible= (sidebar, visible) => ({
   type: types.SIDEBAR_SET_VISIBLE,
   payload: { target: sidebar, value: visible },

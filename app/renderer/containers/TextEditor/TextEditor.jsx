@@ -24,6 +24,7 @@ import fileSubjects from '../../store/fs/subjects';
 
 type Props = {
   editorReadOnly: boolean,
+  fontSize: number,
   activeFile: null | object,
   openFiles: null | {[key: string]: object},
   onBreakpointsUpdate: (Array<any>) => void,
@@ -87,7 +88,7 @@ export default class TextEditor extends Component<Props> {
   }
 
   render() {
-    const { activeFile, openFiles, editorReadOnly } = this.props;
+    const { activeFile, openFiles, editorReadOnly, fontSize } = this.props;
     const self = this;
 
     return (
@@ -111,6 +112,10 @@ export default class TextEditor extends Component<Props> {
               activeLine={file.activeLine}
               visible={file.path === activeFile}
               editorReadOnly={editorReadOnly}
+              fontSize={fontSize}
+              saveSettings={this.props.saveSettings}
+              zoomIn={this.props.zoomIn}
+              zoomOut={this.props.zoomOut}
               onBreakpointsUpdate={(bps) => this.props.onBreakpointsUpdate(file.path, bps)}
               onValueChange={(bps) => ::this.handleValueChange(file.path, bps)}
               onSelectionChange={(bps) => ::this.handleSelectionChange(file.path, bps)}
