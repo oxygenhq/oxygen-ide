@@ -252,7 +252,7 @@ export default (state = defaultState, action, dispatch) => {
         ...state, 
         isLoading: true,
       };
-    case success(ActionTypes.FS_FETCH_FILE_CONTENT):
+    case success(ActionTypes.FS_FETCH_FILE_CONTENT): 
       return {
         ...state,
         isLoading: false,
@@ -264,7 +264,7 @@ export default (state = defaultState, action, dispatch) => {
           }
         }
       }
-
+    
     // FETCH_FILE_INFO
     case ActionTypes.FS_FETCH_FILE_INFO:
       return { 
@@ -285,7 +285,7 @@ export default (state = defaultState, action, dispatch) => {
     case ActionTypes.FS_UPDATE_FILE_CONTENT:
       if (!state.files.hasOwnProperty(path)) {
         return state;
-      }      
+      }
       return {
         ...state,
         isLoading: false,

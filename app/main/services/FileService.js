@@ -51,10 +51,10 @@ const processChange = (eventPath, folderPath, type) => {
     const filePart = eventPath.split(folderPath);
     if (filePart && filePart[1]) {
         // anylize file location
-        if (eventPath) {
+        if (eventPath) {  
             //  file or folder was deleted or renamed
             //  dirUnlink or fileUnlink
-            if (['dirUnlink', 'fileUnlink', 'fileChangeContent'].includes(type)) {
+            if (['dirUnlink', 'fileUnlink', 'fileChangeContent'].includes(type)) { 
                 send({
                     service: 'FileService',
                     event: 'filesWatcher',
@@ -167,8 +167,26 @@ export default class FileService extends ServiceBase {
     }
 
     getFileContent(filePath) {
-        const data = fs.readFileSync(filePath, 'utf8');
-        return data;
+        var data = fs.readFileSync(filePath, 'utf8');
+        if(!data){
+            // sometimes readFileSync return empty data on not emty file :-?
+            setTimeout(function() { 
+                var data = fs.readFileSync(filePath, 'utf8');
+                send({
+                    service: 'FileService',
+                    event: 'getFileContent',
+                    content: data,
+                    path: filePath
+                });
+            }, 100);
+        } else {
+            send({
+                service: 'FileService',
+                event: 'getFileContent',
+                content: data,
+                path: filePath
+            });
+        }
     }
 
     renameFileOrFolder(orgPath, newName) {

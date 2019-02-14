@@ -87,7 +87,7 @@ export function findTreeNode(root, nodePath) {
     return null;
 }
 
-export function addTreeNode(root, fsInfo, rootPath) {
+export function addTreeNode(root, fsInfo, rootPath = '') {
     if (!root || !root.length) {
         return [fsInfo];
     }

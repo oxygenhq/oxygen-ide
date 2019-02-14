@@ -67,6 +67,23 @@ export default class ElectronService extends ServiceBase {
         return this.showOpenDialog('openDirectory');
     }
 
+    showMessageBox(title, message, buttons) {
+        return new Promise((resolve, reject) => {
+            dialog.showMessageBox({
+                type: 'warning',
+                buttons: buttons,
+                title: title,
+                message: message
+            },(response) => {
+                resolve(response);
+            });
+        });
+    }
+
+    showConfirmFileChangeBox(title, message, buttons) {
+        return this.showMessageBox(title, message, buttons);
+    }
+
     showErrorBox(title, message) {
         dialog.showErrorBox(title, message);
     }
