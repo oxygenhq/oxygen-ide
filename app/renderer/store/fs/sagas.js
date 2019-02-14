@@ -44,7 +44,8 @@ export function* handleServiceEvents({ payload }) {
         event,
         type,
         data,
-        path
+        path,
+        content
     } = payload;
     if (!event) {
         return;
@@ -54,15 +55,73 @@ export function* handleServiceEvents({ payload }) {
         if (['dirAdd', 'fileAdd'].includes(type)) {
             yield addFileOrFolder(data);
         }
-        if (['dirUnlink', 'fileUnlink'].includes(type)) {
+        if (type === 'fileUnlink') {
+            const file = yield select(state => state.fs.files[path]);
+            if (file) {
+                yield put(fsActions.updateFileContent(path, file.content));
+            } else {
+                yield unlinkFile(path);
+            }
+        }
+        if(type === 'dirUnlink'){
             yield unlinkFile(path);
         }
         if (type === 'fileChangeContent') {
             const activeNode = yield select(state => state.fs.tree.activeNode);
-            if (activeNode && path && activeNode === path) {
+            if (activeNode && path && activeNode === path) {                    
                 const localPayload = { path };
                 yield fetchFileContent({ payload: localPayload });
             }
+        }
+    }
+
+    if (service === 'FileService' && event === 'getFileContent' ) {
+        if(path){
+            const file = yield select(state => state.fs.files[path]);
+            if(file && typeof file.modified !== 'undefined'){
+                //file exist in edit
+                if(file.modified){
+                    // looks like file modefied in oxygen-ide 
+                    // and now modefied outside oxygen-ide
+                    // file modefied, but not saved
+
+                    if(content !== file.content){
+                        const ansver = yield call(
+                            services.mainIpc.call,
+                            "ElectronService",
+                            "showConfirmFileChangeBox",
+                            [
+                              "Oxygen-ide",
+                              "Fike has changed on disk. Do yo want to reload it?",
+                              ['Cancel', 'Reload']
+                            ]
+                          );
+                        if(typeof ansver !== 'undefined'){
+                            if(ansver === 1){
+                                // 1 - Reload
+                                yield put(fsActions._fetchFileContent_Success(path, content));
+                            }
+    
+                            if(ansver === 0){
+                                // 0 - Cancel
+                                // do nothing
+                            }
+                        }
+                    } else {
+                        // do nothing 
+                    }
+                } else {
+                    // looks like file already added
+                    // file not modefied, we can refresh it
+                    yield put(fsActions._fetchFileContent_Success(path, content));
+                }
+            } else {
+                // looks like add file first
+                // safe operation, because file not modefied yet 
+                yield put(fsActions._fetchFileContent_Success(path, content));
+            }
+        } else {
+            console.warn('on getFileContent no path');
         }
     }
 }
@@ -152,8 +211,12 @@ export function* fetchFileContent({ payload }) {
             if (!file) {
                 yield putAndTake(fsActions.fetchFileInfo(path));
             }
-            const content = yield call(services.mainIpc.call, 'FileService', 'getFileContent', [path]);
-            yield put(fsActions._fetchFileContent_Success(path, content));
+            yield call(
+                services.mainIpc.call,
+                'FileService',
+                'getFileContent',
+                [path]
+            );
         } catch (err) {
             /* istanbul ignore next */
             yield put(fsActions._fetchFileContent_Failure(path, err));
@@ -188,6 +251,8 @@ export function* saveFileContent({ payload }) {
     }
     catch (err) {
         /* istanbul ignore next */
+        
+        yield call(services.mainIpc.call, 'ElectronService', 'showErrorBox', ['Save File Failed', err.code]);
         yield put(fsActions._saveFile_Failure(path, err));
     }
 }
