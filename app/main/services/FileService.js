@@ -9,6 +9,7 @@
 
 /* eslint-disable class-methods-use-this */
 import fs from 'fs';
+import fsExtra from 'fs-extra';
 import path from 'path';
 import rimraf from 'rimraf';
 import junk from 'junk';
@@ -211,6 +212,28 @@ export default class FileService extends ServiceBase {
                             reject(this._humanizeErrorCode(error));
                         } else {
                             resolve(this.getFileInfo(newPath));
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    move(oldPath, newPath){
+        if (!oldPath || !newPath) {
+            throw new Error('Invalid arguments.');
+        }
+        return new Promise((resolve, reject) => {
+            // make sure file with the new name doesn't already exist before renaming the old one
+            fs.access(oldPath, (error) => {
+                if (error) {
+                    console.warn('error', error);
+                } else {
+                    fsExtra.move(oldPath, newPath, error => {
+                        if(error){
+                            console.error('error',error)
+                        } else {
+                            //do nothing, file watcher will do all work
                         }
                     });
                 }

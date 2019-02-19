@@ -28,8 +28,12 @@ export default class ScrollContainer extends Component {
     if (nextProps.refreshScroll !== this.props.refreshScroll && this.scroller && this.scrollWrap) {
       this.scrollWrap.scrollTop = 0;
     }
-  }
 
+    if (nextProps.refreshScrollBottom !== this.props.refreshScrollBottom && this.scroller && this.scrollWrap){
+      this.scrollWrap.scrollTop = this.scrollWrap.scrollHeight;
+    }
+
+  }
 
   componentWillUnmount() {
     this.scroller.destroy();
@@ -55,6 +59,7 @@ export default class ScrollContainer extends Component {
 
 ScrollContainer.propTypes = {
   refreshScroll: PropTypes.bool,
+  refreshScrollBottom: PropTypes.bool,
   disableVertical: PropTypes.bool,
   disableHorizontal: PropTypes.bool,
   classes: PropTypes.oneOfType([

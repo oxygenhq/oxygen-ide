@@ -49,7 +49,11 @@ export function getPosition(level, index) {
 }
 
 export function isTreeNode(node) {
-  return node && node.type && node.type.isTreeNode;
+  if(node && typeof node.type !== 'undefined' && node.type.isTreeNode){
+    return node && node.type && node.type.isTreeNode;
+  } else {
+    return false
+  }
 }
 
 export function getNodeChildren(children) {
@@ -117,14 +121,6 @@ export function getDragNodesKeys(treeNodes, node) {
 // Only used when drag, not affect SSR.
 export function calcDropPosition(event, treeNode) {
   const { clientY } = event;
-  const { top, bottom, height } = treeNode.selectHandle.getBoundingClientRect();
-  const des = Math.max(height * DRAG_SIDE_RANGE, DRAG_MIN_GAP);
-
-  if (clientY <= top + des) {
-    return -1;
-  } else if (clientY >= bottom - des) {
-    return 1;
-  }
 
   return 0;
 }

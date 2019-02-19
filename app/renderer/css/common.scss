@@ -63,7 +63,8 @@
     display: block;
     //width: calc(100% - 10px);
     width: 100%;
-    padding: 0px !important;
+    padding: 8px !important;
+    padding-right: 0px !important;
 
     > li {
       padding: $nodePadding 0;

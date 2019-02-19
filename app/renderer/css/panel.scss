@@ -28,9 +28,6 @@
 .panel-body {
   border-right: solid 1px $panelBorderColor;
   border-left: solid 1px $panelBorderColor;
-  padding-left: 8px;
-  padding-top: 8px;
-  padding-bottom: 8px;
   background-color: $panelBodyBgColor;
   font-family: Helvetica;
   font-size: 12px;
@@ -40,10 +37,7 @@
   line-height: normal;
   letter-spacing: normal;
   color: #333333;
-  /*height: calc(100vh - 73px);*/
-  height:calc(100% - 30px);
-  height:-moz-calc(100% - 30px);
-  height:-webkit-calc(100% - 30px);
+  height: 100vh;
   overflow: hidden; 
 }
 .panel-body:not(> .scroller) {

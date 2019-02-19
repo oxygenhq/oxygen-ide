@@ -20,18 +20,10 @@
   -khtml-user-drag: element;
   -webkit-user-drag: element;
 }
-.rc-tree li.drag-over > .draggable {
-  background-color: #316ac5;
-  color: white;
-  border: 1px #316ac5 solid;
-  opacity: 0.8;
+.rc-tree li.drag-over, .ul-drag-over {
+  background-color: #DAD8D0;
 }
-.rc-tree li.drag-over-gap-top > .draggable {
-  border-top: 2px blue solid;
-}
-.rc-tree li.drag-over-gap-bottom > .draggable {
-  border-bottom: 2px blue solid;
-}
+
 .rc-tree li.filter-node > .rc-tree-node-content-wrapper {
   color: #a60000!important;
   font-weight: bold!important;

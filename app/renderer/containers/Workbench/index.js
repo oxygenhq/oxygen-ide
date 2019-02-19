@@ -13,6 +13,7 @@ import * as wbActions from '../../store/workbench/actions';
 import * as testActions from '../../store/test/actions';
 import * as settingsActions from '../../store/settings/actions';
 import * as recorderActions from '../../store/recorder/actions';
+import { move } from '../../store/fs/actions';
 
 const mapStoreToProps = (state) => {
   const activeNode = state.fs.tree.activeNode;
@@ -30,7 +31,7 @@ const mapStoreToProps = (state) => {
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...wbActions, ...testActions, ...settingsActions } , dispatch)
+  bindActionCreators({ ...wbActions, ...testActions, ...settingsActions, move } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Workbench);

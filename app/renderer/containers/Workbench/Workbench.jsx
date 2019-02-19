@@ -194,6 +194,10 @@ export default class Workbench extends Component<Props> {
     }, 500);
   }
 
+  fileExplorer_onMove(oldPath, newPath){
+    this.props.move(oldPath, newPath)
+  }
+
   /* Logger */
   logger_onHide() {
     this.props.setLoggerVisible(false);
@@ -303,6 +307,7 @@ export default class Workbench extends Component<Props> {
                   onCreate={ ::this.fileExplorer_onCreate }
                   onRename={ ::this.fileExplorer_onRename }
                   onDelete={ ::this.fileExplorer_onDelete }
+                  onMove={ ::this.fileExplorer_onMove }
                 />
               </Sidebar>
               <Layout className="ide-editors">{/*ideScreenEditorHolder*/}

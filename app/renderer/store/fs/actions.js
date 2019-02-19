@@ -190,6 +190,12 @@ export const _rename_Failure = (path, error) => ({
   payload: { path, error },
 });
 
+/* move files/folders to another place */
+export const move = (oldPath, newPath) => ({
+  type: TYPES.FS_MOVE,
+  payload: { oldPath, newPath },
+});
+
 /* delete */
 export const deleteFile = (path) => ({
   type: TYPES.FS_DELETE,
