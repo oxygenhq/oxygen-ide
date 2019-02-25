@@ -32,15 +32,20 @@ export default class Panel extends Component<Props> {
             scrollWrapperClass = null,
             scrollRefresh = false,
             scrollVerticalOnly = false,
+            refreshScrollBottom = false,
+            wrapRef
         } = this.props;
 
         let children = this.props.children;
         if (scroller) {
-            children = renderChildrenWithScroller(this.props.children, scrollWrapperClass, scrollVerticalOnly, scrollRefresh);
+            children = renderChildrenWithScroller(this.props.children, scrollWrapperClass, scrollVerticalOnly, scrollRefresh, refreshScrollBottom);
         }
 
         return (
-            <div className="panel">
+            <div 
+                ref={wrapRef ? wrapRef : undefined}
+                className="panel"
+            >
                 <div className="panel-header">
                     <span>{ header }</span>
                 </div>
@@ -52,7 +57,7 @@ export default class Panel extends Component<Props> {
     }
 }
 
-function renderChildrenWithScroller(children, wrapperClass = null, scrollVerticalOnly = false, refreshScroll = false) {
+function renderChildrenWithScroller(children, wrapperClass = null, scrollVerticalOnly = false, refreshScroll = false, refreshScrollBottom = false) {
     let classes = 'scroller';
     if (wrapperClass) {
         classes += ' ' + wrapperClass;
@@ -60,6 +65,7 @@ function renderChildrenWithScroller(children, wrapperClass = null, scrollVertica
     return (
         <ScrollContainer
           refreshScroll={ refreshScroll }
+          refreshScrollBottom={ refreshScrollBottom }
           disableHorizontal={ scrollVerticalOnly }
           classes={ classes }
         >

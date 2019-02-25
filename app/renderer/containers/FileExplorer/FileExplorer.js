@@ -8,6 +8,7 @@
  */
 // @flow
 import React, { Component } from 'react';
+import path from 'path';
 import Tree from '../../components/Tree';
 import Panel from '../../components/Panel';
 import onSelectNode from './onSelectNode';
@@ -25,6 +26,7 @@ type Props = {
 export default class FileExplorer extends Component<Props> {
     constructor(props: Props) {
         super(props: Props);
+        this.wrap = React.createRef();
         // keeps path hash of nodes which children loading is in progress
         this.loadingNodes = {};
         // keeps reference to Rxjs subscriptions
@@ -40,7 +42,9 @@ export default class FileExplorer extends Component<Props> {
             selectedKeys = [this.props.activeNodePath];
         }
         this.state = {
-            selectedKeys
+            selectedKeys,
+            refreshScroll: false,
+            refreshScrollBottom: false
         };
     }
 
@@ -91,29 +95,84 @@ export default class FileExplorer extends Component<Props> {
         onSelectNode.apply(this, [selectedKeys, info]);
     }
 
+
+    onDrop = (info) => {
+        const node = info.node.props.nodeInfo;
+        const dragNode = info.dragNode.props.nodeInfo;
+
+        if(node && typeof node.type !=='undefined' && node.type !== 'file'){
+
+            const oldPath = dragNode.path;
+            const newPath = node.path + path.sep + dragNode.name;
+
+            const safeOldPath = oldPath.endsWith(path.sep) ? oldPath : oldPath + path.sep;
+            const safeNewPath = newPath.endsWith(path.sep) ? newPath : newPath + path.sep;
+            
+            if(safeOldPath !== safeNewPath){
+                this.props.onMove(safeOldPath, safeNewPath);
+            }
+        } else {
+            const { rootPath } = this.props;
+            if(rootPath){
+                const oldPath = dragNode.path;
+                const newPath = rootPath + path.sep + dragNode.name;
+
+                const safeOldPath = oldPath.endsWith(path.sep) ? oldPath : oldPath + path.sep;
+                const safeNewPath = newPath.endsWith(path.sep) ? newPath : newPath + path.sep;
+                
+                if(safeOldPath !== safeNewPath){
+                    this.props.onMove(safeOldPath, safeNewPath);
+                }
+            }
+        }
+    }
+
+    doRefreshScrollBottom = () => {
+        this.setState({
+            refreshScrollBottom: !this.state.refreshScrollBottom
+        })
+    }
+
+    doRefreshScrollTop = () => {
+        this.setState({
+            refreshScroll: !this.state.refreshScroll
+        })
+    }
+
     render() {
-        const { rootName } = this.props;
-        const { selectedKeys } = this.state;
+        const { rootName, rootPath } = this.props;
+        const { selectedKeys, refreshScroll, refreshScrollBottom } = this.state;
         const headerTitle = 'File Explorer' + (rootName ? ` - ${rootName}` : '');
         return (
             <Panel
+                wrapRef={this.wrap}
                 header={headerTitle}
                 scroller
                 scrollWrapperClass="tree-wrapper"
                 scrollRefresh={this.props.refreshScroll}
+                refreshScrollBottom={refreshScrollBottom}
+                scrollRefresh={refreshScroll}
                 scrollVerticalOnly
             >
-              <Tree
-                showLine
-                checkable={false}
-                defaultExpandedKeys={["nonexistingkey"]}
-                autoExpandParent
-                selectedKeys={selectedKeys}
-                loadData={this.loadData}
-                onSelect={this.onSelectNode}
-              >
-                {renderTreeNodes.apply(this, [this.props.treeData])}
-              </Tree>
+                <Tree
+                    showLine
+                    draggable
+                    checkable={false}
+                    defaultExpandedKeys={["nonexistingkey"]}
+                    autoExpandParent
+                    selectedKeys={selectedKeys}
+                    rootPath={rootPath}
+                    loadData={this.loadData}
+                    onSelect={this.onSelectNode}
+                    onDragStart={this.onDragStart}
+                    onDragEnter={this.onDragEnter}
+                    onDrop={this.onDrop}
+                    doRefreshScrollBottom={this.doRefreshScrollBottom}
+                    doRefreshScrollTop={this.doRefreshScrollTop}
+                    wrap={this.wrap}
+                >
+                    {renderTreeNodes.apply(this, [this.props.treeData])}
+                </Tree>
             </Panel>
         );
     }

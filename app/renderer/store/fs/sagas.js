@@ -29,6 +29,7 @@ export default function* root() {
         takeLatest(ActionTypes.FS_CREATE_FOLDER, createFolder),
         takeLatest(ActionTypes.FS_CREATE_FILE, createFile),
         takeLatest(ActionTypes.FS_RENAME, renameFileOrFolder),
+        takeLatest(ActionTypes.FS_MOVE, move),
         takeLatest(ActionTypes.FS_DELETE, deleteFileOrFolder),
         takeLatest(ActionTypes.FS_SAVE_FILE, saveFileContent),
         takeLatest(ActionTypes.FS_SAVE_FILE_AS, saveFileContentAs),
@@ -271,6 +272,16 @@ export function* saveFileContentAs({ payload }) {
     catch (err) {
         /* istanbul ignore next */
         yield put(fsActions._saveFileAs_Failure(path, err));
+    }
+}
+
+export function* move({ payload }){
+    const { oldPath, newPath } = payload;
+    if (!oldPath || !newPath) {
+        console.warn('Invalid arguments - saga: FS, method: move');
+        return;
+    } else {
+        yield call(services.mainIpc.call, 'FileService', 'move', [oldPath, newPath]);
     }
 }
 
