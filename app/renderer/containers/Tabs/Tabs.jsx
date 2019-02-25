@@ -26,6 +26,14 @@ type Props = {
   onClose: (string) => void
 };
 
+const circle = () => {
+  return (
+    <svg height="14" width="14">
+      <circle cx="7" cy="7" r="5" fill="lightblue" />
+    </svg>
+  )
+}
+
 class Tabs extends Component<Props, void> {
   static defaultProps = {
     onClose: noop,
@@ -141,11 +149,20 @@ class Tabs extends Component<Props, void> {
                     </button>
                   </Tooltip>
 
-                  <Icon
-                    className="close-icon"
-                    onClick={() => this.props.onClose(tab.key)}
-                    type={tab.touched ? 'star' : 'close'}
-                  />
+                  { tab.touched &&
+                    <Icon
+                      className="close-icon"
+                      onClick={() => this.props.onClose(tab.key)}
+                      component={circle}
+                    />
+                  }
+                  { !tab.touched &&
+                    <Icon
+                      className="close-icon"
+                      onClick={() => this.props.onClose(tab.key)}
+                      type={'close'}
+                    />
+                  }
                 </div>
               </DraggableTab>
               );
