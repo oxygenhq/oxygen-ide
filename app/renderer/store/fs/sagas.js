@@ -260,7 +260,7 @@ export function* saveFileContent({ payload }) {
 export function* saveFileContentAs({ payload }) {
     const { path, content } = payload;
     try {
-        if (!path || !content) {
+        if (!path || typeof content === 'undefined') {
             console.warn('Invalid arguments - saga: FS, method: saveFileContentAs.');
             return;
         }
