@@ -8,6 +8,7 @@
  */
 import { all, put, select, takeLatest, take, call, fork } from 'redux-saga/effects';
 import { putAndTake } from '../../helpers/saga';
+import pathHelper from 'path';
 
 import SupportedExtensions from '../../helpers/file-extensions';
 import * as Const from '../../../const';
@@ -282,6 +283,7 @@ export function* createFile({ payload }) {
     else {
         //yield put(fsActions.treeLoadNodeChildren())
         yield put(wbActions._createFile_Success(path, name));
+        yield put(wbActions.openFile(path+pathHelper.sep+name));
     }
 }
 
