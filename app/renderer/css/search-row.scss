@@ -1,0 +1,31 @@
+@import 'vars';
+
+ .search-row {
+  margin-right: 8px;
+  margin-bottom: 16px;
+
+   .ant-input {
+    padding-right: 22px;
+  }
+
+   .ant-input-group-addon {
+    padding: 0;
+  }
+}
+
+ .search-row-contols {
+  height: 30px;
+  line-height: 30px;
+
+   .clear {    
+    position: absolute;
+    margin-left: -16px;
+    z-index: 9999;
+    cursor: pointer;
+  }
+
+   .text {
+    padding: 0px 8px;
+    min-width: 32px;
+  }
+} 

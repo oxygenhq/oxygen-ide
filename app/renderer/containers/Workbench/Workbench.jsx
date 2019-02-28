@@ -14,6 +14,8 @@ import updateModals from '../../components/updateModals';
 // Dialogs
 import FileRenameDialog from '../../components/dialogs/FileRenameDialog';
 import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
+import ObjectCreateDialog from '../../components/dialogs/ObjectCreateDialog';
+import ObjectFolderCreateDialog from '../../components/dialogs/ObjectFolderCreateDialog';
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
 import SettingsDialog from '../../components/dialogs/SettingsDialog';
 // Other components
@@ -213,6 +215,25 @@ export default class Workbench extends Component<Props> {
   fileCreateDialog_onCancel() {
     this.props.hideDialog('DIALOG_FILE_CREATE');
   }
+
+  objectCreateDialog_onSubmit(name, type, parentPath) {
+    this.props.hideDialog('DIALOG_OBJECT_CREATE');
+    this.props.createObject(name, parentPath);
+  }
+
+  objectCreateDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_CREATE');
+  }
+
+  objectFolderCreateDialog_onSubmit(name, type, parentPath) {
+    this.props.hideDialog('DIALOG_OBJECT_FOLDER_CREATE');
+    this.props.createObjectFolder(name, parentPath);
+  }
+
+  objectFolderCreateDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_FOLDER_CREATE');
+  }
+
   // Rename
   fileRenameDialog_onSubmit(path, type, newName) {
     this.props.hideDialog('DIALOG_FILE_RENAME');
@@ -257,6 +278,16 @@ export default class Workbench extends Component<Props> {
             { ...dialog['DIALOG_FILE_CREATE'] }
             onSubmit={ ::this.fileCreateDialog_onSubmit }
             onCancel={ ::this.fileCreateDialog_onCancel } 
+          />
+          <ObjectCreateDialog
+            { ...dialog['DIALOG_OBJECT_CREATE'] }
+            onSubmit={ ::this.objectCreateDialog_onSubmit }
+            onCancel={ ::this.objectCreateDialog_onCancel } 
+          />
+          <ObjectFolderCreateDialog
+            { ...dialog['DIALOG_OBJECT_FOLDER_CREATE'] }
+            onSubmit={ ::this.objectFolderCreateDialog_onSubmit }
+            onCancel={ ::this.objectFolderCreateDialog_onCancel } 
           />
           <FileRenameDialog 
             { ...dialog['DIALOG_FILE_RENAME'] } 

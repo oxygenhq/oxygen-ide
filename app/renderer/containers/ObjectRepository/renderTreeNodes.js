@@ -9,34 +9,78 @@
 import Tree from '../../components/Tree';
 import React from 'react';
 
-function handleContextMenuEvent(e, node, menuName) {
-  e.preventDefault();
-  this.props.setActiveNode(node.path);
-  this.props.showContextMenu(menuName, e);
+const checkHighLightChild = (arr, searchResults) => {
+  return arr.some(item => {
+    return (searchResults.indexOf(item.name) > -1);
+  })
 }
 
-function renderTreeNodes(nodes) {
+function handleContextMenuEvent(e, node, menuName) {
+  e.preventDefault();
+  if(this.props.setActiveNode){
+    this.props.setActiveNode(node.path);
+  }
+  if(this.props.showContextMenu){
+
+    let safeNode = null;
+
+    if(node){
+      safeNode = node;
+    }
+
+    this.props.showContextMenu(menuName, e, safeNode);
+  }
+}
+
+function renderTreeNodes(nodes, searchResults) {
+    const { active } = this.props;
+
     if (!nodes || !nodes.length || nodes.length == 0) {
       return null;
     }
     handleContextMenuEvent = handleContextMenuEvent.bind(this);
     return nodes.map(element => {
-      const resolveClassName = element.name === '.emptyfile'
+            const resolveClassName = element.name === '.emptyfile'
         ? 'hidden-node' : element.type;
 
       let theTitle = element.name;  
+      let highLight = false;
+
+       if (searchResults.indexOf(theTitle) > -1) {
+        highLight = true;
+      }
+      const highLightStyle = highLight ? { backgroundColor: 'yellow' } :  {};
+
       if (element.type === 'object') {
         theTitle = (
-          <span title={ element.name } style={{ userSelect: 'none' }} onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FILE') }>{element.name}</span>
+          <span 
+            className="nodeText"
+            title={ element.name } 
+            style={{ userSelect: 'none', ...highLightStyle }} 
+            onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_OBJECT') }
+          >{element.name}</span>
         );
       }
       else if (element.type === 'container') {
         theTitle = (
-          <span title={ element.name } style={{ userSelect: 'none' }} onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FOLDER') }>{element.name}</span>
+          <span 
+            className="nodeText"
+            title={ element.name } 
+            style={{ userSelect: 'none', ...highLightStyle }} 
+            onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_FOLDER') }
+          >{element.name}</span>
         );
       }
 
-      if (element.type === 'container') { 
+      if (element.type === 'container') {
+        let highLightChild = false;
+
+        if(element.children && element.children.length){
+          const checkedHighLightChild = checkHighLightChild(element.children, searchResults);
+          if(checkedHighLightChild){
+            highLightChild = true;
+          }
+        }
         return (
           <Tree.TreeNode
             nodeInfo={element}
@@ -46,8 +90,9 @@ function renderTreeNodes(nodes) {
             dataRef={element}
             style={{ userSelect: 'none' }}
             isLeaf={false}
+            highLightChild={highLightChild}
           >
-            {element.children ? renderTreeNodes.apply(this, [element.children]) : []}
+            {element.children ? renderTreeNodes.apply(this, [element.children, searchResults]) : []}
           </Tree.TreeNode>
         );
       }

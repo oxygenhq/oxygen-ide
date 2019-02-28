@@ -14,13 +14,25 @@ const defaultState = {
   name: 'name',
   tree: null,
   active: null,
+  start: null,
+  end: null,
+  repoRoot: null,
+  parent: null
 };
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { tree, path, name } = payload;
+  const { tree, path, name, start, end, repoRoot, parent } = payload;
 
   switch (action.type) {
+
+    // SET_PARENT
+    case ActionTypes.OR_SET_PARENT: 
+      return {
+        ...state,
+        parent: parent
+      };
+
     // OPEN_FILE_SUCCESS
     case success(ActionTypes.OR_OPEN_FILE):
       return {
@@ -28,6 +40,9 @@ export default (state = defaultState, action) => {
         tree: tree,
         path: path,
         name: name,
+        start: start,
+        end: end,
+        repoRoot: repoRoot
       };
 
     // OPEN_FILE_SUCCESS

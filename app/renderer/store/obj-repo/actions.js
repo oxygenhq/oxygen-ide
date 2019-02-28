@@ -9,15 +9,21 @@
 import * as ActionTypes from './types';
 import { success, failure } from '../../helpers/redux';
 
+// setParent 
+export const setParent = (parent = null) => ({
+  type: ActionTypes.OR_SET_PARENT,
+  payload: { parent }
+});
+
 // openFile
 export const openFile = (path) => ({
   type: ActionTypes.OR_OPEN_FILE,
   payload: { path },
 });
 
-export const _openFile_Success = (path, name, tree) => ({
+export const _openFile_Success = (path, name, tree, start, end, repoRoot) => ({
   type: success(ActionTypes.OR_OPEN_FILE),
-  payload: { path, name, tree },
+  payload: { path, name, tree, start, end, repoRoot },
 });
 
 export const _openFile_Failure = (path, error) => ({

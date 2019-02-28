@@ -56,10 +56,16 @@ export function* openFile({ payload }) {
         return;
     }
     let repoRoot;
+    let start;
+    let end;
     // if this is a .js file, then use 'require' to parse the file
     if (file.ext === '.js') {
         try {
             repoRoot = orgRequire(file.path);
+            const content = yield getFileContent(path);
+            start = content.split('{')[0];
+            const endArray = content.split('}');
+            end = endArray[endArray.length-1];
         }
         catch (e) {
             yield put(repoActions._openFile_Failure(path, e));
@@ -83,7 +89,7 @@ export function* openFile({ payload }) {
     // convert original object repository structure to tree based structure
     const treeRoot = convertToObjectTree(repoRoot);
     // report success
-    yield put(repoActions._openFile_Success(path, name, treeRoot));
+    yield put(repoActions._openFile_Success(path, name, treeRoot, start, end, repoRoot));
 }
 
 function* getFileContent(path) {

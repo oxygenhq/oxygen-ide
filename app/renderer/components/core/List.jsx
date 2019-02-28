@@ -8,14 +8,15 @@
  */
 // @flow
 
-import React, { PureComponent } from 'react';
-import { Input } from 'antd';
+import React, { PureComponent, Fragment } from 'react';
+import { Input, Button } from 'antd';
 import styled from '@emotion/styled';
 
 import FlexColumn from './FlexColumn';
 import FlexRow from './FlexRow';
 
 import '../../css/list.scss';
+import { throws } from 'assert';
 
 /**
  * A container dispalying its children in a column
@@ -38,20 +39,121 @@ export default class List extends PureComponent<ListProps> {
         console.log('key press', e)
     }
 
+
+    deleteSingleLocator = (locator) => {
+        if(this.props.object && this.props.deleteLocator){
+            this.props.deleteLocator(this.props.object);
+        }
+    }
+
+    startEditSingleLocator = (locator) => {
+        const { object, startEdit } = this.props;
+
+        if(object && startEdit){
+
+            const { locator, path } = object;
+
+            if(locator && path){
+                startEdit(locator, path)
+            } else {
+                console.warn('no locator or path');
+            }
+
+        } else {
+            console.warn('this.props', this.props);
+        }
+    }
     
-    render() {
+    startAdd = () => {
+        const { object, startEdit } = this.props;
+        if(object && startEdit){
+            
+            const { path } = object;
+
+            if(path){
+                startEdit("", path)
+            } else {
+                console.warn('no path');
+            }
+
+        } else {
+            console.warn('this.props', this.props);
+        }
+    }
+
+    renderInner() {
         const { 
             data = null,
             editable = false,
         } = this.props;
-        if (!data || !Array.isArray(data) || data.length == 0) {
-            return <EmptyList />;
+
+        if (!data || !Array.isArray(data) || data.length === 0 || !data[0]) {
+            return(
+                <Fragment>
+                    <div className="control-wrap">
+                        <div className="control-wrap-right">
+                            <Button 
+                                onClick={ this.startAdd }
+                                className="control"
+                                type="primary"
+                                shape="circle" 
+                                icon="plus" 
+                            />
+                        </div>
+                    </div>
+                    <EmptyList />
+                </Fragment>
+            );
+        }      
+
+        
+        if (!data || !Array.isArray(data) || data.length === 1 || !data[0]) {
+            return (
+                <Fragment>
+                    <div className="control-wrap">
+                        <div className="control-wrap-right">
+                            <Button 
+                                onClick={ () => this.deleteSingleLocator(data[0]) }
+                                className="control" 
+                                type="primary" 
+                                shape="circle" 
+                                icon="delete" 
+                            />
+                            <Button 
+                                onClick={ () => this.startEditSingleLocator(data[0]) }
+                                className="control" 
+                                type="primary" 
+                                shape="circle" 
+                                icon="edit" 
+                            />
+                        </div>
+                    </div>
+                    <List.Container className="list" onKeyPress={(e) => this.handleKeyPress(e)}>
+                        { data.map( (itm, index) => <ListItem key={ `itm_${index}`} data={ itm } editable={ editable } />) }
+                    </List.Container>
+                </Fragment>
+            );
         }
+        
         return (
-            <List.Container className="list" onKeyPress={(e) => this.handleKeyPress(e)}>
-                { data.map( (itm, index) => <ListItem key={ `itm_${index}`} data={ itm } editable={ editable } />) }
-            </List.Container>
+            <Fragment>
+                <List.Container className="list" onKeyPress={(e) => this.handleKeyPress(e)}>
+                    { data.map( (itm, index) => 
+                        <div key={ `itm_${index}`} className="item-value-wrap">
+                            <ListItem  data={ itm } editable={ editable } />
+                        </div>
+                    ) }
+                </List.Container>
+            </Fragment>
         );
+    }
+
+    render(){
+        return(
+            <Fragment>
+                { this.renderInner() }
+            </Fragment>
+        )
     }
 }
 
@@ -138,8 +240,8 @@ class ListItem extends PureComponent<ListItemProps> {
                     :
                     <div
                         className="item-value-wrap"
-                        onClick={ ::this.toggleEdit } 
-                    >
+                        // onClick={ ::this.toggleEdit } 
+                    >   
                         { value }
                     </div>
                 }
@@ -150,6 +252,8 @@ class ListItem extends PureComponent<ListItemProps> {
 
 const EmptyList = () => {
     return (
-        <div>No Data</div>
+        <div className="no-data">
+            <p>No Data</p>
+        </div>
     );
 }

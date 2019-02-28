@@ -23,6 +23,12 @@ const defaultState = {
   },
   [types.DIALOG_SETTINGS]: {
     visible: false,
+  },
+  [types.DIALOG_OBJECT_CREATE]: {
+    visible: false,
+  },
+  [types.DIALOG_OBJECT_FOLDER_CREATE]: {
+    visible: false,
   }
 };
 

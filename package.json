@@ -154,6 +154,7 @@
     "electron-settings": "^3.1.4",
     "firacode": "^1.205.0",
     "font-awesome": "^4.7.0",
+    "js-beautify": "^1.8.9",
     "junk": "^2.1.0",
     "moment": "^2.22.2",
     "perfect-scrollbar": "^1.4.0",

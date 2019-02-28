@@ -50,6 +50,7 @@ class TreeNode extends React.Component {
 
     // By user
     isLeaf: PropTypes.bool,
+    highLightChild: PropTypes.bool,
     selectable: PropTypes.bool,
     disabled: PropTypes.bool,
     disableCheckbox: PropTypes.bool,
@@ -302,6 +303,7 @@ class TreeNode extends React.Component {
   // Switcher
   renderSwitcher = () => {
     const {
+      highLightChild,
       expanded,
       switcherIcon: switcherIconFromProps,
     } = this.props;
@@ -323,7 +325,14 @@ class TreeNode extends React.Component {
       );
     }
 
-    const switcherCls = classNames(`${prefixCls}-switcher`, `${prefixCls}-switcher_${expanded ? ICON_OPEN : ICON_CLOSE}`);
+    let highLight = '';
+    
+    if(highLightChild){
+      highLight = '_and_highLight';
+    }
+
+    const switcherCls = classNames(`${prefixCls}-switcher`, `${prefixCls}-switcher_${expanded ? ICON_OPEN : ICON_CLOSE}${highLight}`);
+
     return (
       <span onClick={this.onExpand} className={switcherCls}>
         {typeof switcherIcon === 'function' ?
@@ -492,6 +501,7 @@ class TreeNode extends React.Component {
       dragOver, dragOverGapTop, dragOverGapBottom,
       isLeaf,
       expanded, selected, checked, halfChecked,
+      onContextMenu,
       ...otherProps
     } = this.props;
     const { rcTree: {
@@ -517,6 +527,8 @@ class TreeNode extends React.Component {
           'drag-over-gap-bottom': !disabled && dragOverGapBottom,
           'filter-node': filterTreeNode && filterTreeNode(this),
         })}
+
+        onContextMenu={this.props.onContextMenu}
 
         style={style}
 

@@ -71,3 +71,385 @@ export function getRepositoryNameFromFileName(fileName) {
     // if no standard suffix of repository file was found, return repository name AS IS
     return fileName;    
 }
+
+
+export function addLocatorInRepoRoot(repo, parentPath, locatorName){
+    if (!repo && !parentPath && !locatorName) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(parentPath)){
+        pathToObject = parentPath.join(".");
+    } else if(typeof parentPath === "object"){
+        const { path } = parentPath;
+        pathToObject = path;
+    } else if (typeof parentPath === "string") {
+        pathToObject = parentPath;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = addLocatorInRepoRoot(value, serchStringLast, locatorName);
+                newRoot[key] = newChildValue;
+            } else {
+                newRoot[key] = value;
+                newRoot[key][locatorName] = "";
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
+
+
+export function deleteObjectOrFolder(repo, parentPath, name){
+    if (!repo && !parentPath && !name) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(parentPath)){
+        pathToObject = obj.join(".");
+    } else if(typeof parentPath === "object"){
+        const { path } = parentPath;
+        pathToObject = parentPath;
+    } else if (typeof parentPath === "string") {
+        pathToObject = parentPath;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = deleteObjectOrFolder(value, serchStringLast, name);
+                newRoot[key] = newChildValue;
+            } else {
+                let tmpValue = value;
+                delete tmpValue[name];
+                newRoot[key] = tmpValue;
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
+
+// obj - node where need to delete
+export function deleteLocatorInRepoRoot(repo, obj){
+    if (!repo && !newObjName && !parentNode) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(obj)){
+        pathToObject = obj.join(".");
+    } else if(typeof obj === "object"){
+        const { path } = obj;
+        pathToObject = path;
+    } else if (typeof obj === "string") {
+        pathToObject = obj;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = deleteLocatorInRepoRoot(value, serchStringLast);
+                newRoot[key] = newChildValue;
+            } else {
+                newRoot[key] = "";
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
+
+export function renameLocatorInRepoRoot(repo, parentPath, newName, originName){
+    if (!repo && !parentPath && !newName && !originName) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(parentPath)){
+        pathToObject = parentPath.join(".");
+    } else if(typeof parentPath === "object"){
+        const { path } = parentPath;
+        pathToObject = path;
+    } else if (typeof parentPath === "string") {
+        pathToObject = parentPath;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = renameLocatorInRepoRoot(value, serchStringLast, newName, originName);
+                newRoot[key] = newChildValue;
+            } else {
+                let tmpValue = value;
+                tmpValue[newName] = tmpValue[originName];
+                delete tmpValue[originName];
+                newRoot[key] = tmpValue;
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
+
+export function updateLocatorValueInRepoRoot(repo, locatorPath, locatorNewValue){
+    if (!repo && !locatorPath && !locatorNewValue) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(locatorPath)){
+        pathToObject = locatorPath.join(".");
+    } else if(typeof locatorPath === "object"){
+        const { path } = locatorPath;
+        pathToObject = path;
+    } else if (typeof locatorPath === "string") {
+        pathToObject = locatorPath;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = updateLocatorValueInRepoRoot(value, serchStringLast, locatorNewValue);
+                newRoot[key] = newChildValue;
+            } else {
+                newRoot[key] = locatorNewValue;
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
+
+// obj - parentNode
+export function createFolderInRepoRoot(repo, newObjName, obj){
+    if (!repo && !newObjName && !parentNode) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(obj)){
+        pathToObject = obj.join(".");
+    } else if(typeof obj === "object"){
+        const { path } = obj;
+        pathToObject = path;
+    } else if (typeof obj === "string") {
+        pathToObject = obj;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = createFolderInRepoRoot(value, newObjName, serchStringLast);
+                newRoot[key] = newChildValue;
+            } else {
+                newRoot[key] = value;
+                newRoot[key][newObjName] = {};
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
+
+// obj - parentNode
+export function createObjectInRepoRoot(repo, newObjName, obj){
+    if (!repo && !newObjName && !parentNode) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(obj)){
+        pathToObject = obj.join(".");
+    } else if(typeof obj === "object"){
+        const { path } = obj;
+        pathToObject = path;
+    } else if (typeof obj === "string") {
+        pathToObject = obj;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = createObjectInRepoRoot(value, newObjName, serchStringLast);
+                newRoot[key] = newChildValue;
+            } else {
+                newRoot[key] = value;
+                newRoot[key][newObjName] = "";
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
+
+export function copyObjectInRepoRoot(repo, obj){
+    if (!obj && !repo) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(obj)){
+        pathToObject = obj.join(".");
+    } else if(typeof obj === "object"){
+        const { path } = obj;
+        pathToObject = path;
+    } else if (typeof obj === "string") {
+        pathToObject = obj;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = copyObjectInRepoRoot(value, serchStringLast);
+                newRoot[key] = newChildValue;
+            } else {
+                newRoot[key] = repo[serchString];
+                newRoot[key+'-copy'] = repo[serchString];
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
