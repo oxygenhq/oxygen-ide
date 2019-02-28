@@ -192,7 +192,6 @@ export default class ObjectEditor extends PureComponent<Props> {
       // }
     }
     // make sure to wrap the locator property in array if it's a string
-    console.log('!object', object);
     const locators = Array.isArray(object.locator) ? object.locator : [object.locator];
 
     return (

@@ -16,9 +16,9 @@ export const setParent = (parent = null) => ({
 });
 
 // openFile
-export const openFile = (path) => ({
+export const openFile = (path, force = false, repoRootCopy = null) => ({
   type: ActionTypes.OR_OPEN_FILE,
-  payload: { path },
+  payload: { path, force, repoRootCopy },
 });
 
 export const _openFile_Success = (path, name, tree, start, end, repoRoot) => ({

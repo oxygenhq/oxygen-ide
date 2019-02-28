@@ -260,6 +260,13 @@ export default class FileService extends ServiceBase {
         return new Promise((resolve, reject) => {
             let fileContent;
             if (beautifyContent) {
+                send({
+                    service: 'FileService',
+                    event: 'ObjectRepoWatcher',
+                    path: filePath,
+                    content: content
+                });
+
                 fileContent = beautify(content, { indent_size: 2, space_in_empty_paren: true });
             } else {
                 fileContent = content;

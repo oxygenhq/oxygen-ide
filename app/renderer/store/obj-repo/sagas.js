@@ -35,17 +35,21 @@ export default function* root() {
 }
 
 export function* openFile({ payload }) {
-    const { path } = payload;
+    const { path, force, repoRootCopy } = payload;
     if (!path) {
-        console.warn('openFile has been called with invalid payload - path parameter is missing');
         return;
     }
 
     const currentRepoPath = yield select(state => state.objrepo.path);
-    // check if the repo we are trying to open is the same as the one currently open
-    if (path === currentRepoPath) {
-        return;     // ignore open file call 
-    }    
+
+    if(force){
+        // info from file watcher that file changed
+    } else {
+        // check if the repo we are trying to open is the same as the one currently open
+        if (path === currentRepoPath) {
+            return;     // ignore open file call 
+        }    
+    }
     // get file info from the cache
     let file = yield select(state => state.fs.files[path]);
     if (!file) {
@@ -61,7 +65,11 @@ export function* openFile({ payload }) {
     // if this is a .js file, then use 'require' to parse the file
     if (file.ext === '.js') {
         try {
-            repoRoot = orgRequire(file.path);
+            if(force && repoRootCopy){
+                repoRoot = repoRootCopy;
+            } else {
+                repoRoot = orgRequire(file.path);
+            }
             const content = yield getFileContent(path);
             start = content.split('{')[0];
             const endArray = content.split('}');
