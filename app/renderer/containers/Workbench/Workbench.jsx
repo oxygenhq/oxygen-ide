@@ -274,11 +274,13 @@ export default class Workbench extends Component<Props> {
       <div>
         { dialog && 
         <Fragment>
-          <FileCreateDialog 
-            { ...dialog['DIALOG_FILE_CREATE'] }
-            onSubmit={ ::this.fileCreateDialog_onSubmit }
-            onCancel={ ::this.fileCreateDialog_onCancel } 
-          />
+          { dialog.DIALOG_FILE_CREATE && dialog.DIALOG_FILE_CREATE.visible &&
+            <FileCreateDialog 
+              { ...dialog['DIALOG_FILE_CREATE'] }
+              onSubmit={ ::this.fileCreateDialog_onSubmit }
+              onCancel={ ::this.fileCreateDialog_onCancel } 
+            />
+          }
           <ObjectCreateDialog
             { ...dialog['DIALOG_OBJECT_CREATE'] }
             onSubmit={ ::this.objectCreateDialog_onSubmit }
@@ -289,6 +291,14 @@ export default class Workbench extends Component<Props> {
             onSubmit={ ::this.objectFolderCreateDialog_onSubmit }
             onCancel={ ::this.objectFolderCreateDialog_onCancel } 
           />
+
+          { dialog.DIALOG_FILE_CREATE && dialog.DIALOG_FILE_CREATE.visible &&
+            <FileCreateDialog 
+              { ...dialog['DIALOG_FILE_CREATE'] }
+              onSubmit={ ::this.fileCreateDialog_onSubmit }
+              onCancel={ ::this.fileCreateDialog_onCancel } 
+            />
+          }
           <FileRenameDialog 
             { ...dialog['DIALOG_FILE_RENAME'] } 
             onSubmit={ ::this.fileRenameDialog_onSubmit }
@@ -308,7 +318,7 @@ export default class Workbench extends Component<Props> {
         </Fragment>
         }
         {updateModals.call(this)}
-        <Toolbar 
+        <Toolbar
           testMode={ runtimeSettings.testMode }
           testTarget={ runtimeSettings.testTarget }
           stepDelay={ runtimeSettings.stepDelay }
@@ -356,8 +366,16 @@ export default class Workbench extends Component<Props> {
                   </Row>
                 </Header>
                 <div className="editor-container">
-                  <TextEditor onBreakpointsUpdate={ ::this.handleBreakpointsUpdate } onContentUpdate={ ::this.handleFileContentUpdate } />
-                  <Logger visible={ loggerVisible } onHide={ ::this.logger_onHide } />
+                  <div id="editors-container-wrap">
+                    <TextEditor
+                      onBreakpointsUpdate={::this.handleBreakpointsUpdate}
+                      onContentUpdate={::this.handleFileContentUpdate}
+                    />
+                  </div>
+                  <Logger
+                    visible={loggerVisible}
+                    onHide={::this.logger_onHide}
+                  />
                 </div>
               </Layout>
               <Sidebar 

@@ -143,6 +143,18 @@ export default (cmdHandler, settings) => {
     label: '&View',
     submenu: [
       {
+        label: 'Zoom In',
+        click() { cmdHandler(Const.MENU_CMD_VIEW_ZOOM_IN) }
+      },
+      {
+        label: 'Zoom Out',
+        click() { cmdHandler(Const.MENU_CMD_VIEW_ZOOM_OUT) }
+      },
+      {
+        label: 'Zoom to default',
+        click() { cmdHandler(Const.MENU_CMD_VIEW_ZOOM_TO_DEFAULT) }
+      },
+      {
         label: 'Settings...',
         click() { cmdHandler(Const.MENU_CMD_VIEW_SETTINGS) }
       },
@@ -183,6 +195,10 @@ export default (cmdHandler, settings) => {
       {
         label: 'Contribute',
         click() { cmdHandler(Const.MENU_CMD_HELP_CONTRIBUTE) }
+      },
+      {
+        label: 'Go Professional',
+        click() { cmdHandler(Const.MENU_CMD_HELP_GO_PRO) }
       },
       {
         type: 'separator'

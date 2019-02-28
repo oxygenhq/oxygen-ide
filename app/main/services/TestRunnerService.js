@@ -121,12 +121,12 @@ export default class TestRunnerService extends ServiceBase {
             this._emitLogEvent(SEVERITY_INFO, 'Initializing...');
 
             await this.oxRunner.init(options);
-            this._emitTestStarted();    
+            this._emitTestStarted();
             // assign user-set breakpoints
             testsuite.testcases[0].breakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
             return this.oxRunner.run(testsuite, null, caps).then((result) => {
                 // eslint-disable-line
-                this._emitTestEnded(result);                        
+                this._emitTestEnded(result);
                 // @TODO: update UI elements
                 return this.dispose();
             })
@@ -141,12 +141,12 @@ export default class TestRunnerService extends ServiceBase {
                 return this.dispose();
             });
         } catch (e) {
-            // the error at .init stage can be cause by parallel call to .kill() method
+            // the error at .init stage can be caused by parallel call to .kill() method
             // make sure in case we are in the middle of stopping the test to ignore any error at this stage
             if (!this.isStopping) {
-                this._emitLogEvent(SEVERITY_ERROR, 'Test Failed!');
+                this._emitLogEvent(SEVERITY_ERROR, `Test Failed!: ${e.message}. ${e.stack || ''}`);
                 return this.dispose();
-            }            
+            }
         }
     }
 

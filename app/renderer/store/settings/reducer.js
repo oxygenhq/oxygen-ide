@@ -9,6 +9,9 @@
 import { remote } from 'electron';
 import * as types from './types';
 
+const FONT_SIZE_MIN = 12;
+const FONT_SIZE_MAX = 36;
+
 const defaultAppSettings = {
   lastSession: {
     tabs: [],
@@ -18,6 +21,7 @@ const defaultAppSettings = {
 };
 
 const defaultState = {
+  fontSize: 12,
   navbar: {
     visible: false,
   },
@@ -40,8 +44,55 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { value, target, settings } = payload;
+  const { value, target, settings, zoom } = payload;
   switch (action.type) {
+    
+    // ZOOM_IN
+    case types.EDITOR_ZOOM_IN: {
+      const newFontSize = state.fontSize+2;
+      if(newFontSize > FONT_SIZE_MAX){
+        return state;
+      } else {
+        return { 
+          ...state,
+          fontSize: newFontSize
+        }
+      }
+    }
+
+    // ZOOM_OUT
+    case types.EDITOR_ZOOM_OUT: {
+      const newFontSize = state.fontSize-2;
+      if(newFontSize < FONT_SIZE_MIN){
+        return state;
+      } else {
+        return { 
+          ...state,
+          fontSize: newFontSize
+        }
+      }
+    }
+
+    // ZOOM_TO_DEFAULT
+    case types.EDITOR_ZOOM_TO_DEFAULT: {
+      return { 
+        ...state,
+        fontSize: defaultState.fontSize
+      }
+    }
+
+    // SET_ZOOM
+    case types.EDITOR_SET_ZOOM: {
+      if(zoom){
+        return { 
+          ...state,
+          fontSize: zoom
+        }
+      } else {
+        return state;
+      }
+    }
+
     // SETTINGS_MERGE
     case types.SETTINGS_MERGE:
       return {

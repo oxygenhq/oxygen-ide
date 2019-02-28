@@ -58,12 +58,18 @@ export default class MonacoEditor extends React.Component {
     super(props);
     this.editorContainer = undefined;
     this.__current_value = props.value;
+    this.elem = null;
+    this.on = 0;
   }
 
   componentDidMount() {
     amdRequire(['vs/editor/editor.main'], () => {
       this.initMonaco();
     });
+
+    this.elem = document.getElementById('editors-container-wrap');
+    this.elem.addEventListener("keydown", this.keydownCallback);
+    this.elem.addEventListener("keyup", this.keyupCallback);
   }
 
   shouldComponentUpdate(nextProps, nextState) {    
@@ -73,28 +79,20 @@ export default class MonacoEditor extends React.Component {
     return shouldUpdate;
   }
 
-  determineUpdatedProps(diffProps) {
-    return {
-      // prevent re-render when editor's value property is changed by onDidChangeModelContent event
-      // otherwise, we will have an unneccessary call to editor.setValue (in componentDidUpdate) and duplicated render
-      value: 
-        this.editor ? 
-          diffProps.value !== this.props.value &&
-          diffProps.value !== this.editor.getValue() : false,
-      lang: 
-        diffProps.language !== this.props.language,
-      activeLine:
-        diffProps.activeLine !== this.props.activeLine,
-      theme: 
-        diffProps.theme !== this.props.theme,
-      size:
-          this.props.width !== diffProps.width || this.props.height !== diffProps.height,
-      visible:
-          this.props.visible != diffProps.visible,
-    };
-  }
-
   componentDidUpdate(prevProps) {
+    const RATIO = 1.58;
+    if (prevProps.fontSize !== this.props.fontSize && this.editor) {
+
+      // update editor
+      this.editor.updateOptions({ 
+        fontSize: this.props.fontSize,
+        lineHeight: this.props.fontSize*RATIO
+      });
+
+      // save electron settings
+      this.props.saveSettings();
+
+    }
     if (this.props.value !== this.__current_value) {
       // Always refer to the latest value
       this.__current_value = this.props.value;
@@ -108,12 +106,17 @@ export default class MonacoEditor extends React.Component {
     if (prevProps.language !== this.props.language) {
       monaco.editor.setModelLanguage(this.editor.getModel(), this.props.language);
     }
+
+    if (prevProps.editorReadOnly !== this.props.editorReadOnly && this.editor) {
+      this.editor.updateOptions({ readOnly: this.props.editorReadOnly });
+    }
+
     if (prevProps.activeLine !== this.props.activeLine) {
       const { activeLine } = this.props;
       // scroll view into the current active line
       if (activeLine && Number.isInteger(activeLine)) {
         this.editor.revealLineInCenter(activeLine);
-      }      
+      }
       // set current line marker or clear it if activeLine is null
       helpers.updateActiveLineMarker(this.editor, activeLine);
     }
@@ -133,6 +136,68 @@ export default class MonacoEditor extends React.Component {
 
   componentWillUnmount() {
     this.destroyMonaco();
+    this.elem.removeEventListener("keydown", this.keydownCallback);
+    this.elem.removeEventListener("keyup", this.keyupCallback);
+  }
+  
+  wheelCallback = (e) => {
+    e.stopPropagation()
+    if(e && e.deltaY && e.deltaY < 0){
+      //up
+      if(this.props.zoomIn){
+        this.props.zoomIn();
+      }
+    }
+    if(e && e.deltaY && e.deltaY > 0){
+      //down
+      if(this.props.zoomOut){
+        this.props.zoomOut();
+      }
+    }
+  }
+  
+  keydownCallback = (e) => {
+    if(e.key === 'Control'){
+      if(!this.on){
+        e.stopPropagation()
+        this.elem.addEventListener('wheel', this.wheelCallback , true);
+        this.on = true;
+      }
+    }
+  }
+  
+  keyupCallback = (e) => {
+    if(e.key === 'Control'){
+      e.stopPropagation()
+      this.elem.removeEventListener('wheel',  this.wheelCallback , true)
+      this.on = 0;
+    }
+  }
+
+  determineUpdatedProps(diffProps) {
+    return {
+      // prevent re-render when editor's value property is changed by onDidChangeModelContent event
+      // otherwise, we will have an unneccessary call to editor.setValue (in componentDidUpdate)
+      // and duplicated render
+      value:
+        this.editor ?
+          diffProps.value !== this.props.value &&
+          diffProps.value !== this.editor.getValue() : false,
+      lang:
+        diffProps.language !== this.props.language,
+      activeLine:
+        diffProps.activeLine !== this.props.activeLine,
+      theme:
+        diffProps.theme !== this.props.theme,
+      size:
+        this.props.width !== diffProps.width || this.props.height !== diffProps.height,
+      visible:
+        this.props.visible !== diffProps.visible,
+      editorReadOnly:
+        diffProps.editorReadOnly !== this.props.editorReadOnly,
+      fontSize:
+          diffProps.fontSize !== this.props.fontSize
+    };
   }
 
   editorWillMount() {
@@ -185,10 +250,10 @@ export default class MonacoEditor extends React.Component {
       // workaround for not being able to override or extend existing tokenziers
       // https://github.com/Microsoft/monaco-editor/issues/252
       monaco.languages.onLanguage('javascript', () => {
-          // waits til after monaco tries to register things itself
-          setTimeout(() => {
-            monaco.languages.setMonarchTokensProvider('javascript', jsTokenizer);
-          }, 1000);
+        // waits til after monaco tries to register things itself
+        setTimeout(() => {
+          monaco.languages.setMonarchTokensProvider('javascript', jsTokenizer);
+        }, 1000);
       });
 
       monaco.editor.defineTheme('oxygen-theme', {
@@ -283,6 +348,8 @@ export default class MonacoEditor extends React.Component {
 
 MonacoEditor.propTypes = {
     visible: PropTypes.bool,
+    editorReadOnly: PropTypes.bool,
+    fontSize: PropTypes.number,
     width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     value: PropTypes.string,
@@ -294,11 +361,13 @@ MonacoEditor.propTypes = {
     editorWillMount: PropTypes.func,
     onValueChange: PropTypes.func,
     onSelectionChange: PropTypes.func,
-    onBreakpointsUpdate: PropTypes.func,
+    onBreakpointsUpdate: PropTypes.func
 };
 
 MonacoEditor.defaultProps = {
     visible: true,
+    editorReadOnly: false,
+    fontSize: 12,
     width: '100%',
     height: '100%',
     value: null,

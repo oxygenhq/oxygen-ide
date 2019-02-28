@@ -13,6 +13,7 @@ import * as fsActions from './actions';
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import { putAndTake } from '../../helpers/saga';
 import fileSubjects from '../../store/fs/subjects';
+import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
@@ -22,18 +23,120 @@ const services = ServicesSingleton();
  */
 export default function* root() {
     yield all([
-      takeLatest(ActionTypes.FS_FETCH_FOLDER_CONTENT, fetchFolderContent),
-      takeLatest(ActionTypes.FS_FETCH_FILE_CONTENT, fetchFileContent),
-      takeLatest(ActionTypes.FS_FETCH_FILE_INFO, fetchFileInfo),
-      takeLatest(ActionTypes.FS_CREATE_FOLDER, createFolder),
-      takeLatest(ActionTypes.FS_CREATE_FILE, createFile),
-      takeLatest(ActionTypes.FS_RENAME, renameFileOrFolder),
-      takeLatest(ActionTypes.FS_DELETE, deleteFileOrFolder),
-      takeLatest(ActionTypes.FS_SAVE_FILE, saveFileContent),
-      takeLatest(ActionTypes.FS_SAVE_FILE_AS, saveFileContentAs),
-      takeLatest(ActionTypes.FS_TREE_OPEN_FOLDER, treeOpenFolder),      
-      takeLatest(ActionTypes.FS_TREE_LOAD_NODE_CHILDREN, treeLoadNodeChildren),
+        takeLatest(ActionTypes.FS_FETCH_FOLDER_CONTENT, fetchFolderContent),
+        takeLatest(ActionTypes.FS_FETCH_FILE_CONTENT, fetchFileContent),
+        takeLatest(ActionTypes.FS_FETCH_FILE_INFO, fetchFileInfo),
+        takeLatest(ActionTypes.FS_CREATE_FOLDER, createFolder),
+        takeLatest(ActionTypes.FS_CREATE_FILE, createFile),
+        takeLatest(ActionTypes.FS_RENAME, renameFileOrFolder),
+        takeLatest(ActionTypes.FS_DELETE, deleteFileOrFolder),
+        takeLatest(ActionTypes.FS_SAVE_FILE, saveFileContent),
+        takeLatest(ActionTypes.FS_SAVE_FILE_AS, saveFileContentAs),
+        takeLatest(ActionTypes.FS_TREE_OPEN_FOLDER, treeOpenFolder),
+        takeLatest(ActionTypes.FS_TREE_LOAD_NODE_CHILDREN, treeLoadNodeChildren),
+        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents)
     ]);
+}
+
+export function* handleServiceEvents({ payload }) {
+    const {
+        service,
+        event,
+        type,
+        data,
+        path,
+        content
+    } = payload;
+    if (!event) {
+        return;
+    }
+
+    if (service === 'FileService' && event === 'filesWatcher') {
+        if (['dirAdd', 'fileAdd'].includes(type)) {
+            yield addFileOrFolder(data);
+        }
+        if (type === 'fileUnlink') {
+            const file = yield select(state => state.fs.files[path]);
+            if (file) {
+                yield put(fsActions.updateFileContent(path, file.content));
+            } else {
+                yield unlinkFile(path);
+            }
+        }
+        if(type === 'dirUnlink'){
+            yield unlinkFile(path);
+        }
+        if (type === 'fileChangeContent') {
+            const activeNode = yield select(state => state.fs.tree.activeNode);
+            if (activeNode && path && activeNode === path) {                    
+                const localPayload = { path };
+                yield fetchFileContent({ payload: localPayload });
+            }
+        }
+    }
+
+    if (service === 'FileService' && event === 'getFileContent' ) {
+        if(path){
+            const file = yield select(state => state.fs.files[path]);
+            if(file && typeof file.modified !== 'undefined'){
+                //file exist in edit
+                if(file.modified){
+                    // looks like file modefied in oxygen-ide 
+                    // and now modefied outside oxygen-ide
+                    // file modefied, but not saved
+
+                    if(content !== file.content){
+                        const ansver = yield call(
+                            services.mainIpc.call,
+                            "ElectronService",
+                            "showConfirmFileChangeBox",
+                            [
+                              "Oxygen-ide",
+                              "Fike has changed on disk. Do yo want to reload it?",
+                              ['Cancel', 'Reload']
+                            ]
+                          );
+                        if(typeof ansver !== 'undefined'){
+                            if(ansver === 1){
+                                // 1 - Reload
+                                yield put(fsActions._fetchFileContent_Success(path, content));
+                            }
+    
+                            if(ansver === 0){
+                                // 0 - Cancel
+                                // do nothing
+                            }
+                        }
+                    } else {
+                        // do nothing 
+                    }
+                } else {
+                    // looks like file already added
+                    // file not modefied, we can refresh it
+                    yield put(fsActions._fetchFileContent_Success(path, content));
+                }
+            } else {
+                // looks like add file first
+                // safe operation, because file not modefied yet 
+                yield put(fsActions._fetchFileContent_Success(path, content));
+            }
+        } else {
+            console.warn('on getFileContent no path');
+        }
+    }
+}
+
+function* addFileOrFolder(fileOrFolder) {
+    if (fileOrFolder) {
+        yield put(fsActions.addFileOrFolder(fileOrFolder));
+    }
+}
+
+
+function* unlinkFile(path) {
+    if (path) {
+        yield put(fsActions._delete_Success(path));
+    }
 }
 
 export function* treeLoadNodeChildren({ payload }) {
@@ -65,9 +168,16 @@ export function* treeOpenFolder({ payload }) {
     yield put(fsActions._treeOpenFolder_Success(path, folder.children));
 }
 
+export function* watchOnFiles(path) {
+    yield call(services.mainIpc.call, 'FileService', 'createWatchOnFilesChannel', [path]);
+}
+
 export function* _fetchFolderContent(path) {
     try {
-        let folder = yield call(services.mainIpc.call, 'FileService', 'getFolderContent', [ path ]);
+        let folder = yield call(services.mainIpc.call, 'FileService', 'getFolderContent', [path]);
+        if (folder && path) {
+            yield watchOnFiles(path);
+        }
         yield put({
             type: success(ActionTypes.FS_FETCH_FOLDER_CONTENT),
             payload: { path, response: folder },
@@ -88,26 +198,31 @@ export function* fetchFolderContent({ payload }) {
     const { path } = payload;
     try {
         yield _fetchFolderContent(path);
-    }
-    catch (err) {
-
+    } catch (err) {
+        console.warn('Problem when fetching folder content whith payload:', payload);
     }
 }
 
 export function* fetchFileContent({ payload }) {
-    const { path } = payload;
-    try {
-        let file = yield select(state => state.fs.files[path]);
-        if (!file) {
-            const { response, error } = yield putAndTake(fsActions.fetchFileInfo(path));
-            let file = yield select(state => state.fs.files[path]);
+    if (payload && payload.path) {
+        const { path } = payload;
+        try {
+            const file = yield select(state => state.fs.files[path]);
+            if (!file) {
+                yield putAndTake(fsActions.fetchFileInfo(path));
+            }
+            yield call(
+                services.mainIpc.call,
+                'FileService',
+                'getFileContent',
+                [path]
+            );
+        } catch (err) {
+            /* istanbul ignore next */
+            yield put(fsActions._fetchFileContent_Failure(path, err));
         }
-        const content = yield call(services.mainIpc.call, 'FileService', 'getFileContent', [ path ]);
-        yield put(fsActions._fetchFileContent_Success(path, content));
-    }
-    catch (err) {
-        /* istanbul ignore next */
-        yield put(fsActions._fetchFileContent_Failure(path, err));
+    } else {
+        yield put(fsActions._fetchFileContent_Failure('', 'No file path in payload'));
     }
 }
 
@@ -136,6 +251,8 @@ export function* saveFileContent({ payload }) {
     }
     catch (err) {
         /* istanbul ignore next */
+        
+        yield call(services.mainIpc.call, 'ElectronService', 'showErrorBox', ['Save File Failed', err.code]);
         yield put(fsActions._saveFile_Failure(path, err));
     }
 }

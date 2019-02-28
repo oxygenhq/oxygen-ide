@@ -36,16 +36,23 @@ export default class UserHintsService {
     }
 
     *_analyzeTestRunnerLogs(message, severity) {
-        if (
-            (message.indexOf('ECONNREFUSED') > -1 && message.indexOf('RuntimeError') > -1)
-            || message.indexOf('APPIUM_UNREACHABLE_ERROR') > -1
-        ) {
-            // get test mode 
+        if ((message.indexOf('ECONNREFUSED') > -1 && message.indexOf('RuntimeError') > -1)
+            || message.indexOf('APPIUM_UNREACHABLE_ERROR') > -1) {
+            // get test mode
             const testMode = yield select(state => state.test.runtimeSettings.testMode);
-            if (testMode && testMode === 'mob') {
+            if (testMode === 'mob') {
                 yield this._handleAppiumServerUnavailable();
+            } else if (testMode === 'web') {
+                alert('Invalid test mode selected: Web.\n\nTo run Mobile tests please select Mobile mode.');
+            } else if (testMode === 'resp') {
+                alert('Invalid test mode selected: Responsive.\n\nTo run Mobile tests please select Mobile mode.');
             }
-            
+        } else if (message.indexOf('INVALID_CAPABILITIES') > -1) {
+            const testMode = yield select(state => state.test.runtimeSettings.testMode);
+            if (message.indexOf('Failed to initialize `web` module - browserName must be specified.') > -1 &&
+                testMode && testMode === 'mob') {
+                alert('Invalid test mode selected: Mobile.\n\nTo run Web tests please select Web or Responsive mode.');
+            }
         }
     }
 

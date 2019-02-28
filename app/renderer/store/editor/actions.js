@@ -11,6 +11,11 @@ import moment from 'moment';
 import * as ActionTypes from './types';
 import { success, failure } from '../../helpers/redux';
 
+/* set font size to settings */
+export const saveSettings = () => ({
+  type: ActionTypes.SAVE_SETTINGS,
+});
+
 /* openFile */
 export const openFile = (path, setActive = true) => ({
   type: ActionTypes.EDITOR_OPEN_FILE,

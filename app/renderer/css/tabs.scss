@@ -16,6 +16,7 @@
   }  
   .ps__rail-x {
     z-index: 999999;
+    top: 22px !important;
   }
 
   > div:not([class*="ps__rail"]) {

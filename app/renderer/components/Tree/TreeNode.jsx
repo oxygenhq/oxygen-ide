@@ -373,6 +373,7 @@ class TreeNode extends React.Component {
 
     return (
       <span
+        onContextMenu={this.onIconContextMenu}
         className={classNames(
           `${prefixCls}-iconEle`,
           `${prefixCls}-icon__${this.getNodeState() || 'docu'}`,
@@ -381,6 +382,13 @@ class TreeNode extends React.Component {
       />
     );
   };
+
+  onIconContextMenu = (e) => {
+    e.preventDefault();
+    if (this.props.onIconContextMenu) {
+      this.props.onIconContextMenu(e);
+    }
+  }
 
   // Icon + Title
   renderSelector = () => {
@@ -511,7 +519,6 @@ class TreeNode extends React.Component {
     } } = this.context;
     const disabled = this.isDisabled();
     const dataOrAriaAttributeProps = getDataAndAria(otherProps);
-
     return (
       <li
         className={classNames(className, {
@@ -525,7 +532,7 @@ class TreeNode extends React.Component {
           'drag-over': !disabled && dragOver,
           'drag-over-gap-top': !disabled && dragOverGapTop,
           'drag-over-gap-bottom': !disabled && dragOverGapBottom,
-          'filter-node': filterTreeNode && filterTreeNode(this),
+          'filter-node': filterTreeNode && filterTreeNode(this)
         })}
 
         onContextMenu={this.props.onContextMenu}

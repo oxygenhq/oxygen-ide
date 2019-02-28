@@ -71,16 +71,14 @@ export default (state = defaultState, action) => {
         isRunning: true,
         isPaused: false,
       };
-    
+
     // TEST_START_FAILURE
     case failure(ActionTypes.TEST_START):
       if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SAVED) {
-        message.error('The current file has been modified. Please save the file before running the test.')
-      }
-      else if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SELECTED) {
+        message.warning('The current file has been modified. Please save the file before running the test.')
+      } else if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SELECTED) {
         message.error('Please open a script file before you could run the test.')
-      }
-      else if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_IS_EMPTY) {
+      } else if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_IS_EMPTY) {
         message.error('Test with empty script file cannot be started.')
       }
       return {

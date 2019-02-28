@@ -23,6 +23,8 @@ import editorSubjects from '../../store/editor/subjects';
 import fileSubjects from '../../store/fs/subjects';
 
 type Props = {
+  editorReadOnly: boolean,
+  fontSize: number,
   activeFile: null | object,
   openFiles: null | {[key: string]: object},
   onBreakpointsUpdate: (Array<any>) => void,
@@ -86,7 +88,7 @@ export default class TextEditor extends Component<Props> {
   }
 
   render() {
-    const { activeFile, openFiles } = this.props;
+    const { activeFile, openFiles, editorReadOnly, fontSize } = this.props;
     const self = this;
 
     return (
@@ -100,17 +102,23 @@ export default class TextEditor extends Component<Props> {
 
           const language = SupportedExtensions[file.ext] || DEFAULT_EDITOR_LANGUAGE;
           // file.language
+
           return (
-            <MonacoEditor 
+            <MonacoEditor
               ref={(ref) => { self.editors[file.path] = ref; }}
-              key={ file.path }
-              value={ file.content }
-              language={ language }
-              activeLine={ file.activeLine }
-              visible={ file.path === activeFile }
-              onBreakpointsUpdate={ (bps) => this.props.onBreakpointsUpdate(file.path, bps) }
-              onValueChange={ (bps) => ::this.handleValueChange(file.path, bps) }
-              onSelectionChange={ (bps) => ::this.handleSelectionChange(file.path, bps) }
+              key={file.path}
+              value={file.content}
+              language={language}
+              activeLine={file.activeLine}
+              visible={file.path === activeFile}
+              editorReadOnly={editorReadOnly}
+              fontSize={fontSize}
+              saveSettings={this.props.saveSettings}
+              zoomIn={this.props.zoomIn}
+              zoomOut={this.props.zoomOut}
+              onBreakpointsUpdate={(bps) => this.props.onBreakpointsUpdate(file.path, bps)}
+              onValueChange={(bps) => ::this.handleValueChange(file.path, bps)}
+              onSelectionChange={(bps) => ::this.handleSelectionChange(file.path, bps)}
             />
           );
         })}
@@ -119,12 +127,19 @@ export default class TextEditor extends Component<Props> {
           <div>
             <Icon type="inbox" />
             <p>You have no active opened files</p>
-            <p>Just pick one from your sidebar or open new one</p>
-            <p><b>Ctrl/Command + O</b> - Open folder</p>
-            <p><b>Ctrl/Command + N</b> - New file</p>
-            <p><b>Ctrl/Command + Shift + L</b> - Toggle logger</p>
+            <p>Open a folder first, then select a file or create a new file</p>
+            { process.platform === 'win32' || process.platform === 'linux' ?
+              <div>
+                <p><b>Ctrl + O</b> - Open folder</p>
+                <p><b>Ctrl + N</b> - New file</p>
+              </div>
+            : 
+              <div>
+                <p><b>Command + O</b> - Open folder</p>
+                <p><b>Command + N</b> - New file</p>
+              </div>
+            }
           </div>
-
         </div>
           )}
       </Fragment>

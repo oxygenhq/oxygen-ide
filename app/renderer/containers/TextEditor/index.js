@@ -10,6 +10,8 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import TextEditor from './TextEditor';
 import * as editorActions from '../../store/editor/actions';
+import { zoomIn, zoomOut } from '../../store/settings/actions';
+
 
 const mapStoreToProps = (state) => {
   // combine file data and editor related metadata
@@ -19,13 +21,15 @@ const mapStoreToProps = (state) => {
   }));
 
   return {
+    editorReadOnly: state.test.isRunning,
     activeFile: state.editor.activeFile,
+    fontSize: state.settings.fontSize,
     openFiles: openFiles, //state.editor.openFiles,
   };
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...editorActions } , dispatch)
+  bindActionCreators({ ...editorActions, zoomIn, zoomOut } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(TextEditor);

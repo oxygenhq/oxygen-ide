@@ -6,12 +6,15 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
+
+/* eslint-disable class-methods-use-this */
 import fs from 'fs';
 import beautify from 'js-beautify';
 import path from 'path';
 import rimraf from 'rimraf';
 import junk from 'junk';
-
+import chokidar from 'chokidar';
+import { webContents } from 'electron';
 import ServiceBase from './ServiceBase';
 import fileFolderSorter from '../helpers/fileFolderSorter';
 import isUnixHiddenPath from '../helpers/isUnixHiddenPath';
@@ -24,10 +27,100 @@ const FS_ERRORS = {
     EPERM: 'Operation not permitted'
 };
 
-export default class FileService extends ServiceBase {
-    constructor() {
-        super();
+const getFileInfo = (filePath) => {
+    // this function accepts either fs.Stats object or path as string
+    const stats = fs.lstatSync(filePath);
+    const type = stats.isDirectory() ? 'folder' : (stats.isFile() ? 'file' : 'other');
+    const parentPath = path.dirname(filePath);
+    return {
+        name: path.basename(filePath),
+        path: filePath,
+        parentPath,
+        type,
+        ext: path.extname(filePath),
+    };
+};
+
+const send = data => {
+    const allWebContents = webContents.getAllWebContents();
+    allWebContents.forEach((contents) => {
+        contents.send('MAIN_SERVICE_EVENT', data);
+    });
+};
+
+const processChange = (eventPath, folderPath, type) => {
+    const filePart = eventPath.split(folderPath);
+    if (filePart && filePart[1]) {
+        // anylize file location
+        if (eventPath) {  
+            //  file or folder was deleted or renamed
+            //  dirUnlink or fileUnlink
+            if (['dirUnlink', 'fileUnlink', 'fileChangeContent'].includes(type)) { 
+                send({
+                    service: 'FileService',
+                    event: 'filesWatcher',
+                    type: type,
+                    path: eventPath
+                });
+            } else {
+                //  file or folder was added
+                // dirAdd or fileAdd
+                const fileInfo = getFileInfo(eventPath);
+                send({
+                    service: 'FileService',
+                    event: 'filesWatcher',
+                    type: type,
+                    data: fileInfo
+                });
+            }
+        } else {
+            console.warn(`bad eventPath: ${eventPath}`);
+        }
+    } else {
+        console.warn(`bad split result wirh eventPath: ${eventPath} and folderPath: ${folderPath}`);
     }
+};
+
+export default class FileService extends ServiceBase {
+    watcherOn = false;
+
+    createWatchOnFilesChannel(folderPath) {
+        if (!this.watcherOn) {
+            this.watcherOn = true;
+            chokidar.watch(folderPath, {
+                ignored: ['**/node_modules/**/*', '**/node_modules/**/**/*', '**/.git/**/*', '*.gz'],
+                ignoreInitial: true,
+                ignorePermissionErrors: true,
+                followSymlinks: true,
+                interval: 1000,
+                binaryInterval: 1000,
+                useFsEvents: false
+            }).on('all', (event, eventPath, third) => {
+                if (event === 'add') {
+                    // file add
+                    processChange(eventPath, folderPath, 'fileAdd');
+                } else if (event === 'unlink') {
+                    // file unlink(part of rename or delete)
+                    processChange(eventPath, folderPath, 'fileUnlink');
+                } else if (event === 'addDir') {
+                    // dir add
+                    processChange(eventPath, folderPath, 'dirAdd');
+                } else if (event === 'unlinkDir') {
+                    // dir unlink(part of rename or delete)
+                    processChange(eventPath, folderPath, 'dirUnlink');
+                } else if (event === 'change') {
+                    // change file content
+                    processChange(eventPath, folderPath, 'fileChangeContent');
+                }
+
+                else {
+                    // console.log('event', event);
+                    // console.log('eventPath', eventPath);
+                }
+            });
+        }
+    }
+
     getFolderContent(folderPath) {
         let stats = fs.lstatSync(folderPath);
         if (!stats.isDirectory()) {
@@ -76,7 +169,25 @@ export default class FileService extends ServiceBase {
 
     getFileContent(filePath) {
         var data = fs.readFileSync(filePath, 'utf8');
-        return data;
+        if(!data){
+            // sometimes readFileSync return empty data on not emty file :-?
+            setTimeout(function() { 
+                var data = fs.readFileSync(filePath, 'utf8');
+                send({
+                    service: 'FileService',
+                    event: 'getFileContent',
+                    content: data,
+                    path: filePath
+                });
+            }, 100);
+        } else {
+            send({
+                service: 'FileService',
+                event: 'getFileContent',
+                content: data,
+                path: filePath
+            });
+        }
     }
 
     renameFileOrFolder(orgPath, newName) {
