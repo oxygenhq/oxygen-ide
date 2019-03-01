@@ -128,7 +128,7 @@ export default class List extends PureComponent<ListProps> {
                             />
                         </div>
                     </div>
-                    <List.Container className="list" onKeyPress={(e) => this.handleKeyPress(e)}>
+                    <List.Container className="list list-auto-height" onKeyPress={(e) => this.handleKeyPress(e)}>
                         { data.map( (itm, index) => <ListItem key={ `itm_${index}`} data={ itm } editable={ editable } />) }
                     </List.Container>
                 </Fragment>
@@ -137,7 +137,7 @@ export default class List extends PureComponent<ListProps> {
         
         return (
             <Fragment>
-                <List.Container className="list" onKeyPress={(e) => this.handleKeyPress(e)}>
+                <List.Container className="list list-auto-height" onKeyPress={(e) => this.handleKeyPress(e)}>
                     { data.map( (itm, index) => 
                         <div key={ `itm_${index}`} className="item-value-wrap">
                             <ListItem  data={ itm } editable={ editable } />

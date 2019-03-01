@@ -61,16 +61,19 @@ export default class ObjectRepository extends PureComponent<Props> {
       }
       return (
         <ObjectRepository.Container>
-            <Panel header={ repoPanelTitle }
+            <Panel 
+                header={ repoPanelTitle }
+                afterHeader = {
+                  <SearchRow
+                    setSearchResults={ this.setSearchResults }
+                    tree={ tree }
+                  />
+                }
                 scroller
-                scrollWrapperClass="tree-wrapper"
+                scrollWrapperClass="tree-wrapper tree-wrapper-half"
                 scrollRefresh={ this.props.refreshScroll }
                 scrollVerticalOnly
             >
-                <SearchRow
-                    setSearchResults={ this.setSearchResults }
-                    tree={ tree }
-                />
                 <ObjectTree
                     searchResults= { this.state.searchResults }
                     tree={ tree }
@@ -80,8 +83,12 @@ export default class ObjectRepository extends PureComponent<Props> {
                 />
             </Panel>
             { selectedObject &&
-            <Panel header={ editorPanelTitle } noBodyPadding={ true } >
+              <Panel 
+                header={ editorPanelTitle } 
+                noBodyPadding={ true } 
+              >
                 <ObjectEditor 
+                  refreshScroll={ this.props.refreshScroll }
                   addLocator = {this.props.addLocator}
                   deleteLocator = {this.props.deleteLocator}
                   updateLocator = {this.props.updateLocator}
@@ -89,7 +96,7 @@ export default class ObjectRepository extends PureComponent<Props> {
                   removeObjectOrFolder = {this.props.removeObjectOrFolder}
                   object={ selectedObject } 
                 />
-            </Panel>
+              </Panel>
             }
         </ObjectRepository.Container>
       );    

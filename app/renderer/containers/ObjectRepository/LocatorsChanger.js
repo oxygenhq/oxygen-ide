@@ -36,6 +36,9 @@ export default class LocatorsChanger extends PureComponent<Props> {
     }
     if(this.props.addLocator){
       this.props.addLocator(text);
+      this.setState({
+        text: ''
+      })
     }
   }
 
@@ -44,6 +47,9 @@ export default class LocatorsChanger extends PureComponent<Props> {
 
     if(editStr && finishEdit){
       finishEdit(editStr);
+      this.setState({
+        text: ''
+      })
     } else {
       // looks line need delete element or do nothing
     }

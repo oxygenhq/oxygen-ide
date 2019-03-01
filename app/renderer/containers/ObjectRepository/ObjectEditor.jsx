@@ -10,6 +10,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Button } from 'antd';
 import List from '../../components/core/List';
+import Panel from '../../components/Panel';
 import LocatorsChanger from './LocatorsChanger';
 import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
 
@@ -81,11 +82,6 @@ export default class ObjectEditor extends PureComponent<Props> {
     const { object } = this.props;
     const { path } = object;
 
-    console.log('---');
-    console.log('name', name);
-    console.log('originStr', originStr);
-    console.log('---');
-
     this.setState({
       editStr: null,
       editing: false
@@ -117,94 +113,96 @@ export default class ObjectEditor extends PureComponent<Props> {
     })
   }
 
-  render() {
+  renderLocatorChanger() {
+    const { object } = this.props;
+
+    if(object && object.children && object.children.length) {
+      return (
+        <LocatorsChanger 
+          editing={ this.state.editing }
+          editStr={ this.state.editStr }
+          onChangeUpdate={ this.onChangeUpdate }
+          finishEdit={ this.finishEdit }
+          addLocator={this.addLocator} 
+        />
+      )
+    }
+
+    if(object && object.children && object.children.length === 0) {
+      return(
+        <LocatorsChanger 
+          addLocator={this.addLocator} 
+        />
+      )
+    }
+
+    if (object && object.hasOwnProperty('locator') && this.state.editing) {
+      return(
+        <LocatorsChanger 
+          editing={ this.state.editing }
+          editStr={ this.state.editStr }
+          addLocator={this.addLocator} 
+          onChangeUpdate={ this.onChangeUpdate }
+          finishEdit={ this.finishEditLocator }
+        />
+      )
+    }
+
+    return null;
+  }
+
+  renderInner() {
     const { object } = this.props;
     
     if(object && object.children && object.children.length) {
       return (
-        <div className="list">
-          <LocatorsChanger 
-            editing={ this.state.editing }
-            editStr={ this.state.editStr }
-            onChangeUpdate={ this.onChangeUpdate }
-            finishEdit={ this.finishEdit }
-            addLocator={this.addLocator} 
-          />
-          { object.children.map( (itm, index) => 
-            <div 
-              className="list-item" 
-              key={index}
-            >
-              <div className="item-value-wrap">
-                <Button 
-                  onClick={ () => { this.remove(itm.name) } }
-                  className="control" 
-                  type="primary" 
-                  shape="circle" 
-                  icon="delete" 
-                />
-                <Button 
-                  onClick={ () => { this.startEdit(itm.name) } }
-                  className="control" 
-                  type="primary" 
-                  shape="circle" 
-                  icon="edit" 
-                />
-                <p className="control" >
-                  {itm.name}
-                </p>
+        <div className="list list-auto-height">
+            { object.children.map( (itm, index) => 
+              <div 
+                className="list-item" 
+                key={index}
+              >
+                <div className="item-value-wrap">
+                  <Button 
+                    onClick={ () => { this.remove(itm.name) } }
+                    className="control" 
+                    type="primary" 
+                    shape="circle" 
+                    icon="delete" 
+                  />
+                  <Button 
+                    onClick={ () => { this.startEdit(itm.name) } }
+                    className="control" 
+                    type="primary" 
+                    shape="circle" 
+                    icon="edit" 
+                  />
+                  <p className="control" >
+                    {itm.name}
+                  </p>
+                </div>
               </div>
-            </div>
-          ) }
+            ) }
         </div>
       );
     }
 
     if(object && object.children && object.children.length === 0) {
       return (
-        <div className="list">
-          <LocatorsChanger addLocator={this.addLocator} />
+        <div className="list list-auto-height">
           <EmptyList />
         </div>
       );
     }
 
-
     if (!object && !object.hasOwnProperty('locator')) {
       return null;
-      // if(!object.hasOwnProperty('children')){
-      //   console.log('here#1');
-      //   return (
-      //     <Fragment>
-      //       <LocatorsChanger addLocator={this.addLocator} />
-      //       <EmptyList />
-      //     </Fragment>
-      //   );
-      // } else {
-      //   return (
-      //     <Fragment>
-      //       <LocatorsChanger addLocator={this.addLocator} />
-      //       { object.children.map( (itm, index) => 
-      //         <div>{itm.name}</div>  
-      //       ) }
-      //     </Fragment>
-      //   );
-      // }
     }
     // make sure to wrap the locator property in array if it's a string
     const locators = Array.isArray(object.locator) ? object.locator : [object.locator];
 
     return (
       <Fragment>
-        { this.state.editing &&
-          <LocatorsChanger 
-            editing={ this.state.editing }
-            editStr={ this.state.editStr }
-            addLocator={this.addLocator} 
-            onChangeUpdate={ this.onChangeUpdate }
-            finishEdit={ this.finishEditLocator }
-          />
-        }
         <List 
           startEdit={ this.startEdit }
           deleteLocator={ this.props.deleteLocator }
@@ -212,6 +210,25 @@ export default class ObjectEditor extends PureComponent<Props> {
           data={ locators } 
           editable={ true } 
         />
+      </Fragment>
+    );
+  }
+
+  render() {
+    return (
+      <Fragment>
+        { this.renderLocatorChanger() }
+        <Panel 
+          className="panel-full-height"
+          noBodyPadding={ true }
+          noBodyBorders={ true }
+          scroller
+          scrollWrapperClass="tree-wrapper tree-wrapper-half"
+          scrollRefresh={ this.props.refreshScroll }
+          scrollVerticalOnly
+        >
+          { this.renderInner() }
+        </Panel>
       </Fragment>
     );
   }
