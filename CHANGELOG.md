@@ -1,15 +1,28 @@
 # CHANGELOG
 
-## v1.4.0 (2019-xx-xx)
-* Bump Oxygen 0.41.1.
+## v1.4.0 (2019-03-04)
+* Bump Oxygen 0.42.0.
+* Bump Geckodriver 0.24.0.
+* Bump IEDriverServer 1.141.5.
+* Bump Chromedriver 2.46.0.
 * Allow to set and pause on breakpoints in module files (called by require from the main script).
-* Fix crash in create file dialog when filename is not specified.
 * Add more user hints for some script execution errors.
-* Fix selenium process getting killed when opening two instances of the IDE.
+* Add button for copying general/selenium log content to clipboard.
+* Automatically synchronize file hierarchy and content when files are modified outside of the IDE.
+* Add 'go professional' menu entry.
+* Prevent script editing during execution.
+* Don't allow creating folders files with illegal characters in their names.
+* Add option to change editor's font size.
+* Add support for drag-and-drop inside the file tree.
+* Changed 'modified' tab icon.
+* Update recorder certificates.
+* Print more error details on 'Test Failed' errors.
 * Show message about unsaved file as a warning instead of error.
 * Improve welcome message.
-* Add 'go professional' menu entry.
-* Print more error details on 'Test Failed' errors.
+* Fix selenium process getting killed when opening two instances of the IDE.
+* Fix crash in create file dialog when filename is not specified.
+* Fix general log scrolling issues.
+* Fix tab scroller appearing in the middle of the tabs and not in the bottom of the tabs.
 
 ## v1.3.1 (2019-01-03)
 * Bump Oxygen 0.39.0.
