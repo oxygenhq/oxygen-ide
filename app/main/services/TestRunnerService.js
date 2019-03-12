@@ -280,7 +280,7 @@ export default class TestRunnerService extends ServiceBase {
             this._emitLogEvent(SEVERITY_ERROR, message);
         });
 
-        this.oxRunner.on('ui-log-add', (level, msg) => {
+        this.oxRunner.on('log-add', (level, msg) => {
             this._emitLogEvent(SEVERITY_INFO, `LEVEL: ${level} MSG: ${msg}`);
         });
 
