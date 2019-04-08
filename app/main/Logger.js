@@ -129,6 +129,10 @@ export default class Logger {
         this.error = (...args) => {
             prepError(args);
             const ret = _log.error.apply(this, args);
+             // do not show errors to the user about deprecated Buffer()
+            if (args[0] && args[0].includes('DeprecationWarning: Buffer() is deprecated')) {
+                return ret;
+            }
             showDialog(args[0], args.length === 2 ? args[1] : '', 'error');
             return ret;
         }
