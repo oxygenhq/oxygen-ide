@@ -20,6 +20,7 @@ const mapStoreToProps = (state) => {
   const editorActiveFile = state.editor.activeFile;
   const rootPath = state.fs.rootPath || null;
   return {
+    javaError: state.wb.javaError,
     isRecording: state.recorder.isRecording,
     settings: state.settings,
     test: state.test,

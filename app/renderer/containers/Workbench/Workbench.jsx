@@ -12,6 +12,7 @@ import { Modal, Layout, Icon, Row, Col, Tooltip, message } from 'antd';
 /* eslint-disable react/no-did-update-set-state */
 import updateModals from '../../components/updateModals';
 // Dialogs
+import JavaDialog from '../../components/dialogs/JavaDialog';
 import FileRenameDialog from '../../components/dialogs/FileRenameDialog';
 import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
@@ -240,7 +241,7 @@ export default class Workbench extends Component<Props> {
   }
 
   render() {
-    const { test, settings, dialog } = this.props;
+    const { test, settings, dialog, javaError } = this.props;
     const { runtimeSettings } = test;
     // sidebars state
     const leftSidebarSize = settings.sidebars.left.size;
@@ -251,6 +252,12 @@ export default class Workbench extends Component<Props> {
 
     return (
       <div>
+        { javaError && 
+          <JavaDialog 
+            clean={this.props.cleanJavaError}
+            javaError={javaError}
+          />  
+        }
         { dialog && 
         <Fragment>
           { dialog.DIALOG_FILE_CREATE && dialog.DIALOG_FILE_CREATE.visible &&

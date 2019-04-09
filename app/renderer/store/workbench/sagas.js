@@ -28,6 +28,8 @@ import { success, failure, successOrFailure } from '../../helpers/redux';
 
 import ActionTypes from '../types';
 import { MAIN_MENU_EVENT, MAIN_SERVICE_EVENT } from '../../services/MainIpc';
+import { JAVA_ERROR_INFO, JAVA_NOT_FOUND, JAVA_BAD_VERSION } from '../../services/JavaService';
+
 import ServicesSingleton from '../../services';
 import editorSubjects from '../editor/subjects';
 const services = ServicesSingleton();
@@ -58,6 +60,9 @@ export default function* root() {
       takeLatest(success(ActionTypes.FS_DELETE), handleFileDelete),
       takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
       takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
+      takeLatest(JAVA_ERROR_INFO, handleJavaError),
+      takeLatest(JAVA_NOT_FOUND, handleJavaNotFound),
+      takeLatest(JAVA_BAD_VERSION, handleJavaBadVersion),
     ]);
 }
 
@@ -129,6 +134,37 @@ export function* handleServiceEvents({ payload }) {
     if (service === 'UpdateService') {
         yield handleUpdateServiceEvent(event);
     }
+}
+
+export function* handleJavaError({ payload }){
+    if(payload.err){
+        yield put(wbActions.setJavaError(payload.err));
+    } else {
+        yield put(wbActions.setJavaError());
+    }
+}
+
+export function* handleJavaNotFound(inner){
+    if(payload.message){
+        yield put(wbActions.setJavaError({
+            reason: 'not-found',
+            message: payload.message
+        }));
+    } else {
+        yield put(wbActions.setJavaError());
+    }
+}
+
+export function* handleJavaBadVersion({ payload }){
+    if(payload.message){
+        yield put(wbActions.setJavaError({
+            reason: 'bad-version',
+            message: payload.message
+        }));
+    } else {
+        yield put(wbActions.setJavaError());
+    }
+    return;
 }
 
 function* handleUpdateServiceEvent(event) {
