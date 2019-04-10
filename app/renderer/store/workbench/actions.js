@@ -179,6 +179,12 @@ export const stopRecorder = () => ({
   type: ActionTypes.WB_STOP_RECORDER,
     payload: { },
 });
+
+/* startRecorderWatcher */
+export const startRecorderWatcher = () => ({
+  type: ActionTypes.WB_RECORDER_START_WATCHER
+});
+
 /* onTabChange */
 export const onTabChange = (key) => {
   return {

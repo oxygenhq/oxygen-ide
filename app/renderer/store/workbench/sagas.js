@@ -53,6 +53,7 @@ export default function* root() {
       takeLatest(ActionTypes.WB_SAVE_CURRENT_FILE, saveCurrentFile),   
       takeLatest(ActionTypes.WB_START_RECORDER, startRecorder),         
       takeLatest(ActionTypes.WB_STOP_RECORDER, stopRecorder),
+      takeLatest(ActionTypes.WB_RECORDER_START_WATCHER, startRecorderWatcher),
       takeLatest(ActionTypes.WB_SHOW_CONTEXT_MENU, showContextMenu),      
       takeLatest(ActionTypes.WB_ON_TAB_CHANGE, changeTab),
       takeLatest(ActionTypes.WB_ON_CONTENT_UPDATE, contentUpdate),      
@@ -487,6 +488,10 @@ export function* startRecorder({ payload }) {
 
 export function* stopRecorder({ payload }) {
     yield put(recorderActions.stopRecorder());
+}
+
+export function* startRecorderWatcher({ payload }) {
+    yield put(recorderActions.startRecorderWatcher());
 }
 
 export function* showNewFileDialog({ payload }) {

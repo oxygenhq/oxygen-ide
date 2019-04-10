@@ -43,8 +43,52 @@ type Props = {
 const { Option } = Select;
 
 export default class Toolbar extends Component<Props> {
-  props: Props;
+  constructor(props){
+    super(props);
 
+    let canRecord;
+
+    if(!props.isChromeExtensionEnabled){
+      canRecord = false;
+    } else {
+      canRecord = true;
+    }
+
+    this.state = {
+      canRecord: canRecord
+    }
+  }
+
+  componentDidMount() {
+    var intervalId = setInterval(this.timer, 1000);
+    this.setState({intervalId: intervalId});
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.intervalId);
+  }
+
+  timer = () => {
+    if(Number.isInteger(this.props.isChromeExtensionEnabled)){
+      const now = Date.now();
+      const diff = now - this.props.isChromeExtensionEnabled;
+
+      let canRecord;
+
+      if(diff && diff > 2000){
+        canRecord = false;
+      } else {
+        canRecord = true;
+      }
+
+      if(canRecord !== this.state.canRecord){
+        this.setState({
+          canRecord: canRecord
+        });
+      }
+    }
+  }
+  
   handleClickEvent(ctrlId) {
     if (this._isEnabled(ctrlId) && this._isVisible(ctrlId) && this.props.onButtonClick) {
       this.props.onButtonClick(ctrlId);
@@ -93,8 +137,17 @@ export default class Toolbar extends Component<Props> {
 
   render() {
     const {
-      testMode, testTarget, devices, browsers, emulators, stepDelay
+      testMode, 
+      testTarget, 
+      devices, 
+      browsers, 
+      emulators, 
+      stepDelay,
+      isChromeExtensionEnabled
     } = this.props;
+
+    const { canRecord } = this.state;
+
     return (
       <div className="appTollbar">
         { this._isVisible(Controls.NEW_FILE) && (
@@ -282,15 +335,28 @@ export default class Toolbar extends Component<Props> {
 
         <div className="separator" />
 
-        <span
-          className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
-          title="Record"
-        >
-          <FaMicrophone
-            style={{ marginRight: 0 }}
-            onClick={ () => ::this.handleClickEvent(Controls.TEST_RECORD) }
-          />
-        </span>
+        { !canRecord && 
+          <span
+            className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
+            title="Record"
+          >
+            <FaMicrophone
+              style={{ marginRight: 0, color: 'darkred', cursor: 'not-allowed' }}
+            />
+            <p className="ext-err-message">Chrome extension not work</p>
+          </span>}
+
+        { canRecord &&
+          <span
+            className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
+            title="Record"
+          >
+            <FaMicrophone
+              style={{ marginRight: 0 }}
+              onClick={ () => ::this.handleClickEvent(Controls.TEST_RECORD) }
+            />
+          </span>
+        }
 
         <span 
           className={ this._isSelected(Controls.TEST_SETTINGS) ? 'control selectable active' : 'control selectable' }

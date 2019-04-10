@@ -26,6 +26,7 @@ export default function* root() {
     yield all([
       takeLatest(ActionTypes.RECORDER_START, startRecorder),
       takeLatest(ActionTypes.RECORDER_STOP, stopRecorder),
+      takeLatest(ActionTypes.RECORDER_START_WATCHER, startRecorderWatcher),
       takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
     ]);
 }
@@ -35,6 +36,9 @@ export function* handleServiceEvents({ payload }) {
 
     if (!event) {
         return;
+    }
+    if (service === 'RecorderService' && event.type === 'CHROME_EXTENSION_ENABLED') {
+        yield put(recorderActions.setLastExtentionEnabledTimestamp(Date.now()));
     }
     if (service === 'RecorderService' && event.type === 'RECORDER_EVENT') {        
         const step = {
@@ -83,6 +87,10 @@ export function* startRecorder({ payload }) {
     yield put(recorderActions._startRecorder_Success(currentOpenFile));
 }
 
-export function* stopRecorder({ payload }) {
+export function* stopRecorder({ payload }) {    
     yield call(services.mainIpc.call, 'RecorderService', 'stop', []);
+}
+
+export function* startRecorderWatcher({}){
+    yield call(services.mainIpc.call, 'RecorderService', 'watch', []);
 }

@@ -43,3 +43,11 @@ export const addStep = (step) => ({
   payload: { step },
 });
 
+export const startRecorderWatcher = () => ({
+  type: ActionTypes.RECORDER_START_WATCHER
+});
+
+export const setLastExtentionEnabledTimestamp = (timestamp) => ({
+  type: ActionTypes.RECORDER_SET_TIMESTAMP,
+  payload: { value: timestamp }
+});

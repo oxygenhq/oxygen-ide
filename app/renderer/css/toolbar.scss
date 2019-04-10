@@ -104,3 +104,10 @@
 .appTollbar button.control.button.stop:hover {
   color: $hover;
 }
+
+.ext-err-message {
+  font-size: 10px;
+  line-height: 10px;
+  margin-bottom: 0px;
+  color: darkred;
+}

@@ -67,7 +67,8 @@ export default class Workbench extends Component<Props> {
 
   componentDidMount() {
     // start IDE initialization process
-    this.props.initialize();    
+    this.props.initialize();
+    this.props.startRecorderWatcher();
   }
 
   handleTabChange(key) {
@@ -287,6 +288,7 @@ export default class Workbench extends Component<Props> {
         }
         {updateModals.call(this)}
         <Toolbar
+          isChromeExtensionEnabled={ this.props.isChromeExtensionEnabled }
           testMode={ runtimeSettings.testMode }
           testTarget={ runtimeSettings.testTarget }
           stepDelay={ runtimeSettings.stepDelay }

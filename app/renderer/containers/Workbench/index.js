@@ -22,6 +22,7 @@ const mapStoreToProps = (state) => {
   return {
     javaError: state.wb.javaError,
     isRecording: state.recorder.isRecording,
+    isChromeExtensionEnabled: state.recorder.isChromeExtensionEnabled,
     settings: state.settings,
     test: state.test,
     dialog: state.dialog,

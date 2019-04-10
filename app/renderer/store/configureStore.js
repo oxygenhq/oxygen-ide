@@ -46,7 +46,10 @@ const configureStore = (initialState?: counterStateType) => {
   // Apply redux-logger if we are in debugging mode
   if (process.env.NODE_ENV === 'development') {
     const { createLogger } = require('redux-logger');
-    middleware.push(createLogger({ collapsed: true }));
+    middleware.push(createLogger({ 
+      collapsed: true,
+      predicate: (getState, action) => !(action.type === 'MAIN_SERVICE_EVENT' && action.payload && action.payload.event && action.payload.event.type && action.payload.event.type === "CHROME_EXTENSION_ENABLED")
+    }));
   }
 
   // Apply Rxjs Action to Subject middleware
