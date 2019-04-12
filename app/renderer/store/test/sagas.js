@@ -11,6 +11,7 @@ import { putAndTake } from '../../helpers/saga';
 
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import * as testActions from './actions';
+import * as wbActions from '../workbench/actions';
 import * as editorActions from '../editor/actions';
 import * as tabActions from '../tabs/actions';
 import * as loggerActions from '../logger/actions';
@@ -108,11 +109,7 @@ export function* startTest({ payload }) {
         return;
     }
     else if (file.modified) {
-        yield put({
-            type: failure(ActionTypes.TEST_START),
-            payload: { error: { type: ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SAVED } },
-        });
-        return;
+        yield put(wbActions.saveCurrentFile());
     }
     try {        
         // reset active line cursor in all editors
