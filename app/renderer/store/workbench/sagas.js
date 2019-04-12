@@ -96,6 +96,10 @@ export function* handleMainMenuEvents({ payload }) {
     else if (cmd === Const.MENU_CMD_HELP_CHECK_UPDATES) {
         yield services.mainIpc.call('UpdateService', 'start', [true]).then(() => {});
     }
+    else if (cmd === Const.MENU_CMD_CLEAR_ALL) {
+        yield services.mainIpc.call('ElectronService', 'clearSettings');
+        yield initialize();
+    }
     else if (cmd === Const.MENU_CMD_OPEN_FOLDER) {
         yield put(wbActions.showDialog('OPEN_FOLDER'));
     }
@@ -174,7 +178,7 @@ function* handleUpdateServiceEvent(event) {
     }
 }
 
-export function* initialize({ payload }) {
+export function* initialize() {
     services.mainIpc.call('UpdateService', 'start').then(() => {});
     // start Selenium server
     services.mainIpc.call('SeleniumService', 'start').then(() => {});
@@ -185,6 +189,12 @@ export function* initialize({ payload }) {
     if (appSettings) {
         // make sure we push Electron store settings to our Redux Store
         yield put(settingsActions.mergeSettings(appSettings));
+    }
+
+    if(appSettings && appSettings.lastSession && appSettings.lastSession.rootFolder){
+        yield put(settingsActions.hildeLanding());
+    } else {
+        yield put(settingsActions.showLanding());
     }
     // retrieve and save merged settings back to Electron store
     const allSettings = yield select(state => state.settings);

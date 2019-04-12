@@ -18,6 +18,10 @@ export default class ElectronService extends ServiceBase {
         super(mainWindow);
     }
 
+    clearSettings() {
+        appSettings.deleteAll();
+    }
+
     getSettings() {
         return appSettings.get('appSettings');
     }

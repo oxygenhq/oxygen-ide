@@ -25,6 +25,7 @@ import Logger from '../Logger';
 import Toolbar from '../../components/Toolbar';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
+import Landing from '../../components/Landing';
 import Settings from '../Settings';
 import * as Controls from '../../components/Toolbar/controls';
 // Styles
@@ -250,6 +251,7 @@ export default class Workbench extends Component<Props> {
     const rightSidebarSize = settings.sidebars.right.size;
     const rightSidebarVisible = settings.sidebars.right.visible;
     const loggerVisible = settings.logger.visible;
+    const showLanding = settings.showLanding;
 
     return (
       <div>
@@ -304,22 +306,23 @@ export default class Workbench extends Component<Props> {
           </Col>
 
           <Col style={{ width: '100%' }}>
-            <Layout className="ide-main">
-              <Sidebar 
-                align="left"
-                size={ leftSidebarSize } 
-                visible={ leftSidebarVisible } 
-                onResize={ (size) => ::this.handleSidebarResize('left', size) }
-              >
-                <FileExplorer 
-                  onSelect={ ::this.fileExplorer_onSelect } 
-                  onCreate={ ::this.fileExplorer_onCreate }
-                  onRename={ ::this.fileExplorer_onRename }
-                  onDelete={ ::this.fileExplorer_onDelete }
-                  onMove={ ::this.fileExplorer_onMove }
-                />
-              </Sidebar>
-              <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
+            { !showLanding && 
+              <Layout className="ide-main">
+                <Sidebar 
+                  align="left"
+                  size={ leftSidebarSize } 
+                  visible={ leftSidebarVisible } 
+                  onResize={ (size) => ::this.handleSidebarResize('left', size) }
+                >
+                  <FileExplorer 
+                    onSelect={ ::this.fileExplorer_onSelect } 
+                    onCreate={ ::this.fileExplorer_onCreate }
+                    onRename={ ::this.fileExplorer_onRename }
+                    onDelete={ ::this.fileExplorer_onDelete }
+                    onMove={ ::this.fileExplorer_onMove }
+                  />
+                </Sidebar>
+                <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
                 <Header className="tabs-container">{/*headerBar*/}
                   <Row>
                     <Col className="sidebar-trigger">                      
@@ -349,15 +352,19 @@ export default class Workbench extends Component<Props> {
                   />
                 </div>
               </Layout>
-              <Sidebar 
-                align="right"
-                size={ rightSidebarSize } 
-                visible={ rightSidebarVisible } 
-                onResize={ (size) => ::this.handleSidebarResize('right', size) }
-              >
-                <Settings />
-              </Sidebar>
-            </Layout>
+                <Sidebar 
+                  align="right"
+                  size={ rightSidebarSize } 
+                  visible={ rightSidebarVisible } 
+                  onResize={ (size) => ::this.handleSidebarResize('right', size) }
+                >
+                  <Settings />
+                </Sidebar>
+              </Layout>
+            }
+            { showLanding && 
+              <Landing/>
+            }
           </Col>
         </Row>
       </div>

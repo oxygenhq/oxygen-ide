@@ -8,6 +8,16 @@
  */
 import * as types from './types';
 
+/* show Landing */
+export const showLanding = () => ({
+  type: types.SHOW_LANDING
+});
+
+/* hide Landing */
+export const hildeLanding = () => ({
+  type: types.HIDE_LANDING
+});
+
 /* zoomIn */
 export const zoomIn = () => ({
   type: types.EDITOR_ZOOM_IN

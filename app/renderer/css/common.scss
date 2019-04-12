@@ -119,3 +119,27 @@
 .ant-model .ant-modal-body .ant-row {
   margin-bottom: 20px;
 }
+
+.landing-container {
+  background: #f1f1f1;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+
+.landing-inner {
+  left: 0;
+  right: 0;
+  top: 45%;
+  position: absolute;
+}
+
+.landing-title {
+  color: darkgray;
+}
+
+.landing-text {
+  font-size: 22px;
+  color: darkgray;
+  font-style: italic;
+}
