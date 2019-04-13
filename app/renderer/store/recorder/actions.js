@@ -9,6 +9,12 @@
 import * as ActionTypes from './types';
 import { success, failure } from '../../helpers/redux';
 
+// stop wait chrome extension
+export const stopWaitChromeExtension = () => ({
+  type: ActionTypes.STOP_WAIT_CHROME_EXTENSION,
+  payload: null,
+});
+
 // startRecorder
 export const startRecorder = () => ({
   type: ActionTypes.RECORDER_START,

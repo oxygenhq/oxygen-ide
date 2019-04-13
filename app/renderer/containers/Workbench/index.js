@@ -12,7 +12,7 @@ import Workbench from './Workbench';
 import * as wbActions from '../../store/workbench/actions';
 import * as testActions from '../../store/test/actions';
 import * as settingsActions from '../../store/settings/actions';
-import * as recorderActions from '../../store/recorder/actions';
+import { stopWaitChromeExtension } from '../../store/recorder/actions';
 import { move } from '../../store/fs/actions';
 
 const mapStoreToProps = (state) => {
@@ -23,6 +23,7 @@ const mapStoreToProps = (state) => {
     javaError: state.wb.javaError,
     isRecording: state.recorder.isRecording,
     isChromeExtensionEnabled: state.recorder.isChromeExtensionEnabled,
+    waitChromeExtension: state.recorder.waitChromeExtension,
     settings: state.settings,
     test: state.test,
     dialog: state.dialog,
@@ -33,7 +34,7 @@ const mapStoreToProps = (state) => {
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...wbActions, ...testActions, ...settingsActions, move } , dispatch)
+  bindActionCreators({ ...wbActions, ...testActions, ...settingsActions, move, stopWaitChromeExtension } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Workbench);
