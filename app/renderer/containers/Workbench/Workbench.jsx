@@ -133,7 +133,16 @@ export default class Workbench extends Component<Props> {
       this.props.saveCurrentFile();
     }
     else if (ctrlId === Controls.NEW_FILE) {
-      this.props.showNewFileDialog();      
+      const { settings } = this.props;
+
+      if(settings && settings.showLanding){
+        notification['error']({
+          message: 'Can\'t add a new file to not exist folder',
+          description: 'Please, open folder first'
+        });
+      } else {
+        this.props.showNewFileDialog();   
+      }
     }
     else if (ctrlId === Controls.TEST_RECORD) {
       const { isRecording } = this.props;
