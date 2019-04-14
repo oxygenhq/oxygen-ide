@@ -30,14 +30,15 @@ export default class NoChromeDialog extends Component<Props> {
   render(){
     return (
       <Modal
-        title="Oxygen Chrome extension is not installed or is disabled"
+        title="Oxygen Chrome Extension is not installed or is disabled"
         visible={true}
         onOk={this.handleOk}
         okText={'Yes'}
         onCancel={this.handleCancel}
         cancelText={'No'}
       >
-        <p>Do you wan't to open docs page, to solwe this issue <a onClick={this.processLink}>Link</a></p>
+        <p>In order to record web pages, Oxygen Chrome Extension must be installed!</p>
+        <p>Do you want to open a troubleshooting guide to solve this issue?</p>
       </Modal>
     )
   }

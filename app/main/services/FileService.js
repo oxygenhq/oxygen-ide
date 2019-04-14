@@ -50,6 +50,7 @@ const send = data => {
 
 const processChange = (eventPath, folderPath, type) => {
     const filePart = eventPath.split(folderPath);
+    // FIXME: handle properly case when eventPath === folderPath
     if (filePart && filePart[1]) {
         // anylize file location
         if (eventPath) {  
@@ -77,7 +78,7 @@ const processChange = (eventPath, folderPath, type) => {
             console.warn(`bad eventPath: ${eventPath}`);
         }
     } else {
-        console.warn(`bad split result wirh eventPath: ${eventPath} and folderPath: ${folderPath}`);
+        console.warn(`Bad split result with eventPath: ${eventPath} and folderPath: ${folderPath}`);
     }
 };
 
