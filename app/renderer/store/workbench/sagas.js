@@ -399,8 +399,17 @@ export function* showDialog({ payload }) {
     // show system dialog - OPEN_FOLDER
     if (dialog === 'OPEN_FOLDER') {
         const paths = yield call(services.mainIpc.call, 'ElectronService', 'showOpenFolderDialog', []);
+
         if (paths && Array.isArray(paths) && paths.length > 0) {
-            yield openFolder({ payload: { path: paths[0] }});
+
+            const path = paths[0];
+            const splitResult = path.split('\\');
+
+            if(splitResult && splitResult.length === 2 && !splitResult[1]){
+                alert('Sorry, we don\'t support open full disc, please select some folder');
+            } else {
+                yield openFolder({ payload: { path: paths[0] }});
+            }
         }
     }
     else if (dialog === 'OPEN_FILE') {
