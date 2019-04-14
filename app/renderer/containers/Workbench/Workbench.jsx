@@ -8,7 +8,7 @@
  */
 // @flow
 import React, { Component, Fragment } from 'react';
-import { Modal, Layout, Icon, Row, Col, Tooltip, message } from 'antd';
+import { Modal, Layout, Icon, Row, Col, Tooltip, message, notification } from 'antd';
 /* eslint-disable react/no-did-update-set-state */
 import updateModals from '../../components/updateModals';
 // Dialogs
@@ -97,8 +97,19 @@ export default class Workbench extends Component<Props> {
   }
 
   handleToolbarButtonClick(ctrlId) {
-    if (ctrlId === Controls.TEST_RUN) {      
-      this.props.startTest();
+    if (ctrlId === Controls.TEST_RUN) {     
+      
+      const { editorActiveFile } = this.props;
+
+      if(editorActiveFile){
+        this.props.startTest();
+      } else {
+        notification['error']({
+          message: 'Can\'t record when not opened file',
+          description: 'Please, select some file in the tree to make record possible.'
+        });
+      }
+      
     }
     else if (ctrlId === Controls.TEST_STOP) {
       this.props.stopTest();
