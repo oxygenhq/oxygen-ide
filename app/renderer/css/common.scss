@@ -1,5 +1,18 @@
 @import 'vars';
 
+.show-on-hover-path-path {
+  display: none;
+}
+
+.show-on-hover-path:hover {
+  .show-on-hover-path-path {
+    display: inline;
+  }
+  .show-on-hover-path-name {
+    display: none;
+  }
+}
+
 .sideNavClass {
   min-width: 50px;
 }
