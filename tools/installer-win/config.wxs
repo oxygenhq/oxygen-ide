@@ -146,15 +146,24 @@
                       Impersonate="no"
                       Execute="deferred"
                       Return="ignore" />
-        
-        <UIRef Id="WixUI_FeatureTree" />
+        <UI>
+            <UIRef Id="WixUI_FeatureTree" />
+            <Publish Dialog="ExitDialog"
+                Control="Finish" 
+                Event="DoAction" 
+                Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+        </UI>
         <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
         <WixVariable Id="WixUIDialogBmp" Value="dialog.bmp" />
         <Icon Id="app.ico" SourceFile="..\..\resources\app.ico" />
         <Property Id="ARPPRODUCTICON" Value="app.ico" />
         <Property Id="MSIFASTINSTALL" Value="3" />
-        
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch Oxygen IDE" />
+
+        <Property Id="WixShellExecTarget" Value="[#fil29E2B7C2878787B81283DC106FD94D4C]" />
+        <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+
         <InstallExecuteSequence>
             <Custom Action="InstallCertificates" After="InstallFiles"><![CDATA[&IEExt=3 OR &ChromeExt=3]]></Custom>
             <Custom Action="RemoveCertificates" After="RemoveFiles" />
