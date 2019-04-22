@@ -8,6 +8,7 @@
  */
 // @flow
 import React, { Component } from 'react';
+import { Tooltip } from 'antd';
 import path from 'path';
 import Tree from '../../components/Tree';
 import Panel from '../../components/Panel';
@@ -142,7 +143,12 @@ export default class FileExplorer extends Component<Props> {
     render() {
         const { rootName, rootPath } = this.props;
         const { selectedKeys, refreshScroll, refreshScrollBottom } = this.state;
-        const headerTitle = 'File Explorer' + (rootName ? ` - ${rootName}` : '');
+        const headerTitle = (
+            <Tooltip title={(rootPath ? rootPath : '')}>
+              <span>{'File Explorer' + (rootName ? ` - ${rootName}` : '')}</span>
+            </Tooltip>
+        );
+
         return (
             <Panel
                 wrapRef={this.wrap}
