@@ -41,6 +41,7 @@ export default function* root() {
       takeLatest(ActionTypes.WB_OPEN_FOLDER, openFolder),
       takeLatest(ActionTypes.WB_INIT, initialize),
       takeLatest(ActionTypes.WB_OPEN_FILE, openFile),
+      takeLatest(ActionTypes.WB_OPEN_FAKE_FILE, openFakeFile),
       takeLatest(ActionTypes.WB_SHOW_DIALOG, showDialog),
       takeLatest(ActionTypes.WB_HIDE_DIALOG, hideDialog),
       takeLatest(ActionTypes.WB_CLOSE_FILE, closeFile),
@@ -98,6 +99,7 @@ export function* handleMainMenuEvents({ payload }) {
     }
     else if (cmd === Const.MENU_CMD_CLEAR_ALL) {
         yield services.mainIpc.call('ElectronService', 'clearSettings');
+        yield clearAll();
         yield initialize();
     }
     else if (cmd === Const.MENU_CMD_OPEN_FOLDER) {
@@ -107,7 +109,7 @@ export function* handleMainMenuEvents({ payload }) {
         yield put(wbActions.showDialog('OPEN_FILE'));
     }
     else if (cmd === Const.MENU_CMD_NEW_FILE) {
-        yield showNewFileDialog({});
+        yield openFakeFile();
     }
     else if (cmd === Const.MENU_CMD_NEW_FOLDER) {
         yield showNewFolderDialog({});
@@ -178,6 +180,10 @@ function* handleUpdateServiceEvent(event) {
     }
 }
 
+export function* clearAll() {
+    yield put(wbActions.reset());
+}
+
 export function* initialize() {
     services.mainIpc.call('UpdateService', 'start').then(() => {});
     // start Selenium server
@@ -186,6 +192,11 @@ export function* initialize() {
     services.mainIpc.call('DeviceDiscoveryService', 'start').then(() => {});
     // get app settings from the store
     const appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');
+
+    if(appSettings && appSettings.cache){
+        yield put(wbActions.restoreFromCache(appSettings.cache));
+    }
+
     if (appSettings) {
         // make sure we push Electron store settings to our Redux Store
         yield put(settingsActions.mergeSettings(appSettings));
@@ -215,7 +226,10 @@ export function* initialize() {
             );
             // if any error occurs during openning tab's file content (e.g. file doesn't not exist), remove this tab
             if (error) {
-                yield put(tabActions.removeTab(tab.key));
+                console.log('error', error);
+                if(tab && tab.key){
+                    yield put(tabActions.removeTab(tab.key));
+                }
             }
             else {                
                 yield put(testActions.setMainFile(tab.key));
@@ -262,18 +276,51 @@ export function* openFolder({ payload }) {
 }
 
 export function* changeTab({ payload }) {
-    const { key } = payload;
-    const { error } = yield putAndTake(
-        editorActions.openFile(key, true)
-    );
-    // if any error occurs during openning tab's file content (e.g. file doesn't not exist), remove this tab
-    if (error) {
-        yield put(tabActions.removeTab(tab.key));
+    const { key, name } = payload;
+    if(key === "unknown"){
+        yield put(tabActions.setActiveTab(key, name));
+        yield put(testActions.setMainFile(key, name));
+        yield put(editorActions.setActiveFile(key, name));
+    } else {
+        const { error } = yield putAndTake(
+            editorActions.openFile(key, true)
+        );
+        // if any error occurs during openning tab's file content (e.g. file doesn't not exist), remove this tab
+        if (error) {
+            console.log('error', error);
+            if(key){
+                yield put(tabActions.removeTab(key));
+            }
+        }
+        else {
+            yield put(tabActions.setActiveTab(key));
+            yield put(testActions.setMainFile(key));
+        }
     }
-    else {
-        yield put(tabActions.setActiveTab(key));
-        yield put(testActions.setMainFile(key));
+}
+
+export function* openFakeFile(){
+    let tabs = yield select(state => state.tabs);
+    let idenity;
+
+    if(tabs && tabs.list && Array.isArray(tabs.list)){
+        idenity = tabs.list.filter((tab) => tab.key === "unknown");
+        if(!idenity){
+            idenity = [];
+        }
+    } else {
+        idenity = [];
     }
+
+    const key = "unknown";
+    const name = "Untitled-"+(idenity.length+1);
+
+    yield put(tabActions.addTab(key, name));
+    yield put(tabActions.setActiveTab(key, name));
+    yield put(editorActions.setActiveFile(key, name));
+    yield put(editorActions.addFile(key, name));
+    yield put(settingsActions.addFile(key,name));
+    yield put(wbActions._openFakeFile_Success(key,name));
 }
 
 export function* openFile({ payload }) {
@@ -319,7 +366,6 @@ export function* renameFile({ payload }) {
 }
 
 export function* createFile({ payload }) {
-    console.log('workbench - createFile', payload)
     const { path, name } = payload;
     const { error } = yield putAndTake(
         fsActions.createFile(path, name)
@@ -357,7 +403,7 @@ export function* deleteFile({ payload }) {
 }
 
 export function* closeFile({ payload }) {
-    const { path, force = false } = payload;
+    const { path, force = false, name = null } = payload;
     const file = yield select(state => state.fs.files[path]);
     // prompt user if file has been modified and unsaved
     if (file && force == false && file.modified && file.modified == true) {
@@ -365,7 +411,7 @@ export function* closeFile({ payload }) {
             return;
         }
     }
-    yield put(tabActions.removeTab(path));
+    yield put(tabActions.removeTab(path, name));
     yield put(editorActions.closeFile(path));
     yield put(fsActions.resetFileContent(path));
     yield put(testActions.removeBreakpoints(path));
@@ -431,54 +477,115 @@ export function* hideDialog({ payload }) {
 }
 
 export function* contentUpdate({ payload }) {
-    const { path, content } = payload;
+    const { path, content, name } = payload;
     let tabsList = yield select(state => state.tabs.list);
-    const tab = tabsList.find(x => x.key === path);
+
+    const tab = tabsList.find(x => x.key === path && x.title === name);
+    
     // if tab is untouched (e.g. original content has not been updated), then mark the tab as touched
     if (tab && (!tab.touched || tab.touched == false)) {
-        yield put(tabActions.setTabTouched(path, true));
+        yield put(tabActions.setTabTouched(path, true, name));
     }    
-    yield put(fsActions.updateFileContent(path, content));
+
+    if(path === "unknown"){
+        yield put(settingsActions.updateFileContent(path, content, name));
+    } else {
+        yield put(fsActions.updateFileContent(path, content));
+    }
+}
+
+export function* closeTmpFile(file){
+    console.log('file', file);
+
+    yield put(editorActions.closeFile(file.path, false, file.name));
+    yield put(tabActions.removeTab(file.path, file.name));
+
+    const state = yield select(state => state);
+
+    const { fs, settings, ...st } = state;
+    const { cache, ...set } = settings;
 }
 
 export function* saveCurrentFile({ payload }) {
     const { prompt } = payload || {};
-    const activeFilePath = yield select(state => state.editor.activeFile);
-    const files = yield select(state => state.fs.files);
-    if (!activeFilePath || !files.hasOwnProperty(activeFilePath)) {
-        return;
-    }
-    const currentFile = files[activeFilePath];
-    // prompt user with "Save As" dialog before saving the file
-    if (prompt) {
-        const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, activeFilePath]);
+    const editor = yield select(state => state.editor);
+
+    const { activeFile, activeFileName } = editor;
+
+    if(activeFile === "unknown"){
+        const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, null]);
+    
         if (!saveAsPath) {
             return; // Save As dialog was canceled by user
         }
+
+        const files = yield select(state => state.settings.files);
+        
+        const currentFile = files[activeFile+activeFileName];
+
         const { error } = yield putAndTake(
             fsActions.saveFileAs(saveAsPath, currentFile.content)
         );
+        
         if (!error) {            
             // re-retrieve all files, as Saved As file info has been just added to the File Cache.
             const updatedFiles = yield select(state => state.fs.files);
             // retrieve file info for the newly saved file
             const saveAsFile = updatedFiles[saveAsPath];
+
+
             if (!saveAsFile) {
                 return;     // not suppose to happen
             }
             // refresh File Explorer tree in case save file's parent folder is currently open in the tree
             yield fsActions.treeLoadNodeChildren(saveAsFile.parentPath, true);
             // open newly saved file (as it's not necessary open) - e.g. open it in a new tab
+
+            if(currentFile){
+                yield closeTmpFile(currentFile);
+            }
             yield openFile({ payload: { path: saveAsPath } });
         }
-    }
-    // just save current file without prompting the user
-    else if (currentFile.modified || prompt) {
-        const { error } = yield putAndTake(
-            fsActions.saveFile(activeFilePath, currentFile.content)
-        );
-        if (!error) {
-            yield put(tabActions.setTabTouched(activeFilePath, false));
+    } else {
+    
+        if (!activeFile || !files.hasOwnProperty(activeFile)) {
+            return;
+        }
+
+        const files = yield select(state => state.fs.files);
+
+        const currentFile = files[activeFile];
+        // prompt user with "Save As" dialog before saving the file
+        if (prompt) {
+            const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, activeFile]);
+            if (!saveAsPath) {
+                return; // Save As dialog was canceled by user
+            }
+            const { error } = yield putAndTake(
+                fsActions.saveFileAs(saveAsPath, currentFile.content)
+            );
+            if (!error) {            
+                // re-retrieve all files, as Saved As file info has been just added to the File Cache.
+                const updatedFiles = yield select(state => state.fs.files);
+                // retrieve file info for the newly saved file
+                const saveAsFile = updatedFiles[saveAsPath];
+                if (!saveAsFile) {
+                    return;     // not suppose to happen
+                }
+                // refresh File Explorer tree in case save file's parent folder is currently open in the tree
+                yield fsActions.treeLoadNodeChildren(saveAsFile.parentPath, true);
+                // open newly saved file (as it's not necessary open) - e.g. open it in a new tab
+                yield openFile({ payload: { path: saveAsPath } });
+            }
+        }
+        // just save current file without prompting the user
+        else if (currentFile.modified || prompt) {
+            const { error } = yield putAndTake(
+                fsActions.saveFile(activeFile, currentFile.content)
+            );
+            if (!error) {
+                yield put(tabActions.setTabTouched(activeFile, false));
+            }
         }
     }
 }

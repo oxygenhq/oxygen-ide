@@ -33,6 +33,29 @@ type Props = {
 
 const DEFAULT_EDITOR_LANGUAGE = 'javascript';
 
+const getKey = (file) => {
+  if(file && file.path && file.name && file.path === "unknown"){
+    return file.path+file.name;
+  }
+  if(file && file.path){
+    return file.path;
+  }
+
+  return +new Date;
+}
+
+const getVisible = (file, activeFile, activeFileName) => {
+  if(activeFile && file && file.path && file.name && file.path === "unknown"){
+    return file.path === activeFile && file.name === activeFileName;
+  }
+
+  if(activeFile && file && file.path){
+    return file.path === activeFile;
+  }
+
+  return false;
+}
+
 export default class TextEditor extends Component<Props> {
   props: Props;
 
@@ -79,8 +102,8 @@ export default class TextEditor extends Component<Props> {
     }
   }
 
-  handleValueChange(filePath, value) {
-    this.props.onContentUpdate(filePath, value);
+  handleValueChange(filePath, value, name) {
+    this.props.onContentUpdate(filePath, value, name);
   }
 
   handleSelectionChange(filePath, selectedText) {
@@ -88,7 +111,13 @@ export default class TextEditor extends Component<Props> {
   }
 
   render() {
-    const { activeFile, openFiles, editorReadOnly, fontSize } = this.props;
+    const { 
+      activeFile, 
+      openFiles, 
+      editorReadOnly, 
+      fontSize,
+      activeFileName
+    } = this.props;
     const self = this;
 
     return (
@@ -106,18 +135,18 @@ export default class TextEditor extends Component<Props> {
           return (
             <MonacoEditor
               ref={(ref) => { self.editors[file.path] = ref; }}
-              key={file.path}
+              key={getKey(file)}
               value={file.content}
               language={language}
               activeLine={file.activeLine}
-              visible={file.path === activeFile}
+              visible={getVisible(file, activeFile, activeFileName)}
               editorReadOnly={editorReadOnly}
               fontSize={fontSize}
               saveSettings={this.props.saveSettings}
               zoomIn={this.props.zoomIn}
               zoomOut={this.props.zoomOut}
               onBreakpointsUpdate={(bps) => this.props.onBreakpointsUpdate(file.path, bps)}
-              onValueChange={(bps) => ::this.handleValueChange(file.path, bps)}
+              onValueChange={(bps) => ::this.handleValueChange(file.path, bps, file.name)}
               onSelectionChange={(bps) => ::this.handleSelectionChange(file.path, bps)}
             />
           );

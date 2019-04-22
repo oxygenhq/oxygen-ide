@@ -16,6 +16,21 @@ export const initialize = () => {
   };
 };
 
+export const reset = () => {
+  return {
+    type: 'RESET',
+    payload: null,
+  };
+};
+
+
+export const restoreFromCache = (cache) => {
+  return {
+    type: 'FROM_CACHE',
+    payload: { cache },
+  };
+};
+
 export const setJavaError = (error) => {
   return {
     type: ActionTypes.WB_SET_JAVA_ERROR,
@@ -30,6 +45,30 @@ export const cleanJavaError = () => {
     type: ActionTypes.WB_CLEAN_JAVA_ERROR
   }
 }
+
+/* openFakeFile */
+
+export const openFakeFile = () => {
+  return {
+    type: ActionTypes.WB_OPEN_FAKE_FILE,
+    payload: null,
+  }
+};
+
+export const _openFakeFile_Success = (key,name) => {
+  return {
+    type: success(ActionTypes.WB_OPEN_FAKE_FILE),
+    payload: { key, name },
+  }
+}
+
+export const _openFakeFile_Failure = (error) => {
+  return {
+    type: failure(ActionTypes.WB_OPEN_FAKE_FILE),
+    payload: { error },
+  }
+}
+
 
 /* openFile */
 export const openFile = (path) => {
@@ -52,10 +91,10 @@ export const _openFile_Failure = (path, error) => {
 };
 
 /* closeFile */
-export const closeFile = (path, force = false) => {
+export const closeFile = (path, force = false, name = null) => {
   return {
     type: ActionTypes.WB_CLOSE_FILE,
-    payload: { path, force },
+    payload: { path, force, name },
   };
 };
 
@@ -186,16 +225,16 @@ export const startRecorderWatcher = () => ({
 });
 
 /* onTabChange */
-export const onTabChange = (key) => {
+export const onTabChange = (key, name = null) => {
   return {
     type: ActionTypes.WB_ON_TAB_CHANGE,
-    payload: { key },
+    payload: { key, name },
   };
 };
 /* onContentUpdate */
-export const onContentUpdate = (path, content) => ({
+export const onContentUpdate = (path, content, name = null) => ({
   type: ActionTypes.WB_ON_CONTENT_UPDATE,
-  payload: { path, content },
+  payload: { path, content, name },
 })
 
 /* showContextMenu */

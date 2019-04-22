@@ -21,9 +21,9 @@ export const startRecorder = () => ({
   payload: null,
 });
 
-export const _startRecorder_Success = (path) => ({
+export const _startRecorder_Success = (path, name = null) => ({
   type: success(ActionTypes.RECORDER_START),
-  payload: { path },
+  payload: { path, name },
 });
 
 export const _startRecorder_Failure = (path, error) => ({

@@ -28,8 +28,20 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
   const { payload } = action;
-  const { dialog } = payload || {};
+  const { dialog, cache } = payload || {};
 
+  if(action.type === 'RESET'){
+    return defaultState;
+  }
+
+  if(action.type === 'FROM_CACHE'){
+    return {
+      ...defaultState,
+      ...cache.dialog
+    };
+  }
+  
+  
   if (!dialog || !state.hasOwnProperty(dialog)) {
     return state;
   }

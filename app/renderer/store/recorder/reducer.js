@@ -14,12 +14,13 @@ const defaultState = {
   isChromeExtensionEnabled: false,
   waitChromeExtension: true,
   activeFile: null,
+  activeFileName: null,
   steps: [],
 };
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { path, step, value } = payload;
+  const { path, step, value, cache, name } = payload;
 
   switch (action.type) {
     case ActionTypes.STOP_WAIT_CHROME_EXTENSION : {
@@ -42,6 +43,7 @@ export default (state = defaultState, action) => {
         ...state,
         isRecording: true,
         activeFile: path,
+        activeFileName: name
       };
 
     // RECORDER_STOP
@@ -57,6 +59,7 @@ export default (state = defaultState, action) => {
         ...state,
         //$FlowFixMe
         activeFile: value,
+        activeFileName: null
       };
 
     // RECORDER_ADD_STEP
@@ -68,6 +71,16 @@ export default (state = defaultState, action) => {
           step,
         ],
       };
+
+    case 'FROM_CACHE': 
+      return {
+        ...defaultState,
+        ...cache.recorder
+      }
+
+    case 'RESET': {
+      return defaultState;
+    }
 
     default:
       return state;

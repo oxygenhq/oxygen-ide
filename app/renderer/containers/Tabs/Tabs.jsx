@@ -93,8 +93,15 @@ class Tabs extends Component<Props, void> {
   }
 
   render() {
-    const { active, tabs } = this.props;
-    const activeTab = active ? tabs.find(x => x.key === active) : null;
+    const { active, tabs, activeTitle } = this.props;
+    let activeTab;
+
+    if(active === "unknown"){
+      activeTab = active ? tabs.find(x => x.key === active && x.title === activeTitle) : null;
+    } else {
+      activeTab = active ? tabs.find(x => x.key === active) : null;
+    }
+    
     let confirmFooter = [
       <Button key="close-without-saving" onClick={this.onCloseWithoutConfirm}>Close without saving</Button>,
       <Button key="just-cancel" type="danger" onClick={this.onCancelClose}>Cancel</Button>,
@@ -128,13 +135,13 @@ class Tabs extends Component<Props, void> {
 
           {tabs.length > 0 && (
           tabs.map((tab, index) => {
-            const itemClass = activeTab && activeTab.key === tab.key ?
+            const itemClass = activeTab && activeTab.key === tab.key && activeTab.title === tab.title ?
             'tabItemElem activeTabitem' : 'tabItemElem';
             return (
               <DraggableTab
                 id={tab.key}
                 index={index}
-                key={tab.key}
+                key={tab.key+tab.title}
                 moveCard={this.changeTabOrder}
               >
                 <div className={itemClass}>
@@ -143,7 +150,7 @@ class Tabs extends Component<Props, void> {
                     placement="top"
                     title={tab.key}
                   >
-                    <button onClick={() => this.props.onChange(tab.key)}>
+                    <button onClick={() => this.props.onChange(tab.key, tab.title)}>
                       {tabs.length < 6 && <Icon type="file" />}
                       <span style={{ marginLeft: 5 }}>{tab.title}</span>
                     </button>
@@ -152,14 +159,14 @@ class Tabs extends Component<Props, void> {
                   { tab.touched &&
                     <Icon
                       className="close-icon"
-                      onClick={() => this.props.onClose(tab.key)}
+                      onClick={() => this.props.onClose(tab.key, tab.title)}
                       component={circle}
                     />
                   }
                   { !tab.touched &&
                     <Icon
                       className="close-icon"
-                      onClick={() => this.props.onClose(tab.key)}
+                      onClick={() => this.props.onClose(tab.key, tab.title)}
                       type={'close'}
                     />
                   }

@@ -11,6 +11,7 @@ import subjects from './subjects';
 
 const DEFAULT_STATE = {
   activeFile: null,
+  activeFileName: null,
   openFiles: {},
   toolbarButtonsState: {
     cutCopy: false,
@@ -23,7 +24,7 @@ const DEFAULT_OPEN_FILE_STATE = {
 }
 
 export default (state = DEFAULT_STATE, action) => {
-  const { file, path, newPath, line, time } = action.payload || {};
+  const { file, name, path, newPath, line, time , cache } = action.payload || {};
   let _openFilesClone, _newActiveFile;
 
   switch (action.type) {
@@ -69,19 +70,43 @@ export default (state = DEFAULT_STATE, action) => {
 
     // SET_ACTIVE_FILE
     case types.EDITOR_SET_ACTIVE_FILE:
-      return { ...state, activeFile: path };
+      if(path === "unknown"){
+        return { 
+          ...state, 
+          activeFile: path, 
+          activeFileName: name 
+        };
+      } else {
+        return { 
+          ...state, 
+          activeFile: path }
+        ;
+      }
 
     // ADD_FILE
     case types.EDITOR_ADD_FILE:
-      return { 
-        ...state, 
-        openFiles: {
-          ...state.openFiles,
-          [path]: {
-            ...DEFAULT_OPEN_FILE_STATE
+      if(path === "unknown"){
+        return { 
+          ...state, 
+          openFiles: {
+            ...state.openFiles,
+            [path+name]: {
+              ...DEFAULT_OPEN_FILE_STATE
+            },
           },
-        },
-      };
+        };
+      } else {
+        return { 
+          ...state, 
+          openFiles: {
+            ...state.openFiles,
+            [path]: {
+              ...DEFAULT_OPEN_FILE_STATE
+            },
+          },
+        };
+      }
+
     // CLOSE_FILE
     case types.EDITOR_CLOSE_FILE:
       _openFilesClone = {};
@@ -124,10 +149,17 @@ export default (state = DEFAULT_STATE, action) => {
         activeFile: _newActiveFile,
         openFiles: _openFilesClone,
       };
+   
+    case 'FROM_CACHE': 
+      return {
+        ...DEFAULT_STATE,
+        ...cache.editor
+      }
 
-    // ACTION
-    case types.EDITOR_ACTION:
-    
+    case 'RESET': {
+      return DEFAULT_STATE;
+    }
+
     default:
       return state;
   }

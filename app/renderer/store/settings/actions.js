@@ -8,6 +8,20 @@
  */
 import * as types from './types';
 
+/* Add file */
+export const addFile = (key,name) => {
+    return {
+      type: types.TMP_ADD_FILE,
+      payload: { key,name },
+    };
+  }
+
+/* updateFileContent */
+export const updateFileContent = (path, content, name) => ({
+  type: types.TMP_UPDATE_FILE_CONTENT,
+  payload: { path, content, name },
+});
+
 /* show Landing */
 export const showLanding = () => ({
   type: types.SHOW_LANDING

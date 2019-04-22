@@ -21,8 +21,41 @@ const services = ServicesSingleton();
 export default function* root() {
     yield all([
       takeLatest(ActionTypes.LOGGER_SET_VISIBLE, onSetLoggerVisible),
+      takeLatest(ActionTypes.TMP_ADD_FILE, tmpAddFile),
+      takeLatest(ActionTypes.TMP_UPDATE_FILE_CONTENT, tmpUpdateFileContent),
       takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
     ]);
+}
+
+
+export function* tmpAddFile({ payload }) {
+    if (payload && payload.key && payload.name) {
+        const { key, name } = payload;
+        try {            
+            const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'addFile', [key, name]);
+            
+            if(newSettings){
+                yield put(settingsActions.mergeSettings(newSettings));
+            }
+        } catch (err) {
+            console.warn('err', err);
+        }
+    }
+}
+
+export function* tmpUpdateFileContent({ payload }) {
+    if (payload && payload.path && payload.name && payload.content) {
+        const { path, name, content } = payload;
+        try {            
+            const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'updateFileContent', [path, name, content]);
+            
+            if(newSettings){
+                yield put(settingsActions.mergeSettings(newSettings));
+            }
+        } catch (err) {
+            console.warn('err', err);
+        }
+    }
 }
 
 export function* handleMainMenuEvents({ payload }) {

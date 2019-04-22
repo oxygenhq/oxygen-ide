@@ -15,14 +15,24 @@ import { zoomIn, zoomOut } from '../../store/settings/actions';
 
 const mapStoreToProps = (state) => {
   // combine file data and editor related metadata
-  const openFiles = Object.keys(state.editor.openFiles).map(path => ({
-    ...state.fs.files[path],
-    ...state.editor.openFiles[path],
-  }));
+  const openFiles = Object.keys(state.editor.openFiles).map(path => {
+    if(path.startsWith('unknownUntitled')){
+      return {
+        ...state.settings.files[path],
+        ...state.editor.openFiles[path],
+      }
+    } else {
+      return {
+        ...state.fs.files[path],
+        ...state.editor.openFiles[path],
+      }
+    }
+  });
 
   return {
     editorReadOnly: state.test.isRunning,
     activeFile: state.editor.activeFile,
+    activeFileName: state.editor.activeFileName,
     fontSize: state.settings.fontSize,
     openFiles: openFiles, //state.editor.openFiles,
   };

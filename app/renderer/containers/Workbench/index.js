@@ -19,6 +19,20 @@ const mapStoreToProps = (state) => {
   const activeNode = state.fs.tree.activeNode;
   const editorActiveFile = state.editor.activeFile;
   const rootPath = state.fs.rootPath || null;
+
+  const { activeFile, activeFileName } = state.editor;
+
+  let fullEditorActiveFile = null;
+ 
+  if(activeFile){
+    if(activeFile === 'unknown'){
+      const key = activeFile+activeFileName;
+      fullEditorActiveFile = state.settings.files.hasOwnProperty(key) ? state.settings.files[key] : null;
+    } else {
+      fullEditorActiveFile = state.fs.files.hasOwnProperty(activeFile) ? state.fs.files[activeFile] : null;
+    }
+  }
+
   return {
     javaError: state.wb.javaError,
     isRecording: state.recorder.isRecording,
@@ -28,7 +42,7 @@ const mapStoreToProps = (state) => {
     test: state.test,
     dialog: state.dialog,
     treeActiveFile: activeNode && state.fs.files.hasOwnProperty(activeNode) ? state.fs.files[activeNode] : null,
-    editorActiveFile: editorActiveFile && state.fs.files.hasOwnProperty(editorActiveFile) ? state.fs.files[editorActiveFile] : null,
+    editorActiveFile: fullEditorActiveFile,
     rootPath: rootPath
   };
 };
