@@ -73,9 +73,9 @@ export default class ElectronService extends ServiceBase {
     
             appSettings.set('appSettings', newSettings);
     
-            return 'success';
+            return newSettings;
         } else {
-            return 'fail';
+            return;
         }
     }
 

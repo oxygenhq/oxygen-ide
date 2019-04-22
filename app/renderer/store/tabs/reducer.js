@@ -122,7 +122,11 @@ export default (state = defaultState, action, dispatch) => {
         list: _newList,
       };
 
-    case 'FROM_CACHE': 
+    case 'FROM_CACHE':
+    
+      console.log('defaultState', defaultState);
+      console.warn('FROM_CACHE in tabs', cache.tabs);
+
       return {
         ...defaultState,
         ...cache.tabs

@@ -74,16 +74,31 @@ const configureStore = (initialState?: counterStateType) => {
   const composeEnhancers = compose;
   /* eslint-enable no-underscore-dangle */
 
-  // async function updateCache(cache) {
-  //   const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [cache] );
-  // }
+  async function updateCache(cache, action) {
+
+    const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [cache] );
+
+    if(result){
+      // console.log('---');
+      // console.log('cache in', cache);
+      // console.log('action', action);
+      // console.log('result', result);
+      // console.log('result.cache.tabs.list', result.cache.tabs.list);
+      // console.log('JSON.stringify result', JSON.stringify(result));
+      // console.log('---');
+    }
+  }
 
   const cache = store => next => action => {
-    const cache = store.getState();
+    const state = store.getState();
 
-    delete cache.settings.cache;
+    if(state.settings.cacheUsed){
+      delete state.cache;
+      delete state.settings.cache;
+  
+      updateCache(state, action);
+    }
 
-    // updateCache(cache);
     let result = next(action);
     return result;
   }
