@@ -30,7 +30,7 @@ const defaultState = {
 
 export default (state = defaultState, action, dispatch) => {
   const payload = action.payload || {};
-  const { path, node, name, response, content, error, fileOrFolder } = payload;
+  const { path, node, name, response, content, error, fileOrFolder, cache } = payload;
   let _newActiveNode, _filesClone, _node, _treeDataClone;
 
   switch (action.type) {
@@ -352,6 +352,16 @@ export default (state = defaultState, action, dispatch) => {
         },
       };
 
+    case 'FROM_CACHE': 
+      return {
+        ...defaultState,
+        ...cache.fs
+      }
+
+    case 'RESET': {
+      return defaultState;
+    }
+  
     default:
       return state;
   }

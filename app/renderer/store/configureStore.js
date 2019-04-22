@@ -17,6 +17,11 @@ import rootReducer from './reducers';
 import createActionToSubjectMiddleware from './middleware/createActionToSubjectMiddleware';
 import rootSaga from './sagas';
 
+
+import ServicesSingleton from '../services';
+const services = ServicesSingleton();
+
+
 const history = createHashHistory();
 
 // initialize Rxjs subject for action to subject middleware
@@ -68,6 +73,22 @@ const configureStore = (initialState?: counterStateType) => {
   */
   const composeEnhancers = compose;
   /* eslint-enable no-underscore-dangle */
+
+  // async function updateCache(cache) {
+  //   const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [cache] );
+  // }
+
+  const cache = store => next => action => {
+    const cache = store.getState();
+
+    delete cache.settings.cache;
+
+    // updateCache(cache);
+    let result = next(action);
+    return result;
+  }
+  
+  middleware.push(cache);
 
   // Apply Middleware & Compose Enhancers
   enhancers.push(applyMiddleware(...middleware));

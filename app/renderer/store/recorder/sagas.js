@@ -50,41 +50,89 @@ export function* handleServiceEvents({ payload }) {
             timestamp: event.timestamp || (new Date()).getTime(),
         };
         yield put(recorderActions.addStep(step));
-        const currentOpenFile = yield select(state => state.recorder.activeFile);
-        if (!currentOpenFile) {
-            return;
-        }
-        const file = yield select(state => state.fs.files[currentOpenFile]);
-        if (!file) {
-            return;
+
+        const recorder = yield select(state => state.recorder);
+
+        const { activeFile, activeFileName } = recorder;
+        
+        if(activeFile === 'unknown'){
+            
+            if (!activeFileName) {
+                return;
+            }
+
+            const file = yield select(state => state.settings.files[activeFile+activeFileName]);
+
+    
+            if (!file) {
+                return;
+            }
+            // generated code
+            const generatedCode = toOxygenCode([ step ]);
+            // current code, before update (make sure to include new line at the end of the content)
+            let prevContent = file.content;
+            if (!prevContent.endsWith('\n') && prevContent !== '') {
+                prevContent += '\n';
+            }
+            // prepend web.init if it doesn't exist in the script
+            if (file.content.indexOf('web.init') === -1) {
+                prevContent += 'web.init();\n';
+            }
+            const newContent = `${prevContent}${generatedCode}`;
+            // append newly recorded content
+            yield put(wbActions.onContentUpdate(activeFile, newContent, activeFileName));
+
+        } else {
+            if (!activeFile) {
+                return;
+            }
+            const file = yield select(state => state.fs.files[activeFile]);
+        
+            if (!file) {
+                return;
+            }
+    
+            // generated code
+            const generatedCode = toOxygenCode([ step ]);
+            // current code, before update (make sure to include new line at the end of the content)
+            let prevContent = file.content;
+            if (!prevContent.endsWith('\n') && prevContent !== '') {
+                prevContent += '\n';
+            }
+            // prepend web.init if it doesn't exist in the script
+            if (file.content.indexOf('web.init') === -1) {
+                prevContent += 'web.init();\n';
+            }
+            const newContent = `${prevContent}${generatedCode}`;
+            // append newly recorded content
+            yield put(wbActions.onContentUpdate(activeFile, newContent));
         }
 
-        // generated code
-        const generatedCode = toOxygenCode([ step ]);
-        // current code, before update (make sure to include new line at the end of the content)
-        let prevContent = file.content;
-        if (!prevContent.endsWith('\n') && prevContent !== '') {
-            prevContent += '\n';
-        }
-        // prepend web.init if it doesn't exist in the script
-        if (file.content.indexOf('web.init') === -1) {
-            prevContent += 'web.init();\n';
-        }
-        const newContent = `${prevContent}${generatedCode}`;
-        // append newly recorded content
-        yield put(wbActions.onContentUpdate(currentOpenFile, newContent));
     }
 }
 
 export function* startRecorder({ payload }) {
-    const currentOpenFile = yield select(state => state.editor.activeFile);
+    const editor = yield select(state => state.editor);
+    const { activeFile } = editor;
+
     // if no file is currently open (no open tabs), then ignore the recording
-    if (!currentOpenFile) {
-        yield put(recorderActions._startRecorder_Failure(undefined, { code: 'NO_ACTIVE_FILE' }));
-        return;
+    if (!activeFile) {
+        
+        const resp = yield putAndTake(wbActions.openFakeFile());
+        
+        if(resp && resp.key && resp.name){
+            const { key, name } = resp;
+            
+            yield call(services.mainIpc.call, 'RecorderService', 'start', []);
+            yield put(recorderActions._startRecorder_Success(key, name));
+        } else {
+            yield put(recorderActions._startRecorder_Failure(undefined, { code: 'NO_ACTIVE_FILE' }));
+            return;
+        }
+    } else {
+        yield call(services.mainIpc.call, 'RecorderService', 'start', []);
+        yield put(recorderActions._startRecorder_Success(activeFile));
     }
-    yield call(services.mainIpc.call, 'RecorderService', 'start', []);
-    yield put(recorderActions._startRecorder_Success(currentOpenFile));
 }
 
 export function* stopRecorder({ payload }) {    

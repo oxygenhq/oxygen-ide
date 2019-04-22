@@ -72,16 +72,16 @@ export default class Workbench extends Component<Props> {
     this.props.startRecorderWatcher();
   }
 
-  handleTabChange(key) {
-    this.props.onTabChange(key);
+  handleTabChange(key, name = null) {
+    this.props.onTabChange(key, name);
   }
 
-  handleTabClose(key) {
-    this.props.closeFile(key);
+  handleTabClose(key, name = null) {
+    this.props.closeFile(key, false, name);
   }
 
-  handleFileContentUpdate(path, content) {
-    this.props.onContentUpdate(path, content);
+  handleFileContentUpdate(path, content, name) {
+    this.props.onContentUpdate(path, content, name);
   }
 
   handleBreakpointsUpdate(filePath, breakpoints) {
@@ -100,6 +100,8 @@ export default class Workbench extends Component<Props> {
     if (ctrlId === Controls.TEST_RUN) {     
       
       const { editorActiveFile } = this.props;
+
+      console.log('editorActiveFile', editorActiveFile);
 
       if(editorActiveFile){
         this.props.startTest();
@@ -135,13 +137,10 @@ export default class Workbench extends Component<Props> {
     else if (ctrlId === Controls.NEW_FILE) {
       const { settings } = this.props;
 
-      if(settings && settings.showLanding){
-        notification['error']({
-          message: 'Can\'t add a new file to not exist folder',
-          description: 'Please, open folder first'
-        });
+      if(this.props.openFakeFile){
+        this.props.openFakeFile();
       } else {
-        this.props.showNewFileDialog();   
+        console.warn('no openFakeFile');
       }
     }
     else if (ctrlId === Controls.TEST_RECORD) {
@@ -161,7 +160,6 @@ export default class Workbench extends Component<Props> {
   }
 
   handleToolbarValueChange(ctrlId, value) {
-    console.log('handleToolbarValueChange', ctrlId, value);
     if (ctrlId === Controls.TEST_TARGET) {
       this.props.setTestTarget(value);
     }
@@ -328,7 +326,6 @@ export default class Workbench extends Component<Props> {
           </Col>
 
           <Col style={{ width: '100%' }}>
-            { !showLanding && 
               <Layout className="ide-main">
                 <Sidebar 
                   align="left"
@@ -357,7 +354,10 @@ export default class Workbench extends Component<Props> {
                       />
                     </Col>
                     <Col className="tabs-bar-container">
-                      <Tabs onChange={ this.handleTabChange } onClose={ this.handleTabClose } />
+                      <Tabs 
+                        onChange={ this.handleTabChange } 
+                        onClose={ this.handleTabClose } 
+                      />
                     </Col>
                   </Row>
                 </Header>
@@ -383,10 +383,6 @@ export default class Workbench extends Component<Props> {
                   <Settings />
                 </Sidebar>
               </Layout>
-            }
-            { showLanding && 
-              <Landing/>
-            }
           </Col>
         </Row>
       </div>

@@ -19,7 +19,7 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { message, severity, logger, timestamp, extra } = payload;
+  const { message, severity, logger, timestamp, extra, cache } = payload;
 
   switch (action.type) {
     // LOGGER_ADD_LOG
@@ -57,6 +57,16 @@ export default (state = defaultState, action) => {
           ['general']: [],
         },
       };
+
+    case 'FROM_CACHE': 
+      return {
+        ...defaultState,
+        ...cache.logger
+      }
+
+    case 'RESET': {
+      return defaultState;
+    }
 
     default:
       return state;

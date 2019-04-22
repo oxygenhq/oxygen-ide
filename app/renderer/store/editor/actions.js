@@ -31,9 +31,9 @@ export const _openFile_Failure = (path, error) => ({
 });
 
 /* closeFile */
-export const closeFile = (path, setActive = true) => ({
+export const closeFile = (path, setActive = true, name = null) => ({
   type: ActionTypes.EDITOR_CLOSE_FILE,
-  payload: { path },
+  payload: { path, name },
 });
 export const _closeFile_Success = (path) => ({
   type: success(ActionTypes.EDITOR_CLOSE_FILE),
@@ -45,9 +45,9 @@ export const _closeFile_Failure = (path, error) => ({
 });
 
 /* setActiveFile */
-export const setActiveFile = (path) => ({
+export const setActiveFile = (path, name = null) => ({
   type: ActionTypes.EDITOR_SET_ACTIVE_FILE,
-  payload: { path },
+  payload: { path, name },
 });
 
 /* setActiveLine */
@@ -69,9 +69,9 @@ export const resetActiveLines = () => ({
 });
 
 /* addFile */
-export const addFile = (path) => ({
+export const addFile = (path, name = null) => ({
   type: ActionTypes.EDITOR_ADD_FILE,
-  payload: { path },
+  payload: { path, name },
 });
 
 /* updateFileBreakpoints */

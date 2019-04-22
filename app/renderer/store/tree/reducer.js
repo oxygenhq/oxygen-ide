@@ -177,6 +177,16 @@ export default (state = defaultState, action) => {
         refreshScroll: !refreshScroll,
       };
 
+    case 'FROM_CACHE': 
+      return {
+        ...defaultState,
+        ...action.payload.cache.tree
+      }
+      
+    case 'RESET': {
+      return defaultState;
+    }
+    
     default:
       return state;
   }

@@ -17,6 +17,67 @@ export default class ElectronService extends ServiceBase {
     constructor(mainWindow) {
         super(mainWindow);
     }
+    
+    addFile(key, name){
+        const settings = appSettings.get('appSettings');
+
+        const newSettings = { ...settings };
+        if(key, name){
+            newSettings.files = {
+                ...newSettings.files,
+                [key+name] : {
+                    content: '',
+                    ext: ".js",
+                    name: name,
+                    path: key,
+                    type: "file"
+                }
+            }
+        } else {
+            return null;
+        }
+
+        appSettings.set('appSettings', newSettings);
+        
+        return newSettings;
+    }
+
+    updateFileContent(key, name, content){
+        const settings = appSettings.get('appSettings');
+
+        const newSettings = { ...settings };
+        if(key, name, content){
+            newSettings.files = {
+                ...newSettings.files,
+                [key+name] : {
+                    ...newSettings.files[key+name],
+                    content: content
+                }
+            }
+        } else {
+            return null;
+        }
+
+        appSettings.set('appSettings', newSettings);
+        
+        return newSettings;
+    }
+
+    updateCache(cache) {
+        if(cache){
+            const settings = appSettings.get('appSettings');
+            
+            const newSettings = { ...settings };
+
+            newSettings.cache = cache;
+    
+            appSettings.set('appSettings', newSettings);
+    
+            return 'success';
+        } else {
+            return 'fail';
+        }
+    }
 
     clearSettings() {
         appSettings.deleteAll();

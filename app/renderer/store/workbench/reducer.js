@@ -15,7 +15,7 @@ const defaultState = {
 };
 
 export default (state = defaultState, action, dispatch) => {
-  const { error } = action.payload || {};
+  const { error, cache } = action.payload || {};
 
   switch (action.type) {
     
@@ -56,6 +56,16 @@ export default (state = defaultState, action, dispatch) => {
     // WB_STOP_RECORDER
     case ActionTypes.WB_STOP_RECORDER:
       return state;
+
+    case 'FROM_CACHE': 
+      return {
+        ...defaultState,
+        ...cache.workbench
+      }
+      
+    case 'RESET': {
+      return defaultState;
+    }
 
     default:
       return state;

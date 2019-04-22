@@ -13,6 +13,8 @@ const FONT_SIZE_MIN = 12;
 const FONT_SIZE_MAX = 36;
 
 const defaultAppSettings = {
+  cache: null,
+  files: {},
   lastSession: {
     tabs: [],
     rootFolder: null,
@@ -44,7 +46,7 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { value, target, settings, zoom } = payload;
+  const { value, target, settings, zoom, cache } = payload;
   switch (action.type) {
     
     // SHOW LANDING
@@ -168,6 +170,15 @@ export default (state = defaultState, action) => {
           visible: value,
         },
       };
+      
+    case 'FROM_CACHE': 
+      return {
+        ...defaultState,
+        ...cache.settings
+      }
+    case 'RESET': 
+      return defaultState;
+    
     default:
       return state;
   }

@@ -59,7 +59,7 @@ if (process.platform === 'darwin') {
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { value, settings, device, breakpoints, path, error } = payload;
+  const { value, settings, device, breakpoints, path, error, cache } = payload;
   let _newDevices = [];
   let _newBreakpoints = {};
 
@@ -261,6 +261,16 @@ export default (state = defaultState, action) => {
           ...settings
         },
       };
+
+    case 'FROM_CACHE': 
+      return {
+        ...defaultState,
+        ...cache.test
+      }
+
+    case 'RESET': {
+      return defaultState;
+    }
 
     default:
       return state;

@@ -31,7 +31,7 @@ const rootReducer = combineReducers({
   logger,
   dialog,
   wb,
-  recorder,
+  recorder
 });
 
 export default rootReducer;
