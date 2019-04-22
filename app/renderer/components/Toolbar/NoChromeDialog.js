@@ -27,7 +27,7 @@ export default class NoChromeDialog extends Component<Props> {
     electron.shell.openExternal(docsUrl);
   }
 
-  render(){
+  render(){    
     return (
       <Modal
         title="Oxygen Chrome Extension is not installed or is disabled"

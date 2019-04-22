@@ -8,6 +8,14 @@
  */
 import * as types from './types';
 
+
+export const changeCacheUsed = (value) => {
+    return {
+      type: types.CACHE_USED_CHANGE,
+      payload: { value },
+    };
+  }
+
 /* Add file */
 export const addFile = (key,name) => {
     return {

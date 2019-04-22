@@ -191,10 +191,13 @@ export function* initialize() {
     // start Android and iOS device watcher
     services.mainIpc.call('DeviceDiscoveryService', 'start').then(() => {});
     // get app settings from the store
-    const appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');
+    let appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');
 
     if(appSettings && appSettings.cache){
         yield put(wbActions.restoreFromCache(appSettings.cache));
+    } else {
+        yield put(settingsActions.changeCacheUsed(true));
+        appSettings.cacheUsed = true;
     }
 
     if (appSettings) {
@@ -210,32 +213,32 @@ export function* initialize() {
     // retrieve and save merged settings back to Electron store
     const allSettings = yield select(state => state.settings);
     yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [allSettings]);
-    // if a folder was open in the last session, load this folder in File Explorer 
-    if (allSettings && allSettings.lastSession && allSettings.lastSession.rootFolder) {
-        const { error } = yield putAndTake(
-            wbActions.openFolder(allSettings.lastSession.rootFolder)
-        );
-        // ignore any errors
-    }
-    // if last session includes previously open tabs, reopen tabs for files which still exist 
-    if (allSettings && allSettings.lastSession && allSettings.lastSession.tabs) {
-        for (let tab of allSettings.lastSession.tabs) {            
-            yield put(tabActions.addTab(tab.key, tab.title));
-            const { error } = yield putAndTake(
-                editorActions.openFile(tab.key)
-            );
-            // if any error occurs during openning tab's file content (e.g. file doesn't not exist), remove this tab
-            if (error) {
-                console.log('error', error);
-                if(tab && tab.key){
-                    yield put(tabActions.removeTab(tab.key));
-                }
-            }
-            else {                
-                yield put(testActions.setMainFile(tab.key));
-            }
-        }
-    }
+    // // if a folder was open in the last session, load this folder in File Explorer 
+    // if (allSettings && allSettings.lastSession && allSettings.lastSession.rootFolder) {
+    //     const { error } = yield putAndTake(
+    //         wbActions.openFolder(allSettings.lastSession.rootFolder)
+    //     );
+    //     // ignore any errors
+    // }
+    // // if last session includes previously open tabs, reopen tabs for files which still exist 
+    // if (allSettings && allSettings.lastSession && allSettings.lastSession.tabs) {
+    //     for (let tab of allSettings.lastSession.tabs) {            
+    //         yield put(tabActions.addTab(tab.key, tab.title));
+    //         const { error } = yield putAndTake(
+    //             editorActions.openFile(tab.key)
+    //         );
+    //         // if any error occurs during openning tab's file content (e.g. file doesn't not exist), remove this tab
+    //         if (error) {
+    //             console.log('error', error);
+    //             if(tab && tab.key){
+    //                 yield put(tabActions.removeTab(tab.key));
+    //             }
+    //         }
+    //         else {                
+    //             yield put(testActions.setMainFile(tab.key));
+    //         }
+    //     }
+    // }
     // indicate successful end of initialization process
     yield put({
         type: success(ActionTypes.WB_INIT),

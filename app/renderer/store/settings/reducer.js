@@ -23,6 +23,7 @@ const defaultAppSettings = {
 };
 
 const defaultState = {
+  cacheUsed: false,
   showLanding: false,
   fontSize: 12,
   navbar: {
@@ -40,8 +41,8 @@ const defaultState = {
       visible: false,
       size: 250,
     },
-    ...defaultAppSettings,
   },
+  ...defaultAppSettings,
 };
 
 export default (state = defaultState, action) => {
@@ -55,6 +56,14 @@ export default (state = defaultState, action) => {
         ...state,
         showLanding: true,
         ...defaultAppSettings
+      }
+    }
+
+    // CACHE USED CHANGE
+    case types.CACHE_USED_CHANGE: {
+      return { 
+        ...state,
+        cacheUsed: value
       }
     }
     
