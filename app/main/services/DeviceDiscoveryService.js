@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-2019 CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ export default class DeviceDiscoveryService extends ServiceBase {
     }
 
     start() {
+        // limit the number of retries in order to prevent console spamming when adb is not installed for example
+        this.retries = 5;
         this._getConnectedDevices();
     }
 
@@ -50,7 +52,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
     }
 
     _getConnectedDevices() {
-        var self =this;
+        var self = this;
         ADB.createADB().then((adb) => {
             adb.getConnectedDevices().then((devices) => {
                 const currentDevices = {};
@@ -77,6 +79,9 @@ export default class DeviceDiscoveryService extends ServiceBase {
             })
             .catch((e) => {
                 console.debug(e);
+                if (self.retries-- === 0) {
+                    Promise.resolve();
+                }
                 return self._delay(CHECK_INTERVAL).then(function() {
                     return self._getConnectedDevices();
                 });
@@ -84,6 +89,9 @@ export default class DeviceDiscoveryService extends ServiceBase {
         })
         .catch((e) => {
             console.debug(e);
+            if (self.retries-- === 0) {
+                return Promise.resolve();
+            }
             return self._delay(CHECK_INTERVAL).then(function() {
                 return self._getConnectedDevices();
             });
