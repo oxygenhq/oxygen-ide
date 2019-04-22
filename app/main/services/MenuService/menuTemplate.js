@@ -48,6 +48,10 @@ export default (cmdHandler, settings) => {
       type: 'separator'
     },
     {
+      label: 'Clear all',
+      click() { cmdHandler(Const.MENU_CMD_CLEAR_ALL) }
+    },
+    {
       label: '&Close',
       accelerator: process.platform === 'darwin' ? 'Command+Q' : 'Alt+F4',
       click() {

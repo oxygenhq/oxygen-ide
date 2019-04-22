@@ -11,6 +11,8 @@ import { success, failure } from '../../helpers/redux';
 
 const defaultState = {
   isRecording: false,
+  isChromeExtensionEnabled: false,
+  waitChromeExtension: true,
   activeFile: null,
   steps: [],
 };
@@ -20,6 +22,20 @@ export default (state = defaultState, action) => {
   const { path, step, value } = payload;
 
   switch (action.type) {
+    case ActionTypes.STOP_WAIT_CHROME_EXTENSION : {
+      return {
+        ...state,
+        waitChromeExtension: false
+      };
+    }
+
+    case ActionTypes.RECORDER_SET_TIMESTAMP : {
+      return {
+        ...state,
+        isChromeExtensionEnabled: value
+      };
+    }
+
     // RECORDER_START
     case success(ActionTypes.RECORDER_START):
       return {

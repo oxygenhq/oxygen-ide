@@ -28,6 +28,8 @@ import { success, failure, successOrFailure } from '../../helpers/redux';
 
 import ActionTypes from '../types';
 import { MAIN_MENU_EVENT, MAIN_SERVICE_EVENT } from '../../services/MainIpc';
+import { JAVA_ERROR_INFO, JAVA_NOT_FOUND, JAVA_BAD_VERSION } from '../../services/JavaService';
+
 import ServicesSingleton from '../../services';
 import editorSubjects from '../editor/subjects';
 const services = ServicesSingleton();
@@ -51,6 +53,7 @@ export default function* root() {
       takeLatest(ActionTypes.WB_SAVE_CURRENT_FILE, saveCurrentFile),   
       takeLatest(ActionTypes.WB_START_RECORDER, startRecorder),         
       takeLatest(ActionTypes.WB_STOP_RECORDER, stopRecorder),
+      takeLatest(ActionTypes.WB_RECORDER_START_WATCHER, startRecorderWatcher),
       takeLatest(ActionTypes.WB_SHOW_CONTEXT_MENU, showContextMenu),      
       takeLatest(ActionTypes.WB_ON_TAB_CHANGE, changeTab),
       takeLatest(ActionTypes.WB_ON_CONTENT_UPDATE, contentUpdate),      
@@ -58,6 +61,9 @@ export default function* root() {
       takeLatest(success(ActionTypes.FS_DELETE), handleFileDelete),
       takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
       takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
+      takeLatest(JAVA_ERROR_INFO, handleJavaError),
+      takeLatest(JAVA_NOT_FOUND, handleJavaNotFound),
+      takeLatest(JAVA_BAD_VERSION, handleJavaBadVersion),
     ]);
 }
 
@@ -89,6 +95,10 @@ export function* handleMainMenuEvents({ payload }) {
     }
     else if (cmd === Const.MENU_CMD_HELP_CHECK_UPDATES) {
         yield services.mainIpc.call('UpdateService', 'start', [true]).then(() => {});
+    }
+    else if (cmd === Const.MENU_CMD_CLEAR_ALL) {
+        yield services.mainIpc.call('ElectronService', 'clearSettings');
+        yield initialize();
     }
     else if (cmd === Const.MENU_CMD_OPEN_FOLDER) {
         yield put(wbActions.showDialog('OPEN_FOLDER'));
@@ -131,13 +141,44 @@ export function* handleServiceEvents({ payload }) {
     }
 }
 
+export function* handleJavaError({ payload }){
+    if(payload.err){
+        yield put(wbActions.setJavaError(payload.err));
+    } else {
+        yield put(wbActions.setJavaError());
+    }
+}
+
+export function* handleJavaNotFound(inner){
+    if(payload.message){
+        yield put(wbActions.setJavaError({
+            reason: 'not-found',
+            message: payload.message
+        }));
+    } else {
+        yield put(wbActions.setJavaError());
+    }
+}
+
+export function* handleJavaBadVersion({ payload }){
+    if(payload.message){
+        yield put(wbActions.setJavaError({
+            reason: 'bad-version',
+            message: payload.message
+        }));
+    } else {
+        yield put(wbActions.setJavaError());
+    }
+    return;
+}
+
 function* handleUpdateServiceEvent(event) {
     if (event.type === 'UPDATE_CHECK') {
         yield put(wbActions.showDialog('DIALOG_UPDATE', { version: event.version, url: event.url }));
     }
 }
 
-export function* initialize({ payload }) {
+export function* initialize() {
     services.mainIpc.call('UpdateService', 'start').then(() => {});
     // start Selenium server
     services.mainIpc.call('SeleniumService', 'start').then(() => {});
@@ -148,6 +189,12 @@ export function* initialize({ payload }) {
     if (appSettings) {
         // make sure we push Electron store settings to our Redux Store
         yield put(settingsActions.mergeSettings(appSettings));
+    }
+
+    if(appSettings && appSettings.lastSession && appSettings.lastSession.rootFolder){
+        yield put(settingsActions.hildeLanding());
+    } else {
+        yield put(settingsActions.showLanding());
     }
     // retrieve and save merged settings back to Electron store
     const allSettings = yield select(state => state.settings);
@@ -352,8 +399,17 @@ export function* showDialog({ payload }) {
     // show system dialog - OPEN_FOLDER
     if (dialog === 'OPEN_FOLDER') {
         const paths = yield call(services.mainIpc.call, 'ElectronService', 'showOpenFolderDialog', []);
+
         if (paths && Array.isArray(paths) && paths.length > 0) {
-            yield openFolder({ payload: { path: paths[0] }});
+
+            const path = paths[0];
+            const splitResult = path.split('\\');
+
+            if(splitResult && splitResult.length === 2 && !splitResult[1]){
+                alert('Sorry, we don\'t support open full disc, please select some folder');
+            } else {
+                yield openFolder({ payload: { path: paths[0] }});
+            }
         }
     }
     else if (dialog === 'OPEN_FILE') {
@@ -451,6 +507,10 @@ export function* startRecorder({ payload }) {
 
 export function* stopRecorder({ payload }) {
     yield put(recorderActions.stopRecorder());
+}
+
+export function* startRecorderWatcher({ payload }) {
+    yield put(recorderActions.startRecorderWatcher());
 }
 
 export function* showNewFileDialog({ payload }) {

@@ -8,7 +8,7 @@
  */
 // @flow
 /* eslint-disable react/no-unused-state */
-import { Icon, Select, Input, message } from 'antd';
+import { Spin, Icon, Select, Input, message } from 'antd';
 import React, { Component } from 'react';
 import { FaMicrophone } from 'react-icons/lib/fa';
 import {
@@ -21,6 +21,7 @@ import {
 import '../../css/toolbar.scss';
 
 import * as Controls from './controls';
+import NoChromeDialog from './NoChromeDialog';
 import { type DeviceInfo } from '../../types/DeviceInfo';
 import { type BrowserInfo } from '../../types/BrowserInfo';
 
@@ -43,7 +44,74 @@ type Props = {
 const { Option } = Select;
 
 export default class Toolbar extends Component<Props> {
-  props: Props;
+  constructor(props){
+    super(props);
+
+    let canRecord;
+
+    if(!props.isChromeExtensionEnabled){
+      canRecord = false;
+    } else {
+      canRecord = true;
+    }
+
+    this.state = {
+      canRecord: false
+    }
+  }
+
+  componentDidMount() {
+    var intervalId = setInterval(this.timer, 2000);
+    this.setState({intervalId: intervalId});
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.state.intervalId);
+  }
+
+  timer = () => {
+    const { 
+      isChromeExtensionEnabled, 
+      waitChromeExtension,
+      stopWaitChromeExtension
+    } = this.props;
+
+    let newState = {};
+
+    if(Number.isInteger(isChromeExtensionEnabled)){
+      const now = Date.now();
+      const diff = now - isChromeExtensionEnabled;
+
+      if(diff && diff > 2000){
+        newState.canRecord = false;      
+      } else {
+        newState.canRecord = true;
+      }
+
+      if(newState.canRecord !== this.state.canRecord){
+        this.setState(newState);
+      }
+    } else {
+      if(typeof this.state.showNoChromeDialog === 'undefined'){
+        newState.showNoChromeDialog = true;
+        this.setState(newState);
+      }
+    }
+
+    if(waitChromeExtension){
+      // extension not finded
+      if(stopWaitChromeExtension){
+        stopWaitChromeExtension();
+      }
+    }
+  }
+
+  
+  hideNoChromeDialog = () => {
+    this.setState({
+      showNoChromeDialog: false
+    });
+  }
 
   handleClickEvent(ctrlId) {
     if (this._isEnabled(ctrlId) && this._isVisible(ctrlId) && this.props.onButtonClick) {
@@ -93,10 +161,27 @@ export default class Toolbar extends Component<Props> {
 
   render() {
     const {
-      testMode, testTarget, devices, browsers, emulators, stepDelay
+      testMode, 
+      testTarget, 
+      devices, 
+      browsers, 
+      emulators, 
+      stepDelay,
+      isChromeExtensionEnabled,
+      waitChromeExtension
     } = this.props;
+
+    const { 
+      canRecord,
+      showNoChromeDialog
+    } = this.state;
+
     return (
       <div className="appTollbar">
+        { typeof showNoChromeDialog !== 'undefined' && showNoChromeDialog && 
+          <NoChromeDialog hide={this.hideNoChromeDialog}/>
+        }
+
         { this._isVisible(Controls.NEW_FILE) && (
           <Icon
             className="control button"
@@ -282,15 +367,35 @@ export default class Toolbar extends Component<Props> {
 
         <div className="separator" />
 
-        <span
-          className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
-          title="Record"
-        >
-          <FaMicrophone
-            style={{ marginRight: 0 }}
-            onClick={ () => ::this.handleClickEvent(Controls.TEST_RECORD) }
-          />
-        </span>
+        { waitChromeExtension && 
+          <span style={{marginLeft:'10px'}}>
+            <Spin indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} />
+            <span style={{marginLeft:'10px'}}>Waiting for extension</span>
+          </span>
+        }
+
+        { !waitChromeExtension && !canRecord && 
+          <span
+            className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
+            title="Record"
+          >
+            <FaMicrophone
+              style={{ marginRight: 0, color: 'darkred', cursor: 'not-allowed' }}
+            />
+            <p className="ext-err-message">Oxygen Chrome extension is not installed or is disabled</p>
+          </span>}
+
+        { !waitChromeExtension && canRecord &&
+          <span
+            className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
+            title="Record"
+          >
+            <FaMicrophone
+              style={{ marginRight: 0 }}
+              onClick={ () => ::this.handleClickEvent(Controls.TEST_RECORD) }
+            />
+          </span>
+        }
 
         <span 
           className={ this._isSelected(Controls.TEST_SETTINGS) ? 'control selectable active' : 'control selectable' }

@@ -19,6 +19,16 @@ export default (state = defaultState, action, dispatch) => {
 
   switch (action.type) {
     
+    case ActionTypes.WB_SET_JAVA_ERROR:
+      return {
+        ...state,
+        javaError: error
+      }
+    case ActionTypes.WB_CLEAN_JAVA_ERROR:
+        let newState = { ...state };
+        delete newState.javaError;
+        return newState;
+
     // WB_OPEN_FILE
     case ActionTypes.WB_OPEN_FILE:
       return { 

@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 const IDE_URL_HTTP = 'http://localhost:7778';
+const IDE_URL_HTTP_FOR_PING = 'http://localhost:7779';
 const IDE_URL_HTTPS = 'https://localhost:8889';
 
 const MENU_ID_WAITFORTEXT = 'waitForText';
@@ -106,7 +107,7 @@ setInterval(() => checkIfRecordingIsActive(), PING_INTERVAL);
 function checkIfRecordingIsActive() {
     try {
         var req = new XMLHttpRequest();
-        req.open('GET', IDE_URL_HTTP + '/ping');
+        req.open('GET', IDE_URL_HTTP_FOR_PING + '/ping');
         req.timeout = PING_INTERVAL - 100;  // should be less than polling interval
         req.onload = function (e) {
             if (req.readyState === 4) {

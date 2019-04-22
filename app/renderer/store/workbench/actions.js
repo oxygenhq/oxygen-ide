@@ -15,6 +15,22 @@ export const initialize = () => {
     payload: null,
   };
 };
+
+export const setJavaError = (error) => {
+  return {
+    type: ActionTypes.WB_SET_JAVA_ERROR,
+    payload: { 
+      error: error
+    }
+  }
+}
+
+export const cleanJavaError = () => {
+  return {
+    type: ActionTypes.WB_CLEAN_JAVA_ERROR
+  }
+}
+
 /* openFile */
 export const openFile = (path) => {
   return {
@@ -163,6 +179,12 @@ export const stopRecorder = () => ({
   type: ActionTypes.WB_STOP_RECORDER,
     payload: { },
 });
+
+/* startRecorderWatcher */
+export const startRecorderWatcher = () => ({
+  type: ActionTypes.WB_RECORDER_START_WATCHER
+});
+
 /* onTabChange */
 export const onTabChange = (key) => {
   return {

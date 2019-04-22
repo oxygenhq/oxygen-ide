@@ -94,7 +94,6 @@ export default class Logger extends PureComponent<Props> {
           className="dragline"
         />
         <div className="panel-header logger-header" ref={headerRef => { this.headerRef = headerRef; }}>
-          <span className="title">Event Log</span>
           <Tabs
             defaultActiveKey={ active }
             activeKey={ active }

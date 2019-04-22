@@ -142,7 +142,17 @@ export default class FileExplorer extends Component<Props> {
     render() {
         const { rootName, rootPath } = this.props;
         const { selectedKeys, refreshScroll, refreshScrollBottom } = this.state;
-        const headerTitle = 'File Explorer' + (rootName ? ` - ${rootName}` : '');
+        
+        const headerTitle = (
+            <span className={rootPath ? 'show-on-hover-path' : ''}>
+                <span className="show-on-hover-path-name">
+                    { 'File Explorer' + (rootName ? ` - ${rootName}` : '') }
+                </span>
+                <span className="show-on-hover-path-path">
+                    { 'Full path' + (rootPath ? ` - ${rootPath}` : '') }
+                </span>
+            </span>
+        );
         return (
             <Panel
                 wrapRef={this.wrap}

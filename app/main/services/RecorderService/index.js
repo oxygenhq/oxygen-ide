@@ -16,16 +16,56 @@ import ServiceBase from "../ServiceBase";
 import * as Const from '../../../const';
 
 const PORT_HTTP = 7778;
+const PORT_HTTP_FOR_PING = 7779;
 const PORT_HTTPS = 8889;
+const PORT_HTTPS_FOR_PING = 8890;
+
 const RECORDER_DIR = process.env.NODE_ENV === 'production' ?
                         path.resolve(__dirname, 'services', 'RecorderService') :
                         path.resolve(__dirname, '.');
 const RECORDER_EVENT = 'RECORDER_EVENT';
+const CHROME_EXTENSION_ENABLED = 'CHROME_EXTENSION_ENABLED';
 
 export default class RecorderService extends ServiceBase {
     constructor(mainWindow) {
         super(mainWindow);
         this.windowGroups = [];
+    }
+
+    watch() {
+        // prevent starting the recorder twice
+        if (this.httpSrvPing || this.httpsSrvPing) {
+            return;
+        }
+        this.httpSrvPing = http.createServer(::this._onPingRequest);
+        this.httpSrvPing.on('error', (err) => {console.log("Unable to bind recorder's HTTP listener. " + err)});
+
+        var options = {
+            key: fs.readFileSync(path.join(RECORDER_DIR, 'cloudbeat-key.pem')),
+            cert: fs.readFileSync(path.join(RECORDER_DIR, 'cloudbeat-cert.pem')),
+            requestCert: false,
+            rejectUnauthorized: false
+        };
+        this.httpsSrvPing = https.createServer(options, ::this._onPingRequest);
+        this.httpSrvPing.on('error', (err) => {console.log("Unable to bind recorder's HTTPS listener " + err)});
+
+        // here be horrors...
+        // 'localhost' might be unavailable in certain situations
+        // TODO: figure out a proper solution for this since this doesn't support IPv6
+        //       and we can't just bind on 0.0.0.0 for security reasons
+        //       and... browser extensions use 'localhost' to connect
+        dns.lookup('localhost', (err, addr, family) => {
+            var hostname;
+            if (!err) { // not resolvable - use IPv4 loopback
+                hostname = '127.0.0.1';
+            } else if (family == 4 && addr !== '127.0.0.1') { // resolves to something other than 127.0.0.1
+                hostname = '127.0.0.1';
+            } else {
+                hostname = 'localhost';
+            }
+            this.httpSrvPing.listen(PORT_HTTP_FOR_PING, hostname, function(){ });
+            this.httpsSrvPing.listen(PORT_HTTPS_FOR_PING, hostname, function(){ });
+        });
     }
 
     start() {
@@ -72,6 +112,30 @@ export default class RecorderService extends ServiceBase {
         if (this.httpsSrv) {
             this.httpsSrv.close();
             this.httpsSrv = null;
+        }
+    }
+
+    _onPingRequest(request, response) {
+        response.setHeader('Access-Control-Allow-Origin', '*');
+        response.setHeader("Access-Control-Allow-Headers", "*");
+        // disable keep-alive. 
+        // otherwise connection pooling might prevent the recorder stopping in a timely manner.
+        response.setHeader('Connection', 'close');
+        const self = this;
+
+        if (request.method === 'GET') {
+            if (request.url === '/ping') {               
+                this.notify({
+                    type: CHROME_EXTENSION_ENABLED
+                });
+
+                response.statusCode = 200;
+                response.statusMessage = 'OK';
+            } else {
+                response.statusCode = 404;
+                response.statusMessage = 'Not found';
+            } 
+            response.end();
         }
     }
 

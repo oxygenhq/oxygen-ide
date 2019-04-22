@@ -21,6 +21,7 @@ const defaultAppSettings = {
 };
 
 const defaultState = {
+  showLanding: false,
   fontSize: 12,
   navbar: {
     visible: false,
@@ -46,6 +47,23 @@ export default (state = defaultState, action) => {
   const { value, target, settings, zoom } = payload;
   switch (action.type) {
     
+    // SHOW LANDING
+    case types.SHOW_LANDING: {
+      return { 
+        ...state,
+        showLanding: true,
+        ...defaultAppSettings
+      }
+    }
+    
+    // HIDE LANDING
+    case types.HIDE_LANDING: {
+      return { 
+        ...state,
+        showLanding: false
+      }
+    }
+
     // ZOOM_IN
     case types.EDITOR_ZOOM_IN: {
       const newFontSize = state.fontSize+2;
@@ -96,12 +114,13 @@ export default (state = defaultState, action) => {
     case types.SETTINGS_MERGE:
       return {
         ...state,
-        ...settings,
+        ...settings
       };
     // LAST_SESSION_SET_ROOT_FOLDER
     case types.LAST_SESSION_SET_ROOT_FOLDER:
       return {
         ...state,
+        showLanding: false,
         lastSession: {
           ...state.lastSession,
           rootFolder: value,

@@ -8,10 +8,11 @@
  */
 // @flow
 import React, { Component, Fragment } from 'react';
-import { Modal, Layout, Icon, Row, Col, Tooltip, message } from 'antd';
+import { Modal, Layout, Icon, Row, Col, Tooltip, message, notification } from 'antd';
 /* eslint-disable react/no-did-update-set-state */
 import updateModals from '../../components/updateModals';
 // Dialogs
+import JavaDialog from '../../components/dialogs/JavaDialog';
 import FileRenameDialog from '../../components/dialogs/FileRenameDialog';
 import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
@@ -24,6 +25,7 @@ import Logger from '../Logger';
 import Toolbar from '../../components/Toolbar';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
+import Landing from '../../components/Landing';
 import Settings from '../Settings';
 import * as Controls from '../../components/Toolbar/controls';
 // Styles
@@ -66,7 +68,8 @@ export default class Workbench extends Component<Props> {
 
   componentDidMount() {
     // start IDE initialization process
-    this.props.initialize();    
+    this.props.initialize();
+    this.props.startRecorderWatcher();
   }
 
   handleTabChange(key) {
@@ -94,8 +97,19 @@ export default class Workbench extends Component<Props> {
   }
 
   handleToolbarButtonClick(ctrlId) {
-    if (ctrlId === Controls.TEST_RUN) {      
-      this.props.startTest();
+    if (ctrlId === Controls.TEST_RUN) {     
+      
+      const { editorActiveFile } = this.props;
+
+      if(editorActiveFile){
+        this.props.startTest();
+      } else {
+        notification['error']({
+          message: 'Can\'t record when not opened file',
+          description: 'Please, select some file in the tree to make record possible.'
+        });
+      }
+      
     }
     else if (ctrlId === Controls.TEST_STOP) {
       this.props.stopTest();
@@ -119,7 +133,16 @@ export default class Workbench extends Component<Props> {
       this.props.saveCurrentFile();
     }
     else if (ctrlId === Controls.NEW_FILE) {
-      this.props.showNewFileDialog();      
+      const { settings } = this.props;
+
+      if(settings && settings.showLanding){
+        notification['error']({
+          message: 'Can\'t add a new file to not exist folder',
+          description: 'Please, open folder first'
+        });
+      } else {
+        this.props.showNewFileDialog();   
+      }
     }
     else if (ctrlId === Controls.TEST_RECORD) {
       const { isRecording } = this.props;
@@ -240,7 +263,7 @@ export default class Workbench extends Component<Props> {
   }
 
   render() {
-    const { test, settings, dialog } = this.props;
+    const { test, settings, dialog, javaError } = this.props;
     const { runtimeSettings } = test;
     // sidebars state
     const leftSidebarSize = settings.sidebars.left.size;
@@ -248,9 +271,16 @@ export default class Workbench extends Component<Props> {
     const rightSidebarSize = settings.sidebars.right.size;
     const rightSidebarVisible = settings.sidebars.right.visible;
     const loggerVisible = settings.logger.visible;
+    const showLanding = settings.showLanding;
 
     return (
       <div>
+        { javaError && 
+          <JavaDialog 
+            clean={this.props.cleanJavaError}
+            javaError={javaError}
+          />  
+        }
         { dialog && 
         <Fragment>
           { dialog.DIALOG_FILE_CREATE && dialog.DIALOG_FILE_CREATE.visible &&
@@ -280,6 +310,9 @@ export default class Workbench extends Component<Props> {
         }
         {updateModals.call(this)}
         <Toolbar
+          isChromeExtensionEnabled={ this.props.isChromeExtensionEnabled }
+          waitChromeExtension={ this.props.waitChromeExtension }
+          stopWaitChromeExtension={ this.props.stopWaitChromeExtension }
           testMode={ runtimeSettings.testMode }
           testTarget={ runtimeSettings.testTarget }
           stepDelay={ runtimeSettings.stepDelay }
@@ -295,22 +328,23 @@ export default class Workbench extends Component<Props> {
           </Col>
 
           <Col style={{ width: '100%' }}>
-            <Layout className="ide-main">
-              <Sidebar 
-                align="left"
-                size={ leftSidebarSize } 
-                visible={ leftSidebarVisible } 
-                onResize={ (size) => ::this.handleSidebarResize('left', size) }
-              >
-                <FileExplorer 
-                  onSelect={ ::this.fileExplorer_onSelect } 
-                  onCreate={ ::this.fileExplorer_onCreate }
-                  onRename={ ::this.fileExplorer_onRename }
-                  onDelete={ ::this.fileExplorer_onDelete }
-                  onMove={ ::this.fileExplorer_onMove }
-                />
-              </Sidebar>
-              <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
+            { !showLanding && 
+              <Layout className="ide-main">
+                <Sidebar 
+                  align="left"
+                  size={ leftSidebarSize } 
+                  visible={ leftSidebarVisible } 
+                  onResize={ (size) => ::this.handleSidebarResize('left', size) }
+                >
+                  <FileExplorer 
+                    onSelect={ ::this.fileExplorer_onSelect } 
+                    onCreate={ ::this.fileExplorer_onCreate }
+                    onRename={ ::this.fileExplorer_onRename }
+                    onDelete={ ::this.fileExplorer_onDelete }
+                    onMove={ ::this.fileExplorer_onMove }
+                  />
+                </Sidebar>
+                <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
                 <Header className="tabs-container">{/*headerBar*/}
                   <Row>
                     <Col className="sidebar-trigger">                      
@@ -340,15 +374,19 @@ export default class Workbench extends Component<Props> {
                   />
                 </div>
               </Layout>
-              <Sidebar 
-                align="right"
-                size={ rightSidebarSize } 
-                visible={ rightSidebarVisible } 
-                onResize={ (size) => ::this.handleSidebarResize('right', size) }
-              >
-                <Settings />
-              </Sidebar>
-            </Layout>
+                <Sidebar 
+                  align="right"
+                  size={ rightSidebarSize } 
+                  visible={ rightSidebarVisible } 
+                  onResize={ (size) => ::this.handleSidebarResize('right', size) }
+                >
+                  <Settings />
+                </Sidebar>
+              </Layout>
+            }
+            { showLanding && 
+              <Landing/>
+            }
           </Col>
         </Row>
       </div>
