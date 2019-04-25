@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" 
-     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
      
     <?define Vendor = "CloudBeat" ?>
     <?if $(sys.BUILDARCH) = x64 ?>
@@ -175,7 +176,15 @@
             <![CDATA[Installed OR JAVA_VER_32 OR JAVA_VER_64]]>
         </Condition>
 
+        <util:CloseApplication Id="CloseChrome"
+                               CloseMessage="yes"
+                               Target="chrome.exe"
+                               RebootPrompt="no"
+                               PromptToContinue="yes"
+                               Description="Chrome needs to be closed before the installation can proceed. Please close Chrome manually."/>
+
         <InstallExecuteSequence>
+            <Custom Action="WixCloseApplications" Before="LaunchConditions"></Custom>
             <Custom Action="InstallCertificates" After="InstallFiles"><![CDATA[&IEExt=3 OR &ChromeExt=3]]></Custom>
             <Custom Action="RemoveCertificates" After="RemoveFiles" />
         </InstallExecuteSequence>
