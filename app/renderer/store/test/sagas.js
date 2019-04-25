@@ -52,6 +52,15 @@ function* handleTestRunnerServiceEvent(event) {
     }
     else if (event.type === 'TEST_ENDED') {
         yield put(testActions.onTestEnded());
+        var a = 'raaaaaaaaass';
+        console.log('event', event);
+
+        if(event && event.result && event.result.summary){
+            const { summary } = event.result;
+            if(summary && summary._status && summary._status ==="passed"){
+                yield put(editorActions.resetActiveLines());
+            }
+        }
     }
     else if (event.type === 'LINE_UPDATE') {
         yield put(testActions.onLineUpdate(event.time, event.file, event.line, event.primary));

@@ -28,6 +28,8 @@ export default class NoChromeDialog extends Component<Props> {
   }
 
   render(){    
+    return null;
+    
     return (
       <Modal
         title="Oxygen Chrome Extension is not installed or is disabled"

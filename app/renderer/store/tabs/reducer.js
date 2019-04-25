@@ -40,7 +40,13 @@ export default (state = defaultState, action, dispatch) => {
     
     // TABS_SET_TOUCHED
     case ActionTypes.TABS_SET_TOUCHED:
-      _index = state.list.findIndex(x => x.key === key && x.title === title);
+
+      if(key === "unknown"){
+        _index = state.list.findIndex(x => x.key === key && x.title === title);
+      } else {
+        _index = state.list.findIndex(x => x.key === key);
+      }
+
       if (_index === -1) {
         return state;
       }

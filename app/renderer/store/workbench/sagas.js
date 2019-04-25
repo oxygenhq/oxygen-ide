@@ -40,8 +40,10 @@ export default function* root() {
     yield all([
       takeLatest(ActionTypes.WB_OPEN_FOLDER, openFolder),
       takeLatest(ActionTypes.WB_INIT, initialize),
+      takeLatest(ActionTypes.WB_DEACTIVATE, deactivate),
       takeLatest(ActionTypes.WB_OPEN_FILE, openFile),
       takeLatest(ActionTypes.WB_OPEN_FAKE_FILE, openFakeFile),
+      takeLatest(ActionTypes.WB_CREATE_NEW_REAL_FILE, createNewRealFile),
       takeLatest(ActionTypes.WB_SHOW_DIALOG, showDialog),
       takeLatest(ActionTypes.WB_HIDE_DIALOG, hideDialog),
       takeLatest(ActionTypes.WB_CLOSE_FILE, closeFile),
@@ -184,12 +186,25 @@ export function* clearAll() {
     yield put(wbActions.reset());
 }
 
+export function* deactivate() {
+    // stop Selenium server
+    let SeleniumServiceStopResult = yield call(services.mainIpc.call, 'SeleniumService', 'stop');
+    console.log('SeleniumServiceStopResult', SeleniumServiceStopResult);
+}
+
 export function* initialize() {
-    services.mainIpc.call('UpdateService', 'start').then(() => {});
+    console.log('initialize');
+    let UpdateServiceStartResult = yield call(services.mainIpc.call, 'UpdateService', 'start');
+    console.log('UpdateServiceStartResult', UpdateServiceStartResult);
+
     // start Selenium server
-    services.mainIpc.call('SeleniumService', 'start').then(() => {});
+    let SeleniumServiceStartResult = yield call(services.mainIpc.call, 'SeleniumService', 'start');
+    console.log('SeleniumServiceStartResult', SeleniumServiceStartResult);
+
     // start Android and iOS device watcher
-    services.mainIpc.call('DeviceDiscoveryService', 'start').then(() => {});
+    let DeviceDiscoveryServiceStartResult = yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'start');
+    console.log('DeviceDiscoveryServiceStartResult', DeviceDiscoveryServiceStartResult);
+
     // get app settings from the store
     let appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');
 
@@ -197,7 +212,9 @@ export function* initialize() {
         yield put(wbActions.restoreFromCache(appSettings.cache));
     } else {
         yield put(settingsActions.changeCacheUsed(true));
-        appSettings.cacheUsed = true;
+        if(appSettings){
+            appSettings.cacheUsed = true;
+        }
     }
 
     if (appSettings) {
@@ -299,6 +316,91 @@ export function* changeTab({ payload }) {
             yield put(tabActions.setActiveTab(key));
             yield put(testActions.setMainFile(key));
         }
+    }
+}
+
+export function* createNewRealFile({ payload }){
+    console.log('createNewRealFile', payload);
+    
+    const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, null]);
+    
+    console.log('saveAsPath', saveAsPath);
+
+    if (!saveAsPath) {
+        return; // Save As dialog was canceled by user
+    }
+    
+    // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
+    let folderPath = saveAsPath.split("\\");
+    folderPath.pop();
+    folderPath = folderPath.join("\\");
+    console.log('folderPath', folderPath);
+
+    let content = '';
+    
+    if(payload && payload.fakeFile){
+        content= payload.fakeFile.content;
+    }
+
+    const { error } = yield putAndTake(
+        fsActions.saveFileAs(saveAsPath, content)
+    );
+
+    if (!error) {            
+        // re-retrieve all files, as Saved As file info has been just added to the File Cache.
+        const updatedFiles = yield select(state => state.fs.files);
+        // retrieve file info for the newly saved file
+        const saveAsFile = updatedFiles[saveAsPath];
+
+        if (!saveAsFile) {
+            return;     // not suppose to happen
+        }
+
+
+        if(payload && payload.fakeFile){
+
+            const { path, name } = payload.fakeFile;
+
+            const files = yield select(state => state.settings.files);
+
+            console.log('files', files);
+
+            const currentFile = files[path+name];
+
+            console.log('currentFile', currentFile);
+
+            if(currentFile){
+                yield closeTmpFile(currentFile);
+            }
+        }
+
+        const fs = yield select(state => state.fs);
+        
+        console.log('fs', fs);
+        
+        if(fs && typeof typeof fs.rootPath !== 'undefined' && fs.rootPath === null){
+            const { error } = yield putAndTake(
+                fsActions.treeOpenFolder(folderPath)
+            );
+
+            if (error) {
+                console.log('error')
+
+                yield put(wbActions._openFile_Failure(folderPath, error));
+                return;
+            }   
+
+            // report success
+            yield put(wbActions._openFile_Success(folderPath));
+        } else {
+            console.log('rootPath is good');
+        }
+
+        // refresh File Explorer tree in case save file's parent folder is currently open in the tree
+        yield fsActions.treeLoadNodeChildren(saveAsFile.parentPath, true);
+        // open newly saved file (as it's not necessary open) - e.g. open it in a new tab
+        yield openFile({ payload: { path: saveAsPath } });
+
     }
 }
 
@@ -550,12 +652,12 @@ export function* saveCurrentFile({ payload }) {
             yield openFile({ payload: { path: saveAsPath } });
         }
     } else {
+        const files = yield select(state => state.fs.files);
+
     
         if (!activeFile || !files.hasOwnProperty(activeFile)) {
             return;
         }
-
-        const files = yield select(state => state.fs.files);
 
         const currentFile = files[activeFile];
         // prompt user with "Save As" dialog before saving the file

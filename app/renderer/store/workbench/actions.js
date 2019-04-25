@@ -16,6 +16,14 @@ export const initialize = () => {
   };
 };
 
+export const deactivate = () => {
+  return {
+    type: ActionTypes.WB_DEACTIVATE,
+    payload: null,
+  };
+};
+
+
 export const reset = () => {
   return {
     type: 'RESET',
@@ -45,6 +53,17 @@ export const cleanJavaError = () => {
     type: ActionTypes.WB_CLEAN_JAVA_ERROR
   }
 }
+
+/* createNewRealFile */
+
+export const createNewRealFile = (fakeFile=null) => {
+  return {
+    type: ActionTypes.WB_CREATE_NEW_REAL_FILE,
+    payload: {
+      fakeFile: fakeFile
+    },
+  }
+};
 
 /* openFakeFile */
 

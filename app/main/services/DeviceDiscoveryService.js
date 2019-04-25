@@ -13,6 +13,10 @@ const DEVICE_CONNECTED = 'DEVICE_CONNECTED';
 const DEVICE_DISCONNECTED = 'DEVICE_DISCONNECTED';
 const CHECK_INTERVAL = 2000;
 
+let isError = function(e){
+    return e && e.stack && e.message;
+}
+
 export default class DeviceDiscoveryService extends ServiceBase {
     devices = {};
 
@@ -20,10 +24,21 @@ export default class DeviceDiscoveryService extends ServiceBase {
         super();
     }
 
-    start() {
+    async start() {
+        let result;
         // limit the number of retries in order to prevent console spamming when adb is not installed for example
-        this.retries = 5;
-        this._getConnectedDevices();
+        this.retries = 3;
+        result = await this._getConnectedDevices();
+
+        console.log('result', result);
+
+        if(isError(result)){
+            console.log('result.message', result.message);
+            return result.message;
+        } else {
+            return result;
+        }
+
     }
 
     async stop() {
@@ -53,8 +68,9 @@ export default class DeviceDiscoveryService extends ServiceBase {
 
     _getConnectedDevices() {
         var self = this;
-        ADB.createADB().then((adb) => {
+        return ADB.createADB().then((adb) => {
             adb.getConnectedDevices().then((devices) => {
+                console.log('#egetConnectedDevices ', devices);
                 const currentDevices = {};
                 // notify about any new device
                 for (const dev of devices) {
@@ -78,9 +94,10 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 });
             })
             .catch((e) => {
+                console.log('#e getConnectedDevices e', devices);
                 console.debug(e);
                 if (self.retries-- === 0) {
-                    Promise.resolve();
+                    Promise.resolve(e);
                 }
                 return self._delay(CHECK_INTERVAL).then(function() {
                     return self._getConnectedDevices();
@@ -88,9 +105,10 @@ export default class DeviceDiscoveryService extends ServiceBase {
             })
         })
         .catch((e) => {
+            console.log('#ee ', e);
             console.debug(e);
             if (self.retries-- === 0) {
-                return Promise.resolve();
+                return Promise.resolve(e);
             }
             return self._delay(CHECK_INTERVAL).then(function() {
                 return self._getConnectedDevices();

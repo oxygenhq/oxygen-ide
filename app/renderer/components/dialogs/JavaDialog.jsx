@@ -34,6 +34,8 @@ export default class JavaDialog extends PureComponent {
       message = (<p>Uncatched error with Java, try to install/reinstall <a onClick={this.processLink}>Java JDK 8</a></p>);
     }
 
+    return null;
+
     return (
       <Modal
         title="Error with Java"
