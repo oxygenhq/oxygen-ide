@@ -9,6 +9,15 @@
 import * as types from './types';
 
 
+/* Change Cache Used  */
+export const changeShowRecorderMessageValue = (value) => {
+    return {
+      type: types.SHOW_RECORDER_MESSAGE_VALUE,
+      payload: { value },
+    };
+  }
+
+/* Change Cache Used  */
 export const changeCacheUsed = (value) => {
     return {
       type: types.CACHE_USED_CHANGE,
@@ -23,6 +32,14 @@ export const addFile = (key,name) => {
       payload: { key,name },
     };
   }
+
+/* Remove file */
+export const removeFile = (key,name) => {
+  return {
+    type: types.TMP_REMOVE_FILE,
+    payload: { key,name },
+  };
+}
 
 /* updateFileContent */
 export const updateFileContent = (path, content, name) => ({

@@ -27,20 +27,51 @@ export default class SeleniumService extends ServiceBase {
         super();
     }
 
-    start() {
+    async start() {
+        let result;
         // prevent from starting the process twice
         if (this.seleniumProc != null) {
-            return;
+            result = 'twice_port=';
+            this.stop();
+            const detectPortResult = await this.detectPort();
+            result+= detectPortResult;
+        } else {
+            const detectPortResult = await this.detectPort();
+            result = detectPortResult;
         }
+
+        return result;
+    }
+
+    detectPort(){
+        let result;
         // get available port
-        detectPort(selSettings.port, (err, availablePort) => {
-            if (err) {
-                console.error(`Port "${port}" on "localhost" is already in use. Please set another port in config.json file.`, err);
-            } else {
-                this._startProcess(availablePort);
-                this.availablePort = availablePort;
-            }
+        return detectPort(selSettings.port)
+        .then(availablePort => {
+            this._startProcess(availablePort);
+            this.availablePort = availablePort;
+            return availablePort;
+        })
+        .catch(err => {
+            result = `Port "${selSettings.port}" on "localhost" is already in use. Please set another port in config.json file.`;
+            console.log(`Port "${selSettings.port}" on "localhost" is already in use. Please set another port in config.json file.`, err);
+            return result;
         });
+
+        //let result;
+        // detectPort(selSettings.port, (err, availablePort) => {
+        //     if (err) {
+        //         result = `Port "${port}" on "localhost" is already in use. Please set another port in config.json file.`;
+        //         console.error(`Port "${port}" on "localhost" is already in use. Please set another port in config.json file.`, err);
+        //     } else {
+                
+        //         this._startProcess(availablePort);
+        //         this.availablePort = availablePort;
+        //         console.log('availablePort', availablePort);
+        //         result = 'availablePort';
+        //     }
+        // });
+        // return result;
     }
 
     stop() {

@@ -11,8 +11,7 @@ import type { Element } from 'react';
 import '../../css/property-list.scss';
 
 type Props = {
-    children?: Element,
-    onChange: (key: string, value: any) => void,
+    children?: Element
 };
 
 export default class PropertyList extends PureComponent<Props> {    
@@ -29,18 +28,17 @@ export default class PropertyList extends PureComponent<Props> {
 
 export class PropertyItem extends PureComponent
     <{|
-        key: string,
+        base: string,
         label: string, 
         type: 'boolean' | 'string' | 'number' | 'list',
         value?: any,
         list?: Array<any>,
         defaultValue?: any,
-        editable?: boolean,
-        onChange?: (key: string, value: any) => void,
+        editable?: boolean
     |}> {
 
     render() {
-        const { key, label, value, editable = false } = this.props;
+        const { base, label, value, editable = false } = this.props;
 
         return (
             <div className="property-item">
@@ -81,7 +79,7 @@ class EditableNumber extends PureComponent {
         const { value } = this.props;
 
         return (
-            <input className="editable-number" value={ value } type="number" />
+            <input className="editable-number" value={ value } type="number" onChange={()=>{}} />
         );
     }
 }

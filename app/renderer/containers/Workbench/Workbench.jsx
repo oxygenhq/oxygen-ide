@@ -26,6 +26,7 @@ import Toolbar from '../../components/Toolbar';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import Landing from '../../components/Landing';
+import Initializing from '../../components/Initializing';
 import Settings from '../Settings';
 import * as Controls from '../../components/Toolbar/controls';
 // Styles
@@ -72,6 +73,23 @@ export default class Workbench extends Component<Props> {
     this.props.startRecorderWatcher();
   }
 
+  componentWillUnmount(){
+    // stop IDE process
+    if(this.props.deactivate){
+      this.props.deactivate();
+    } else {
+      alert('no deactivate');
+    }
+    const { isRecording } = this.props;
+    if (isRecording) {
+      if(this.props.stopRecorder){
+        this.props.stopRecorder();
+      } else {
+        alert('no stopRecorder');
+      }  
+    }
+  }
+
   handleTabChange(key, name = null) {
     this.props.onTabChange(key, name);
   }
@@ -104,8 +122,15 @@ export default class Workbench extends Component<Props> {
       console.log('editorActiveFile', editorActiveFile);
 
       if(editorActiveFile){
-        this.props.startTest();
+
+        if(editorActiveFile && editorActiveFile.path && editorActiveFile.path ==="unknown"){
+          this.props.createNewRealFile(editorActiveFile);
+        } else {
+          this.props.startTest();
+        }
+
       } else {
+        this.props.createNewRealFile();
         notification['error']({
           message: 'Can\'t record when not opened file',
           description: 'Please, select some file in the tree to make record possible.'
@@ -261,7 +286,7 @@ export default class Workbench extends Component<Props> {
   }
 
   render() {
-    const { test, settings, dialog, javaError } = this.props;
+    const { test, settings, dialog, javaError, initialized, changeShowRecorderMessageValue } = this.props;
     const { runtimeSettings } = test;
     // sidebars state
     const leftSidebarSize = settings.sidebars.left.size;
@@ -270,6 +295,14 @@ export default class Workbench extends Component<Props> {
     const rightSidebarVisible = settings.sidebars.right.visible;
     const loggerVisible = settings.logger.visible;
     const showLanding = settings.showLanding;
+    const showRecorderMessage = settings.showRecorderMessage;
+
+
+    if(!initialized){
+      return (
+        <Initializing/>
+      )
+    }
 
     return (
       <div>
@@ -317,6 +350,8 @@ export default class Workbench extends Component<Props> {
           devices={ test.devices }
           browsers={ test.browsers }
           emulators={ test.emulators }
+          showRecorderMessage={ showRecorderMessage }
+          changeShowRecorderMessageValue={ changeShowRecorderMessageValue }
           controlsState={ this.getToolbarControlsState() } 
           onButtonClick={ ::this.handleToolbarButtonClick }
           onValueChange={ ::this.handleToolbarValueChange } />

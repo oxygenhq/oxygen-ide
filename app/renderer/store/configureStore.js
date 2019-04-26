@@ -19,6 +19,7 @@ import rootSaga from './sagas';
 
 
 import ServicesSingleton from '../services';
+import { dialog } from 'electron';
 const services = ServicesSingleton();
 
 
@@ -74,28 +75,61 @@ const configureStore = (initialState?: counterStateType) => {
   const composeEnhancers = compose;
   /* eslint-enable no-underscore-dangle */
 
+  const ignoreTypes = [
+    'MAIN_SERVICE_EVENT',
+    'RESET'
+  ] 
+
   async function updateCache(cache, action) {
-
-    const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [cache] );
-
-    if(result){
-      // console.log('---');
-      // console.log('cache in', cache);
-      // console.log('action', action);
-      // console.log('result', result);
-      // console.log('result.cache.tabs.list', result.cache.tabs.list);
-      // console.log('JSON.stringify result', JSON.stringify(result));
-      // console.log('---');
+    if(action && ignoreTypes.includes(action.type)){
+      return;
     }
+
+    if(action && action.type.startsWith('RECORDER_')){
+      return;
+    }
+
+    if(action && action.type.startsWith('TEST_')){
+      return;
+    }
+
+    if(action && action.type.startsWith('LOGGER_')){
+      return;
+    }
+
+    const state = { ...cache };
+
+    delete state.cache;
+    delete state.settings.cache;
+    delete state.dialog;
+    delete state.logger;
+    delete state.router;
+    delete state.test;
+    delete state.recorder;
+    delete state.wb;
+
+    // console.log('---');
+    // console.log('action', action);
+    // console.log('state', state);
+    // console.log('---');
+
+    const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [state] );
+
+    // if(result){
+    //   // console.log('---');
+    //   // console.log('cache in', cache);
+    //   // console.log('action', action);
+    //   // console.log('result', result);
+    //   // console.log('result.cache.tabs.list', result.cache.tabs.list);
+    //   // console.log('JSON.stringify result', JSON.stringify(result));
+    //   // console.log('---');
+    // }
   }
 
   const cache = store => next => action => {
     const state = store.getState();
 
     if(state.settings.cacheUsed){
-      delete state.cache;
-      delete state.settings.cache;
-  
       updateCache(state, action);
     }
 

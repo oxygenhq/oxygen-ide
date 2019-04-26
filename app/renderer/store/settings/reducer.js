@@ -23,6 +23,7 @@ const defaultAppSettings = {
 };
 
 const defaultState = {
+  showRecorderMessage: null,
   cacheUsed: false,
   showLanding: false,
   fontSize: 12,
@@ -50,12 +51,21 @@ export default (state = defaultState, action) => {
   const { value, target, settings, zoom, cache } = payload;
   switch (action.type) {
     
+    
+
+    // SHOW LANDING
+    case types.SHOW_RECORDER_MESSAGE_VALUE: {
+      return { 
+        ...state,
+        showRecorderMessage: value
+      }
+    }
+
     // SHOW LANDING
     case types.SHOW_LANDING: {
       return { 
         ...state,
-        showLanding: true,
-        ...defaultAppSettings
+        showLanding: true
       }
     }
 
@@ -181,6 +191,8 @@ export default (state = defaultState, action) => {
       };
       
     case 'FROM_CACHE': 
+      // console.log('!FROM_CACHE settings', cache.settings);
+
       return {
         ...defaultState,
         ...cache.settings

@@ -32,6 +32,7 @@ import { JAVA_ERROR_INFO, JAVA_NOT_FOUND, JAVA_BAD_VERSION } from '../../service
 
 import ServicesSingleton from '../../services';
 import editorSubjects from '../editor/subjects';
+
 const services = ServicesSingleton();
 /**
  * Workbench Sagas
@@ -40,8 +41,10 @@ export default function* root() {
     yield all([
       takeLatest(ActionTypes.WB_OPEN_FOLDER, openFolder),
       takeLatest(ActionTypes.WB_INIT, initialize),
+      takeLatest(ActionTypes.WB_DEACTIVATE, deactivate),
       takeLatest(ActionTypes.WB_OPEN_FILE, openFile),
       takeLatest(ActionTypes.WB_OPEN_FAKE_FILE, openFakeFile),
+      takeLatest(ActionTypes.WB_CREATE_NEW_REAL_FILE, createNewRealFile),
       takeLatest(ActionTypes.WB_SHOW_DIALOG, showDialog),
       takeLatest(ActionTypes.WB_HIDE_DIALOG, hideDialog),
       takeLatest(ActionTypes.WB_CLOSE_FILE, closeFile),
@@ -98,7 +101,8 @@ export function* handleMainMenuEvents({ payload }) {
         yield services.mainIpc.call('UpdateService', 'start', [true]).then(() => {});
     }
     else if (cmd === Const.MENU_CMD_CLEAR_ALL) {
-        yield services.mainIpc.call('ElectronService', 'clearSettings');
+        const clearRsult = yield services.mainIpc.call('ElectronService', 'clearSettings');
+        // console.log('!FROM_CACHE clearRsult', clearRsult);
         yield clearAll();
         yield initialize();
     }
@@ -184,20 +188,49 @@ export function* clearAll() {
     yield put(wbActions.reset());
 }
 
+export function* deactivate() {
+    // stop Selenium server
+    let SeleniumServiceStopResult = yield call(services.mainIpc.call, 'SeleniumService', 'stop');
+    console.log('SeleniumServiceStopResult', SeleniumServiceStopResult);
+}
+
 export function* initialize() {
+    console.log('initialize');
+
+    // start check for update
     services.mainIpc.call('UpdateService', 'start').then(() => {});
     // start Selenium server
     services.mainIpc.call('SeleniumService', 'start').then(() => {});
     // start Android and iOS device watcher
     services.mainIpc.call('DeviceDiscoveryService', 'start').then(() => {});
+
+    /* sync variant
+
+    let UpdateServiceStartResult = yield call(services.mainIpc.call, 'UpdateService', 'start');
+    console.log('UpdateServiceStartResult', UpdateServiceStartResult);
+
+    // start Selenium server
+    let SeleniumServiceStartResult = yield call(services.mainIpc.call, 'SeleniumService', 'start');
+    console.log('SeleniumServiceStartResult', SeleniumServiceStartResult);
+
+    // start Android and iOS device watcher
+    let DeviceDiscoveryServiceStartResult = yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'start');
+    console.log('DeviceDiscoveryServiceStartResult', DeviceDiscoveryServiceStartResult);
+
+    */
+
     // get app settings from the store
     let appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');
+
+    console.log('appSettings', appSettings);
 
     if(appSettings && appSettings.cache){
         yield put(wbActions.restoreFromCache(appSettings.cache));
     } else {
         yield put(settingsActions.changeCacheUsed(true));
-        appSettings.cacheUsed = true;
+        if(appSettings){
+            appSettings.cacheUsed = true;
+        }
     }
 
     if (appSettings) {
@@ -280,6 +313,10 @@ export function* openFolder({ payload }) {
 
 export function* changeTab({ payload }) {
     const { key, name } = payload;
+
+    // console.log('key', key);
+    // console.log('name', name);
+
     if(key === "unknown"){
         yield put(tabActions.setActiveTab(key, name));
         yield put(testActions.setMainFile(key, name));
@@ -302,9 +339,119 @@ export function* changeTab({ payload }) {
     }
 }
 
+export function* createNewRealFile({ payload }){
+    console.log('createNewRealFile', payload);
+    
+    const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, null]);
+    
+    console.log('saveAsPath', saveAsPath);
+
+    if (!saveAsPath) {
+        return; // Save As dialog was canceled by user
+    }
+    
+    // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
+    let folderPath = saveAsPath.split("\\");
+    folderPath.pop();
+    folderPath = folderPath.join("\\");
+    console.log('folderPath', folderPath);
+
+    let content = '';
+    
+    if(payload && payload.fakeFile){
+        content= payload.fakeFile.content;
+    }
+
+    const { error } = yield putAndTake(
+        fsActions.saveFileAs(saveAsPath, content)
+    );
+
+    if (!error) {            
+        // re-retrieve all files, as Saved As file info has been just added to the File Cache.
+        const updatedFiles = yield select(state => state.fs.files);
+        // retrieve file info for the newly saved file
+        const saveAsFile = updatedFiles[saveAsPath];
+
+        if (!saveAsFile) {
+            return;     // not suppose to happen
+        }
+
+
+        if(payload && payload.fakeFile){
+
+            const { path, name } = payload.fakeFile;
+
+            const files = yield select(state => state.settings.files);
+
+            console.log('files', files);
+
+            const currentFile = files[path+name];
+
+            console.log('currentFile', currentFile);
+
+            if(currentFile){
+                yield closeTmpFile(currentFile);
+            }
+        }
+
+        const fs = yield select(state => state.fs);
+        
+        console.log('fs', fs);
+        
+        if(fs && typeof typeof fs.rootPath !== 'undefined' && fs.rootPath === null){
+            const { error } = yield putAndTake(
+                fsActions.treeOpenFolder(folderPath)
+            );
+
+            if (error) {
+                console.log('error')
+
+                yield put(wbActions._openFile_Failure(folderPath, error));
+                return;
+            }   
+
+            // report success
+            yield put(wbActions._openFile_Success(folderPath));
+        } else {
+            console.log('rootPath is good');
+        }
+
+        // refresh File Explorer tree in case save file's parent folder is currently open in the tree
+        yield fsActions.treeLoadNodeChildren(saveAsFile.parentPath, true);
+        // open newly saved file (as it's not necessary open) - e.g. open it in a new tab
+        yield openFile({ payload: { path: saveAsPath } });
+        yield put(testActions.startTest());
+
+    }
+}
+
+const getMaxIndex = (tabs) => {
+    let index = 0;
+
+    if(Array.isArray(tabs)){
+        tabs.map(tab => {
+            if(tab && tab.title && tab.key && tab.key === "unknown"){
+                const number = parseInt(tab.title.replace( /^\D+/g, ''));
+
+                if(isNaN(number)){
+                    // ignore
+                } else {
+                    if(number > index){
+                        index = number;
+                    }
+                }
+            }
+        })
+    }
+
+    return index;
+}
+
 export function* openFakeFile(){
     let tabs = yield select(state => state.tabs);
     let idenity;
+
+    // console.log('tabs', tabs);
 
     if(tabs && tabs.list && Array.isArray(tabs.list)){
         idenity = tabs.list.filter((tab) => tab.key === "unknown");
@@ -315,8 +462,28 @@ export function* openFakeFile(){
         idenity = [];
     }
 
+    // console.log('idenity', idenity);
+    
+
     const key = "unknown";
-    const name = "Untitled-"+(idenity.length+1);
+    let name = "Untitled-"+(idenity.length+1);
+
+    
+    const tmpFileExist = tabs.list.some((tab) => tab.key === key && tab.title === name );
+
+    // console.log('tmpFileExist', tmpFileExist);
+    if(tmpFileExist){
+        // console.log('in if');
+        const index = getMaxIndex(tabs.list);
+        // console.log('tabs.list', tabs.list);
+        // console.log('index', index);
+        if(index === 0){
+            const timestamp = + new Date();
+            name = "Untitled-"+(timestamp);
+        } else {
+            name = "Untitled-"+(index+1);
+        }
+    }
 
     yield put(tabActions.addTab(key, name));
     yield put(tabActions.setActiveTab(key, name));
@@ -429,6 +596,13 @@ export function* closeFile({ payload }) {
     else {
         yield put(testActions.setMainFile(null));
     }
+
+    if(path === "unknown"){
+      console.log('path', path);
+
+       yield put(settingsActions.removeFile(path, name));
+    }
+
     yield put(wbActions._closeFile_Success(path));
 }
 
@@ -502,11 +676,7 @@ export function* closeTmpFile(file){
 
     yield put(editorActions.closeFile(file.path, false, file.name));
     yield put(tabActions.removeTab(file.path, file.name));
-
-    const state = yield select(state => state);
-
-    const { fs, settings, ...st } = state;
-    const { cache, ...set } = settings;
+    yield put(settingsActions.removeFile(file.path, file.name));
 }
 
 export function* saveCurrentFile({ payload }) {
@@ -515,12 +685,22 @@ export function* saveCurrentFile({ payload }) {
 
     const { activeFile, activeFileName } = editor;
 
+    // console.log('activeFile', activeFile);
+    // console.log('activeFileName', activeFileName);
+
     if(activeFile === "unknown"){
         const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, null]);
     
         if (!saveAsPath) {
             return; // Save As dialog was canceled by user
         }
+
+        
+        // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
+        let folderPath = saveAsPath.split("\\");
+        folderPath.pop();
+        folderPath = folderPath.join("\\");
+        // console.log('folderPath', folderPath);
 
         const files = yield select(state => state.settings.files);
         
@@ -547,17 +727,45 @@ export function* saveCurrentFile({ payload }) {
             if(currentFile){
                 yield closeTmpFile(currentFile);
             }
+
+            const fs = yield select(state => state.fs);
+            
+            // console.log('fs', fs);
+
+            if(fs && typeof typeof fs.rootPath !== 'undefined' && fs.rootPath === null){
+                const { error } = yield putAndTake(
+                    fsActions.treeOpenFolder(folderPath)
+                );
+    
+                if (error) {
+                    console.log('error')
+    
+                    yield put(wbActions._openFile_Failure(folderPath, error));
+                    return;
+                }   
+    
+                // report success
+                yield put(wbActions._openFile_Success(folderPath));
+            } else {
+                console.log('rootPath is good');
+            }
+
             yield openFile({ payload: { path: saveAsPath } });
         }
     } else {
+        const files = yield select(state => state.fs.files);
+
+        // console.log('files', files);
     
         if (!activeFile || !files.hasOwnProperty(activeFile)) {
             return;
         }
 
-        const files = yield select(state => state.fs.files);
-
         const currentFile = files[activeFile];
+
+        // console.log('currentFile', currentFile);
+        // console.log('prompt', prompt);
+
         // prompt user with "Save As" dialog before saving the file
         if (prompt) {
             const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, activeFile]);
@@ -589,6 +797,27 @@ export function* saveCurrentFile({ payload }) {
             if (!error) {
                 yield put(tabActions.setTabTouched(activeFile, false));
             }
+        } else {
+            const tabsFiles = yield select(state => state.tabs);
+
+            const { list } = tabsFiles;
+
+            if(list && Array.isArray(list)){
+                const tab = list.find(x => x.key === activeFile);
+
+                if(tab && typeof tab.touched !== 'undefined' && tab.touched){
+                    const { error } = yield putAndTake(
+                        fsActions.saveFile(activeFile, currentFile.content)
+                    );
+                    if (!error) {
+                        yield put(tabActions.setTabTouched(activeFile, false));
+                    }
+                }
+                // console.log('tab', tab);
+            }
+            
+            // console.log('tabsFiles', tabsFiles);
+
         }
     }
 }

@@ -42,6 +42,25 @@ export default class ElectronService extends ServiceBase {
         return newSettings;
     }
 
+    removeFile(key, name){
+        const settings = appSettings.get('appSettings');
+
+        const newSettings = { ...settings };
+        if(key && name){
+            let filesCopy = { ... newSettings.files };
+            
+            delete filesCopy[key+name];
+
+            newSettings.files = filesCopy;
+        } else {
+            return null;
+        }
+
+        appSettings.set('appSettings', newSettings);
+        
+        return newSettings;
+    }
+
     updateFileContent(key, name, content){
         const settings = appSettings.get('appSettings');
 
@@ -81,6 +100,9 @@ export default class ElectronService extends ServiceBase {
 
     clearSettings() {
         appSettings.deleteAll();
+
+        const settings = appSettings.get('appSettings');
+        return settings;
     }
 
     getSettings() {

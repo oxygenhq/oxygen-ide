@@ -12,6 +12,7 @@ import * as ActionTypes from './types';
 
 const defaultState = {
   isLoading: false,
+  initialized: false
 };
 
 export default (state = defaultState, action, dispatch) => {
@@ -19,6 +20,13 @@ export default (state = defaultState, action, dispatch) => {
 
   switch (action.type) {
     
+    case success(ActionTypes.WB_INIT): {
+      return {
+        ...state,
+        initialized: true
+      }
+    }
+
     case ActionTypes.WB_SET_JAVA_ERROR:
       return {
         ...state,
