@@ -10,7 +10,7 @@
 /* eslint-disable react/no-unused-state */
 import { Spin, Icon, Select, Input, message } from 'antd';
 import React, { Component } from 'react';
-import { FaMicrophone } from 'react-icons/lib/fa';
+import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/lib/fa';
 import {
   MdUndo,
   MdRedo,
@@ -22,6 +22,7 @@ import '../../css/toolbar.scss';
 
 import * as Controls from './controls';
 import NoChromeDialog from './NoChromeDialog';
+import WorkingChromeDialog from './WorkingChromeDialog';
 import { type DeviceInfo } from '../../types/DeviceInfo';
 import { type BrowserInfo } from '../../types/BrowserInfo';
 
@@ -46,17 +47,9 @@ const { Option } = Select;
 export default class Toolbar extends Component<Props> {
   constructor(props){
     super(props);
-
-    let canRecord;
-
-    if(!props.isChromeExtensionEnabled){
-      canRecord = false;
-    } else {
-      canRecord = true;
-    }
-
     this.state = {
-      canRecord: false
+      canRecord: false,
+      showWorkingChromeDialog: false
     }
   }
 
@@ -92,10 +85,10 @@ export default class Toolbar extends Component<Props> {
         this.setState(newState);
       }
     } else {
-      if(typeof this.state.showNoChromeDialog === 'undefined'){
-        newState.showNoChromeDialog = true;
-        this.setState(newState);
-      }
+      // if(typeof this.state.showNoChromeDialog === 'undefined'){
+      //   newState.showNoChromeDialog = true;
+      //   this.setState(newState);
+      // }
     }
 
     if(waitChromeExtension){
@@ -106,10 +99,15 @@ export default class Toolbar extends Component<Props> {
     }
   }
 
-  
   hideNoChromeDialog = () => {
     this.setState({
       showNoChromeDialog: false
+    });
+  }
+
+  hideWorkingChromeDialog = () => {
+    this.setState({
+      showWorkingChromeDialog: false
     });
   }
 
@@ -159,6 +157,20 @@ export default class Toolbar extends Component<Props> {
     return classNames;
   }
 
+  showNotWorkingOxygenExtensionModal = () => {
+    this.setState({
+      showNoChromeDialog: true
+    });
+  }
+
+  showWorkingOxygenExtensionModal = () => {
+    this.setState({
+      showWorkingChromeDialog: true
+    }, () => {
+      this.handleClickEvent(Controls.TEST_RECORD);
+    });
+  }
+
   render() {
     const {
       testMode, 
@@ -168,18 +180,28 @@ export default class Toolbar extends Component<Props> {
       emulators, 
       stepDelay,
       isChromeExtensionEnabled,
-      waitChromeExtension
+      waitChromeExtension,
+      showRecorderMessage,
+      changeShowRecorderMessageValue
     } = this.props;
 
     const { 
       canRecord,
-      showNoChromeDialog
+      showNoChromeDialog,
+      showWorkingChromeDialog
     } = this.state;
-
     return (
       <div className="appTollbar">
         { typeof showNoChromeDialog !== 'undefined' && showNoChromeDialog && 
           <NoChromeDialog hide={this.hideNoChromeDialog}/>
+        }
+
+        { showWorkingChromeDialog && this._isSelected(Controls.TEST_RECORD) &&
+          <WorkingChromeDialog 
+            changeShowRecorderMessageValue={changeShowRecorderMessageValue}
+            showRecorderMessage={showRecorderMessage}
+            hide={this.hideWorkingChromeDialog}
+          />
         }
 
         { this._isVisible(Controls.NEW_FILE) && (
@@ -208,46 +230,6 @@ export default class Toolbar extends Component<Props> {
         />
 
         <div className="separator" />
-          {/*
-        <MdContentCut
-          className="control button"
-          style={ getOpacity(this._isEnabled(Controls.CUT)) }
-          onClick={ () => ::this.handleClickEvent(Controls.CUT) }
-          title="Cut"
-        />
-        <Icon
-          className="control button"
-          style={ getOpacity(this._isEnabled(Controls.COPY)) }
-          onClick={ () => ::this.handleClickEvent(Controls.COPY) }
-          title="Copy"
-          type="copy"
-        />
-        <span title="Paste" className="control button">
-          <MdContentPaste
-            style={ getOpacity(this._isEnabled(Controls.PASTE)) }
-            onClick={ () => ::this.handleClickEvent(Controls.PASTE) }
-          />
-        </span>
-
-        <div className="separator" />
-          
-        <span title="Undo" className="control button">
-          <MdUndo 
-            style={ getOpacity(this._isEnabled(Controls.UNDO)) }
-            onClick={ () => ::this.handleClickEvent(Controls.UNDO) }
-          />
-        </span>
-        <span title="Redo" className="control button">
-          <MdRedo
-            style={ getOpacity(this._isEnabled(Controls.REDO)) }
-            onClick={ () => ::this.handleClickEvent(Controls.REDO) }
-            style={{ marginRight: 0 }}
-          />
-        </span>
-        
-        <div className="separator" />
-        */}
-        {/* modeResp */}
         <span className={testMode === 'web' ? 'control selectable active' : 'control selectable'}>
           <Icon
             style={ getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)) }
@@ -315,7 +297,7 @@ export default class Toolbar extends Component<Props> {
           <button
             onClick={ () => ::this.handleClickEvent(Controls.TEST_RUN) }
             className={ this._getControlClassNames(Controls.TEST_RUN, 'button') }
-            enabled={ this._isEnabled(Controls.TEST_RUN) }
+            disabled={ !this._isEnabled(Controls.TEST_RUN) }
           >
             <Icon
               title="Run Test"
@@ -367,22 +349,34 @@ export default class Toolbar extends Component<Props> {
 
         <div className="separator" />
 
-        { waitChromeExtension && 
+        { /* waitChromeExtension &&
           <span style={{marginLeft:'10px'}}>
             <Spin indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} />
-            <span style={{marginLeft:'10px'}}>Waiting for extension</span>
+            <span className="ext-wait-message">Waiting for extension</span>
+          </span>
+           */
+        }
+        { waitChromeExtension &&
+          <span
+            style={ getOpacity(false) }
+            className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
+            title="Record"
+          >
+            <FaMicrophone
+              style={{ marginRight: 0 }}
+            />
           </span>
         }
 
         { !waitChromeExtension && !canRecord && 
           <span
-            className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
+            className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable not-work active' : 'control selectable not-work' }
             title="Record"
           >
-            <FaMicrophone
-              style={{ marginRight: 0, color: 'darkred', cursor: 'not-allowed' }}
+            <FaMicrophoneSlash
+              style={{ marginRight: 0 }}
+              onClick={ this.showNotWorkingOxygenExtensionModal }
             />
-            <p className="ext-err-message">Oxygen Chrome extension is not installed or is disabled</p>
           </span>}
 
         { !waitChromeExtension && canRecord &&
@@ -392,7 +386,7 @@ export default class Toolbar extends Component<Props> {
           >
             <FaMicrophone
               style={{ marginRight: 0 }}
-              onClick={ () => ::this.handleClickEvent(Controls.TEST_RECORD) }
+              onClick={ this.showWorkingOxygenExtensionModal }
             />
           </span>
         }

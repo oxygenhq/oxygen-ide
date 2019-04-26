@@ -8,7 +8,6 @@ export default class NoChromeDialog extends Component<Props> {
   }
 
   handleOk = () => {
-    this.processLink();
     this.handleCancel();
   }
 
@@ -27,20 +26,22 @@ export default class NoChromeDialog extends Component<Props> {
     electron.shell.openExternal(docsUrl);
   }
 
-  render(){    
-    return null;
+  render(){
     
     return (
       <Modal
-        title="Oxygen Chrome Extension is not installed or is disabled"
+        title="Unable to connect to Oxygen Chrome extension."
         visible={true}
-        onOk={this.handleOk}
-        okText={'Yes'}
         onCancel={this.handleCancel}
-        cancelText={'No'}
+        footer={
+          <Button
+            type="primary"
+            onClick={this.handleOk}
+          >Ok</Button>
+        }
       >
-        <p>In order to record web pages, Oxygen Chrome Extension must be installed!</p>
-        <p>Do you want to open a troubleshooting guide to solve this issue?</p>
+        <p>In order to record web sites Chrome must be running and Oxygen extension for Chrome installed & enabled.</p>
+        <p>Please see the <a onClick={this.processLink}>Troubleshooting Guide</a> for more information.</p>
       </Modal>
     )
   }

@@ -36,6 +36,7 @@ export default (state = defaultState, action, dispatch) => {
         ...state, 
         //$FlowFixMe
         active: key,
+        activeTitle: null
       };
     
     // TABS_SET_TOUCHED
@@ -75,6 +76,7 @@ export default (state = defaultState, action, dispatch) => {
         list: tabListClone,
         //$FlowFixMe
         active: key,
+        activeTitle: null
       };
     
     // TABS_REMOVE
@@ -89,11 +91,22 @@ export default (state = defaultState, action, dispatch) => {
       if (newActiveTabKey === key) {
         newActiveTabKey = newListAfterRemove.length > 0 ? newListAfterRemove[newListAfterRemove.length - 1].key : null;
       }
+
+      let activeTitle;
+
+      if(newActiveTabKey === "unknown"){
+        activeTitle = newListAfterRemove[newListAfterRemove.length - 1].title;
+      } else {
+        activeTitle = null
+      }
+
+      
       return { 
         ...state, 
         list: newListAfterRemove,
         // when the tab is removed, set the last tab in the list as active
         active: newActiveTabKey,
+        activeTitle: activeTitle
       };
 
     // TABS_RENAME
@@ -130,8 +143,8 @@ export default (state = defaultState, action, dispatch) => {
 
     case 'FROM_CACHE':
     
-      console.log('defaultState', defaultState);
-      console.warn('FROM_CACHE in tabs', cache.tabs);
+      // console.log('defaultState', defaultState);
+      // console.warn('FROM_CACHE in tabs', cache.tabs);
 
       return {
         ...defaultState,

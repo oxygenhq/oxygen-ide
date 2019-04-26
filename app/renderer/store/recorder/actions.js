@@ -11,7 +11,7 @@ import { success, failure } from '../../helpers/redux';
 
 // stop wait chrome extension
 export const stopWaitChromeExtension = () => ({
-  type: ActionTypes.STOP_WAIT_CHROME_EXTENSION,
+  type: ActionTypes.RECORDER_STOP_WAIT_CHROME_EXTENSION,
   payload: null,
 });
 

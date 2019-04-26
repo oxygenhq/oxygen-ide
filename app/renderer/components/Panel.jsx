@@ -13,7 +13,7 @@ import ScrollContainer from './ScrollContainer';
 import '../css/panel.scss';
 
 type Props = {
-  header: string,
+  header: string|React.Node,
   scroller?: boolean,
   scrollWrapperClass?: string,
   scrollRefresh?: boolean,

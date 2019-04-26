@@ -7,7 +7,7 @@ export const JAVA_BAD_VERSION = 'JAVA_BAD_VERSION';
 export default class JavaService {
 
   constructor(store) {
-    console.log('~JavaService elive');
+    // console.log('~JavaService elive');
   }
   
   javaversion(callback) {

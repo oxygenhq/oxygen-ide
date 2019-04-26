@@ -286,7 +286,7 @@ export default class Workbench extends Component<Props> {
   }
 
   render() {
-    const { test, settings, dialog, javaError, initialized } = this.props;
+    const { test, settings, dialog, javaError, initialized, changeShowRecorderMessageValue } = this.props;
     const { runtimeSettings } = test;
     // sidebars state
     const leftSidebarSize = settings.sidebars.left.size;
@@ -295,6 +295,8 @@ export default class Workbench extends Component<Props> {
     const rightSidebarVisible = settings.sidebars.right.visible;
     const loggerVisible = settings.logger.visible;
     const showLanding = settings.showLanding;
+    const showRecorderMessage = settings.showRecorderMessage;
+
 
     if(!initialized){
       return (
@@ -348,6 +350,8 @@ export default class Workbench extends Component<Props> {
           devices={ test.devices }
           browsers={ test.browsers }
           emulators={ test.emulators }
+          showRecorderMessage={ showRecorderMessage }
+          changeShowRecorderMessageValue={ changeShowRecorderMessageValue }
           controlsState={ this.getToolbarControlsState() } 
           onButtonClick={ ::this.handleToolbarButtonClick }
           onValueChange={ ::this.handleToolbarValueChange } />

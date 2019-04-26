@@ -20,7 +20,7 @@ export default class JavaDialog extends PureComponent {
       javaError
     } = this.props;
     
-    console.log('javaError', javaError);
+    // console.log('javaError', javaError);
 
     let message;
 

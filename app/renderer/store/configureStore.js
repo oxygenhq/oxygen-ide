@@ -75,7 +75,27 @@ const configureStore = (initialState?: counterStateType) => {
   const composeEnhancers = compose;
   /* eslint-enable no-underscore-dangle */
 
+  const ignoreTypes = [
+    'MAIN_SERVICE_EVENT',
+    'RESET'
+  ] 
+
   async function updateCache(cache, action) {
+    if(action && ignoreTypes.includes(action.type)){
+      return;
+    }
+
+    if(action && action.type.startsWith('RECORDER_')){
+      return;
+    }
+
+    if(action && action.type.startsWith('TEST_')){
+      return;
+    }
+
+    if(action && action.type.startsWith('LOGGER_')){
+      return;
+    }
 
     const state = { ...cache };
 
@@ -88,8 +108,10 @@ const configureStore = (initialState?: counterStateType) => {
     delete state.recorder;
     delete state.wb;
 
-    console.log('state', state);
-    console.log('---');
+    // console.log('---');
+    // console.log('action', action);
+    // console.log('state', state);
+    // console.log('---');
 
     const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [state] );
 

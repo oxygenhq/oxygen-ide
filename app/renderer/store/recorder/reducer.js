@@ -23,7 +23,7 @@ export default (state = defaultState, action) => {
   const { path, step, value, cache, name } = payload;
 
   switch (action.type) {
-    case ActionTypes.STOP_WAIT_CHROME_EXTENSION : {
+    case ActionTypes.RECORDER_STOP_WAIT_CHROME_EXTENSION : {
       return {
         ...state,
         waitChromeExtension: false

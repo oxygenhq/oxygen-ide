@@ -31,8 +31,8 @@ export default class Settings extends PureComponent<Props> {
             >
                 {() => (
                     <PropertyList>
-                        <PropertyItem key="iterations" label="Iterations" value="0" type="number" editable />
-                        <PropertyItem key="params-file" label="Parameter File" value="" type="string" editable />
+                        <PropertyItem base="iterations" label="Iterations" value="0" type="number" editable />
+                        <PropertyItem base="params-file" label="Parameter File" value="" type="string" editable />
                     </PropertyList>
                 )}
             </ScrollContainer>
