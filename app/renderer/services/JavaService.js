@@ -40,7 +40,7 @@ export default class JavaService {
         // do nothing, java version is correct;
       } else if(version && typeof version === 'string' && !version.startsWith('1.8')){
         const message = `Java 8 is required to run test, but currently installed version is ${version}.
-        “Please install the JDK v1.8 `;        
+        Please install the JDK v1.8 : `;        
         store.dispatch({
           type: JAVA_BAD_VERSION,
           payload: {
@@ -51,7 +51,7 @@ export default class JavaService {
         // do nothing, java version is correct;
       } else if(version && typeof version === 'boolean' && !version ){
         const message = `“Java installation was either not found.
-        “Please install the JDK v1.8 ”`;
+        Please install the JDK v1.8 : `;
         store.dispatch({
             type: JAVA_NOT_FOUND,
             message: message

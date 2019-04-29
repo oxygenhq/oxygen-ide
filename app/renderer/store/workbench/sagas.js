@@ -167,11 +167,23 @@ export function* handleJavaNotFound(inner){
 }
 
 export function* handleJavaBadVersion({ payload }){
+
+    const { message, version } = payload;
+
     if(payload.message){
-        yield put(wbActions.setJavaError({
-            reason: 'bad-version',
-            message: payload.message
-        }));
+        if(version){
+            const versionInt = parseInt(version);
+
+            if(versionInt < 8 || versionInt > 10){
+                yield put(wbActions.setJavaError({
+                    reason: 'bad-version',
+                    message: message
+                }));
+            } else {
+                // ignore, version is correct
+                return;
+            }
+        }
     } else {
         yield put(wbActions.setJavaError());
     }
