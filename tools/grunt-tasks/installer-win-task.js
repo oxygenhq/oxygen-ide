@@ -80,6 +80,7 @@ module.exports = function(grunt) {
                             [ '-arch', arch,
                               '-dVersion=' + version,
                               '-ext', 'WixFirewallExtension',
+                              '-ext', 'WixUtilExtension',
                               '-o', wixRoot + 'config.wixobj',
                               wixRoot + 'config.wxs'],
                             { stdio : 'inherit'});

@@ -110,7 +110,9 @@ export default class UpdateService extends ServiceBase {
     }
 
     _checkForUpdate(notifyIfNoUpdate) {
+
         const self = this;
+
         return new Promise(function(resolve, reject) {
             getLatestReleaseDetails((status, response) => {
                 if (status == 200 && response) {
