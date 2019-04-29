@@ -49,11 +49,18 @@ export function* handleServiceEvents({ payload }) {
             value: event.value || null,
             timestamp: event.timestamp || (new Date()).getTime(),
         };
-        yield put(recorderActions.addStep(step));
 
         const recorder = yield select(state => state.recorder);
 
-        const { activeFile, activeFileName } = recorder;
+        const { activeFile, activeFileName, isRecording } = recorder;
+        
+        if(!isRecording){
+            // ignore events when recording not started
+            return;
+        }
+
+        yield put(recorderActions.addStep(step));
+
         
         if(activeFile === 'unknown'){
             
