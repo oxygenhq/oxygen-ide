@@ -701,7 +701,10 @@ export function* saveCurrentFile({ payload }) {
     // console.log('activeFileName', activeFileName);
 
     if(activeFile === "unknown"){
-        const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, null]);
+        const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, null, [ 
+            { name: 'JavaScript file', extensions:['js'] },
+            { name: 'All Files', extensions: ['*'] } 
+        ] ]);
     
         if (!saveAsPath) {
             return; // Save As dialog was canceled by user
