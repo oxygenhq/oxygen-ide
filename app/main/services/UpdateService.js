@@ -110,23 +110,32 @@ export default class UpdateService extends ServiceBase {
     }
 
     _checkForUpdate(notifyIfNoUpdate) {
+        const self = this;
         return new Promise(function(resolve, reject) {
             getLatestReleaseDetails((status, response) => {
                 if (status == 200 && response) {
                     var result = parseResponse(response);
                     if (isNewer(result.version, pkgInfo.version)) {
                         var url = getDownloadUrl(result.downloads);
-                        this.notify({
-                            type: UPDATE_CHECK,
-                            version: result.version,
-                            url: url
-                        });
+                        if(self && self.notify){
+                            self.notify({
+                                type: UPDATE_CHECK,
+                                version: result.version,
+                                url: url
+                            });
+                        } else {
+                            console.log('self.notify is not exist');
+                        }
                         console.log('201');
                         resolve(201);
                     } else if (notifyIfNoUpdate) {
-                        this.notify({
-                            type: UPDATE_CHECK
-                        });
+                        if(self && self.notify){
+                            self.notify({
+                                type: UPDATE_CHECK
+                            });
+                        } else {
+                            console.log('self.notify is not exist');
+                        }
                         console.log('202');
                         resolve(202);
                     } else {
