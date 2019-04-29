@@ -70,7 +70,7 @@ export default class WorkingChromeDialog extends Component {
 
     return (
       <Modal
-        title="Record started"
+        title="Recording started"
         visible={true}
         onCancel={this.handleCancel}
         footer={
