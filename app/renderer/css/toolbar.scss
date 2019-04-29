@@ -25,6 +25,23 @@
   opacity: 0.5;
   pointer-events: none;
 }
+
+.appTollbar .control.loader-wrap {
+  position: relative;
+}
+
+.appTollbar .control.loader-wrap .ant-spin-spinning {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+}
+
+.appTollbar .control.loader-wrap .loader-wrap-inner {
+  padding-top: 3px;
+}
+
 /* Patch Ant Select component, to narrow down a bit the component height to be in match with other toolbar controls */
 .appTollbar .control.select .ant-select-selection--single {
   height: 30px !important;
@@ -81,6 +98,11 @@
 
 .appTollbar .control.selectable.not-work:hover {
   color: $danger;
+}
+
+
+.appTollbar .control.selectable.loader-wrap:hover {
+  color: rgba(0, 0, 0, 0.65);
 }
 
 .dont-show-again-contol {

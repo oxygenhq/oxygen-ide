@@ -49,17 +49,23 @@ export default class Toolbar extends Component<Props> {
     super(props);
     this.state = {
       canRecord: false,
-      showWorkingChromeDialog: false
+      showWorkingChromeDialog: false,
+      checkExtension: false
     }
   }
 
-  componentDidMount() {
-    var intervalId = setInterval(this.timer, 2000);
-    this.setState({intervalId: intervalId});
+  componentWillUnmount() {
+    if(this.state.intervalId){
+      clearInterval(this.state.intervalId);
+    }
   }
 
-  componentWillUnmount() {
-    clearInterval(this.state.intervalId);
+  checkExtension = () => {
+    var intervalId = setInterval(this.timer, 2000);
+    this.setState({
+      intervalId: intervalId,
+      checkExtension: true,
+    });
   }
 
   timer = () => {
@@ -94,7 +100,11 @@ export default class Toolbar extends Component<Props> {
     if(waitChromeExtension){
       // extension not finded
       if(stopWaitChromeExtension){
-        stopWaitChromeExtension();
+        this.setState({
+          checkExtension: false
+        }, () => {
+          stopWaitChromeExtension();
+        });
       }
     }
   }
@@ -188,7 +198,8 @@ export default class Toolbar extends Component<Props> {
     const { 
       canRecord,
       showNoChromeDialog,
-      showWorkingChromeDialog
+      showWorkingChromeDialog,
+      checkExtension
     } = this.state;
     return (
       <div className="appTollbar">
@@ -356,8 +367,21 @@ export default class Toolbar extends Component<Props> {
           </span>
            */
         }
-        { waitChromeExtension &&
+        { checkExtension &&
           <span
+            style={ getOpacity(false) }
+            className={ 'control selectable loader-wrap' }
+            title="Conecting to chrome extension"
+          >
+            <FaMicrophone
+              style={{ marginRight: 0 }}
+            />
+            <Spin indicator={<Icon type="loading" className="loader-wrap-inner" spin />}/>
+          </span>
+        }
+        { !checkExtension && waitChromeExtension &&
+          <span
+            onClick={ this.checkExtension }
             style={ getOpacity(false) }
             className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
             title="Record"
@@ -368,10 +392,10 @@ export default class Toolbar extends Component<Props> {
           </span>
         }
 
-        { !waitChromeExtension && !canRecord && 
+        { !checkExtension && !waitChromeExtension && !canRecord && 
           <span
             className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable not-work active' : 'control selectable not-work' }
-            title="Record"
+            title="Chrome extension not finded"
           >
             <FaMicrophoneSlash
               style={{ marginRight: 0 }}
@@ -379,7 +403,7 @@ export default class Toolbar extends Component<Props> {
             />
           </span>}
 
-        { !waitChromeExtension && canRecord &&
+        { !checkExtension && !waitChromeExtension && canRecord &&
           <span
             className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
             title="Record"
