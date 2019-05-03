@@ -49,11 +49,17 @@ export function* handleServiceEvents({ payload }) {
             value: event.value || null,
             timestamp: event.timestamp || (new Date()).getTime(),
         };
-        yield put(recorderActions.addStep(step));
 
         const recorder = yield select(state => state.recorder);
 
-        const { activeFile, activeFileName } = recorder;
+        const { activeFile, activeFileName, isRecording } = recorder;
+
+        if(!isRecording){
+            //ignore messages from RecorderService because recording process not started
+            return;
+        }
+        
+        yield put(recorderActions.addStep(step));
         
         if(activeFile === 'unknown'){
             
@@ -136,7 +142,8 @@ export function* startRecorder({ payload }) {
 }
 
 export function* stopRecorder({ payload }) {    
-    yield call(services.mainIpc.call, 'RecorderService', 'stop', []);
+    // don't stop recorder, just change isRecording fo false and scip all messages from recorder
+    // yield call(services.mainIpc.call, 'RecorderService', 'stop', []);
 }
 
 export function* startRecorderWatcher({}){
