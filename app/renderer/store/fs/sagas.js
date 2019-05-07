@@ -35,6 +35,7 @@ export default function* root() {
         takeLatest(ActionTypes.FS_SAVE_FILE_AS, saveFileContentAs),
         takeLatest(ActionTypes.FS_TREE_OPEN_FOLDER, treeOpenFolder),
         takeLatest(ActionTypes.FS_TREE_LOAD_NODE_CHILDREN, treeLoadNodeChildren),
+        takeLatest('FROM_CACHE', fromCache),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents)
     ]);
 }
@@ -167,6 +168,15 @@ export function* treeOpenFolder({ payload }) {
     }
     const folder = yield select(state => state.fs.files[path]);  
     yield put(fsActions._treeOpenFolder_Success(path, folder.children));
+}
+
+export function* fromCache({ payload }) {
+    const { cache } = payload;
+    const { fs } = cache;
+    const { rootPath } = fs;
+    if(rootPath){
+        yield call(services.mainIpc.call, 'FileService', 'createWatchOnFilesChannel', [rootPath]);
+    }
 }
 
 export function* watchOnFiles(path) {

@@ -929,13 +929,22 @@ export function* showRenameFolderDialog({ payload }) {
     }
     // folder information might not be pre-fetched if the selected folder was not previously expanded in the tree
     // in that case, fetch folder info before proceeding
-    const treeActiveFile = yield getOrFetchFileInfo(activeNodePath);
-    // ignore any file entry which is not folder
-    if (!treeActiveFile || treeActiveFile.type !== 'folder') {
-        return;
+    const { response, error } = yield getOrFetchFileInfo(activeNodePath);
+
+    if(response){
+        const treeActiveFile = response;
+        // ignore any file entry which is not folder
+        if (!treeActiveFile || treeActiveFile.type !== 'folder') {
+            return;
+        }
+        const { type, path, name } = treeActiveFile;
+        yield put(wbActions.showDialog('DIALOG_FILE_RENAME', { type, path, name }));
     }
-    const { type, path, name } = treeActiveFile;
-    yield put(wbActions.showDialog('DIALOG_FILE_RENAME', { type, path, name }));
+
+    if(error && error.message){
+        alert(error.message);
+        yield put(fsActions.deleteFile(activeNodePath));
+    }
 }
 
 export function* showRenameFileDialog({ payload }) {   
@@ -945,13 +954,24 @@ export function* showRenameFileDialog({ payload }) {
     }
     // folder information might not be pre-fetched if the selected folder was not previously expanded in the tree
     // in that case, fetch folder info before proceeding
-    const treeActiveFile = yield getOrFetchFileInfo(activeNodePath);
-    // ignore any file entry which is not folder
-    if (!treeActiveFile || treeActiveFile.type !== 'file') {
-        return;
+    
+    const { response, error } = yield getOrFetchFileInfo(activeNodePath);
+
+    if(response){
+        const treeActiveFile = response;
+
+        // ignore any file entry which is not folder
+        if (!treeActiveFile || treeActiveFile.type !== 'file') {
+            return;
+        }
+        const { type, path, name } = treeActiveFile;
+        yield put(wbActions.showDialog('DIALOG_FILE_RENAME', { type, path, name }));
     }
-    const { type, path, name } = treeActiveFile;
-    yield put(wbActions.showDialog('DIALOG_FILE_RENAME', { type, path, name }));
+
+    if(error && error.message){
+        alert(error.message);
+        yield put(fsActions.deleteFile(activeNodePath));
+    }
 }
 
 export function* showDeleteFileDialog({ payload }) {
@@ -962,16 +982,24 @@ export function* showDeleteFileDialog({ payload }) {
     }
     // folder information might not be pre-fetched if the selected folder was not previously expanded in the tree
     // in that case, fetch folder info before proceeding
-    const treeActiveFile = yield getOrFetchFileInfo(activeNodePath);
+    const { response, error } = yield getOrFetchFileInfo(activeNodePath);
     
-    if (!treeActiveFile) {
-        return;
+    if(response){
+        const treeActiveFile = response;
+        if (!treeActiveFile) {
+            return;
+        }
+        //yield call(delay, 500)
+        if (!confirm(`Are you sure you want to delete '${treeActiveFile.name}'?`)) {
+            return;
+        }
+        yield put(fsActions.deleteFile(activeNodePath));
     }
-    //yield call(delay, 500)
-    if (!confirm(`Are you sure you want to delete '${treeActiveFile.name}'?`)) {
-        return;
+
+    if(error && error.message){
+        alert(error.message);
+        yield put(fsActions.deleteFile(activeNodePath));
     }
-    yield put(fsActions.deleteFile(activeNodePath));
 }
 
 export function* showContextMenu({ payload }) {
@@ -994,16 +1022,17 @@ export function* getOrFetchFileInfo(path) {
     const files = yield select(state => state.fs.files);
     let fileInfo = files.hasOwnProperty(path) ? files[path] : null;    
     if (fileInfo) {
-        return fileInfo;
+        return { response: fileInfo, error: null };
     }
+
+
     const { response, error } = yield putAndTake(
         fsActions.fetchFileInfo(path)
     );
     if (error || !response) {
         console.warn(`Cannot fetch file information: ${path}`, error);
-        return null;
     }
-    return response;
+    return { response, error };
 }
 
 function getUnsavedFiles(files) {
