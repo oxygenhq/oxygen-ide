@@ -9,6 +9,7 @@
 import AppiumService from './AppiumService';
 import SeleniumService from './SeleniumService';
 import FileService from './FileService';
+import AnalyticsService from './AnalyticsService';
 import TestRunnerService from './TestRunnerService';
 import ElectronService from './ElectronService';
 import MenuService from './MenuService';
@@ -20,6 +21,7 @@ export default {
     AppiumService,
     SeleniumService,
     FileService,
+    AnalyticsService,
     TestRunnerService,
     ElectronService,
     MenuService,

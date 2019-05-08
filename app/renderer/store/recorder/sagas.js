@@ -123,6 +123,7 @@ export function* startRecorder({ payload }) {
         if(resp && resp.key && resp.name){
             const { key, name } = resp;
             
+            yield call(services.mainIpc.call, 'AnalyticsService', 'recStart', []);
             yield call(services.mainIpc.call, 'RecorderService', 'start', []);
             yield put(recorderActions._startRecorder_Success(key, name));
         } else {
@@ -130,12 +131,21 @@ export function* startRecorder({ payload }) {
             return;
         }
     } else {
+        yield call(services.mainIpc.call, 'AnalyticsService', 'recStart', []);
         yield call(services.mainIpc.call, 'RecorderService', 'start', []);
         yield put(recorderActions._startRecorder_Success(activeFile));
     }
 }
 
 export function* stopRecorder({ payload }) {    
+    let recorded_items_count = 0;
+    const recorder = yield select(state => state.recorder);
+
+    if(recorder && recorder.steps && Array.isArray(recorder.steps)){
+        recorded_items_count = recorder.steps.length;
+    }
+
+    yield call(services.mainIpc.call, 'AnalyticsService', 'recStop', [recorded_items_count]);
     yield call(services.mainIpc.call, 'RecorderService', 'stop', []);
 }
 

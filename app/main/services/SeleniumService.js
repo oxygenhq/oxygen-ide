@@ -97,6 +97,9 @@ export default class SeleniumService extends ServiceBase {
     }
 
     _emitStartedEvent(port) {
+
+        console.log('_emitStartedEvent', port);
+
         this.notify({
             type: ON_SELENIUM_STARTED,
             port: port,
@@ -128,6 +131,9 @@ export default class SeleniumService extends ServiceBase {
     }
 
     _startProcess(port) {
+
+        console.log('_startProcess', port);
+
         // initialize Selenium server
         const selArgs = [selSettings.jar].concat(selSettings.args);
     

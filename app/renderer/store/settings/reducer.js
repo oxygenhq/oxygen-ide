@@ -23,6 +23,8 @@ const defaultAppSettings = {
 };
 
 const defaultState = {
+  uuid: null,
+  first: true,
   showRecorderMessage: null,
   cacheUsed: false,
   showLanding: false,
@@ -48,10 +50,24 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { value, target, settings, zoom, cache } = payload;
+  const { value, target, settings, zoom, cache, uuid } = payload;
   switch (action.type) {
     
-    
+    // // FIRST OPEN
+    // case types.FIRST_OPEN: {
+    //   return { 
+    //     ...state,
+    //     first: false
+    //   }
+    // }
+
+    // CREATE USER
+    case types.CREATE_USER: {
+      return { 
+        ...state,
+        uuid: uuid
+      }
+    }
 
     // SHOW LANDING
     case types.SHOW_RECORDER_MESSAGE_VALUE: {

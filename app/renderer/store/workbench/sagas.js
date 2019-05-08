@@ -6,6 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
+import uuidv4 from'uuid/v4';
 import { all, put, select, takeLatest, take, call, fork } from 'redux-saga/effects';
 import { putAndTake } from '../../helpers/saga';
 import pathHelper from 'path';
@@ -238,8 +239,19 @@ export function* initialize() {
 
     if(appSettings && appSettings.cache){
         yield put(wbActions.restoreFromCache(appSettings.cache));
+
+        if(appSettings.cache.settings && appSettings.cache.settings.uuid){
+            yield call(services.mainIpc.call, 'AnalyticsService', 'setUser', [appSettings.cache.settings.uuid]);
+        }
+
     } else {
         yield put(settingsActions.changeCacheUsed(true));
+
+        const uuid = uuidv4();
+
+        yield call(services.mainIpc.call, 'AnalyticsService', 'createUser', [uuid]);
+        yield put(settingsActions.createUser(uuid));
+        yield put(settingsActions.firstOpen());
         if(appSettings){
             appSettings.cacheUsed = true;
         }
@@ -285,6 +297,7 @@ export function* initialize() {
     //     }
     // }
     // indicate successful end of initialization process
+    
     yield put({
         type: success(ActionTypes.WB_INIT),
     });
@@ -594,7 +607,7 @@ export function* closeFile({ payload }) {
         }
     }
     yield put(tabActions.removeTab(path, name));
-    yield put(editorActions.closeFile(path));
+    yield put(editorActions.closeFile(path, false, name));
     yield put(fsActions.resetFileContent(path));
     yield put(testActions.removeBreakpoints(path));
     // retrieve new active tab, if there are more files open

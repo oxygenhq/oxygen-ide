@@ -8,6 +8,25 @@
  */
 import * as types from './types';
 
+/* Create User  */
+export const createUser = (uuid) => {
+  return {
+    type: types.CREATE_USER,
+    payload: { 
+      uuid
+    }
+  };
+}
+
+/* First Open  */
+export const firstOpen = () => {
+  return {
+    type: types.FIRST_OPEN,
+    payload: null
+  };
+}
+
+
 
 /* Change Cache Used  */
 export const changeShowRecorderMessageValue = (value) => {

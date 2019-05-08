@@ -137,21 +137,44 @@
   background: #f1f1f1;
   height: 100%;
   width: 100%;
-  text-align: center;
+  position: relative;
 }
 
 .landing-inner {
+  left: 0;
+  right: 0;
+  top: 0;
+  position: absolute;
+  padding: 20px;
+}
+
+.landing-title {
+  font-size: 2em;
+}
+
+.landing-text {
+  font-size: 1.1em;
+}
+
+.initializing-container {
+  background: #f1f1f1;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+
+.initializing-inner {
   left: 0;
   right: 0;
   top: 45%;
   position: absolute;
 }
 
-.landing-title {
+.initializing-title {
   color: darkgray;
 }
 
-.landing-text {
+.initializing-text {
   font-size: 22px;
   color: darkgray;
   font-style: italic;

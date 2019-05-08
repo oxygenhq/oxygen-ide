@@ -21,6 +21,7 @@ import '../../css/editor.scss';
 import SupportedExtensions from '../../helpers/file-extensions';
 import editorSubjects from '../../store/editor/subjects';
 import fileSubjects from '../../store/fs/subjects';
+import Landing from '../../components/Landing';
 
 type Props = {
   editorReadOnly: boolean,
@@ -119,6 +120,10 @@ export default class TextEditor extends Component<Props> {
       activeFileName
     } = this.props;
     const self = this;
+
+    if(activeFile === 'welcome'){
+      return (<Landing/>);
+    }
 
     return (
       <Fragment>
