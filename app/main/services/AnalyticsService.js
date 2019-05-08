@@ -42,35 +42,6 @@ export default class AnalyticsService extends ServiceBase {
         });
     }
 
-    recStop(recorded_items_count){
-
-        console.log('\n\n\n\n');
-        console.log('recStop', this.uuid);
-        console.log('\n\n\n\n');
-
-        const stopMoment = moment();
-        const duration = stopMoment.diff(this.startMoment, 'seconds');
-        this.mixpanel.track('IDE_FEATURE_REC_END', {
-            distinct_id: this.uuid,
-            recorder_type: 'web',
-            duration: duration,
-            recorded_items_count: recorded_items_count || 0
-        });
-        this.startMoment = null;
-    }
-
-    recStart(){
-        this.startMoment = moment();
-        console.log('\n\n\n\n');
-        console.log('recStart', this.uuid);
-        console.log('\n\n\n\n');
-
-        this.mixpanel.track('IDE_FEATURE_REC_START', {
-            distinct_id: this.uuid,
-            recorder_type: 'web'
-        });
-    }
-
     ideClose(){
         return new Promise((resolve, reject) => {    
             const closeMoment = moment();
@@ -84,5 +55,50 @@ export default class AnalyticsService extends ServiceBase {
                 resolve("result");
             }, 10000);
         });
+    }
+
+    recStart(){
+        this.recStartMoment = moment();
+
+        this.mixpanel.track('IDE_FEATURE_REC_START', {
+            distinct_id: this.uuid,
+            recorder_type: 'web'
+        });
+    }
+
+    recStop(recorded_items_count){
+        const recStopMoment = moment();
+        const duration = recStopMoment.diff(this.recStartMoment, 'seconds');
+        this.mixpanel.track('IDE_FEATURE_REC_END', {
+            distinct_id: this.uuid,
+            recorder_type: 'web',
+            duration: duration,
+            recorded_items_count: recorded_items_count || 0
+        });
+        this.recStartMoment = null;
+    }
+
+    playStart(){
+        this.playStartMoment = moment();
+
+        this.mixpanel.track('IDE_FEATURE_PLAY_START', {
+            distinct_id: this.uuid,
+            playback_type: 'web'
+        });
+    }
+
+    playStop(summary){
+        const playStopMoment = moment();
+        const duration = playStopMoment.diff(this.playStartMoment, 'seconds');
+
+        this.mixpanel.track('IDE_FEATURE_PLAY_END', {
+            distinct_id: this.uuid,
+            playback_type: 'web',
+            duration: duration,
+            test_duration: summary && summary._duration,
+            playback_outcome: summary && summary._status
+        });
+
+        this.playStartMoment = null;
     }
 }
