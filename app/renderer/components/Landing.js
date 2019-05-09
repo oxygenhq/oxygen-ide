@@ -27,6 +27,9 @@ export default class Landing extends PureComponent {
           <p className="landing-text">To see an online tour of Oxygen click <a href="http://docs.oxygenhq.org/about-video-tutorials.html" onClick={this.processLink}>here</a></p>
           <p className="landing-text">To read an online guide of Oxygen click <a href="http://docs.oxygenhq.org/guide-web-intro.html" onClick={this.processLink}>here</a></p>
           <p className="landing-text">To learn about Cloudbeat click <a href="http://cloudbeat.io/" onClick={this.processLink}>here</a></p>
+          <div class="videoWrapper">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/xIuLpEGdE-k" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
         </div>
       </div>
     )
