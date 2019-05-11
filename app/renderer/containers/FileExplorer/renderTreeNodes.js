@@ -28,13 +28,23 @@ function renderTreeNodes(nodes) {
       let onIconContextMenu = () => {};
       if (element.type === 'file' && element.name !== '.emptyfile') {
         theTitle = (
-          <span className="tree-row-title" title={ element.name } style={{ userSelect: 'none' }} onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FILE') }>{element.name}</span>
+          <span 
+            className="tree-row-title" 
+            title={ element.name } 
+            style={{ userSelect: 'none' }} 
+            onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FILE') }
+          >{element.name}</span>
         );
         onIconContextMenu = (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FILE');
       }
       else if (element.type === 'folder' && element.name !== '.emptyfile') {
         theTitle = (
-          <span className="tree-row-title" title={ element.name } style={{ userSelect: 'none' }} onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FOLDER') }>{element.name}</span>
+          <span 
+            className="tree-row-title" 
+            title={ element.name } 
+            style={{ userSelect: 'none' }} 
+            onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FOLDER') }
+          >{element.name}</span>
         );
         onIconContextMenu = (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FOLDER');
       }
