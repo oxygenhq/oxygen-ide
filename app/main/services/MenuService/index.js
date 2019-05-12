@@ -126,18 +126,18 @@ export default class MenuService extends ServiceBase {
             notify = false;
         }
         else if (cmd === Const.MENU_CMD_HELP_SHOW_ABOUT) {
-            var oxVersion = pkgNativeInfo.dependencies['oxygen-cli'];
-            var details = 'Oxygen: ' + (oxVersion.startsWith('git') ? oxVersion.substring(oxVersion.length - 40) : oxVersion) + '\n' +
-                    'Electron: ' + process.versions.electron + '\n' +
-                    'Node: ' + process.versions.node + '\n' +
-                    'Architecture: ' + process.arch;
-            electron.dialog.showMessageBox({
-                type: 'info', 
-                title: pkgInfo.productName, 
-                message: pkgInfo.productName + ' ' + pkgInfo.version,
-                detail: details
-            });
-            notify = false;
+            // var oxVersion = pkgNativeInfo.dependencies['oxygen-cli'];
+            // var details = 'Oxygen: ' + (oxVersion.startsWith('git') ? oxVersion.substring(oxVersion.length - 40) : oxVersion) + '\n' +
+            //         'Electron: ' + process.versions.electron + '\n' +
+            //         'Node: ' + process.versions.node + '\n' +
+            //         'Architecture: ' + process.arch;
+            // electron.dialog.showMessageBox({
+            //     type: 'info', 
+            //     title: pkgInfo.productName, 
+            //     message: pkgInfo.productName + ' ' + pkgInfo.version,
+            //     detail: details
+            // });
+            // notify = false;
         }
 
         if (notify) {

@@ -6,13 +6,13 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { util, Runner } from 'oxygen-cli';
+// import { util, Runner } from 'oxygen-cli';
 import moment from 'moment';
 import cfg from '../config.json';
 import ServiceBase from "./ServiceBase";
 
 const { selenium } = cfg;
-const oxutil = util;
+// const oxutil = util;
 
 // Events
 const EVENT_LOG_ENTRY = 'LOG_ENTRY';
@@ -70,7 +70,8 @@ export default class TestRunnerService extends ServiceBase {
         let testsuite = null;
 
         try {
-            testsuite = await oxutil.generateTestSuiteFromJSFile(mainFilePath, paramFilePath, paramMode);
+            return
+            // testsuite = await oxutil.generateTestSuiteFromJSFile(mainFilePath, paramFilePath, paramMode);
         }
         catch (e) {
             this._emitLogEvent(SEVERITY_ERROR, `Cannot generate test suite from JS file: ${e.message}`);

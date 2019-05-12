@@ -1,0 +1,9 @@
+{
+  "name": "ox.native.messanger",
+  "description": "My Application",
+  "path": "C:\\projects\\oxygen-ide-for-development\\oxygen-ide\\app\\chrome-native-messaging\\host\\my_host_3.bat",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://bmfbcejdknlknpncfpeloejonjoledha/"
+  ]
+}

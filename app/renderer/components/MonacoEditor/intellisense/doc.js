@@ -15,7 +15,7 @@
   var fs = require('fs');
   var path = require('path');
   var doctrine = require('doctrine');
-  var modPath = path.resolve(__dirname, '../node_modules/oxygen-cli/ox_modules');
+//   var modPath = path.resolve(__dirname, '../node_modules/oxygen-cli/ox_modules');
   module.exports = {};
 
   var docs = {};
@@ -134,32 +134,32 @@
    * Loads all the required modules.
    */
   module.exports.init = function() {
-      var modules = fs.readdirSync(modPath);
-      for (var m of modules) {
-          if (!m.startsWith('module-')) {
-              continue;
-          }
-          var name = m.substring('module-'.length, m.length - '.js'.length);
-          if (fs.lstatSync(path.join(modPath, m)).isFile() && m.endsWith('.js')) {
-              var modDir = path.join(modPath, 'module-' + name);
-              if (fs.existsSync(modDir)) {
-                  var modDoc = this.load(path.join(modPath, m), true);
-                  // load commands
-                  var cmdsDir = path.join(modDir, 'commands');
-                  var cmds = fs.readdirSync(cmdsDir);
-                  for (var cmd of cmds) {
-                      var cmdfile = path.join(cmdsDir, cmd);
-                      if (fs.lstatSync(cmdfile).isFile() && cmd.endsWith('.js')) {
-                          modDoc.methods = modDoc.methods.concat(this.load(cmdfile, false).methods);
-                      }
-                  }
-                  docs[name] = modDoc;
-              } else {
-                  docs[name] = this.load(path.join(modPath, m), true);
-              }
-          } 
-      }
-      return docs;
+    //   var modules = fs.readdirSync(modPath);
+    //   for (var m of modules) {
+    //       if (!m.startsWith('module-')) {
+    //           continue;
+    //       }
+    //       var name = m.substring('module-'.length, m.length - '.js'.length);
+    //       if (fs.lstatSync(path.join(modPath, m)).isFile() && m.endsWith('.js')) {
+    //           var modDir = path.join(modPath, 'module-' + name);
+    //           if (fs.existsSync(modDir)) {
+    //               var modDoc = this.load(path.join(modPath, m), true);
+    //               // load commands
+    //               var cmdsDir = path.join(modDir, 'commands');
+    //               var cmds = fs.readdirSync(cmdsDir);
+    //               for (var cmd of cmds) {
+    //                   var cmdfile = path.join(cmdsDir, cmd);
+    //                   if (fs.lstatSync(cmdfile).isFile() && cmd.endsWith('.js')) {
+    //                       modDoc.methods = modDoc.methods.concat(this.load(cmdfile, false).methods);
+    //                   }
+    //               }
+    //               docs[name] = modDoc;
+    //           } else {
+    //               docs[name] = this.load(path.join(modPath, m), true);
+    //           }
+    //       } 
+    //   }
+    //   return docs;
   };
   
 }).call(this);

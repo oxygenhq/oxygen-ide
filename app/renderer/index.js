@@ -21,6 +21,30 @@ import { configureServices } from './services';
 import './helpers/';
 import './app.global.scss';
 
+var socket = new WebSocket("ws://localhost:5002","echo-protocol");
+socket.onopen = function() {
+  console.log("onopen");
+
+  setInterval(function(){
+    console.log('setInterval fromIde');
+    socket.send(JSON.stringify({ fromIde: true }));
+  }, 4000);
+
+};
+
+socket.onclose = function(event) {
+  console.log('onclose code: ' + event.code + ' reason: ' + event.reason);
+};
+
+socket.onmessage = function(event) {
+  console.log("onmessage ", event);
+  console.log("onmessage ", event.data);
+};
+
+socket.onerror = function(error) {
+  console.log("onerror ",error.message);
+};
+
 // initialize Redux store
 const store = configureStore();
 configureServices(store);
