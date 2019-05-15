@@ -11,6 +11,7 @@ import * as ActionTypes from './types';
 import * as tabActions from '../tabs/actions';
 import * as editorActions from '../editor/actions';
 import * as settingsActions from './actions';
+import * as wbActions from '../workbench/actions';
 import * as Const from '../../../const';
 import { MAIN_MENU_EVENT } from '../../services/MainIpc';
 
@@ -36,6 +37,13 @@ export function* firstOpen({ payload }){
     yield put(tabActions.setActiveTab('welcome', 'Welcome'));
     yield put(editorActions.setActiveFile('welcome', 'Welcome'));
     yield put(editorActions.addFile('welcome', 'Welcome'));
+
+    const pltfm = process.platform;
+    if(pltfm !== 'win32'){
+        yield put(
+            wbActions.showDialog('DIALOG_NEED_ISTALL_EXTENSION')
+        );
+    }
 }
 
 export function* tmpAddFile({ payload }) {

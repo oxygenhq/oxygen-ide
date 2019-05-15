@@ -23,7 +23,10 @@ const defaultState = {
   },
   [types.DIALOG_SETTINGS]: {
     visible: false,
-  }
+  },
+  [types.DIALOG_NEED_ISTALL_EXTENSION]: {
+    visible: false,
+  },
 };
 
 export default (state = defaultState, action) => {

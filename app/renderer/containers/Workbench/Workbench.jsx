@@ -17,6 +17,7 @@ import FileRenameDialog from '../../components/dialogs/FileRenameDialog';
 import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
 import SettingsDialog from '../../components/dialogs/SettingsDialog';
+import NeedInstallExtension from '../../components/dialogs/NeedInstallExtension';
 // Other components
 import TextEditor from '../TextEditor';
 import Tabs from '../Tabs';
@@ -258,6 +259,11 @@ export default class Workbench extends Component<Props> {
       this.props.createFile(parentPath, name);
     }
   }
+
+  needInstallExtensionOnClose = () => {
+    this.props.hideDialog('DIALOG_NEED_ISTALL_EXTENSION');
+  }
+
   fileCreateDialog_onCancel() {
     this.props.hideDialog('DIALOG_FILE_CREATE');
   }
@@ -318,6 +324,11 @@ export default class Workbench extends Component<Props> {
               { ...dialog['DIALOG_FILE_CREATE'] }
               onSubmit={ ::this.fileCreateDialog_onSubmit }
               onCancel={ ::this.fileCreateDialog_onCancel } 
+            />
+          }
+          { dialog.DIALOG_NEED_ISTALL_EXTENSION && dialog.DIALOG_NEED_ISTALL_EXTENSION.visible &&
+            <NeedInstallExtension
+              onClose={ this.needInstallExtensionOnClose }
             />
           }
           <FileRenameDialog 
