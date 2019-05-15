@@ -52,7 +52,6 @@ function* handleTestRunnerServiceEvent(event) {
     }
     else if (event.type === 'TEST_ENDED') {
         yield put(testActions.onTestEnded());
-        var a = 'raaaaaaaaass';
         console.log('event', event);
 
         if(event && event.result && event.result.summary){
@@ -60,6 +59,8 @@ function* handleTestRunnerServiceEvent(event) {
             if(summary && summary._status && summary._status ==="passed"){
                 yield put(editorActions.resetActiveLines());
             }
+            
+            yield call(services.mainIpc.call, 'AnalyticsService', 'playStop', [summary]);
         }
     }
     else if (event.type === 'LINE_UPDATE') {
@@ -97,8 +98,22 @@ function* handleDeviceDiscoveryServiceEvent(event) {
 
 export function* startTest({ payload }) {
     const { mainFile, breakpoints, runtimeSettings } = yield select(state => state.test);
-    // check if main file of the test is saved (e.g. unmodified)
-    const file = mainFile ? yield select(state => state.fs.files[mainFile]) : null;
+
+    const editor = yield select(state => state.editor);
+
+    let file;
+    let saveMainFile;
+
+    if(mainFile){
+        // check if main file of the test is saved (e.g. unmodified)
+        file = yield select(state => state.fs.files[mainFile]);
+        saveMainFile = mainFile;
+    } else if (editor && editor.activeFile){
+        // check if main file of the test is saved (e.g. unmodified)
+        file = yield select(state => state.fs.files[editor.activeFile]);
+        saveMainFile = editor.activeFile;
+    }
+
     if (!file) {
         yield put({
             type: failure(ActionTypes.TEST_START),
@@ -126,7 +141,9 @@ export function* startTest({ payload }) {
         // reset General log
         yield put(loggerActions.resetGeneralLogs());
         // call TestRunner service to start the test
-        yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ mainFile, breakpoints, runtimeSettings ]);
+        
+        yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', []);
+        const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettings ]);        
         yield put({
             type: success(ActionTypes.TEST_START),
             payload: null,

@@ -8,6 +8,8 @@
  */
 import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
 import * as ActionTypes from './types';
+import * as tabActions from '../tabs/actions';
+import * as editorActions from '../editor/actions';
 import * as settingsActions from './actions';
 import * as Const from '../../../const';
 import { MAIN_MENU_EVENT } from '../../services/MainIpc';
@@ -24,10 +26,17 @@ export default function* root() {
       takeLatest(ActionTypes.TMP_ADD_FILE, tmpAddFile),
       takeLatest(ActionTypes.TMP_REMOVE_FILE, tmpRemoveFile),
       takeLatest(ActionTypes.TMP_UPDATE_FILE_CONTENT, tmpUpdateFileContent),
+      takeLatest(ActionTypes.FIRST_OPEN, firstOpen),
       takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
     ]);
 }
 
+export function* firstOpen({ payload }){
+    yield put(tabActions.addTab('welcome', 'Welcome'));
+    yield put(tabActions.setActiveTab('welcome', 'Welcome'));
+    yield put(editorActions.setActiveFile('welcome', 'Welcome'));
+    yield put(editorActions.addFile('welcome', 'Welcome'));
+}
 
 export function* tmpAddFile({ payload }) {
     if (payload && payload.key && payload.name) {

@@ -156,6 +156,7 @@
     "fs-extra": "^7.0.1",
     "junk": "^3.1.0",
     "lodash": "^4.17.11",
+    "mixpanel": "^0.10.2",
     "moment": "^2.24.0",
     "perfect-scrollbar": "^1.4.0",
     "react": "^16.3.2",
@@ -176,6 +177,7 @@
     "rxjs": "^6.4.0",
     "source-map-support": "^0.5.11",
     "uniqid": "^5.0.3",
+    "uuid": "^3.3.2",
     "winston": "^2.4.4"
   },
   "optionalDependencies": {

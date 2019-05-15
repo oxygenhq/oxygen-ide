@@ -296,8 +296,7 @@ export default class Workbench extends Component<Props> {
     const loggerVisible = settings.logger.visible;
     const showLanding = settings.showLanding;
     const showRecorderMessage = settings.showRecorderMessage;
-
-
+    
     if(!initialized){
       return (
         <Initializing/>

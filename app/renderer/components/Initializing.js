@@ -7,12 +7,12 @@ export default class Initializing extends PureComponent {
 
   render(){
     return (
-      <div className="landing-container">
-        <div className="landing-inner">
-          <h1 className="landing-title">
+      <div className="initializing-container">
+        <div className="initializing-inner">
+          <h1 className="initializing-title">
             Initializing
           </h1>
-          <p className="landing-text">(normaly less then minute)</p>
+          <p className="initializing-text">(normaly less then minute)</p>
         </div>
       </div>
     )
