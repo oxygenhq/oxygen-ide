@@ -119,7 +119,7 @@ export function* handleServiceEvents({ payload }) {
 
 export function* startRecorder({ payload }) {
     const editor = yield select(state => state.editor);
-    const { activeFile } = editor;
+    const { activeFile, activeFileName } = editor;
 
     // if no file is currently open (no open tabs), then ignore the recording
     if (!activeFile) {
@@ -139,7 +139,7 @@ export function* startRecorder({ payload }) {
     } else {
         yield call(services.mainIpc.call, 'AnalyticsService', 'recStart', []);
         yield call(services.mainIpc.call, 'RecorderService', 'start', []);
-        yield put(recorderActions._startRecorder_Success(activeFile));
+        yield put(recorderActions._startRecorder_Success(activeFile, activeFileName));
     }
 }
 
