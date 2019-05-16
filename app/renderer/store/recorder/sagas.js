@@ -6,6 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
+import { notification } from 'antd';
 import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
 import { putAndTake } from '../../helpers/saga';
 import { toOxygenCode } from '../../helpers/recorder';
@@ -27,8 +28,38 @@ export default function* root() {
       takeLatest(ActionTypes.RECORDER_START, startRecorder),
       takeLatest(ActionTypes.RECORDER_STOP, stopRecorder),
       takeLatest(ActionTypes.RECORDER_START_WATCHER, startRecorderWatcher),
+      takeLatest(success(ActionTypes.WB_CLOSE_FILE), wbCloseFileSuccess),
       takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
     ]);
+}
+export function* stopRecorderAfterFileClose(){
+    yield put(wbActions.stopRecorder());
+    const errorWithFileMessage = 'Recording will stop now because the file was closed';
+    notification['error']({
+        message: 'Recording stopped',
+        description: errorWithFileMessage
+    });
+}
+
+export function* wbCloseFileSuccess({ payload }) {
+    const recorder = yield select(state => state.recorder);
+
+    const { activeFile, activeFileName, isRecording } = recorder;
+
+    if(isRecording){
+        if(payload && payload.path){
+            if(payload.path === "unknown") {
+                if(payload.path === activeFile && payload.name === activeFileName){
+                    yield stopRecorderAfterFileClose();
+                }
+            } else {
+                if(payload.path === activeFile){
+                    yield stopRecorderAfterFileClose();
+                }
+            }
+        }
+    }
+    return;
 }
 
 export function* handleServiceEvents({ payload }) {
@@ -40,7 +71,7 @@ export function* handleServiceEvents({ payload }) {
     if (service === 'RecorderService' && event.type === 'CHROME_EXTENSION_ENABLED') {
         yield put(recorderActions.setLastExtentionEnabledTimestamp(Date.now()));
     }
-    if (service === 'RecorderService' && event.type === 'RECORDER_EVENT') {        
+    if (service === 'RecorderService' && event.type === 'RECORDER_EVENT') {          
         const step = {
             module: event.module,
             cmd: event.cmd,
@@ -64,6 +95,7 @@ export function* handleServiceEvents({ payload }) {
         if(activeFile === 'unknown'){
             
             if (!activeFileName) {
+                yield stopRecorderAfterFileClose();
                 return;
             }
 
@@ -71,6 +103,7 @@ export function* handleServiceEvents({ payload }) {
 
     
             if (!file) {
+                yield stopRecorderAfterFileClose();
                 return;
             }
             // generated code
@@ -90,11 +123,13 @@ export function* handleServiceEvents({ payload }) {
 
         } else {
             if (!activeFile) {
+                yield stopRecorderAfterFileClose();
                 return;
             }
             const file = yield select(state => state.fs.files[activeFile]);
         
             if (!file) {
+                yield stopRecorderAfterFileClose();
                 return;
             }
     
@@ -143,7 +178,7 @@ export function* startRecorder({ payload }) {
     }
 }
 
-export function* stopRecorder({ payload }) {    
+export function* stopRecorder({ payload }) {
     let recorded_items_count = 0;
     const recorder = yield select(state => state.recorder);
 

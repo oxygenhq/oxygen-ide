@@ -628,7 +628,7 @@ export function* closeFile({ payload }) {
        yield put(settingsActions.removeFile(path, name));
     }
 
-    yield put(wbActions._closeFile_Success(path));
+    yield put(wbActions._closeFile_Success(path, name));
 }
 
 export function* closeAllFiles({ payload }) {

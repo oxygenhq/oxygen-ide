@@ -117,10 +117,10 @@ export const closeFile = (path, force = false, name = null) => {
   };
 };
 
-export const _closeFile_Success = (path) => {
+export const _closeFile_Success = (path, name = null) => {
   return {
     type: success(ActionTypes.WB_CLOSE_FILE),
-    payload: { path },
+    payload: { path, name },
   };
 };
 
