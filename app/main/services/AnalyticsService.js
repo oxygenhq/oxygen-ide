@@ -13,6 +13,7 @@ import moment from 'moment';
 import { version }  from '../../../package.json';
 import parser from 'xml2json';
 import os from 'os';
+import osLocale from 'os-locale';
 
 export default class AnalyticsService extends ServiceBase {
     constructor() {
@@ -30,14 +31,14 @@ export default class AnalyticsService extends ServiceBase {
         this.ideOpen();
     }
 
-    createUser(uuid){
+    async createUser(uuid){
         this.uuid = uuid;
 
         let region = 'unknown';
         let country_code = 'unknown';
         let country_name = 'unknown';
         const env = process.env;
-        const language = env.LANG || env.LANGUAGE || env.LC_ALL || env.LC_MESSAGES || 'unknown';
+        const language = await osLocale();
 
         try{
             const { net } = require('electron')
