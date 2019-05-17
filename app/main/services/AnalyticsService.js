@@ -10,6 +10,9 @@
 import Mixpanel from 'mixpanel';
 import ServiceBase from "./ServiceBase";
 import moment from 'moment';
+import { version }  from '../../../package.json';
+import parser from 'xml2json';
+import os from 'os';
 
 export default class AnalyticsService extends ServiceBase {
     constructor() {
@@ -29,8 +32,63 @@ export default class AnalyticsService extends ServiceBase {
 
     createUser(uuid){
         this.uuid = uuid;
+
+        let region = 'unknown';
+        let country_code = 'unknown';
+        let country_name = 'unknown';
+        const env = process.env;
+        const language = env.LANG || env.LANGUAGE || env.LC_ALL || env.LC_MESSAGES || 'unknown';
+
+        try{
+            const { net } = require('electron')
+            const request = net.request('http://api.hostip.info')
+            request.on('response', (response) => {
+                    response.on('data', (chunk) => {
+                        var json = JSON.parse(parser.toJson(chunk, {reversible: true}));
+
+                        if(json && json['HostipLookupResultSet']){
+                            if(json['HostipLookupResultSet']['gml:featureMember']){
+                                if(json['HostipLookupResultSet']['gml:featureMember']['Hostip']){
+                                    const Hostip = json['HostipLookupResultSet']['gml:featureMember']['Hostip'];
+
+                                    if(Hostip){
+                                        if(Hostip && Hostip['gml:name'] && Hostip['gml:name']['$t']){
+                                            region = Hostip['gml:name']['$t'];
+                                        }
+                                        if(Hostip && Hostip['countryName'] && Hostip['countryName']['$t']){
+                                            country_name = Hostip['countryName']['$t'];
+                                        }
+                                        if(Hostip && Hostip['countryAbbrev'] && Hostip['gml:name']['$t']){
+                                            country_code = Hostip['countryAbbrev']['$t'];
+                                        }
+                                        this.mixpanel.people.append(uuid, {
+                                            $region: region,
+                                            $country_code: country_code,
+                                            'Сountry Name': country_name,
+                                        });                                       
+                                    }
+                                }
+                            }
+                        }
+
+                    })
+                response.on('end', () => {
+                    // console.log('No more data in response.')
+                })
+            })
+            request.end();
+        } catch(e){
+            console.log('e', e);
+        }
+
         this.mixpanel.people.set(uuid, {
             $created: (new Date()).toISOString(),
+            $timezone: ''+moment().format('Z'),
+            'IDE Version': version,
+            'OS Name': process.platform,
+            'OS Version': os.release(),
+            'Language': language,
+            'Dev': process.env.NODE_ENV === 'development'
         });
         this.ideOpen();
     }
@@ -49,7 +107,7 @@ export default class AnalyticsService extends ServiceBase {
             
             this.mixpanel.track('IDE_CLOSE', {
                 distinct_id: this.uuid,
-                duration: duration
+                'Duration': duration
             });
             setTimeout(() => {
                 resolve("result");
@@ -62,7 +120,7 @@ export default class AnalyticsService extends ServiceBase {
 
         this.mixpanel.track('IDE_FEATURE_REC_START', {
             distinct_id: this.uuid,
-            recorder_type: 'web'
+            'Recorder type': 'web'
         });
     }
 
@@ -71,9 +129,9 @@ export default class AnalyticsService extends ServiceBase {
         const duration = recStopMoment.diff(this.recStartMoment, 'seconds');
         this.mixpanel.track('IDE_FEATURE_REC_END', {
             distinct_id: this.uuid,
-            recorder_type: 'web',
-            duration: duration,
-            recorded_items_count: recorded_items_count || 0
+            'Recorder type': 'web',
+            'Duration': duration,
+            'Recorded items count': recorded_items_count || 0
         });
         this.recStartMoment = null;
     }
@@ -83,7 +141,7 @@ export default class AnalyticsService extends ServiceBase {
 
         this.mixpanel.track('IDE_FEATURE_PLAY_START', {
             distinct_id: this.uuid,
-            playback_type: 'web'
+            'Playback type': 'web'
         });
     }
 
@@ -93,10 +151,10 @@ export default class AnalyticsService extends ServiceBase {
 
         this.mixpanel.track('IDE_FEATURE_PLAY_END', {
             distinct_id: this.uuid,
-            playback_type: 'web',
-            duration: duration,
-            test_duration: summary && summary._duration,
-            playback_outcome: summary && summary._status
+            'Playback type': 'web',
+            'Duration': duration,
+            'Test duration': summary && summary._duration,
+            'Playback outcome': summary && summary._status
         });
 
         this.playStartMoment = null;

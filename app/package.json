@@ -16,6 +16,7 @@
   "dependencies": {
     "chokidar": "2.1.5",
     "monaco-editor": "0.14.3",
-    "oxygen-cli": "0.42.8"
+    "oxygen-cli": "0.42.8",
+    "xml2json": "^0.11.2"
   }
 }

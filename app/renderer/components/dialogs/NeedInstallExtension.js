@@ -10,7 +10,7 @@ export default class NeedInstallExtension extends PureComponent {
   }
 
   processLink = () => {
-    const oxygenUrl = 'https://chrome.google.com/webstore/detail/oxygen/ibbmgejonlmocgjnkmabigdgbolcomea';
+    const oxygenUrl = 'http://docs.oxygenhq.org/install-osx.html';
     electron.shell.openExternal(oxygenUrl);
     this.close();
   }
