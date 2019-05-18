@@ -158,6 +158,7 @@
     "lodash": "^4.17.11",
     "mixpanel": "^0.10.2",
     "moment": "^2.24.0",
+    "os-locale": "^3.1.0",
     "perfect-scrollbar": "^1.4.0",
     "react": "^16.3.2",
     "react-copy-to-clipboard": "^5.0.1",

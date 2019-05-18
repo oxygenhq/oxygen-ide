@@ -17,12 +17,23 @@ export default class JavaService {
           return callback(err, null);
       })
       spawn.stderr.on('data', function(data) {
-          data = data.toString().split('\n')[0];
-          var javaVersion = new RegExp('java version').test(data) ? data.split(' ')[2].replace(/"/g, '') : false;
-          if (javaVersion != false) {
-              return callback(null, javaVersion);
+          if (process.platform === 'win32') {
+            data = data.toString().split('\n')[0];
+            var javaVersion = new RegExp('java version').test(data) ? data.split(' ')[2].replace(/"/g, '') : false;
+            if (javaVersion != false) {
+                return callback(null, javaVersion);
+            } else {
+              return callback(null, false);
+            }
           } else {
-            return callback(null, false);
+            data = data.toString().split('\n')[0];
+            var javaVersion = new RegExp('openjdk version').test(data) ? data.split(' ')[2].replace(/"/g, '') : false;
+            console.log('javaVersion', javaVersion);
+            if (javaVersion != false) {
+              return callback(null, javaVersion);
+            } else {
+              return callback(null, false);
+            }
           }
       });
     } catch(e){
