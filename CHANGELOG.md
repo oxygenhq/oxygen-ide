@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v1.5.0 (2019-05-20)
+* Bump Oxygen 0.42.8.
+* Better synchronization for files and directories modified outside the IDE.
+* Landing screen.
+* UIX improvements to the recording process.
+* Reworked file creation process.
+* Preserve unsaved changes across IDE restarts.
+* Check for Java installation.
+* MSI installer improvements.
+* Anonymous analytics.
+* Other fixes & improvements.
+
 ## v1.4.0 (2019-03-04)
 * Bump Oxygen 0.42.0.
 * Bump Geckodriver 0.24.0.
