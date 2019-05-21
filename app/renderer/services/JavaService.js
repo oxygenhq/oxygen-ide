@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron';
+const path = require('path');
 
 export const JAVA_ERROR_INFO = 'JAVA_ERROR_INFO';
 export const JAVA_NOT_FOUND = 'JAVA_NOT_FOUND';
@@ -10,6 +11,64 @@ export default class JavaService {
     // console.log('~JavaService elive');
   }
   
+
+  chromeVersion(){
+    console.log('chromeVersion');
+    try {
+      const process = require('child_process');   
+      const spawn = process.spawn(path.resolve(__dirname, 'services', 'get_chrome_versions.bat'));
+      spawn.on('error', function(err){
+        console.log('QQ error', err);
+      });
+      spawn.stdout.on('data', function (data) {
+        console.log('QQ ',data);
+        console.log('QQ ',data.toString());
+        console.log('QQ ',data.toString().split('\n'));
+
+        try {
+          let cmdOut = data.toString().split('\n');
+          let infoArray;
+
+          if(Array.isArray(cmdOut)){
+            infoArray = cmdOut.filter(function (el) {
+              console.log('el', el);
+              console.log('el.length', el.length);
+              return el.length > 1;
+            });
+          }
+
+          console.log('QQ infoArray',infoArray);
+
+          if(Array.isArray(infoArray) && infoArray.length === 6){
+            const lineWithVersion = infoArray['3'];
+            const lineWithVersionSplit = lineWithVersion.split(' ');
+            console.log('lineWithVersion', lineWithVersion);
+            console.log('lineWithVersionSplit', lineWithVersionSplit);
+
+            if(Array.isArray(lineWithVersionSplit) && lineWithVersionSplit.length){
+              alert('Chrome version '+ lineWithVersionSplit[lineWithVersionSplit.length - 1]);
+            }
+          }
+          
+        } catch(e){
+          console.log('QQ e', e);
+        }
+      });
+      // spawn.stderr.on('data', function (data) {
+      //   console.log('QQ ',data);
+      //   console.log('QQ ',data.toString());
+      // });
+      spawn.on('close', function (code) {
+        if (code == 0)
+              console.log('QQ Stop');
+        else
+              console.log('QQ Start');
+      });
+    } catch(e){
+      console.log('QQ e', e);
+    }
+  }
+
   javaversion(callback) {
     try {
       const spawn = require('child_process').spawn('java', ['-version']);
@@ -46,6 +105,7 @@ export default class JavaService {
     this.store = store;
     this.action$ = action$;
     
+    this.chromeVersion();
     this.javaversion(function(err,version){    
       if(version && typeof version === 'string' && version.startsWith('1.8')){
         // do nothing, java version is correct;
