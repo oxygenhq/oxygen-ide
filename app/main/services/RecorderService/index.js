@@ -40,7 +40,9 @@ export default class RecorderService extends ServiceBase {
             return;
         }
         this.httpSrv = http.createServer(::this._onRequest);
-        this.httpSrv.on('error', (err) => {console.log("Unable to bind recorder's HTTP listener. " + err)});
+        this.httpSrv.on('error', (err) => {
+            console.log("Unable to bind recorder's HTTP listener. " + err)
+        });
 
         var options = {
             key: fs.readFileSync(path.join(RECORDER_DIR, 'cloudbeat-key.pem')),
@@ -49,7 +51,9 @@ export default class RecorderService extends ServiceBase {
             rejectUnauthorized: false
         };
         this.httpsSrv = https.createServer(options, ::this._onRequest);
-        this.httpSrv.on('error', (err) => {console.log("Unable to bind recorder's HTTPS listener " + err)});
+        this.httpsSrv.on('error', (err) => {
+            console.log("Unable to bind recorder's HTTPS listener " + err)
+        });
 
         // here be horrors...
         // 'localhost' might be unavailable in certain situations
@@ -65,8 +69,16 @@ export default class RecorderService extends ServiceBase {
             } else {
                 hostname = 'localhost';
             }
-            this.httpSrv.listen(PORT_HTTP, hostname, function(){ });
-            this.httpsSrv.listen(PORT_HTTPS, hostname, function(){ });
+            try{
+                this.httpSrv.listen(PORT_HTTP, hostname, function(){ });
+            } catch (e){
+                console.log('#71 e', e);
+            }
+            try{
+                this.httpsSrv.listen(PORT_HTTPS, hostname, function(){ });
+            } catch (e){
+                console.log('#76 e', e);
+            }
         });
     }
 
