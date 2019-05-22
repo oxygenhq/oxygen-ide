@@ -1,5 +1,6 @@
 import { ipcRenderer } from 'electron';
 const path = require('path');
+const os = require('os');
 
 export const JAVA_ERROR_INFO = 'JAVA_ERROR_INFO';
 export const JAVA_NOT_FOUND = 'JAVA_NOT_FOUND';
@@ -14,58 +15,82 @@ export default class JavaService {
 
   chromeVersion(){
     console.log('chromeVersion');
-    try {
-      const process = require('child_process');   
-      const spawn = process.spawn(path.resolve(__dirname, 'services', 'get_chrome_versions.bat'));
+
+    if (os.platform() === 'win32') {
+      try {
+        const process = require('child_process');   
+        const spawn = process.spawn(path.resolve(__dirname, 'services', 'get_chrome_versions.bat'));
+        spawn.on('error', function(err){
+          console.log('QQ error', err);
+        });
+        spawn.stdout.on('data', function (data) {
+          console.log('QQ ',data);
+          console.log('QQ ',data.toString());
+          console.log('QQ ',data.toString().split('\n'));
+  
+          try {
+            let cmdOut = data.toString().split('\n');
+            let infoArray;
+  
+            if(Array.isArray(cmdOut)){
+              infoArray = cmdOut.filter(function (el) {
+                console.log('el', el);
+                console.log('el.length', el.length);
+                return el.length > 1;
+              });
+            }
+  
+            console.log('QQ infoArray',infoArray);
+  
+            if(Array.isArray(infoArray) && infoArray.length === 6){
+              const lineWithVersion = infoArray['3'];
+              const lineWithVersionSplit = lineWithVersion.split(' ');
+              console.log('lineWithVersion', lineWithVersion);
+              console.log('lineWithVersionSplit', lineWithVersionSplit);
+  
+              if(Array.isArray(lineWithVersionSplit) && lineWithVersionSplit.length){
+                alert('Chrome version '+ lineWithVersionSplit[lineWithVersionSplit.length - 1]);
+              }
+            }
+            
+          } catch(e){
+            console.log('QQ e', e);
+          }
+        });
+        // spawn.stderr.on('data', function (data) {
+        //   console.log('QQ ',data);
+        //   console.log('QQ ',data.toString());
+        // });
+        spawn.on('close', function (code) {
+          if (code == 0)
+                console.log('QQ Stop');
+          else
+                console.log('QQ Start');
+        });
+      } catch(e){
+        console.log('QQ e', e);
+      }
+    } else {
+      const spawn = require('child_process').spawn('/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome', ['--version']);
       spawn.on('error', function(err){
         console.log('QQ error', err);
       });
+
       spawn.stdout.on('data', function (data) {
         console.log('QQ ',data);
         console.log('QQ ',data.toString());
         console.log('QQ ',data.toString().split('\n'));
 
-        try {
-          let cmdOut = data.toString().split('\n');
-          let infoArray;
+        let cmdOut = data.toString().split('\n');
 
-          if(Array.isArray(cmdOut)){
-            infoArray = cmdOut.filter(function (el) {
-              console.log('el', el);
-              console.log('el.length', el.length);
-              return el.length > 1;
-            });
+        if(cmdOut && cmdOut[0]){
+          const ArrFromStrWithChromeVersion = cmdOut[0].trim().split(' ');
+          console.log('QQ ArrFromStrWithChromeVersion',ArrFromStrWithChromeVersion);
+          if(Array.isArray(ArrFromStrWithChromeVersion) && ArrFromStrWithChromeVersion.length && ArrFromStrWithChromeVersion.length === 3){
+            alert('Chrome version '+ ArrFromStrWithChromeVersion[2]);
           }
-
-          console.log('QQ infoArray',infoArray);
-
-          if(Array.isArray(infoArray) && infoArray.length === 6){
-            const lineWithVersion = infoArray['3'];
-            const lineWithVersionSplit = lineWithVersion.split(' ');
-            console.log('lineWithVersion', lineWithVersion);
-            console.log('lineWithVersionSplit', lineWithVersionSplit);
-
-            if(Array.isArray(lineWithVersionSplit) && lineWithVersionSplit.length){
-              alert('Chrome version '+ lineWithVersionSplit[lineWithVersionSplit.length - 1]);
-            }
-          }
-          
-        } catch(e){
-          console.log('QQ e', e);
         }
       });
-      // spawn.stderr.on('data', function (data) {
-      //   console.log('QQ ',data);
-      //   console.log('QQ ',data.toString());
-      // });
-      spawn.on('close', function (code) {
-        if (code == 0)
-              console.log('QQ Stop');
-        else
-              console.log('QQ Start');
-      });
-    } catch(e){
-      console.log('QQ e', e);
     }
   }
 
