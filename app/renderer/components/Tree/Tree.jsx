@@ -544,7 +544,7 @@ class Tree extends React.Component {
         const { loadData, onLoad } = this.props;
         const { eventKey } = treeNode.props;
 
-        if (!loadData || loadedKeys.indexOf(eventKey) !== -1 || loadingKeys.indexOf(eventKey) !== -1) {
+        if (!loadData) {
           // react 15 will warn if return null
           return {};
         }
@@ -579,8 +579,8 @@ class Tree extends React.Component {
   );
 
   onNodeExpand = (e, treeNode) => {
-    let { expandedKeys } = this.state;
-    const { onExpand, loadData } = this.props;
+    let { expandedKeys, loadedKeys } = this.state;
+    const { onExpand, loadData, unWatchFolder, watchFolder } = this.props;
     const { eventKey, expanded } = treeNode.props;
 
     // Update selected keys
@@ -600,6 +600,12 @@ class Tree extends React.Component {
 
     this.setUncontrolledState({ expandedKeys });
 
+    if(expanded){
+      if(unWatchFolder){
+        unWatchFolder(eventKey);
+      }
+    }
+
     if (onExpand) {
       onExpand(expandedKeys, {
         node: treeNode,
@@ -614,6 +620,11 @@ class Tree extends React.Component {
       return loadPromise ? loadPromise.then(() => {
         // [Legacy] Refresh logic
         this.setUncontrolledState({ expandedKeys });
+        loadedKeys.map((item) => {
+          if(watchFolder){
+            watchFolder(item);
+          }
+        })
       }) : null;
     }
 

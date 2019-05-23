@@ -81,8 +81,20 @@ export default class FileExplorer extends Component<Props> {
             resolve: resolve,
             reject: reject,
         };
-        this.props.treeLoadNodeChildren(nodeData);
+        this.props.treeLoadNodeChildren(nodeData, true);
     })
+
+    unWatchFolder = (folderPath) => {
+        if(this.props.unWatchFolder){
+            this.props.unWatchFolder(folderPath);
+        }
+    }
+
+    watchFolder = (folderPath) => {
+        if(this.props.watchFolder){
+            this.props.watchFolder(folderPath);
+        }
+    }
 
     onSubjectChildrenLoaded = (e) => {
         if (this.loadingNodes.hasOwnProperty(e.path)) {
@@ -169,6 +181,8 @@ export default class FileExplorer extends Component<Props> {
                     selectedKeys={selectedKeys}
                     rootPath={rootPath}
                     loadData={this.loadData}
+                    unWatchFolder={this.unWatchFolder}
+                    watchFolder={this.watchFolder}
                     onSelect={this.onSelectNode}
                     onDragStart={this.onDragStart}
                     onDragEnter={this.onDragEnter}

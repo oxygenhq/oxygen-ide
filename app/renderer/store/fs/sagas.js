@@ -35,9 +35,35 @@ export default function* root() {
         takeLatest(ActionTypes.FS_SAVE_FILE_AS, saveFileContentAs),
         takeLatest(ActionTypes.FS_TREE_OPEN_FOLDER, treeOpenFolder),
         takeLatest(ActionTypes.FS_TREE_LOAD_NODE_CHILDREN, treeLoadNodeChildren),
+        takeLatest(ActionTypes.FS_TREE_LOAD_NODE_CHILDREN_SUCCESS, maybeNeedAddWatcherToFolder),
+        takeLatest(ActionTypes.FS_TREE_UN_WATCH_FOLDER, maybeNeedRemoveWatcherToFolder),
+        takeLatest(ActionTypes.FS_TREE_WATCH_FOLDER, addFolderToWatchers),
         takeLatest('FROM_CACHE', fromCache),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents)
     ]);
+}
+
+export function* maybeNeedAddWatcherToFolder({ payload }){
+    const fs = yield select(state => state.fs);
+    const { files, rootPath } = fs;
+
+    if(rootPath && payload && payload.path && rootPath !== payload.path){      
+        yield call(services.mainIpc.call, 'FileService', 'addFolderToWatchers', [payload.path]);
+    }
+}
+
+export function* addFolderToWatchers({ payload }){
+    if(payload && payload.path){
+        yield call(services.mainIpc.call, 'FileService', 'addFolderToWatchers', [payload.path]);
+    }
+}
+
+export function* maybeNeedRemoveWatcherToFolder({ payload }){
+    const { path } = payload;
+
+    if(path){
+        yield call(services.mainIpc.call, 'FileService', 'removeFolderToWatchers', [path]);
+    }
 }
 
 export function* handleServiceEvents({ payload }) {
