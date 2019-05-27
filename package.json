@@ -126,6 +126,7 @@
     "jest": "^22.1.4",
     "mini-css-extract-plugin": "^0.4.3",
     "modclean": "^2.1.2",
+    "node-abi": "^2.8.0",
     "node-sass": "^4.7.2",
     "postcss-discard-font-face": "^3.0.0",
     "postcss-loader": "^3.0.0",
