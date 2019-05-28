@@ -1,35 +1,27 @@
 {
   "name": "oxygenide",
-  "productName": "Oxygen IDE",
+  "productName": "OxygenIDE",
   "version": "1.5.0",
   "description": "IDE for Oxygen automation framework.",
+  "main": "./app/main/main.dev.js",
+  "build": {
+    "appId": "oxygen.ide",
+    "mac": {
+      "target": "pkg",
+      "category": "public.app-category.developer-tools"
+    },
+    "files": [
+      "./build/**/*",
+      "./app/main/main.dev.js"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "asar": false
+  },
   "scripts": {
-    "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
-    "build-dll": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.dll.js --colors",
-    "build-main": "cross-env NODE_ENV=production node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.main.prod.js --colors",
-    "build-renderer": "cross-env NODE_ENV=production node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.prod.js --colors",
-    "dev": "cross-env START_HOT=1 node -r babel-register ./internals/scripts/CheckPortInUse.js && cross-env process.env._TESTING=1 START_HOT=1 npm run start-renderer-dev",
-    "electron-rebuild": "electron-rebuild --parallel --force --types prod,dev --module-dir app",
-    "flow": "flow",
-    "flow-typed": "rimraf flow-typed/npm && flow-typed install --ignoreDeps dev --overwrite || (exit 0)",
-    "lint": "cross-env NODE_ENV=development eslint --cache --format=node_modules/eslint-formatter-pretty .",
-    "lint-fix": "npm run lint -- --fix",
-    "lint-styles": "stylelint app/*.css app/components/*.css --syntax scss",
-    "lint-styles-fix": "stylefmt -r app/*.css app/components/*.css",
-    "package": "npm install && npm run build && grunt",
-    "postinstall": "node -r babel-register internals/scripts/CheckNativeDep.js && npm run flow-typed && npm run build-dll && node node_modules/fbjs-scripts/node/check-dev-engines.js package.json && cd app && npm install",
-    "prestart": "npm run build",
-    "start": "cross-env process.env._TESTING=1 NODE_ENV=production electron ./app/",
-    "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron --inspect=5858 -r babel-register ./app/main/main.dev.js",
-    "start-renderer-dev": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack-dev-server/bin/webpack-dev-server --config webpack.config.renderer.dev.js",
-    "test": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./internals/scripts/RunTests.js",
-    "test1": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./node_modules/.bin/jest test/main/services/",
-    "test2": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./app/main/test.js",
-    "test-renderer-store": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./node_modules/.bin/jest test/unit/renderer/store/",
-    "test-file-watcher": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./node_modules/jest/bin/jest test/file-watcher/",
-    "test-all": "npm run lint && npm run flow && npm run build && npm run test && npm run test-e2e",
-    "test-e2e": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r babel-register ./internals/scripts/RunTests.js e2e",
-    "test-watch": "npm test -- --watch"
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "browserslist": "electron 2.0",
   "repository": {
@@ -96,6 +88,7 @@
     "cross-spawn": "^6.0.4",
     "css-loader": "^0.28.10",
     "electron": "^3.1.8",
+    "electron-builder": "^20.40.2",
     "electron-devtools-installer": "^2.2.4",
     "electron-rebuild": "^1.8.4",
     "enzyme": "^3.3.0",

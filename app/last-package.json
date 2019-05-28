@@ -1,9 +1,9 @@
 {
   "name": "oxygenide",
-  "productName": "Oxygen IDE",
+  "productName": "OxygenIDE",
   "version": "1.0.0",
   "description": "IDE for Oxygen automation framework.",
-  "main": "./main/main.prod.js",
+  "main": "./main/main.dev.js",
   "author": {
     "name": "cloudbeat.io",
     "email": "ndimer@cloudbeat.io"
