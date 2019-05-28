@@ -215,9 +215,9 @@ export const deleteFile = (path) => ({
   type: TYPES.FS_DELETE,
   payload: { path },
 });
-export const _delete_Success = (path) => ({
+export const _delete_Success = (path, showDeleteTitle = false) => ({
   type: success(TYPES.FS_DELETE),
-  payload: { path },
+  payload: { path, showDeleteTitle },
 });
 export const _delete_Failure = (path, error) => ({
   type: failure(TYPES.FS_DELETE),

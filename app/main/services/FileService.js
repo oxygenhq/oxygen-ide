@@ -87,6 +87,18 @@ export default class FileService extends ServiceBase {
     folderPath = '';
     subFolders = [];
 
+
+    async dispose() {
+        await this.closeWatcherIfExist();
+    }
+
+    closeWatcherIfExist(){
+        if(this.chokidarWatcher && this.chokidarWatcher.close){
+            this.chokidarWatcher.close();
+            this.watcherOn = false;
+        }
+    }
+
     addFolderToWatchers(folder){
         if(this.subFolders.includes(folder)){
             // ignore

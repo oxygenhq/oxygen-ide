@@ -10,6 +10,7 @@ import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
 import { default as pathNode } from 'path';
 import ActionTypes from '../types';
 import * as fsActions from './actions';
+import * as settingsActions from './../settings/actions';
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import { putAndTake } from '../../helpers/saga';
 import fileSubjects from '../../store/fs/subjects';
@@ -17,6 +18,7 @@ import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
+import pathLib from 'path';
 
 /**
  * File System and File Explorer Sagas
@@ -84,12 +86,7 @@ export function* handleServiceEvents({ payload }) {
             yield addFileOrFolder(data);
         }
         if (type === 'fileUnlink') {
-            const file = yield select(state => state.fs.files[path]);
-            if (file) {
-                yield put(fsActions.updateFileContent(path, file.content));
-            } else {
-                yield unlinkFile(path);
-            }
+            yield unlinkFile(path);
         }
         if(type === 'dirUnlink'){
             yield unlinkFile(path);
@@ -161,9 +158,30 @@ function* addFileOrFolder(fileOrFolder) {
 }
 
 
-function* unlinkFile(path) {
+function* unlinkFile(path) {    
     if (path) {
-        yield put(fsActions._delete_Success(path));
+        const filesState = yield select(state => state.fs.files);
+        const editorState = yield select(state => state.editor);
+        const tabsState = yield select(state => state.tabs);
+
+        if(editorState && editorState.openFiles && editorState.openFiles[path]){
+            let unlinkedFileContent = '';
+            const pathSplit = path.split(pathLib.sep);
+            
+            const newName = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
+
+            if(filesState && filesState[path] && filesState[path]['content']){
+                unlinkedFileContent = filesState[path]['content'];
+            }
+
+
+            console.log('settingsActions', settingsActions);
+
+            yield put(settingsActions.addFile('unknown',newName, unlinkedFileContent));
+        }
+
+        yield put(fsActions._delete_Success(path, true));
+
     }
 }
 

@@ -18,7 +18,7 @@ export default class ElectronService extends ServiceBase {
         super(mainWindow);
     }
     
-    addFile(key, name){
+    addFile(key, name, content = ''){
         const settings = appSettings.get('appSettings');
 
         const newSettings = { ...settings };
@@ -26,7 +26,7 @@ export default class ElectronService extends ServiceBase {
             newSettings.files = {
                 ...newSettings.files,
                 [key+name] : {
-                    content: '',
+                    content: content,
                     ext: ".js",
                     name: name,
                     path: key,

@@ -34,6 +34,8 @@ import { JAVA_ERROR_INFO, JAVA_NOT_FOUND, JAVA_BAD_VERSION } from '../../service
 import ServicesSingleton from '../../services';
 import editorSubjects from '../editor/subjects';
 
+import pathLib from 'path';
+
 const services = ServicesSingleton();
 /**
  * Workbench Sagas
@@ -103,7 +105,7 @@ export function* handleMainMenuEvents({ payload }) {
     }
     else if (cmd === Const.MENU_CMD_CLEAR_ALL) {
         const clearRsult = yield services.mainIpc.call('ElectronService', 'clearSettings');
-        // console.log('!FROM_CACHE clearRsult', clearRsult);
+        const closeWatcherIfExistRsult = yield services.mainIpc.call('FileService', 'closeWatcherIfExist');
         yield clearAll();
         yield initialize();
     }
@@ -308,8 +310,21 @@ export function* openFolder({ payload }) {
     // check if there are any unsaved files - if so, prompt user and ask whether to proceed.
     const files = yield select(state => state.fs.files);
     const unsaved = getUnsavedFiles(files);
+    
     if (unsaved && unsaved.length > 0) {
-        if (!confirm(`There are ${unsaved.length} unsaved files. Are you sure you want to proceed and lose unsaved changes?`)) {
+        let fileNamesStr = '';
+        
+        unsaved.map((file) => {
+            if(file && file.name && typeof file.name){
+                if(fileNamesStr){
+                    fileNamesStr+= ', '+file.name;
+                } else {
+                    fileNamesStr+= file.name;
+                }
+            }
+        });
+
+        if (!confirm(`There are ${unsaved.length} unsaved files : ${fileNamesStr}. Are you sure you want to proceed and lose unsaved changes?`)) {
             return;
         }
     }
@@ -598,7 +613,11 @@ export function* deleteFile({ payload }) {
 }
 
 export function* closeFile({ payload }) {
-    const { path, force = false, name = null } = payload;
+    const filesState = yield select(state => state.fs.files);
+    const editorState = yield select(state => state.editor);
+    const tabsState = yield select(state => state.tabs);
+
+    const { path, force = false, name = null, showDeleteTitle = false } = payload;
     const file = yield select(state => state.fs.files[path]);
     // prompt user if file has been modified and unsaved
     if (file && force == false && file.modified && file.modified == true) {
@@ -606,9 +625,27 @@ export function* closeFile({ payload }) {
             return;
         }
     }
-    yield put(tabActions.removeTab(path, name));
-    yield put(editorActions.closeFile(path, false, name));
-    yield put(fsActions.resetFileContent(path));
+
+    if(showDeleteTitle && path){
+        const pathSplit = path.split(pathLib.sep);
+
+        if(pathSplit && pathSplit.length){
+            const newName = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
+            
+            yield put(tabActions.renameTab(path, 'unknown', newName));
+            yield put(editorActions.renameFile(path, newName, true));
+            return;
+        } else {
+            yield put(tabActions.removeTab(path, name));
+            yield put(editorActions.closeFile(path, false, name));
+            yield put(fsActions.resetFileContent(path));
+        }
+    } else {
+        yield put(tabActions.removeTab(path, name));
+        yield put(editorActions.closeFile(path, false, name));
+        yield put(fsActions.resetFileContent(path));
+    }
+
     yield put(testActions.removeBreakpoints(path));
     // retrieve new active tab, if there are more files open
     const activeTab = yield select(state => state.tabs.active);
@@ -623,7 +660,6 @@ export function* closeFile({ payload }) {
     }
 
     if(path === "unknown"){
-      console.log('path', path);
 
        yield put(settingsActions.removeFile(path, name));
     }
@@ -861,7 +897,7 @@ export function* handleFileRename({ payload }) {
 }
 
 export function* handleFileDelete({ payload }) {
-    const { path } = payload;
+    const { path, showDeleteTitle } = payload;
     yield closeFile({ payload: {...payload, force: true} });
 }
 

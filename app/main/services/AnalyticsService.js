@@ -37,41 +37,57 @@ export default class AnalyticsService extends ServiceBase {
         let region = 'unknown';
         let country_code = 'unknown';
         let country_name = 'unknown';
+        let city = 'unknown';
+        let continent_name = 'unknown';
+        let continent_code = 'unknown';
         const env = process.env;
         const language = await osLocale();
 
         try{
             const { net } = require('electron')
-            const request = net.request('http://api.hostip.info')
+            const request = net.request('https://api.ipdata.co/?api-key=143415c75d2d5036d29cc48ecb1c742bfef9ab3f25af45fbd0939367')
             request.on('response', (response) => {
                     response.on('data', (chunk) => {
-                        var json = JSON.parse(parser.toJson(chunk, {reversible: true}));
-
-                        if(json && json['HostipLookupResultSet']){
-                            if(json['HostipLookupResultSet']['gml:featureMember']){
-                                if(json['HostipLookupResultSet']['gml:featureMember']['Hostip']){
-                                    const Hostip = json['HostipLookupResultSet']['gml:featureMember']['Hostip'];
-
-                                    if(Hostip){
-                                        if(Hostip && Hostip['gml:name'] && Hostip['gml:name']['$t']){
-                                            region = Hostip['gml:name']['$t'];
-                                        }
-                                        if(Hostip && Hostip['countryName'] && Hostip['countryName']['$t']){
-                                            country_name = Hostip['countryName']['$t'];
-                                        }
-                                        if(Hostip && Hostip['countryAbbrev'] && Hostip['gml:name']['$t']){
-                                            country_code = Hostip['countryAbbrev']['$t'];
-                                        }
-                                        this.mixpanel.people.append(uuid, {
-                                            $region: region,
-                                            $country_code: country_code,
-                                            'Сountry Name': country_name,
-                                        });                                       
-                                    }
+                        try{
+                            var json = JSON.parse(chunk);
+    
+                            if(json){
+                                if(json.country_code){
+                                    country_code = json.country_code;
                                 }
-                            }
-                        }
 
+                                if(json.country_name){
+                                    country_name = json.country_name;
+                                }
+                                
+                                if(json.region){
+                                    region = json.region;
+                                }
+
+                                if(json.city){
+                                    city = json.city;
+                                }
+
+                                if(json.continent_name){
+                                    continent_name = json.continent_name;
+                                }
+
+                                if(json.continent_code){
+                                    continent_code = json.continent_code;
+                                }
+
+                                this.mixpanel.people.set(uuid, {
+                                    $region: region,
+                                    $country_code: country_code,
+                                    'Сountry Name': country_name,
+                                    'City': city,
+                                    'Continent Name': continent_name,
+                                    'Continent Code': continent_code
+                                });
+                            }
+                        } catch(e){
+                            console.warn(e);
+                        }
                     })
                 response.on('end', () => {
                     // console.log('No more data in response.')

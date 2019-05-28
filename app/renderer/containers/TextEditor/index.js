@@ -21,6 +21,11 @@ const mapStoreToProps = (state) => {
         ...state.settings.files[path],
         ...state.editor.openFiles[path],
       }
+    } else if(path.endsWith('(deleted from disk)')){
+      return {
+        ...state.settings.files['unknown'+path],
+        ...state.editor.openFiles[path],
+      }
     } else {
       return {
         ...state.fs.files[path],
@@ -28,6 +33,8 @@ const mapStoreToProps = (state) => {
       }
     }
   });
+
+  console.log('openFiles', openFiles);
 
   return {
     editorReadOnly: state.test.isRunning,

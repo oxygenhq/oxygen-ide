@@ -113,6 +113,9 @@ const configureStore = (initialState?: counterStateType) => {
     // console.log('state', state);
     // console.log('---');
 
+    // console.log('new state', state);
+    // console.log('new state stringify', JSON.stringify(state));
+
     const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [state] );
 
     // if(result){
@@ -124,16 +127,25 @@ const configureStore = (initialState?: counterStateType) => {
     //   // console.log('JSON.stringify result', JSON.stringify(result));
     //   // console.log('---');
     // }
+    return state;
   }
 
   const cache = store => next => action => {
+    let result = next(action);
     const state = store.getState();
+    // console.log('str', JSON.stringify(state));
 
     if(state.settings.cacheUsed){
       updateCache(state, action);
+      // const cacheStatePromise = updateCache(state, action);
+      // cacheStatePromise.then((cacheState) => {
+      //   if(typeof cacheState !== 'undefined'){
+      //     console.log('cacheState', cacheState);
+      //     console.log('cacheState stringify', JSON.stringify(cacheState));
+      //   }
+      // })
     }
 
-    let result = next(action);
     return result;
   }
   
