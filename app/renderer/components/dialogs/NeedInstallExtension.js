@@ -33,13 +33,13 @@ export default class NeedInstallExtension extends PureComponent {
             <Button
               onClick={this.close}
             >
-              Skip installation
+              Skip Installation
             </Button>
           </Fragment>
         )}
       >
         <div>
-          { 'In Order for Oxygen to record web tests, we need to install Oxygen extension for Chrome.' }
+          { 'In order for Oxygen to record web tests, Oxygen Chrome extension must be installed.' }
         </div>
       </Modal>
     );
