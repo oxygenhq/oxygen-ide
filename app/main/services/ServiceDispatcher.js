@@ -53,7 +53,9 @@ export default class ServiceDispatcher {
             e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: { type: 'METHOD_NOT_FOUND' } });
             return;
         }
-        console.log(`Service call: ${service}.${method}`, args);
+        if(service !== 'ElectronService' && method !== 'updateCache'){
+            console.log(`Service call: ${service}.${method}`, args);
+        }
         try {
             const retval = methodRef.apply(serviceRef, args);
             Promise.resolve(retval)

@@ -45,10 +45,10 @@ export const changeCacheUsed = (value) => {
   }
 
 /* Add file */
-export const addFile = (key,name) => {
+export const addFile = (key,name, content=null) => {
     return {
       type: types.TMP_ADD_FILE,
-      payload: { key,name },
+      payload: { key,name,content },
     };
   }
 

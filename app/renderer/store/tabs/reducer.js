@@ -110,15 +110,17 @@ export default (state = defaultState, action, dispatch) => {
       };
 
     // TABS_RENAME
-    case ActionTypes.TABS_RENAME:
+    case ActionTypes.TABS_RENAME: {
+      let result;
       _index = state.list.findIndex(x => x.key === key);
       if (_index === -1) {
         return state;
       }
       _newActive = state.active === key ? newKey : state.active;
-      return { 
+        result = { 
         ...state, 
         active: _newActive,
+        activeTitle: newTitle || null,
         list: [
           ...state.list.slice(0, _index),
           {
@@ -129,6 +131,9 @@ export default (state = defaultState, action, dispatch) => {
           ...state.list.slice(_index + 1),
         ],
       };
+
+      return result;
+    }
 
     // TABS_CHANGE_ORDER
     case ActionTypes.TABS_CHANGE_ORDER:

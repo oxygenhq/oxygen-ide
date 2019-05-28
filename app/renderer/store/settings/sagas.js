@@ -48,9 +48,9 @@ export function* firstOpen({ payload }){
 
 export function* tmpAddFile({ payload }) {
     if (payload && payload.key && payload.name) {
-        const { key, name } = payload;
+        const { key, name, content } = payload;
         try {            
-            const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'addFile', [key, name]);
+            const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'addFile', [key, name, content]);
             
             if(newSettings){
                 yield put(settingsActions.mergeSettings(newSettings));

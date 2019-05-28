@@ -147,6 +147,20 @@ export const _saveFileAs_Failure = (path, error) => {
   };
 }
 
+export const watchFolder = (folderPath) => {
+  return {
+    type: TYPES.FS_TREE_WATCH_FOLDER,
+    payload: { path: folderPath },
+  };  
+}
+
+export const unWatchFolder = (folderPath) => {
+  return {
+    type: TYPES.FS_TREE_UN_WATCH_FOLDER,
+    payload: { path: folderPath },
+  };  
+}
+
 /* treeLoadNodeChildren */
 export const treeLoadNodeChildren = (nodePath, force = false) => {
   // node can be either an object or a string. If string is provided, than use it as a key to find the node (path).
@@ -201,9 +215,9 @@ export const deleteFile = (path) => ({
   type: TYPES.FS_DELETE,
   payload: { path },
 });
-export const _delete_Success = (path) => ({
+export const _delete_Success = (path, showDeleteTitle = false) => ({
   type: success(TYPES.FS_DELETE),
-  payload: { path },
+  payload: { path, showDeleteTitle },
 });
 export const _delete_Failure = (path, error) => ({
   type: failure(TYPES.FS_DELETE),

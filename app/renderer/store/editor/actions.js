@@ -57,9 +57,9 @@ export const setActiveLine = (time, path, line) => ({
 });
 
 /* setActiveLine */
-export const renameFile = (oldPath, newPath) => ({
+export const renameFile = (oldPath, newPath, doUnknown = false) => ({
   type: ActionTypes.EDITOR_RENAME_FILE,
-  payload: { path: oldPath, newPath },
+  payload: { path: oldPath, newPath, doUnknown },
 });
 
 /* resetActiveLines */

@@ -10,6 +10,7 @@ import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
 import { default as pathNode } from 'path';
 import ActionTypes from '../types';
 import * as fsActions from './actions';
+import * as settingsActions from './../settings/actions';
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import { putAndTake } from '../../helpers/saga';
 import fileSubjects from '../../store/fs/subjects';
@@ -17,6 +18,7 @@ import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
+import pathLib from 'path';
 
 /**
  * File System and File Explorer Sagas
@@ -35,9 +37,35 @@ export default function* root() {
         takeLatest(ActionTypes.FS_SAVE_FILE_AS, saveFileContentAs),
         takeLatest(ActionTypes.FS_TREE_OPEN_FOLDER, treeOpenFolder),
         takeLatest(ActionTypes.FS_TREE_LOAD_NODE_CHILDREN, treeLoadNodeChildren),
+        takeLatest(ActionTypes.FS_TREE_LOAD_NODE_CHILDREN_SUCCESS, maybeNeedAddWatcherToFolder),
+        takeLatest(ActionTypes.FS_TREE_UN_WATCH_FOLDER, maybeNeedRemoveWatcherToFolder),
+        takeLatest(ActionTypes.FS_TREE_WATCH_FOLDER, addFolderToWatchers),
         takeLatest('FROM_CACHE', fromCache),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents)
     ]);
+}
+
+export function* maybeNeedAddWatcherToFolder({ payload }){
+    const fs = yield select(state => state.fs);
+    const { files, rootPath } = fs;
+
+    if(rootPath && payload && payload.path && rootPath !== payload.path){      
+        yield call(services.mainIpc.call, 'FileService', 'addFolderToWatchers', [payload.path]);
+    }
+}
+
+export function* addFolderToWatchers({ payload }){
+    if(payload && payload.path){
+        yield call(services.mainIpc.call, 'FileService', 'addFolderToWatchers', [payload.path]);
+    }
+}
+
+export function* maybeNeedRemoveWatcherToFolder({ payload }){
+    const { path } = payload;
+
+    if(path){
+        yield call(services.mainIpc.call, 'FileService', 'removeFolderToWatchers', [path]);
+    }
 }
 
 export function* handleServiceEvents({ payload }) {
@@ -58,12 +86,7 @@ export function* handleServiceEvents({ payload }) {
             yield addFileOrFolder(data);
         }
         if (type === 'fileUnlink') {
-            const file = yield select(state => state.fs.files[path]);
-            if (file) {
-                yield put(fsActions.updateFileContent(path, file.content));
-            } else {
-                yield unlinkFile(path);
-            }
+            yield unlinkFile(path);
         }
         if(type === 'dirUnlink'){
             yield unlinkFile(path);
@@ -135,9 +158,30 @@ function* addFileOrFolder(fileOrFolder) {
 }
 
 
-function* unlinkFile(path) {
+function* unlinkFile(path) {    
     if (path) {
-        yield put(fsActions._delete_Success(path));
+        const filesState = yield select(state => state.fs.files);
+        const editorState = yield select(state => state.editor);
+        const tabsState = yield select(state => state.tabs);
+
+        if(editorState && editorState.openFiles && editorState.openFiles[path]){
+            let unlinkedFileContent = '';
+            const pathSplit = path.split(pathLib.sep);
+            
+            const newName = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
+
+            if(filesState && filesState[path] && filesState[path]['content']){
+                unlinkedFileContent = filesState[path]['content'];
+            }
+
+
+            console.log('settingsActions', settingsActions);
+
+            yield put(settingsActions.addFile('unknown',newName, unlinkedFileContent));
+        }
+
+        yield put(fsActions._delete_Success(path, true));
+
     }
 }
 
@@ -179,6 +223,10 @@ export function* fromCache({ payload }) {
     }
 }
 
+export function* watchOnSubFiles(path){
+    yield call(services.mainIpc.call, 'FileService', 'addFolderToWatchers', [path]);
+}
+
 export function* watchOnFiles(path) {
     yield call(services.mainIpc.call, 'FileService', 'createWatchOnFilesChannel', [path]);
 }
@@ -187,7 +235,14 @@ export function* _fetchFolderContent(path) {
     try {
         let folder = yield call(services.mainIpc.call, 'FileService', 'getFolderContent', [path]);
         if (folder && path) {
-            yield watchOnFiles(path);
+            const rootPath = yield select(state => state.fs.rootPath); 
+            if(rootPath === path){
+                //root dir
+                yield watchOnFiles(path);
+            }  else {
+                //nor root dir
+                yield watchOnSubFiles(path);
+            }
         }
         yield put({
             type: success(ActionTypes.FS_FETCH_FOLDER_CONTENT),

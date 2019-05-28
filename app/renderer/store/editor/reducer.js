@@ -24,7 +24,7 @@ const DEFAULT_OPEN_FILE_STATE = {
 }
 
 export default (state = DEFAULT_STATE, action) => {
-  const { file, name, path, newPath, line, time , cache } = action.payload || {};
+  const { file, name, path, newPath, line, time , cache, doUnknown } = action.payload || {};
   let _openFilesClone, _newActiveFile;
 
   switch (action.type) {
@@ -81,8 +81,9 @@ export default (state = DEFAULT_STATE, action) => {
       } else {
         return { 
           ...state, 
-          activeFile: path }
-        ;
+          activeFile: path,
+          activeFileName: null
+        };
       }
     }
 
@@ -149,8 +150,9 @@ export default (state = DEFAULT_STATE, action) => {
 
     // RENAME_FILE
     case types.EDITOR_RENAME_FILE: {
+      let result;
       if (!state.openFiles.hasOwnProperty(path)) {
-        return state;
+        result = state;
       }
       _openFilesClone = {
         ...state.openFiles,
@@ -161,13 +163,27 @@ export default (state = DEFAULT_STATE, action) => {
       _openFilesClone[newPath] = {
         ...DEFAULT_OPEN_FILE_STATE,
       };
-      // update activeFile if its path has changed
-      _newActiveFile = state.activeFile !== path ? state.activeFile : newPath;
-      return {
-        ...state,
-        activeFile: _newActiveFile,
-        openFiles: _openFilesClone,
-      };
+
+      if(doUnknown){
+        // update activeFile if its path has changed
+        _newActiveFile = state.activeFile !== path ? state.activeFile : newPath;
+        result = {
+          ...state,
+          activeFile: 'unknown',
+          activeFileName: _newActiveFile,
+          openFiles: _openFilesClone,
+        };
+      } else {
+        // update activeFile if its path has changed
+        _newActiveFile = state.activeFile !== path ? state.activeFile : newPath;
+        result = {
+          ...state,
+          activeFile: _newActiveFile,
+          openFiles: _openFilesClone,
+        };
+      }
+
+      return result;
     }
 
     case 'FROM_CACHE': 

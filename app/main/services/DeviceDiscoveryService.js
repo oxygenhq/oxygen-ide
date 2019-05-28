@@ -30,10 +30,10 @@ export default class DeviceDiscoveryService extends ServiceBase {
         this.retries = 3;
         result = await this._getConnectedDevices();
 
-        console.log('result', result);
+        // console.log('result', result);
 
         if(isError(result)){
-            console.log('result.message', result.message);
+            // console.log('result.message', result.message);
             return result.message;
         } else {
             return result;
@@ -105,8 +105,8 @@ export default class DeviceDiscoveryService extends ServiceBase {
             })
         })
         .catch((e) => {
-            console.log('#ee ', e);
-            console.debug(e);
+            // console.log('#ee ', e);
+            // console.debug(e);
             if (self.retries-- === 0) {
                 return Promise.resolve(e);
             }

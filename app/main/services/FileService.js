@@ -53,7 +53,7 @@ const processChange = (eventPath, folderPath, type) => {
     // FIXME: handle properly case when eventPath === folderPath
     if (filePart && filePart[1]) {
         // anylize file location
-        if (eventPath) {  
+        if (eventPath && !eventPath.endsWith('.DS_Store')) {  
             //  file or folder was deleted or renamed
             //  dirUnlink or fileUnlink
             if (['dirUnlink', 'fileUnlink', 'fileChangeContent'].includes(type)) { 
@@ -75,7 +75,7 @@ const processChange = (eventPath, folderPath, type) => {
                 });
             }
         } else {
-            console.warn(`bad eventPath: ${eventPath}`);
+            // console.warn(`bad eventPath: ${eventPath}`);
         }
     } else {
         console.warn(`Bad split result with eventPath: ${eventPath} and folderPath: ${folderPath}`);
@@ -84,18 +84,82 @@ const processChange = (eventPath, folderPath, type) => {
 
 export default class FileService extends ServiceBase {
     watcherOn = false;
+    folderPath = '';
+    subFolders = [];
 
-    createWatchOnFilesChannel(folderPath) {
+
+    async dispose() {
+        await this.closeWatcherIfExist();
+    }
+
+    closeWatcherIfExist(){
+        if(this.chokidarWatcher && this.chokidarWatcher.close){
+            this.chokidarWatcher.close();
+            this.watcherOn = false;
+        }
+    }
+
+    addFolderToWatchers(folder){
+        if(this.subFolders.includes(folder)){
+            // ignore
+        } else {
+            this.subFolders.push(folder);
+            this.createWatchOnFilesChannel(this.folderPath, this.subFolders);
+        }
+    }
+
+    
+    removeFolderToWatchers(folder){
+        if(Array.isArray(this.subFolders)){
+            this.subFolders = this.subFolders.filter((item) => {
+                return !item.startsWith(folder);
+            });
+
+            this.createWatchOnFilesChannel(this.folderPath, this.subFolders);
+        }
+    }
+
+    createWatchOnFilesChannel(folderPath, subFolders = null) {
+
+        if(Array.isArray(subFolders)){
+            if(this.chokidarWatcher && this.chokidarWatcher.close){
+                this.chokidarWatcher.close();
+                this.watcherOn = false;
+            }
+        }
+
+        if(this.folderPath !== folderPath){
+
+            this.folderPath = folderPath;
+
+            if(this.chokidarWatcher && this.chokidarWatcher.close){
+                this.chokidarWatcher.close();
+                this.watcherOn = false;
+            }
+        }
+
         if (!this.watcherOn) {
+
             this.watcherOn = true;
-            chokidar.watch(folderPath, {
+
+            let saveWatchFolders;
+
+            if(Array.isArray(subFolders)){
+                saveWatchFolders = [folderPath, ...subFolders];
+            } else {
+                saveWatchFolders = folderPath;
+            }
+
+            this.chokidarWatcher = chokidar.watch(saveWatchFolders, {
                 ignored: ['**/node_modules/**/*', '**/node_modules/**/**/*', '**/.git/**/*', '*.gz'],
                 ignoreInitial: true,
                 ignorePermissionErrors: true,
                 followSymlinks: true,
                 interval: 1000,
                 binaryInterval: 1000,
-                useFsEvents: false
+                useFsEvents: false,
+                usePolling: true,
+                depth: 0
             }).on('all', (event, eventPath, third) => {
                 if (event === 'add') {
                     // file add

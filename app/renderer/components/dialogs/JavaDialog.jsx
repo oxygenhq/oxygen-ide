@@ -15,7 +15,7 @@ export default class JavaDialog extends PureComponent {
     electron.shell.openExternal(javaUrl);
   }
   
-  render() {
+  render() {    
     const {
       javaError
     } = this.props;
