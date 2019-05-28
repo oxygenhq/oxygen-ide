@@ -759,12 +759,19 @@ export function* saveCurrentFile({ payload }) {
             return; // Save As dialog was canceled by user
         }
 
-        
-        // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
-        let folderPath = saveAsPath.split("\\");
-        folderPath.pop();
-        folderPath = folderPath.join("\\");
-        // console.log('folderPath', folderPath);
+        let folderPath;
+
+        if (process.platform === 'win32') {
+            // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
+            folderPath = saveAsPath.split("\\");
+            folderPath.pop();
+            folderPath = folderPath.join("\\");
+        } else {
+            // /Users/developer/Downloads/f.js => /Users/developer/Downloads
+            folderPath = saveAsPath.split("/");
+            folderPath.pop();
+            folderPath = folderPath.join("/");
+        }
 
         const files = yield select(state => state.settings.files);
         

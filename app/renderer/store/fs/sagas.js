@@ -223,6 +223,10 @@ export function* fromCache({ payload }) {
     }
 }
 
+export function* watchOnSubFiles(path){
+    yield call(services.mainIpc.call, 'FileService', 'addFolderToWatchers', [path]);
+}
+
 export function* watchOnFiles(path) {
     yield call(services.mainIpc.call, 'FileService', 'createWatchOnFilesChannel', [path]);
 }
@@ -231,7 +235,14 @@ export function* _fetchFolderContent(path) {
     try {
         let folder = yield call(services.mainIpc.call, 'FileService', 'getFolderContent', [path]);
         if (folder && path) {
-            yield watchOnFiles(path);
+            const rootPath = yield select(state => state.fs.rootPath); 
+            if(rootPath === path){
+                //root dir
+                yield watchOnFiles(path);
+            }  else {
+                //nor root dir
+                yield watchOnSubFiles(path);
+            }
         }
         yield put({
             type: success(ActionTypes.FS_FETCH_FOLDER_CONTENT),

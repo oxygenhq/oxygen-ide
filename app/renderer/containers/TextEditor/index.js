@@ -34,8 +34,6 @@ const mapStoreToProps = (state) => {
     }
   });
 
-  console.log('openFiles', openFiles);
-
   return {
     editorReadOnly: state.test.isRunning,
     activeFile: state.editor.activeFile,
