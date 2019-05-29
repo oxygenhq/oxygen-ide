@@ -137,7 +137,7 @@ export default class AnalyticsService extends ServiceBase {
             });
             setTimeout(() => {
                 resolve("result");
-            }, 10000);
+            }, 2000);
         });
     }
 

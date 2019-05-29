@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 import path from 'path';
+// import { dialog } from 'electron';
 import cp from 'child_process';
 import detectPort from 'detect-port';
 import ServiceBase from "./ServiceBase";
@@ -86,6 +87,7 @@ export default class SeleniumService extends ServiceBase {
 
     dispose() {
         this.stop();
+        this._killSelenium();
     }
 
     _emitStoppedEvent(failed, msg) {
@@ -117,7 +119,10 @@ export default class SeleniumService extends ServiceBase {
         const pltfm = process.platform;
         if (pltfm === 'win32') {
             try {
-                cp.execSync(`wmic process where "CommandLine like '%java%%-jar -Dwebdriver.ie.driver=${pltfm}/IEDriverServer_x86.exe -Dwebdriver.gecko.driver=${pltfm}/geckodriver.exe -Dwebdriver.chrome.driver=${pltfm}/chromedriver.exe ${selSettings.jar} -port ${this.availablePort}%'" Call Terminate`, { stdio: 'pipe' });
+                const str = `wmic process where "CommandLine like '%java%%-jar -Dwebdriver.ie.driver=${pltfm}/IEDriverServer_x86.exe -Dwebdriver.gecko.driver=${pltfm}/geckodriver.exe -Dwebdriver.chrome.driver=${pltfm}/chromedriver.exe ${selSettings.jar} -port ${this.availablePort}%'" Call Terminate`;
+                // dialog.showMessageBox({message: str});
+                // console.log('str', str);
+                cp.execSync(str, { stdio: 'pipe' });
             } catch (e) {
                 console.warn('Failed to kill selenium: ' + e);
             }
