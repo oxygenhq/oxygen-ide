@@ -54,6 +54,15 @@ export default (state = defaultState, action) => {
       };
 
     // RECORDER_SET_ACTIVE_FILE
+    case ActionTypes.RECORDER_REPLACE_FILE_CREDENTIALS:
+      return {
+        ...state,
+        //$FlowFixMe
+        activeFile: path,
+        activeFileName: name
+      };
+
+    // RECORDER_SET_ACTIVE_FILE
     case ActionTypes.RECORDER_SET_ACTIVE_FILE:
       return {
         ...state,

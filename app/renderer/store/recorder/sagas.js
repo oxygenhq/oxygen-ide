@@ -101,7 +101,7 @@ export function* handleServiceEvents({ payload }) {
 
             const file = yield select(state => state.settings.files[activeFile+activeFileName]);
 
-    
+            
             if (!file) {
                 yield stopRecorderAfterFileClose();
                 return;
@@ -110,11 +110,16 @@ export function* handleServiceEvents({ payload }) {
             const generatedCode = toOxygenCode([ step ]);
             // current code, before update (make sure to include new line at the end of the content)
             let prevContent = file.content;
+
+            if(!prevContent){
+                prevContent = '';
+            }
+
             if (!prevContent.endsWith('\n') && prevContent !== '') {
                 prevContent += '\n';
             }
             // prepend web.init if it doesn't exist in the script
-            if (file.content.indexOf('web.init') === -1) {
+            if (prevContent.indexOf('web.init') === -1) {
                 prevContent += 'web.init();\n';
             }
             const newContent = `${prevContent}${generatedCode}`;
@@ -137,11 +142,16 @@ export function* handleServiceEvents({ payload }) {
             const generatedCode = toOxygenCode([ step ]);
             // current code, before update (make sure to include new line at the end of the content)
             let prevContent = file.content;
+
+            if(!prevContent){
+                prevContent = '';
+            }
+
             if (!prevContent.endsWith('\n') && prevContent !== '') {
                 prevContent += '\n';
             }
             // prepend web.init if it doesn't exist in the script
-            if (file.content.indexOf('web.init') === -1) {
+            if (prevContent.indexOf('web.init') === -1) {
                 prevContent += 'web.init();\n';
             }
             const newContent = `${prevContent}${generatedCode}`;

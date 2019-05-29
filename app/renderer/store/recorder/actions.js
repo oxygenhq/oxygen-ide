@@ -43,6 +43,14 @@ export const setActiveFile = (path) => ({
   payload: { path },
 });
 
+
+// setActiveFile
+export const replaceFileCredentials = (path, name) => ({
+  type: ActionTypes.RECORDER_REPLACE_FILE_CREDENTIALS,
+  payload: { path, name },
+});
+
+
 // addStep
 export const addStep = (step) => ({
   type: ActionTypes.RECORDER_ADD_STEP,

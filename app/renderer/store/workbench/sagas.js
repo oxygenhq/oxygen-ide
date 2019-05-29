@@ -753,11 +753,10 @@ export function* closeTmpFile(file){
 export function* saveCurrentFile({ payload }) {
     const { prompt } = payload || {};
     const editor = yield select(state => state.editor);
+    const recorder = yield select(state => state.recorder);
 
     const { activeFile, activeFileName } = editor;
 
-    // console.log('activeFile', activeFile);
-    // console.log('activeFileName', activeFileName);
 
     if(activeFile === "unknown"){
         const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, null, [ 
@@ -789,7 +788,7 @@ export function* saveCurrentFile({ payload }) {
 
         let saveContent = currentFile.content;
 
-        if(!content){
+        if(!saveContent){
             saveContent = '';
         }
 
@@ -838,6 +837,12 @@ export function* saveCurrentFile({ payload }) {
             }
 
             yield openFile({ payload: { path: saveAsPath } });
+
+            if(recorder && recorder.activeFile && recorder.activeFileName){
+                if(recorder.activeFile === activeFile && recorder.activeFileName === activeFileName){
+                    yield put(recorderActions.replaceFileCredentials(saveAsPath, null));
+                }
+            }
         }
     } else {
         const files = yield select(state => state.fs.files);
@@ -862,7 +867,7 @@ export function* saveCurrentFile({ payload }) {
 
             let saveContent = currentFile.content;
 
-            if(!content){
+            if(!saveContent){
                 saveContent = '';
             }
 
