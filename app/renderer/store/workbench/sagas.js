@@ -244,6 +244,10 @@ export function* initialize() {
 
         if(appSettings.cache.settings && appSettings.cache.settings.uuid){
             yield call(services.mainIpc.call, 'AnalyticsService', 'setUser', [appSettings.cache.settings.uuid]);
+        } else {
+            const uuid = uuidv4();
+            yield call(services.mainIpc.call, 'AnalyticsService', 'createUser', [uuid]);
+            yield put(settingsActions.createUser(uuid));
         }
 
     } else {
@@ -402,8 +406,14 @@ export function* createNewRealFile({ payload }){
         content= payload.fakeFile.content;
     }
 
+    let saveContent = content;
+
+    if(!content){
+        saveContent = '';
+    }
+
     const { error } = yield putAndTake(
-        fsActions.saveFileAs(saveAsPath, content)
+        fsActions.saveFileAs(saveAsPath, saveContent)
     );
 
     if (!error) {            
@@ -743,11 +753,10 @@ export function* closeTmpFile(file){
 export function* saveCurrentFile({ payload }) {
     const { prompt } = payload || {};
     const editor = yield select(state => state.editor);
+    const recorder = yield select(state => state.recorder);
 
     const { activeFile, activeFileName } = editor;
 
-    // console.log('activeFile', activeFile);
-    // console.log('activeFileName', activeFileName);
 
     if(activeFile === "unknown"){
         const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, null, [ 
@@ -777,8 +786,14 @@ export function* saveCurrentFile({ payload }) {
         
         const currentFile = files[activeFile+activeFileName];
 
+        let saveContent = currentFile.content;
+
+        if(!saveContent){
+            saveContent = '';
+        }
+
         const { error } = yield putAndTake(
-            fsActions.saveFileAs(saveAsPath, currentFile.content)
+            fsActions.saveFileAs(saveAsPath, saveContent)
         );
         
         if (!error) {            
@@ -822,6 +837,12 @@ export function* saveCurrentFile({ payload }) {
             }
 
             yield openFile({ payload: { path: saveAsPath } });
+
+            if(recorder && recorder.activeFile && recorder.activeFileName){
+                if(recorder.activeFile === activeFile && recorder.activeFileName === activeFileName){
+                    yield put(recorderActions.replaceFileCredentials(saveAsPath, null));
+                }
+            }
         }
     } else {
         const files = yield select(state => state.fs.files);
@@ -843,8 +864,15 @@ export function* saveCurrentFile({ payload }) {
             if (!saveAsPath) {
                 return; // Save As dialog was canceled by user
             }
+
+            let saveContent = currentFile.content;
+
+            if(!saveContent){
+                saveContent = '';
+            }
+
             const { error } = yield putAndTake(
-                fsActions.saveFileAs(saveAsPath, currentFile.content)
+                fsActions.saveFileAs(saveAsPath, saveContent)
             );
             if (!error) {            
                 // re-retrieve all files, as Saved As file info has been just added to the File Cache.

@@ -27,18 +27,23 @@ global.log = new Logger('debug', 'info');
 let mainWindow = null;
 let mainProc = null;
 
-const gotTheLock = app.requestSingleInstanceLock()
-
-if (!gotTheLock) {
-  app.quit()
-} else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
-    // Someone tried to run a second instance, we should focus our window.
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore()
-      mainWindow.focus();
-    }
-  });
+try{
+  const gotTheLock = app.requestSingleInstanceLock()
+  
+  if (!gotTheLock) {
+    app.quit()
+  } else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+      // Someone tried to run a second instance, we should focus our window.
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore()
+        mainWindow.focus();
+      }
+    });
+  }
+} catch(e){
+  alert('Please, open later (2 sec)');
+  console.log(e);
 }
 
 if (process.env.NODE_ENV === 'production') {
@@ -117,7 +122,11 @@ app.on('ready', async () => {
     disposeMainAndQuit();
   });
 
-  mainProc = new MainProcess(mainWindow);
+  try{
+    mainProc = new MainProcess(mainWindow);
+  } catch(e){
+    console.log('e', e);
+  }
 });
 
 function disposeMainAndQuit() {

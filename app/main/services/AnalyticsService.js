@@ -14,6 +14,7 @@ import { version }  from '../../../package.json';
 import parser from 'xml2json';
 import os from 'os';
 import osLocale from 'os-locale';
+import uuidv4 from'uuid/v4';
 
 export default class AnalyticsService extends ServiceBase {
     constructor() {
@@ -27,12 +28,20 @@ export default class AnalyticsService extends ServiceBase {
     }
 
     setUser(uuid){
-        this.uuid = uuid;
+        if(uuid){
+            this.uuid = uuid;
+        } else {
+            this.uuid = uuidv4();
+        }
         this.ideOpen();
     }
 
     async createUser(uuid){
-        this.uuid = uuid;
+        if(uuid){
+            this.uuid = uuid;
+        } else {
+            this.uuid = uuidv4();
+        }
 
         let region = 'unknown';
         let country_code = 'unknown';
@@ -128,7 +137,7 @@ export default class AnalyticsService extends ServiceBase {
             });
             setTimeout(() => {
                 resolve("result");
-            }, 10000);
+            }, 2000);
         });
     }
 
