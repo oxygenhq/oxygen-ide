@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v1.5.1 (2019-05-29)
+* Bump Oxygen 0.44.0.
+* Fixed `log` commands not working.
+* Fixed empty files being incorectly saved.
+* Fixed saving newly created files not working in OS X.
+* Fixed test execution not working on OS X and Linux.
+* Fixed IDE crash when opened folder is located on a network drive.
+* Other fixes & improvements.
+
 ## v1.5.0 (2019-05-20)
 * Bump Oxygen 0.42.8.
 * Better synchronization for files and directories modified outside the IDE.
