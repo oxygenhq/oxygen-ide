@@ -128,7 +128,7 @@ export const _saveFile_Failure = (path, error) => {
 }
 
 /* saveFileAs */
-export const saveFileAs = (path, content) => {
+export const saveFileAs = (path, content = '') => {
   return {
       type: TYPES.FS_SAVE_FILE_AS,
       payload: { path, content },

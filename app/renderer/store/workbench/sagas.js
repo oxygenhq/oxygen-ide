@@ -406,8 +406,14 @@ export function* createNewRealFile({ payload }){
         content= payload.fakeFile.content;
     }
 
+    let saveContent = content;
+
+    if(!content){
+        saveContent = '';
+    }
+
     const { error } = yield putAndTake(
-        fsActions.saveFileAs(saveAsPath, content)
+        fsActions.saveFileAs(saveAsPath, saveContent)
     );
 
     if (!error) {            
@@ -781,8 +787,14 @@ export function* saveCurrentFile({ payload }) {
         
         const currentFile = files[activeFile+activeFileName];
 
+        let saveContent = currentFile.content;
+
+        if(!content){
+            saveContent = '';
+        }
+
         const { error } = yield putAndTake(
-            fsActions.saveFileAs(saveAsPath, currentFile.content)
+            fsActions.saveFileAs(saveAsPath, saveContent)
         );
         
         if (!error) {            
@@ -847,8 +859,15 @@ export function* saveCurrentFile({ payload }) {
             if (!saveAsPath) {
                 return; // Save As dialog was canceled by user
             }
+
+            let saveContent = currentFile.content;
+
+            if(!content){
+                saveContent = '';
+            }
+
             const { error } = yield putAndTake(
-                fsActions.saveFileAs(saveAsPath, currentFile.content)
+                fsActions.saveFileAs(saveAsPath, saveContent)
             );
             if (!error) {            
                 // re-retrieve all files, as Saved As file info has been just added to the File Cache.
