@@ -244,6 +244,10 @@ export function* initialize() {
 
         if(appSettings.cache.settings && appSettings.cache.settings.uuid){
             yield call(services.mainIpc.call, 'AnalyticsService', 'setUser', [appSettings.cache.settings.uuid]);
+        } else {
+            const uuid = uuidv4();
+            yield call(services.mainIpc.call, 'AnalyticsService', 'createUser', [uuid]);
+            yield put(settingsActions.createUser(uuid));
         }
 
     } else {
