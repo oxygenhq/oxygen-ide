@@ -14,7 +14,7 @@ import menuTemplateFromArray from './menuTemplateFromArray';
 import * as Const from '../../../const';
 
 import pkgInfo from '../../../../package.json';
-import pkgNativeInfo from '../../../package.json';
+import pkgNativeInfo from '../../../last-package.json';
 
 const { Menu } = electron;
 const MAIN_MENU_CMD = 'MAIN_MENU_CMD';

@@ -3,16 +3,21 @@
   "productName": "OxygenIDE",
   "version": "1.5.0",
   "description": "IDE for Oxygen automation framework.",
-  "main": "./app/main/main.dev.js",
+  "main": "./app/main/main.prod.js",
   "build": {
+    "productName": "OxygenIDE",
     "appId": "oxygen.ide",
+    "copyright": "Copyright © year ",
     "mac": {
       "target": "pkg",
       "category": "public.app-category.developer-tools"
     },
+    "pkg": {
+      "scripts": "build/pkg-scripts"
+    },
     "files": [
       "./build/**/*",
-      "./app/main/main.dev.js"
+      "./app/main/main.prod.js"
     ],
     "directories": {
       "buildResources": "assets"
@@ -20,8 +25,11 @@
     "asar": false
   },
   "scripts": {
+    "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
+    "build-main": "cross-env NODE_ENV=production node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.main.prod.js --colors",
+    "build-renderer": "cross-env NODE_ENV=production node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.prod.js --colors",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "npm run build && electron-builder"
   },
   "browserslist": "electron 2.0",
   "repository": {
@@ -137,6 +145,10 @@
     "webpack-merge": "^4.1.1"
   },
   "dependencies": {
+    "chokidar": "2.1.5",
+    "monaco-editor": "0.14.3",
+    "oxygen-cli": "0.42.8",
+    "xml2json": "^0.11.2",
     "antd": "^3.4.5",
     "appium-adb": "^7.6.5",
     "clean-stack": "^2.1.0",

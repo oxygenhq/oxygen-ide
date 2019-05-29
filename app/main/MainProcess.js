@@ -25,11 +25,11 @@ export default class MainProcess {
     this._handleEvents();
 
     // open dev tools in debug mode
-    if (process.env.NODE_ENV !== 'production') {
+    // if (process.env.NODE_ENV !== 'production') {
       // TODO: do not open devtools automatically, rather add this option to the main menu
       //this.mainWindow.webContents.openDevTools();
       this.mainWindow.openDevTools();
-    }
+    // }
     console.log('Main process has started');
   }
 
