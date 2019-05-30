@@ -12,9 +12,6 @@
       "target": "pkg",
       "category": "public.app-category.developer-tools"
     },
-    "pkg": {
-      "scripts": "build/pkg-scripts"
-    },
     "files": [
       "./build/**/*",
       "./app/main/main.prod.js"

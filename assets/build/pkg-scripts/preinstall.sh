@@ -13,23 +13,20 @@ elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
     echo found java executable in JAVA_HOME     
     _java="$JAVA_HOME/bin/java"
 else
-    osascript -e 'tell app "Terminal" to display dialog "no java"'
     echo "no java"
-    exit -1
+    exit -2
 fi
 
 if [[ "$_java" ]]; then
     version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
     echo version "$version"
-    if [[ "$version" > "1.5" ]]; then
-        osascript -e 'tell app "Terminal" to display dialog "version is more than 1.5"'
-        echo version is more than 1.5
-        exit -1
+    if [[ "$version" > "8" ]] && [[ "$version" > "10" ]]; then
+        echo version is correct
+        exit 0
     else         
-        osascript -e 'tell app "Terminal" to display dialog "version is less than 1.5"'
-        echo version is less than 1.5
-        exit -1
+        echo version is incorect
+        exit -3
     fi
 else
-    exit -1
+    exit -4
 fi
