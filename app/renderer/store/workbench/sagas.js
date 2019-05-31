@@ -264,6 +264,14 @@ export function* initialize() {
     }
 
     if (appSettings) {
+
+        if(appSettings.showRecorderMessage === null ){
+            // set showRecorderMessage from cache
+            if(appSettings.cache && appSettings.cache.settings && typeof appSettings.cache.settings.showRecorderMessage === "boolean"){
+                appSettings.showRecorderMessage = appSettings.cache.settings.showRecorderMessage
+            }
+        }
+
         // make sure we push Electron store settings to our Redux Store
         yield put(settingsActions.mergeSettings(appSettings));
     }
@@ -386,7 +394,10 @@ export function* changeTab({ payload }) {
 export function* createNewRealFile({ payload }){
     console.log('createNewRealFile', payload);
     
-    const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, null]);
+    const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, null, [ 
+        { name: 'JavaScript file', extensions:['js'] },
+        { name: 'All Files', extensions: ['*'] } 
+    ]]);
     
     console.log('saveAsPath', saveAsPath);
 
