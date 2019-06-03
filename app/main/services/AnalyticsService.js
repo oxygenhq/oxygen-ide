@@ -85,14 +85,18 @@ export default class AnalyticsService extends ServiceBase {
                                     continent_code = json.continent_code;
                                 }
 
-                                this.mixpanel.people.set(uuid, {
-                                    $region: region,
-                                    $country_code: country_code,
-                                    'Сountry Name': country_name,
-                                    'City': city,
-                                    'Continent Name': continent_name,
-                                    'Continent Code': continent_code
-                                });
+                                try{
+                                    this.mixpanel.people.set(uuid, {
+                                        $region: region,
+                                        $country_code: country_code,
+                                        'Сountry Name': country_name,
+                                        'City': city,
+                                        'Continent Name': continent_name,
+                                        'Continent Code': continent_code
+                                    });
+                                } catch(e){
+                                    console.log('mixpanel e', e);
+                                }
                             }
                         } catch(e){
                             console.warn(e);
@@ -107,23 +111,33 @@ export default class AnalyticsService extends ServiceBase {
             console.log('e', e);
         }
 
-        this.mixpanel.people.set(uuid, {
-            $created: (new Date()).toISOString(),
-            $timezone: ''+moment().format('Z'),
-            'IDE Version': version,
-            'OS Name': process.platform,
-            'OS Version': os.release(),
-            'Language': language,
-            'Dev': process.env.NODE_ENV === 'development'
-        });
+        
+        try{
+            this.mixpanel.people.set(uuid, {
+                $created: (new Date()).toISOString(),
+                $timezone: ''+moment().format('Z'),
+                'IDE Version': version,
+                'OS Name': process.platform,
+                'OS Version': os.release(),
+                'Language': language,
+                'Dev': process.env.NODE_ENV === 'development'
+            }); 
+        } catch(e){
+            console.log('mixpanel e', e);
+        }
         this.ideOpen();
     }
 
     ideOpen(){
         this.openMoment = moment();
-        this.mixpanel.track('IDE_OPEN', {
-            distinct_id: this.uuid
-        });
+        
+        try{
+            this.mixpanel.track('IDE_OPEN', {
+                distinct_id: this.uuid
+            }); 
+        } catch(e){
+            console.log('mixpanel e', e);
+        }
     }
 
     ideClose(){
@@ -131,10 +145,14 @@ export default class AnalyticsService extends ServiceBase {
             const closeMoment = moment();
             const duration = closeMoment.diff(this.openMoment, 'seconds');
             
-            this.mixpanel.track('IDE_CLOSE', {
-                distinct_id: this.uuid,
-                'Duration': duration
-            });
+            try{
+                this.mixpanel.track('IDE_CLOSE', {
+                    distinct_id: this.uuid,
+                    'Duration': duration
+                });
+            } catch(e){
+                console.log('mixpanel e', e);
+            }
             setTimeout(() => {
                 resolve("result");
             }, 2000);
@@ -144,44 +162,61 @@ export default class AnalyticsService extends ServiceBase {
     recStart(){
         this.recStartMoment = moment();
 
-        this.mixpanel.track('IDE_FEATURE_REC_START', {
-            distinct_id: this.uuid,
-            'Recorder type': 'web'
-        });
+        try{
+            this.mixpanel.track('IDE_FEATURE_REC_START', {
+                distinct_id: this.uuid,
+                'Recorder type': 'web'
+            });
+        } catch(e){
+            console.log('mixpanel e', e);
+        }
     }
 
     recStop(recorded_items_count){
         const recStopMoment = moment();
         const duration = recStopMoment.diff(this.recStartMoment, 'seconds');
-        this.mixpanel.track('IDE_FEATURE_REC_END', {
-            distinct_id: this.uuid,
-            'Recorder type': 'web',
-            'Duration': duration,
-            'Recorded items count': recorded_items_count || 0
-        });
+        
+        try{
+            this.mixpanel.track('IDE_FEATURE_REC_END', {
+                distinct_id: this.uuid,
+                'Recorder type': 'web',
+                'Duration': duration,
+                'Recorded items count': recorded_items_count || 0
+            });
+        } catch(e){
+            console.log('mixpanel e', e);
+        }
         this.recStartMoment = null;
     }
 
     playStart(){
         this.playStartMoment = moment();
 
-        this.mixpanel.track('IDE_FEATURE_PLAY_START', {
-            distinct_id: this.uuid,
-            'Playback type': 'web'
-        });
+        try{
+            this.mixpanel.track('IDE_FEATURE_PLAY_START', {
+                distinct_id: this.uuid,
+                'Playback type': 'web'
+            });
+        } catch(e){
+            console.log('mixpanel e', e);
+        }
     }
 
     playStop(summary){
         const playStopMoment = moment();
         const duration = playStopMoment.diff(this.playStartMoment, 'seconds');
 
-        this.mixpanel.track('IDE_FEATURE_PLAY_END', {
-            distinct_id: this.uuid,
-            'Playback type': 'web',
-            'Duration': duration,
-            'Test duration': summary && summary._duration,
-            'Playback outcome': summary && summary._status
-        });
+        try{
+            this.mixpanel.track('IDE_FEATURE_PLAY_END', {
+                distinct_id: this.uuid,
+                'Playback type': 'web',
+                'Duration': duration,
+                'Test duration': summary && summary._duration,
+                'Playback outcome': summary && summary._status
+            });
+        } catch(e){
+            console.log('mixpanel e', e);
+        }
 
         this.playStartMoment = null;
     }
