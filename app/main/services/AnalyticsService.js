@@ -20,7 +20,12 @@ export default class AnalyticsService extends ServiceBase {
     constructor() {
         super();
         this.uuid = null;
-        this.mixpanel = Mixpanel.init('e80db0ad2789b5718fa1b84b6661f008');
+        
+        try{
+            this.mixpanel = Mixpanel.init('e80db0ad2789b5718fa1b84b6661f008');
+        } catch(e){
+            console.log('mixpanel e', e);
+        }
     }
 
     async dispose() {
