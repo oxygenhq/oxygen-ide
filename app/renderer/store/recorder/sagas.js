@@ -20,6 +20,42 @@ import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
 
+let lastExtensionTime = 0;
+let canRecord = false;
+let stopWaitChromeExtension = false;
+let waitChromeExtension = true;
+
+const timer = () => {
+    if(lastExtensionTime){
+        let newCanRecord = false;
+        const now = Date.now();
+        const diff = now - lastExtensionTime;
+
+        if(diff && diff > 2000){
+            newCanRecord = false;
+        } else {
+            newCanRecord = true;
+        }
+
+        if(newCanRecord !== canRecord){
+            canRecord = newCanRecord;
+            if(window && window.dispatch){
+                window.dispatch(recorderActions.changeCanRecord(newCanRecord));
+            }
+        }
+    }
+
+    if(waitChromeExtension){
+      // extension not finded
+      if(window && window.dispatch){
+        window.dispatch(recorderActions.stopWaitChromeExtension());
+        waitChromeExtension = false;
+      }
+    }
+}
+
+window.intervalId = setInterval(timer, 2000);
+
 /**
  * Recorder Sagas
  */
@@ -29,9 +65,27 @@ export default function* root() {
       takeLatest(ActionTypes.RECORDER_STOP, stopRecorder),
       takeLatest(ActionTypes.RECORDER_START_WATCHER, startRecorderWatcher),
       takeLatest(success(ActionTypes.WB_CLOSE_FILE), wbCloseFileSuccess),
-      takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
+      takeLatest('MAIN_SERVICE_EVENT', handleServiceEvents),
+      takeLatest('RESET', initialize)
     ]);
 }
+
+
+export function* initialize() {
+    lastExtensionTime = 0;
+    canRecord = false;
+    stopWaitChromeExtension = false;
+    waitChromeExtension = true;
+
+    if(window.intervalId){
+        clearTimeout(window.intervalId);
+    }
+    
+    window.intervalId = setInterval(timer, 2000);
+
+    return;
+}
+
 export function* stopRecorderAfterFileClose(){
     yield put(wbActions.stopRecorder());
     const errorWithFileMessage = 'Recording will stop now because the file was closed';
@@ -69,7 +123,10 @@ export function* handleServiceEvents({ payload }) {
         return;
     }
     if (service === 'RecorderService' && event.type === 'CHROME_EXTENSION_ENABLED') {
-        yield put(recorderActions.setLastExtentionEnabledTimestamp(Date.now()));
+        const recorder = yield select(state => state.recorder);
+
+        waitChromeExtension = recorder.waitChromeExtension;
+        lastExtensionTime = Date.now();
     }
     if (service === 'RecorderService' && event.type === 'RECORDER_EVENT') {          
         const step = {
