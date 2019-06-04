@@ -81,7 +81,11 @@ export default class MonacoEditor extends React.Component {
 
   componentDidUpdate(prevProps) {
     const RATIO = 1.58;
+    let updateFontSize = false;
+    let updateActiveLine = false;
+
     if (prevProps.fontSize !== this.props.fontSize && this.editor) {
+      updateFontSize = this.props.fontSize;
 
       // update editor
       this.editor.updateOptions({ 
@@ -118,7 +122,7 @@ export default class MonacoEditor extends React.Component {
         this.editor.revealLineInCenter(activeLine);
       }
       // set current line marker or clear it if activeLine is null
-      helpers.updateActiveLineMarker(this.editor, activeLine);
+      updateActiveLine = activeLine;
     }
     if (prevProps.theme !== this.props.theme) {
       monaco.editor.setTheme(this.props.theme);
@@ -132,6 +136,28 @@ export default class MonacoEditor extends React.Component {
     else if (this.editor && this.props.visible == true && this.props.visible != prevProps.visible) {
       this.editor.layout();
     }
+
+    if(updateActiveLine && updateFontSize){
+      //update ActiveLine and FontSize
+      helpers.updateActiveLineMarker(this.editor, updateActiveLine, updateFontSize);
+    } else if (updateActiveLine){
+      //update ActiveLine
+      helpers.updateActiveLineMarker(this.editor, updateActiveLine, this.props.fontSize);
+    } else if (updateFontSize){
+      //update FontSize
+      const { activeLine } = this.props;
+      if(activeLine){
+        helpers.updateActiveLineMarker(this.editor, activeLine, updateFontSize);
+      }
+    }
+
+    if (updateFontSize){
+      if(this.ln && Array.isArray(this.ln)){
+        this.ln.map((item) => {
+          helpers.addBreakpointMarker(this.editor, item, updateFontSize);
+        });
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -140,6 +166,22 @@ export default class MonacoEditor extends React.Component {
     this.elem.removeEventListener("keyup", this.keyupCallback);
   }
   
+  addLnToLnArray(ln){
+    if(this.ln && Array.isArray(this.ln)){
+      this.ln.push(ln)
+    } else {
+      this.ln = [ln];
+    }
+  }
+
+  removeLnfromLnArray(ln){
+    if(ln && this.ln && Array.isArray(this.ln)){
+      this.ln = this.ln.filter((item) => {
+        return item !== ln;
+      })
+    }
+  }
+
   wheelCallback = (e) => {
     e.stopPropagation()
     if(e && e.deltaY && e.deltaY < 0){
@@ -308,12 +350,14 @@ export default class MonacoEditor extends React.Component {
         if (editor.getModel().getLineContent(ln).trim().length > 0) {
           let marker = helpers.getBreakpointMarker(editor, ln);
           if (!marker) {
-            if (helpers.addBreakpointMarker(editor, ln)) {
+            if (helpers.addBreakpointMarker(editor, ln, this.props.fontSize)) {
+              this.addLnToLnArray(ln);
               this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
             }
           }
           else {
             if (helpers.removeBreakpointMarker(editor, ln)) {
+              this.removeLnfromLnArray(ln);
               this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
             }
           }
