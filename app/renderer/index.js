@@ -23,6 +23,8 @@ import './app.global.scss';
 
 // initialize Redux store
 const store = configureStore();
+window.dispatch = store.dispatch;
+
 configureServices(store);
 
 render(

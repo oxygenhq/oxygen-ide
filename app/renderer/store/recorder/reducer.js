@@ -10,6 +10,7 @@ import * as ActionTypes from './types';
 import { success, failure } from '../../helpers/redux';
 
 const defaultState = {
+  canRecord: false,
   isRecording: false,
   isChromeExtensionEnabled: false,
   waitChromeExtension: true,
@@ -27,6 +28,13 @@ export default (state = defaultState, action) => {
       return {
         ...state,
         waitChromeExtension: false
+      };
+    }
+
+    case ActionTypes.RECORDER_CHANGE_CAN_RECORD : {
+      return {
+        ...state,
+        canRecord: value
       };
     }
 

@@ -9,6 +9,11 @@
 import * as ActionTypes from './types';
 import { success, failure } from '../../helpers/redux';
 
+export const changeCanRecord = (newCanRecord) => ({
+  type: ActionTypes.RECORDER_CHANGE_CAN_RECORD,
+  payload: { value: newCanRecord },
+});
+
 // stop wait chrome extension
 export const stopWaitChromeExtension = () => ({
   type: ActionTypes.RECORDER_STOP_WAIT_CHROME_EXTENSION,

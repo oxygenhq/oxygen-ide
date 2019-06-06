@@ -37,6 +37,7 @@ const mapStoreToProps = (state) => {
     initialized: state.wb.initialized,
     javaError: state.wb.javaError,
     isRecording: state.recorder.isRecording,
+    canRecord: state.recorder.canRecord,
     isChromeExtensionEnabled: state.recorder.isChromeExtensionEnabled,
     waitChromeExtension: state.recorder.waitChromeExtension,
     settings: state.settings,

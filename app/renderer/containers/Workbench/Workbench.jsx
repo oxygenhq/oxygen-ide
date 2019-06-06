@@ -351,6 +351,7 @@ export default class Workbench extends Component<Props> {
         }
         {updateModals.call(this)}
         <Toolbar
+          canRecord={ this.props.canRecord }
           isChromeExtensionEnabled={ this.props.isChromeExtensionEnabled }
           waitChromeExtension={ this.props.waitChromeExtension }
           stopWaitChromeExtension={ this.props.stopWaitChromeExtension }

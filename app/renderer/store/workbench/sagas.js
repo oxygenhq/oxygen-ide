@@ -210,7 +210,6 @@ export function* deactivate() {
 }
 
 export function* initialize() {
-    console.log('initialize');
 
     // start check for update
     services.mainIpc.call('UpdateService', 'start').then(() => {});

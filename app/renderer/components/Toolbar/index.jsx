@@ -53,52 +53,6 @@ export default class Toolbar extends Component<Props> {
     }
   }
 
-  componentDidMount() {
-    var intervalId = setInterval(this.timer, 2000);
-    this.setState({intervalId: intervalId});
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.state.intervalId);
-  }
-
-  timer = () => {
-    const { 
-      isChromeExtensionEnabled, 
-      waitChromeExtension,
-      stopWaitChromeExtension
-    } = this.props;
-
-    let newState = {};
-
-    if(Number.isInteger(isChromeExtensionEnabled)){
-      const now = Date.now();
-      const diff = now - isChromeExtensionEnabled;
-
-      if(diff && diff > 2000){
-        newState.canRecord = false;      
-      } else {
-        newState.canRecord = true;
-      }
-
-      if(newState.canRecord !== this.state.canRecord){
-        this.setState(newState);
-      }
-    } else {
-      // if(typeof this.state.showNoChromeDialog === 'undefined'){
-      //   newState.showNoChromeDialog = true;
-      //   this.setState(newState);
-      // }
-    }
-
-    if(waitChromeExtension){
-      // extension not finded
-      if(stopWaitChromeExtension){
-        stopWaitChromeExtension();
-      }
-    }
-  }
-
   hideNoChromeDialog = () => {
     this.setState({
       showNoChromeDialog: false
@@ -180,13 +134,13 @@ export default class Toolbar extends Component<Props> {
       emulators, 
       stepDelay,
       isChromeExtensionEnabled,
+      canRecord,
       waitChromeExtension,
       showRecorderMessage,
       changeShowRecorderMessageValue
     } = this.props;
 
-    const { 
-      canRecord,
+    const {
       showNoChromeDialog,
       showWorkingChromeDialog
     } = this.state;
