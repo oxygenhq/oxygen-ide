@@ -101,10 +101,14 @@ export default class UpdateService extends ServiceBase {
     async start(notifyIfNoUpdate = false) {
         let result;
 
-        console.log('UpdateService start', notifyIfNoUpdate);
-        const checkForUpdate = await this._checkForUpdate(notifyIfNoUpdate);
-        console.log('checkForUpdate', checkForUpdate);
-        result = checkForUpdate;
+        try{
+            console.log('UpdateService start', notifyIfNoUpdate);
+            const checkForUpdate = await this._checkForUpdate(notifyIfNoUpdate);
+            console.log('checkForUpdate', checkForUpdate);
+            result = checkForUpdate;
+        } catch(e){
+            console.log('UpdateService e', e);
+        }
         
         return result;
     }
