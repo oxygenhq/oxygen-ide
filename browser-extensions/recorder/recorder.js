@@ -317,7 +317,10 @@ Recorder.prototype.record = function (command, target, value) {
         // and assertText/waitForText sometimes erroneously generated for html/body pulling whole page html as text string
         for (var i = 0; i < cmds.length; i++) {
             var c = cmds[i];
-            if (c.target === 'css=body' || c.target === 'css=html') {
+            if (c.target === 'css=body' ||
+                c.target === 'css=html' ||
+                c.target === '//body' ||
+                c.target === '//html') {
                 return;
             }
         }
