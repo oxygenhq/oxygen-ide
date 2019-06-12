@@ -1,6 +1,4 @@
 import { ipcRenderer } from 'electron';
-const path = require('path');
-const os = require('os');
 
 export const JAVA_ERROR_INFO = 'JAVA_ERROR_INFO';
 export const JAVA_NOT_FOUND = 'JAVA_NOT_FOUND';
