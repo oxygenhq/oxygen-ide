@@ -380,7 +380,7 @@ Recorder.addEventHandler('change', function (ev) {
             if (target.value.length <= 0) {
                 this.record('clear', this.findLocators(target), '');
             } else {
-                this.record('type', this.findLocators(target), target.value);
+                this.record('type', this.findLocators(target), target.value.replace(/\\/g, '\\\\'));
             }
         } else if ('select' == tagName) {
             if (!target.multiple) {
