@@ -175,9 +175,11 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
         transType === 'auto_bookmark' || 
         transType === 'generated' ||
         transType === 'reload') {
-        
+
         // ignore internal Google Chrome urls
-        if (details.url.indexOf('/_/chrome/newtab') > -1 || details.url.indexOf('chrome:') === 0) {
+        if (details.url.indexOf('/_/chrome/newtab') > -1 ||
+            details.url.startsWith('chrome:') ||
+            details.url.startsWith('chrome-search:')) {
             return;
         }
 
