@@ -9,7 +9,7 @@ export default class JavaService {
   constructor(store) {
     // console.log('~JavaService elive');
   }
-  
+
   javaversion(callback) {
     try {
       const spawn = require('child_process').spawn('java', ['-version']);

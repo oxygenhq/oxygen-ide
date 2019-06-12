@@ -7,7 +7,8 @@
  * (at your option) any later version.
  */
 import electron, { BrowserWindow } from 'electron';
-
+const os = require('os');
+const path = require('path');
 import ServiceBase from "../ServiceBase";
 import menuTemplate from './menuTemplate';
 import menuTemplateFromArray from './menuTemplateFromArray';
@@ -24,6 +25,79 @@ const DEFAULT_MENU_STATE = {
         selected: true,
     },
 };
+
+const chromeVersion = () => {
+    return new Promise(function(resolve) {
+      if (os.platform() === 'win32') {
+        try {
+          const process = require('child_process');   
+          const spawn = process.spawn(path.resolve(__dirname, 'get_chrome_versions.bat'));
+          spawn.on('error', function(err){
+            console.log('error', err);
+          });
+
+          let infoArray;
+
+          spawn.stdout.on('data', function (data) {
+            try {
+              let cmdOut = data.toString().split('\n');
+    
+              console.log('cmdOut', cmdOut);
+
+              if(Array.isArray(cmdOut)){
+                infoArray = cmdOut.filter(function (el) {
+                  return el.length > 1;
+                });
+              }              
+            } catch(e){
+              console.log('e', e);
+            }
+          });
+          spawn.on('close', function (code) {
+            if (code == 0){
+                console.log('code 0');
+            }
+            else {
+                const lineWithVersion = infoArray[infoArray.length - 1];
+
+                if(lineWithVersion && lineWithVersion.split){
+                    const lineWithVersionSplit = lineWithVersion.split(' ');
+    
+                    if(Array.isArray(lineWithVersionSplit) && lineWithVersionSplit.length){
+                      resolve(lineWithVersionSplit[lineWithVersionSplit.length - 1]);
+                      spawn.kill();
+                    }
+                } else {
+                    console.log('infoArray', infoArray);
+                    console.log('bad lineWithVersion', lineWithVersion);
+                    resolve('not found');
+                }
+            }
+          });
+        } catch(e){
+          console.log('e', e);
+        }
+      } else {
+        const spawn = require('child_process').spawn('/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome', ['--version']);
+        spawn.on('error', function(err){
+          console.log('error', err);
+        });
+  
+        spawn.stdout.on('data', function (data) {
+  
+          let cmdOut = data.toString().split('\n');
+  
+          if(cmdOut && cmdOut[0]){
+            const ArrFromStrWithChromeVersion = cmdOut[0].trim().split(' ');
+            if(Array.isArray(ArrFromStrWithChromeVersion) && ArrFromStrWithChromeVersion.length && ArrFromStrWithChromeVersion.length === 3){
+              resolve(ArrFromStrWithChromeVersion[2]);
+            }
+          }
+        });
+      }
+    });
+
+  }
 
 export default class MenuService extends ServiceBase {
     constructor(mainWindow) {
@@ -58,7 +132,7 @@ export default class MenuService extends ServiceBase {
         }*/
     }
 
-    _handleMenuCommand(cmd, ...args) {
+    async _handleMenuCommand(cmd, ...args) {
         const focusedWindow = BrowserWindow.getFocusedWindow();
         let notify = true;
 
@@ -126,11 +200,24 @@ export default class MenuService extends ServiceBase {
             notify = false;
         }
         else if (cmd === Const.MENU_CMD_HELP_SHOW_ABOUT) {
+
+            var chromeVer = 'not found';
+            try {
+                const result = await chromeVersion();
+                
+                if(result){
+                    chromeVer = result;
+                }
+            } catch(e){
+                console.log('e',e);
+            }
+
             var oxVersion = pkgNativeInfo.dependencies['oxygen-cli'];
             var details = 'Oxygen: ' + (oxVersion.startsWith('git') ? oxVersion.substring(oxVersion.length - 40) : oxVersion) + '\n' +
                     'Electron: ' + process.versions.electron + '\n' +
                     'Node: ' + process.versions.node + '\n' +
-                    'Architecture: ' + process.arch;
+                    'Architecture: ' + process.arch + '\n' +
+                    'Chrome : ' + chromeVer
             electron.dialog.showMessageBox({
                 type: 'info', 
                 title: pkgInfo.productName, 
