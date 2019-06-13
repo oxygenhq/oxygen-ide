@@ -24,7 +24,7 @@ export default class AnalyticsService extends ServiceBase {
         try{
             this.mixpanel = Mixpanel.init('e80db0ad2789b5718fa1b84b6661f008');
         } catch(e){
-            console.log('mixpanel e', e);
+            console.error('mixpanel e', e);
         }
     }
 
@@ -100,11 +100,11 @@ export default class AnalyticsService extends ServiceBase {
                                         'Continent Code': continent_code
                                     });
                                 } catch(e){
-                                    console.log('mixpanel e', e);
+                                    console.error('mixpanel e', e);
                                 }
                             }
                         } catch(e){
-                            console.warn(e);
+                            console.error(e);
                         }
                     })
                 response.on('end', () => {
@@ -113,7 +113,7 @@ export default class AnalyticsService extends ServiceBase {
             })
             request.end();
         } catch(e){
-            console.log('e', e);
+            console.error('e', e);
         }
 
         
@@ -128,7 +128,7 @@ export default class AnalyticsService extends ServiceBase {
                 'Dev': process.env.NODE_ENV === 'development'
             }); 
         } catch(e){
-            console.log('mixpanel e', e);
+            console.error('mixpanel e', e);
         }
         this.ideOpen();
     }
@@ -141,7 +141,7 @@ export default class AnalyticsService extends ServiceBase {
                 distinct_id: this.uuid
             }); 
         } catch(e){
-            console.log('mixpanel e', e);
+            console.error('mixpanel e', e);
         }
     }
 
@@ -156,7 +156,7 @@ export default class AnalyticsService extends ServiceBase {
                     'Duration': duration
                 });
             } catch(e){
-                console.log('mixpanel e', e);
+                console.error('mixpanel e', e);
             }
             setTimeout(() => {
                 resolve("result");
@@ -173,7 +173,7 @@ export default class AnalyticsService extends ServiceBase {
                 'Recorder type': 'web'
             });
         } catch(e){
-            console.log('mixpanel e', e);
+            console.error('mixpanel e', e);
         }
     }
 
@@ -189,7 +189,7 @@ export default class AnalyticsService extends ServiceBase {
                 'Recorded items count': recorded_items_count || 0
             });
         } catch(e){
-            console.log('mixpanel e', e);
+            console.error('mixpanel e', e);
         }
         this.recStartMoment = null;
     }
@@ -203,7 +203,7 @@ export default class AnalyticsService extends ServiceBase {
                 'Playback type': 'web'
             });
         } catch(e){
-            console.log('mixpanel e', e);
+            console.error('mixpanel e', e);
         }
     }
 
