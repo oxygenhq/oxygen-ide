@@ -46,7 +46,9 @@ const chromeVersion = () => {
 
               if(Array.isArray(cmdOut)){
                 infoArray = cmdOut.filter(function (el) {
-                  return el.length > 1;
+                    if(el && el.length){
+                        return el.length > 1;
+                    }
                 });
               }              
             } catch(e){
@@ -54,25 +56,51 @@ const chromeVersion = () => {
             }
           });
           spawn.on('close', function (code) {
-            if (code == 0){
-                console.log('code 0');
-            }
-            else {
-                const lineWithVersion = infoArray[infoArray.length - 1];
-
-                if(lineWithVersion && lineWithVersion.split){
-                    const lineWithVersionSplit = lineWithVersion.split(' ');
-    
-                    if(Array.isArray(lineWithVersionSplit) && lineWithVersionSplit.length){
-                      resolve(lineWithVersionSplit[lineWithVersionSplit.length - 1]);
-                      spawn.kill();
-                    }
-                } else {
-                    console.log('infoArray', infoArray);
-                    console.log('bad lineWithVersion', lineWithVersion);
-                    resolve('not found');
+              try{
+                if (code == 0){
+                    console.log('code 0');
                 }
-            }
+                else {
+                    if(
+                        infoArray &&
+                        Array.isArray(infoArray) &&
+                        infoArray.length
+                    ){
+                        const lineWithVersion = infoArray[infoArray.length - 1];
+        
+                        if(
+                            lineWithVersion && 
+                            Array.isArray(infoArray) &&
+                            lineWithVersion.split
+                        ){
+                            const lineWithVersionSplit = lineWithVersion.split(' ');
+            
+                            if(
+                                lineWithVersionSplit &&
+                                Array.isArray(lineWithVersionSplit) && 
+                                lineWithVersionSplit.length
+                            ){
+                                resolve(lineWithVersionSplit[lineWithVersionSplit.length - 1]);
+                                spawn.kill();
+                            } else {
+                                console.log('infoArray', infoArray);
+                                console.log('lineWithVersionSplit', lineWithVersionSplit);
+                                console.log('bad lineWithVersion', lineWithVersion);
+                                resolve('not found');
+                            }
+                        } else {
+                            console.log('infoArray', infoArray);
+                            console.log('bad lineWithVersion', lineWithVersion);
+                            resolve('not found');
+                        }
+                    } else {
+                        console.log('infoArray', infoArray);
+                        resolve('not found');
+                    }
+                }
+              } catch(e){
+                  console.log('e', e);
+              }
           });
         } catch(e){
           console.log('e', e);
