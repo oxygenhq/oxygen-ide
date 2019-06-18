@@ -105,7 +105,7 @@ export function breakpointMarkersToLineNumbers(editor) {
 }
 
 export function updateActiveLineMarker(editor, line, fontSize=null) {
-
+    
     // try to convert string value of line to number if possible (line support to be integer)
     if (line && !Number.isInteger(line) && typeof line === 'string' && !isNaN(line)) {
         try { line = parseInt(line); }

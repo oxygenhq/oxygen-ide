@@ -114,7 +114,7 @@ export default class MonacoEditor extends React.Component {
     if (prevProps.editorReadOnly !== this.props.editorReadOnly && this.editor) {
       this.editor.updateOptions({ readOnly: this.props.editorReadOnly });
     }
-
+    
     if (prevProps.activeLine !== this.props.activeLine) {
       const { activeLine } = this.props;
       // scroll view into the current active line
@@ -137,18 +137,16 @@ export default class MonacoEditor extends React.Component {
       this.editor.layout();
     }
 
-    if(updateActiveLine && updateFontSize){
+    if(typeof updateActiveLine !== 'boolean' && updateFontSize){
       //update ActiveLine and FontSize
       helpers.updateActiveLineMarker(this.editor, updateActiveLine, updateFontSize);
-    } else if (updateActiveLine){
+    } else if (typeof updateActiveLine !== 'boolean'){
       //update ActiveLine
       helpers.updateActiveLineMarker(this.editor, updateActiveLine, this.props.fontSize);
     } else if (updateFontSize){
       //update FontSize
       const { activeLine } = this.props;
-      if(activeLine){
-        helpers.updateActiveLineMarker(this.editor, activeLine, updateFontSize);
-      }
+      helpers.updateActiveLineMarker(this.editor, activeLine, updateFontSize);
     }
 
     if (updateFontSize){
