@@ -12,6 +12,9 @@ import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
 CheckNodeEnv('production');
 
 export default merge.smart(baseConfig, {
+  externals: {
+		'@sentry/electron': 'require("@sentry/electron")'
+	},
   devtool: 'source-map',
 
   target: 'electron-main',
@@ -49,6 +52,6 @@ export default merge.smart(baseConfig, {
     }),
 
     // adbkit has a double require for CoffeScript and Javascript and packing fails if we don't ingore the CS ones.
-    new webpack.IgnorePlugin(/(\.\/src\/adb)|(\.\/src\/monkey)|(\.\/src\/logcat)/)
+    new webpack.IgnorePlugin(/(vertx)|(\.\/src\/adb)|(\.\/src\/monkey)|(\.\/src\/logcat)/)
   ],
 });
