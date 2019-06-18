@@ -22,6 +22,7 @@ import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
 import Logger from './Logger';
 import MainProcess from './MainProcess';
 import * as Sentry from '@sentry/electron';
+const path = require('path');
 
 crashReporter.start({
   companyName: 'no-company-nc',
@@ -107,7 +108,8 @@ app.on('ready', async () => {
     width: 1024,
     height: 728,
     webPreferences: {
-      webSecurity: false
+      webSecurity: false,
+      preload: path.join(__dirname, 'sentry.js')
     },
   });
 

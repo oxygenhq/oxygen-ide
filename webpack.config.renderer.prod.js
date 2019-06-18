@@ -131,7 +131,6 @@ export default merge.smart(baseConfig, {
     new BundleAnalyzerPlugin({
       analyzerMode: process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
       openAnalyzer: process.env.OPEN_ANALYZER === 'true'
-    }),
-    new webpack.IgnorePlugin(/vertx/)
+    })
   ],
 });
