@@ -175,7 +175,7 @@ export default class Logger {
 
     _catchTheUncaught() {
         process.on('uncaughtException', error => {
-            log.error('Unhandled Error.', error);
+            log.warn('Unhandled Error.', error);
         });
 
         process.on('unhandledRejection', error => {
