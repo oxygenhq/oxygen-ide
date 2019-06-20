@@ -174,7 +174,10 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
     if (transType === 'typed' || 
         transType === 'auto_bookmark' || 
         transType === 'generated' ||
-        transType === 'reload') {
+        transType === 'reload' ||
+        (transType === 'link' && 
+            details.transitionQualifiers.length === 2 && 
+            details.transitionQualifiers[1] === 'from_address_bar')) {
 
         // ignore internal Google Chrome urls
         if (details.url.indexOf('/_/chrome/newtab') > -1 ||
