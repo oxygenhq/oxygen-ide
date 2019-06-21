@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.5.2 (2019-06-21)
+## v1.6.0 (2019-06-21)
 * Fixed saving recording in a wrong file format deletes the script.
 * Fixed increasing font size does not increase green arrow & red break point.
 * Fixed crash when working in offline mode.
