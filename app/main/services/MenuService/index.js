@@ -106,22 +106,29 @@ const chromeVersion = () => {
           console.log('e', e);
         }
       } else {
-        const spawn = require('child_process').spawn('/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome', ['--version']);
-        spawn.on('error', function(err){
-          console.log('error', err);
-        });
-  
-        spawn.stdout.on('data', function (data) {
-  
-          let cmdOut = data.toString().split('\n');
-  
-          if(cmdOut && cmdOut[0]){
-            const ArrFromStrWithChromeVersion = cmdOut[0].trim().split(' ');
-            if(Array.isArray(ArrFromStrWithChromeVersion) && ArrFromStrWithChromeVersion.length && ArrFromStrWithChromeVersion.length === 3){
-              resolve(ArrFromStrWithChromeVersion[2]);
+        try {
+          const spawn = require('child_process').spawn('/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome', ['--version']);
+          spawn.on('error', function(err){
+            console.log('error', err);
+          });
+    
+          spawn.stdout.on('data', function (data) {
+            try{
+              let cmdOut = data.toString().split('\n');
+      
+              if(cmdOut && cmdOut[0]){
+                const ArrFromStrWithChromeVersion = cmdOut[0].trim().split(' ');
+                if(Array.isArray(ArrFromStrWithChromeVersion) && ArrFromStrWithChromeVersion.length && ArrFromStrWithChromeVersion.length === 3){
+                  resolve(ArrFromStrWithChromeVersion[2]);
+                }
+              }
+            } catch(e){
+              console.log('e', e);
             }
-          }
-        });
+          });
+        } catch(e){
+          console.log('e', e);
+        }
       }
     });
 
