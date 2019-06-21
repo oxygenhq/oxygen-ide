@@ -27,13 +27,14 @@ const DEFAULT_MENU_STATE = {
 };
 
 const chromeVersion = () => {
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
       if (os.platform() === 'win32') {
         try {
           const process = require('child_process');   
           const spawn = process.spawn(path.resolve(__dirname, 'get_chrome_versions.bat'));
           spawn.on('error', function(err){
             console.log('error', err);
+            reject(err);
           });
 
           let infoArray;
@@ -41,8 +42,6 @@ const chromeVersion = () => {
           spawn.stdout.on('data', function (data) {
             try {
               let cmdOut = data.toString().split('\n');
-    
-              console.log('cmdOut', cmdOut);
 
               if(Array.isArray(cmdOut)){
                 infoArray = cmdOut.filter(function (el) {
@@ -53,6 +52,7 @@ const chromeVersion = () => {
               }              
             } catch(e){
               console.log('e', e);
+              reject(e);
             }
           });
           spawn.on('close', function (code) {
@@ -100,28 +100,44 @@ const chromeVersion = () => {
                 }
               } catch(e){
                   console.log('e', e);
+                  reject(e);
               }
           });
         } catch(e){
           console.log('e', e);
+          reject(e);
         }
-      } else {
-        const spawn = require('child_process').spawn('/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome', ['--version']);
-        spawn.on('error', function(err){
-          console.log('error', err);
-        });
-  
-        spawn.stdout.on('data', function (data) {
-  
-          let cmdOut = data.toString().split('\n');
-  
-          if(cmdOut && cmdOut[0]){
-            const ArrFromStrWithChromeVersion = cmdOut[0].trim().split(' ');
-            if(Array.isArray(ArrFromStrWithChromeVersion) && ArrFromStrWithChromeVersion.length && ArrFromStrWithChromeVersion.length === 3){
-              resolve(ArrFromStrWithChromeVersion[2]);
+      } else if(os.platform() === 'darwin') {
+        try {
+          const spawn = require('child_process').spawn('/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome', ['--version']);
+          spawn.on('error', function(err){
+            console.log('error', err);
+            reject(err);
+          });
+    
+          spawn.stdout.on('data', function (data) {
+            try{
+              let cmdOut = data.toString().split('\n');
+      
+              if(cmdOut && cmdOut[0]){
+                const ArrFromStrWithChromeVersion = cmdOut[0].trim().split(' ');
+                if(Array.isArray(ArrFromStrWithChromeVersion) && ArrFromStrWithChromeVersion.length && ArrFromStrWithChromeVersion.length === 3){
+                    resolve(ArrFromStrWithChromeVersion[2]);
+                } else {
+                    resolve('not found');
+                }
+              } else {
+                resolve('not found');
+              }
+            } catch(e){
+              console.log('e', e);
+              reject(e);
             }
-          }
-        });
+          });
+        } catch(e){
+          console.log('e', e);
+          reject(e);
+        }
       }
     });
 
