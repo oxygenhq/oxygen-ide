@@ -42,14 +42,13 @@ const chromeVersion = () => {
           spawn.stdout.on('data', function (data) {
             try {
               let cmdOut = data.toString().split('\n');
-
-              if(Array.isArray(cmdOut)){
+              if(Array.isArray(cmdOut) && cmdOut.length > 2){
                 infoArray = cmdOut.filter(function (el) {
                     if(el && el.length){
                         return el.length > 1;
                     }
                 });
-              }              
+              }
             } catch(e){
               console.log('e', e);
               reject(e);
@@ -83,18 +82,12 @@ const chromeVersion = () => {
                                 resolve(lineWithVersionSplit[lineWithVersionSplit.length - 1]);
                                 spawn.kill();
                             } else {
-                                console.log('infoArray', infoArray);
-                                console.log('lineWithVersionSplit', lineWithVersionSplit);
-                                console.log('bad lineWithVersion', lineWithVersion);
                                 resolve('not found');
                             }
                         } else {
-                            console.log('infoArray', infoArray);
-                            console.log('bad lineWithVersion', lineWithVersion);
                             resolve('not found');
                         }
                     } else {
-                        console.log('infoArray', infoArray);
                         resolve('not found');
                     }
                 }
@@ -245,23 +238,22 @@ export default class MenuService extends ServiceBase {
         }
         else if (cmd === Const.MENU_CMD_HELP_SHOW_ABOUT) {
 
-            var chromeVer = 'not found';
-            try {
-                const result = await chromeVersion();
+            // var chromeVer = 'not found';
+            // try {
+            //     const result = await chromeVersion();
                 
-                if(result){
-                    chromeVer = result;
-                }
-            } catch(e){
-                console.log('e',e);
-            }
+            //     if(result){
+            //         chromeVer = result;
+            //     }
+            // } catch(e){
+            //     console.log('e',e);
+            // }
 
             var oxVersion = pkgNativeInfo.dependencies['oxygen-cli'];
             var details = 'Oxygen: ' + (oxVersion.startsWith('git') ? oxVersion.substring(oxVersion.length - 40) : oxVersion) + '\n' +
                     'Electron: ' + process.versions.electron + '\n' +
                     'Node: ' + process.versions.node + '\n' +
-                    'Architecture: ' + process.arch + '\n' +
-                    'Chrome : ' + chromeVer
+                    'Architecture: ' + process.arch + '\n'
             electron.dialog.showMessageBox({
                 type: 'info', 
                 title: pkgInfo.productName, 
