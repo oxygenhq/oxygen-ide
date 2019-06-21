@@ -48,7 +48,7 @@ export default (cmdHandler, settings) => {
       type: 'separator'
     },
     {
-      label: 'Clear all',
+      label: 'Reset IDE state',
       click() { cmdHandler(Const.MENU_CMD_CLEAR_ALL) }
     },
     {
