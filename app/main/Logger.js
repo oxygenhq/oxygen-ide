@@ -47,8 +47,10 @@ export default class Logger {
         } catch (err) {
             // getPath('logs') fails on linux
             const logsPath = path.join(app.getPath('userData'), 'logs');
-            if (!fs.existsSync(logsPath)) {
+            if (!fs.existsSync(app.getPath('userData'))) {
                 fs.mkdirSync(app.getPath('userData'));
+            }
+            if (!fs.existsSync(logsPath)) {
                 fs.mkdirSync(logsPath);
             }
             this.logFilePath = path.resolve(logsPath, 'oxygenide.log');
