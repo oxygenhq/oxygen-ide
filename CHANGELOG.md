@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v1.5.2 (2019-06-21)
+* Fixed saving recording in a wrong file format deletes the script.
+* Fixed increasing font size does not increase green arrow & red break point.
+* Fixed crash when working in offline mode.
+* Fixed run marker not disappearing when test completes successfully.
+* Bump IEDriverServer 1.141.59.
+* Bump Oxygen 0.45.1.
+
 ## v1.5.1 (2019-05-29)
 * Bump Oxygen 0.44.0.
 * Fixed `log` commands not working.
