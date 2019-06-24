@@ -41,6 +41,10 @@ const timer = () => {
             canRecord = newCanRecord;
             if(window && window.dispatch){
                 window.dispatch(recorderActions.changeCanRecord(newCanRecord));
+
+                if(!newCanRecord){
+                    window.dispatch(recorderActions.stopRecorder());
+                }
             }
         }
     }
