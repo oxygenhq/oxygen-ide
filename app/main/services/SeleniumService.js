@@ -176,12 +176,12 @@ export default class SeleniumService extends ServiceBase {
     _handleProcessEvents() {
         const proc = this.seleniumProc;
         if (!proc) {
-            console.error('Selenium process was not started.');
+            log.error('Selenium process was not started.');
             return;
         }
         // on 'error'
         proc.on('error', (e) => {
-            console.error('Cannot start Selenium process.', e);
+            log.error('Cannot start Selenium process.', e);
             // logGeneral.add('ERROR', 'Unable to find Java.
             // Make sure Java is installed and has been added to the PATH environment variable.');
             this._emitLogEvent(e.toString(), ServiceBase.SEVERITY_ERROR);
