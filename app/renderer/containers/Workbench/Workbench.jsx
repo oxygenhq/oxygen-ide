@@ -392,24 +392,24 @@ export default class Workbench extends Component<Props> {
                   />
                 </Sidebar>
                 <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
-                <Header className="tabs-container">{/*headerBar*/}
-                  <Row>
-                    <Col className="sidebar-trigger">                      
-                      <Icon
-                        title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
-                        className="trigger"
-                        type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
-                        onClick={ () => ::this.toggleSidebarVisible('left') }
-                        style={{ paddingLeft: 15, cursor: 'pointer' }}
-                      />
-                    </Col>
-                    <Col className="tabs-bar-container">
-                      <Tabs 
-                        onChange={ this.handleTabChange } 
-                        onClose={ this.handleTabClose } 
-                      />
-                    </Col>
-                  </Row>
+                  <Header className="tabs-container">{/*headerBar*/}
+                    <Row>
+                      <Col className="sidebar-trigger">                      
+                        <Icon
+                          title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
+                          className="trigger"
+                          type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
+                          onClick={ () => ::this.toggleSidebarVisible('left') }
+                          style={{ paddingLeft: 15, cursor: 'pointer' }}
+                        />
+                      </Col>
+                      <Col className="tabs-bar-container">
+                        <Tabs 
+                          onChange={ this.handleTabChange } 
+                          onClose={ this.handleTabClose } 
+                        />
+                      </Col>
+                    </Row>
                 </Header>
                 <div className="editor-container">
                   <div id="editors-container-wrap">
@@ -423,6 +423,7 @@ export default class Workbench extends Component<Props> {
                     onHide={::this.logger_onHide}
                   />
                 </div>
+                </Layout>
                 <Sidebar 
                   align="right"
                   size={ rightSidebarSize } 

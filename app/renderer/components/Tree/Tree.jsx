@@ -789,7 +789,11 @@ class Tree extends React.Component {
       domProps.onKeyDown = this.onKeyDown;
     }
 
-    const dragOver = dragOverNodeKey === rootPath;
+    let dragOver;
+
+    if(dragOverNodeKey && rootPath){
+      dragOver = dragOverNodeKey === rootPath;
+    }
 
     return (
       <ul

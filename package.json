@@ -146,6 +146,7 @@
   "dependencies": {
     "@emotion/core": "^10.0.5",
     "@emotion/styled": "^10.0.5",
+    "acorn": "^6.1.1",
     "antd": "^3.4.5",
     "appium-adb": "^7.6.5",
     "clean-stack": "^2.1.0",
