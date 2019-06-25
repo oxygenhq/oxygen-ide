@@ -42,15 +42,13 @@ export default class Panel extends Component<Props> {
             scrollRefresh = false,
             scrollVerticalOnly = false,
             noBodyPadding = false,
-            refreshScrollBottom = false,
-            wrapRef,
             noBodyBorders = false,
             className = null
         } = this.props;
 
         let children = this.props.children;
         if (scroller) {
-            children = renderChildrenWithScroller(this.props.children, scrollWrapperClass, scrollVerticalOnly, scrollRefresh, refreshScrollBottom);
+            children = renderChildrenWithScroller(this.props.children, scrollWrapperClass, scrollVerticalOnly, scrollRefresh);
         }
 
         const panelBodyClassNames = 'panel-body' + 
@@ -58,27 +56,22 @@ export default class Panel extends Component<Props> {
             (noBodyBorders ? ' no-borders' : '');
 
         return (
-            <Panel.Container className="panel1">
-                <div 
-                    ref={wrapRef ? wrapRef : undefined}
-                    className="panel"
-                >
-                    { header && 
-                        <div className="panel-header">
-                            <span>{ header }</span>
-                        </div>
-                    }
-                    { afterHeader }
-                    <div className={ panelBodyClassNames }>
-                        { children }
+            <Panel.Container className={`panel1 ${className}`}>
+                { header && 
+                    <div className="panel-header">
+                        <span>{ header }</span>
                     </div>
+                }
+                { afterHeader }
+                <div className={ panelBodyClassNames }>
+                    { children }
                 </div>
             </Panel.Container>
         );
     }
 }
 
-function renderChildrenWithScroller(children, wrapperClass = null, scrollVerticalOnly = false, refreshScroll = false, refreshScrollBottom = false) {
+function renderChildrenWithScroller(children, wrapperClass = null, scrollVerticalOnly = false, refreshScroll = false) {
     let classes = 'scroller';
     if (wrapperClass) {
         classes += ' ' + wrapperClass;
@@ -86,7 +79,6 @@ function renderChildrenWithScroller(children, wrapperClass = null, scrollVertica
     return (
         <ScrollContainer
           refreshScroll={ refreshScroll }
-          refreshScrollBottom={ refreshScrollBottom }
           disableHorizontal={ scrollVerticalOnly }
           classes={ classes }
         >
