@@ -15,10 +15,10 @@ export const addTab = (key, title) => {
   };
 };
 
-export const removeTab = (key) => {
+export const removeTab = (key, title = null) => {
   return {
     type: ActionTypes.TABS_REMOVE,
-    payload: { key },
+    payload: { key, title },
   };
 };
 
@@ -29,16 +29,16 @@ export const renameTab = (oldKey, newKey, newTitle) => {
   };
 };
 
-export const setActiveTab = (key) => {
+export const setActiveTab = (key, title = null) => {
   return {
     type: ActionTypes.TABS_SET_ACTIVE,
-    payload: { key },
+    payload: { key, title },
   };
 };
 
-export const setTabTouched = (key, touched) => ({
+export const setTabTouched = (key, touched, name = null) => ({
   type: ActionTypes.TABS_SET_TOUCHED,
-  payload: { key, value: touched },
+  payload: { key, value: touched, title: name },
 });
 
 export const changeTabOrder = (fromIndex, toIndex) => ({

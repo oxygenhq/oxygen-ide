@@ -79,6 +79,17 @@
   color: $hover;
 }
 
+.appTollbar .control.selectable.not-work:hover {
+  color: $danger;
+}
+
+.dont-show-again-contol {
+  float: left;
+  height: 32px;
+  line-height: 32px!important;
+  margin-left: 8px!important;
+}
+
 .appTollbar .separator {
   height: 22px;
   width: 1px;
@@ -103,4 +114,11 @@
 
 .appTollbar button.control.button.stop:hover {
   color: $hover;
+}
+
+.ext-wait-message {
+  font-size: 10px;
+  line-height: 10px;
+  margin-bottom: 0px;
+  margin-left: 10px;
 }

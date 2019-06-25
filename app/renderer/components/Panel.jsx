@@ -16,7 +16,7 @@ import ScrollContainer from './ScrollContainer';
 import '../css/panel.scss';
 
 type Props = {
-  header: string,
+  header: string|React.Node,
   scroller?: boolean,
   scrollWrapperClass?: string,
   scrollRefresh?: boolean,
@@ -41,11 +41,13 @@ export default class Panel extends Component<Props> {
             scrollRefresh = false,
             scrollVerticalOnly = false,
             noBodyPadding = false,
+            refreshScrollBottom = false,
+            wrapRef
         } = this.props;
 
         let children = this.props.children;
         if (scroller) {
-            children = renderChildrenWithScroller(this.props.children, scrollWrapperClass, scrollVerticalOnly, scrollRefresh);
+            children = renderChildrenWithScroller(this.props.children, scrollWrapperClass, scrollVerticalOnly, scrollRefresh, refreshScrollBottom);
         }
 
         const panelBodyClassNames = 'panel-body' + 
@@ -53,18 +55,23 @@ export default class Panel extends Component<Props> {
 
         return (
             <Panel.Container className="panel1">
+            <div 
+                ref={wrapRef ? wrapRef : undefined}
+                className="panel"
+            >
                 <div className="panel-header">
                     <span>{ header }</span>
                 </div>
                 <div className={ panelBodyClassNames }>
                     { children }
                 </div>
+            </div>
             </Panel.Container>
         );
     }
 }
 
-function renderChildrenWithScroller(children, wrapperClass = null, scrollVerticalOnly = false, refreshScroll = false) {
+function renderChildrenWithScroller(children, wrapperClass = null, scrollVerticalOnly = false, refreshScroll = false, refreshScrollBottom = false) {
     let classes = 'scroller';
     if (wrapperClass) {
         classes += ' ' + wrapperClass;
@@ -72,6 +79,7 @@ function renderChildrenWithScroller(children, wrapperClass = null, scrollVertica
     return (
         <ScrollContainer
           refreshScroll={ refreshScroll }
+          refreshScrollBottom={ refreshScrollBottom }
           disableHorizontal={ scrollVerticalOnly }
           classes={ classes }
         >

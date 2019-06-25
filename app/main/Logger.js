@@ -14,6 +14,32 @@ import util from 'util';
 import path from 'path';
 import fs from 'fs';
 
+/*
+Following is a description of how log.* and console.* commands work and what effect do they have on 
+the end user.
+This relates both Main process and Render process.
+
+TL;DR; Use console.error and log.error with caution since they generate error dialog.
+       This is on purpose, to make sure user is knowns that the application is in unstable state 
+       even if it didn't crash.
+
+Main process:
+-------------
+- console.error() and log.error() will show a dialog with error to the user
+- console.warn() and log.warn() will show a dialog with the error to the user only in DEV mode (npm run dev)
+- Unhandled exception will produce an error dialog
+- Unhandled promise rejections will produce an error dialog only in DEV mode.
+- All console.* methods wrtie to logs.
+
+Render process:
+---------------
+- log.error() will show a dialog with error to the user
+- log.warn() will show a dialog with the error to the user only in DEV mode (npm run dev)
+- Unhandled exceptions will produce an error dialog
+- Unhandled promise rejections will produce an error dialog only in DEV mode.
+- console.* methods including console.error and console.warn *DO NOT* write to logs yet (this will probably change)
+*/
+
 export default class Logger {
     constructor(levelConsole, levelFile) {
         try {
@@ -21,6 +47,9 @@ export default class Logger {
         } catch (err) {
             // getPath('logs') fails on linux
             const logsPath = path.join(app.getPath('userData'), 'logs');
+            if (!fs.existsSync(app.getPath('userData'))) {
+                fs.mkdirSync(app.getPath('userData'));
+            }
             if (!fs.existsSync(logsPath)) {
                 fs.mkdirSync(logsPath);
             }
@@ -129,6 +158,10 @@ export default class Logger {
         this.error = (...args) => {
             prepError(args);
             const ret = _log.error.apply(this, args);
+             // do not show errors to the user about deprecated Buffer()
+            if (args[0] && args[0].includes('DeprecationWarning: Buffer() is deprecated')) {
+                return ret;
+            }
             showDialog(args[0], args.length === 2 ? args[1] : '', 'error');
             return ret;
         }
@@ -144,7 +177,7 @@ export default class Logger {
 
     _catchTheUncaught() {
         process.on('uncaughtException', error => {
-            log.error('Unhandled Error.', error);
+            log.warn('Unhandled Error.', error);
         });
 
         process.on('unhandledRejection', error => {

@@ -1,5 +1,18 @@
 @import 'vars';
 
+.show-on-hover-path-path {
+  display: none;
+}
+
+.show-on-hover-path:hover {
+  .show-on-hover-path-path {
+    display: inline;
+  }
+  .show-on-hover-path-name {
+    display: none;
+  }
+}
+
 .sideNavClass {
   min-width: 50px;
 }
@@ -13,6 +26,20 @@
   top: 3px;
 }
 
+$base: 12;
+$r: 1;
+
+@each $size in 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36 {
+  .breakpointStyle#{$size} {
+    width: #{( $size - $base )*$r+10}px !important;
+    height: #{( $size - $base )*$r+10}px !important;
+    left: 7px !important;
+    top: #{1.58*$size/2}px;
+    margin-top: -#{(( $size - $base )*$r+10)/2}px;
+  }
+}
+
+
 .currentLineDecoratorStyle {
   background: transparent !important;
   border-left: 7px solid $success;
@@ -22,6 +49,23 @@
   height: 0 !important;
   left: 46px !important;
   top: 4px;
+}
+
+$abase: 0.58;
+$a: 0.3;
+
+$bbase: 0.41;
+$b: 0.25;
+
+@each $size in 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36 {
+  .currentLineDecoratorStyle#{$size} { 
+    border-left:  #{( $size - $base )*$a + $base*$abase}px solid $success;
+    border-top: #{( $size - $base )*$b + $base*$bbase}px solid transparent;
+    border-bottom: #{( $size - $base )*$b + $base*$bbase}px solid transparent;
+    left: #{( $size - $base ) * 2.85 + $base*3.85}px !important;
+    top: #{1.58*$size/2}px;
+    margin-top: -#{( $size - $base )*$b+$base*$bbase}px;
+  }
 }
 
 .currLineOptHideMe {
@@ -63,7 +107,8 @@
     display: block;
     //width: calc(100% - 10px);
     width: 100%;
-    padding: 0px !important;
+    padding: 8px !important;
+    padding-right: 0px !important;
 
     > li {
       padding: $nodePadding 0;
@@ -117,4 +162,64 @@
 }
 .ant-model .ant-modal-body .ant-row {
   margin-bottom: 20px;
+}
+
+.videoWrapper {
+	position: relative;
+	padding-bottom: 56.25%; /* 16:9 */
+	padding-top: 25px;
+	height: 0;
+}
+.videoWrapper iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.landing-container {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.landing-inner {
+  left: 0;
+  right: 0;
+  top: 0;
+  position: absolute;
+  padding: 20px;
+}
+
+.landing-title {
+  font-size: 2em;
+}
+
+.landing-text {
+  font-size: 1.1em;
+}
+
+.initializing-container {
+  background: #f1f1f1;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+
+.initializing-inner {
+  left: 0;
+  right: 0;
+  top: 45%;
+  position: absolute;
+}
+
+.initializing-title {
+  color: darkgray;
+}
+
+.initializing-text {
+  font-size: 22px;
+  color: darkgray;
+  font-style: italic;
 }

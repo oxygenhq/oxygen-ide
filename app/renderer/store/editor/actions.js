@@ -11,6 +11,11 @@ import moment from 'moment';
 import * as ActionTypes from './types';
 import { success, failure } from '../../helpers/redux';
 
+/* set font size to settings */
+export const saveSettings = () => ({
+  type: ActionTypes.SAVE_SETTINGS,
+});
+
 /* openFile */
 export const openFile = (path, setActive = true) => ({
   type: ActionTypes.EDITOR_OPEN_FILE,
@@ -26,9 +31,9 @@ export const _openFile_Failure = (path, error) => ({
 });
 
 /* closeFile */
-export const closeFile = (path, setActive = true) => ({
+export const closeFile = (path, setActive = true, name = null) => ({
   type: ActionTypes.EDITOR_CLOSE_FILE,
-  payload: { path },
+  payload: { path, name },
 });
 export const _closeFile_Success = (path) => ({
   type: success(ActionTypes.EDITOR_CLOSE_FILE),
@@ -40,9 +45,9 @@ export const _closeFile_Failure = (path, error) => ({
 });
 
 /* setActiveFile */
-export const setActiveFile = (path) => ({
+export const setActiveFile = (path, name = null) => ({
   type: ActionTypes.EDITOR_SET_ACTIVE_FILE,
-  payload: { path },
+  payload: { path, name },
 });
 
 /* setActiveLine */
@@ -52,9 +57,9 @@ export const setActiveLine = (time, path, line) => ({
 });
 
 /* setActiveLine */
-export const renameFile = (oldPath, newPath) => ({
+export const renameFile = (oldPath, newPath, doUnknown = false) => ({
   type: ActionTypes.EDITOR_RENAME_FILE,
-  payload: { path: oldPath, newPath },
+  payload: { path: oldPath, newPath, doUnknown },
 });
 
 /* resetActiveLines */
@@ -64,9 +69,9 @@ export const resetActiveLines = () => ({
 });
 
 /* addFile */
-export const addFile = (path) => ({
+export const addFile = (path, name = null) => ({
   type: ActionTypes.EDITOR_ADD_FILE,
-  payload: { path },
+  payload: { path, name },
 });
 
 /* updateFileBreakpoints */

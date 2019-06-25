@@ -31,23 +31,36 @@ export function  getBreakpointMarkers(editor) {
     return editor.getModel().getAllDecorations().filter( marker => isBreakpointMarker(marker));
 }
 
-export function addBreakpointMarker(editor, line) {
+export function addBreakpointMarker(editor, line, fontSize=null) {
     // check if this line already has breakpoint marker
-    if (getBreakpointMarker(editor, line)) {
+    if (!fontSize && getBreakpointMarker(editor, line)) {
       return false;
     }
     const columnNum = editor.getModel().getLineFirstNonWhitespaceColumn(line);
+
+    let fontSizeClassName = '';
+
+    if(fontSize && Number.isInteger(fontSize)){
+        fontSizeClassName = 'breakpointStyle'+fontSize;
+    }
+
     const newDecorators = [{
         range: new monaco.Range(line, columnNum, line, columnNum),
         options: {
           isWholeLine: true,
           className: 'myContentClass',
-          linesDecorationsClassName: 'breakpointStyle',
+          linesDecorationsClassName: 'breakpointStyle '+fontSizeClassName,
           stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
         }
     }];
+    
+    const allMarkers = getAllMarkers(editor);
+    
+    const decoratorsToRemove = [
+        ...allMarkers.filter((item) => item.range.endLineNumber === line && item.options.linesDecorationsClassName.startsWith('breakpointStyle') && !item.options.linesDecorationsClassName.endsWith(fontSizeClassName)),
+    ];
 
-    return editor.deltaDecorations([], newDecorators);
+    return editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
 }
 
 export function removeBreakpointMarker(editor, lineOrMarker) {
@@ -91,7 +104,8 @@ export function breakpointMarkersToLineNumbers(editor) {
     return bpMarkers.map(bpMarker => getMarkerLine(bpMarker));
 }
 
-export function updateActiveLineMarker(editor, line) {
+export function updateActiveLineMarker(editor, line, fontSize=null) {
+    
     // try to convert string value of line to number if possible (line support to be integer)
     if (line && !Number.isInteger(line) && typeof line === 'string' && !isNaN(line)) {
         try { line = parseInt(line); }
@@ -100,24 +114,32 @@ export function updateActiveLineMarker(editor, line) {
     }
     const columnNum = Number.isInteger(line) ? editor.getModel().getLineFirstNonWhitespaceColumn(line) : null;
     // line value can be null, if we want to remove the active cursor completely
+    
+    let fontSizeClassName = '';
+
+    if(fontSize && Number.isInteger(fontSize)){
+        fontSizeClassName = 'currentLineDecoratorStyle'+fontSize;
+    }
+    
     const updatedLineDecorator = Number.isInteger(line) ? {
         range: new monaco.Range(line, columnNum, line, columnNum),
         options: {
           isWholeLine: true,
           className: 'myContentClass',
-          linesDecorationsClassName: 'currentLineDecoratorStyle'
+          linesDecorationsClassName: 'currentLineDecoratorStyle '+fontSizeClassName
         }
     } : null;
 
     const allMarkers = getAllMarkers(editor);
     
     const decoratorsToRemove = [
-        ...allMarkers.filter((item) => item.options.linesDecorationsClassName === 'currentLineDecoratorStyle'),
+        ...allMarkers.filter((item) => item.options.linesDecorationsClassName.startsWith('currentLineDecoratorStyle')),
     ];
 
     const newDecorators = [];
     if (updatedLineDecorator) {
         newDecorators.push(updatedLineDecorator);
     }
+
     editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
 }

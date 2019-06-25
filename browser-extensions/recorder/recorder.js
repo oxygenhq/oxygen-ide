@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ Recorder.prototype.parseEventKey = function(eventKey) {
 };
 
 Recorder.prototype.attach = function() {
-    console.log('ox: attaching to ' + window.__hash);
+    ox_log('ox: attaching to ' + window.__hash);
 
     this.locatorBuilders = new LocatorBuilders(window);
     this.attachWindowMethods();
@@ -175,7 +175,7 @@ Recorder.prototype.initializeFrameHorrors = function() {
     window.addEventListener(
         'message', 
         function(e) {
-            // NOTE: message are serialized and passed as strings since IE < 11 can pass only primitives
+            // NOTE: messages are serialized and passed as strings since IE < 11 can pass only primitives
             var msg;
             try {
                 msg = JSON.parse(e.data);
@@ -232,7 +232,7 @@ Recorder.prototype.initializeFrameHorrors = function() {
                     case 'assertText':
                         var txt = getText(el);
                         if (!txt) {
-                            console.log('ox: error: selected element doesn\'t have text');
+                            ox_log('ox: error: selected element doesn\'t have text');
                             return;
                         }
                         self.record(msg.cmd, self.findLocators(el), txt);
@@ -240,7 +240,7 @@ Recorder.prototype.initializeFrameHorrors = function() {
                     case 'waitForValue':
                     case 'assertValue':
                         if (!el.getAttribute('value')) {
-                            console.log('ox: error: selected element doesn\'t have value attribute');
+                            ox_log('ox: error: selected element doesn\'t have value attribute');
                             return;
                         }
                         self.record(msg.cmd, self.findLocators(el), el.value);
@@ -252,6 +252,8 @@ Recorder.prototype.initializeFrameHorrors = function() {
                         self.record(msg.cmd, document.title, null);
                         break;
                 }
+            } else if (msg.type === 'SETTINGS_DEBUG') { // not related to frames...
+                window.ox_debug = msg.enable;
             }
         },
         false
@@ -279,19 +281,19 @@ Recorder.prototype.record = function (command, target, value) {
             var lastWindow = JSON.parse(xhr.responseText);
             var isTop = window.parent == window;
             var isSameOriginFrame = !isTop && window.frameElement != null;
-            console.log('ox: testing for window transition prev:new ' + lastWindow.hash + ' : ' + window.__hash);
+            ox_log('ox: testing for window transition prev:new ' + lastWindow.hash + ' : ' + window.__hash);
             if (lastWindow.hash != window.__hash) {
                 if (isTop) {                                    // new top window
-                    console.log('ox: new window');
+                    ox_log('ox: new window');
                     var winLocator = window.document.title === '' ? '' : 'title=' + window.document.title;
                     cmds.push(Recorder.cmdPrepare('selectWindow', winLocator, null));
                 } else if (lastWindow.sameGroup) {              // same window, new frame
-                    console.log('ox: new frame. same window');
+                    ox_log('ox: new frame. same window');
                     if (window.__frameLocators) {
                         cmds.push(Recorder.cmdPrepare('selectFrame', window.__frameLocators, null));
                     }
                 } else {                                        // new window, new frame
-                    console.log('ox: new frame. new window');
+                    ox_log('ox: new frame. new window');
                     var winLocator = null;
                     try {
                         winLocator = window.top.document.title === '' ? '' : 'title=' + window.parent.document.title;
@@ -317,13 +319,16 @@ Recorder.prototype.record = function (command, target, value) {
         // and assertText/waitForText sometimes erroneously generated for html/body pulling whole page html as text string
         for (var i = 0; i < cmds.length; i++) {
             var c = cmds[i];
-            if (c.target === 'css=body' || c.target === 'css=html') {
+            if (c.target === 'css=body' ||
+                c.target === 'css=html' ||
+                c.target === '//body' ||
+                c.target === '//html') {
                 return;
             }
         }
 
         var data = JSON.stringify(cmds, function (k, v) { return (v === null || v === undefined) ? undefined : v; });
-        console.log('ox: ' + data);
+        ox_log('ox: ' + data);
 
         xhr = new XMLHttpRequest();
         xhr.open('POST', Recorder.GetIdeUrl(), false);
@@ -362,7 +367,7 @@ Recorder.guid = function() {
 
 Recorder.inputTypes = ['text', 'password', 'file', 'datetime', 'datetime-local', 'date', 'month', 'time', 'week', 'number', 'range', 'email', 'url', 'search', 'tel', 'color'];
 Recorder.addEventHandler('change', function (ev) {
-    console.log('ox: change ev');
+    ox_log('ox: change ev');
     var target = ev.target;
 
     if (target.tagName) {
@@ -380,7 +385,7 @@ Recorder.addEventHandler('change', function (ev) {
             if (target.value.length <= 0) {
                 this.record('clear', this.findLocators(target), '');
             } else {
-                this.record('type', this.findLocators(target), target.value);
+                this.record('type', this.findLocators(target), target.value.replace(/\\/g, '\\\\'));
             }
         } else if ('select' == tagName) {
             if (!target.multiple) {
@@ -388,15 +393,15 @@ Recorder.addEventHandler('change', function (ev) {
                 if (this.activeElementValue == option) {    // value did not change
                     return;
                 }
-                console.log('ox: selectedIndex=' + target.selectedIndex);
+                ox_log('ox: selectedIndex=' + target.selectedIndex);
                 this.record('select', this.findLocators(target), this.getOptionLocator(option));
             } else {
-                console.log('ox: change selection on select-multiple');
+                ox_log('ox: change selection on select-multiple');
                 var options = target.options;
                 for (var i = 0; i < options.length; i++) {
-                    console.log('ox: option=' + i + ', ' + options[i].selected);
+                    ox_log('ox: option=' + i + ', ' + options[i].selected);
                     if (options[i]._wasSelected === null || options[i]._wasSelected === undefined) {
-                        console.log('ox: _wasSelected was not recorded');
+                        ox_log('ox: _wasSelected was not recorded');
                     }
                     if (options[i]._wasSelected != options[i].selected) {
                         var value = this.getOptionLocator(options[i]);
@@ -417,7 +422,7 @@ if (browserVersion.isIE && browserVersion.ieMode < 11) {
     // IE 9 Quirks mode. To simulate 'change' event we catch focusin/out and handle those.
     // TODO: select multiselect
     Recorder.addEventHandler('focusin', function (ev) {
-        console.log('ox: focusin ev');
+        ox_log('ox: focusin ev');
         var target = ev.target;
 
         if (target.nodeName.toLowerCase() === 'input' || target.nodeName.toLowerCase() === 'textarea') {
@@ -428,7 +433,7 @@ if (browserVersion.isIE && browserVersion.ieMode < 11) {
     });
 
     Recorder.addEventHandler('focusout', function (ev) {
-        console.log('ox: focusout ev');
+        ox_log('ox: focusout ev');
         if (!this.activeElementValue) {
             return;
         }
@@ -444,7 +449,7 @@ if (browserVersion.isIE && browserVersion.ieMode < 11) {
     });
 } else {
     Recorder.addEventHandler('focus', function (ev) {
-        console.log('ox: focus ev');
+        ox_log('ox: focus ev');
         var target = ev.target;
 
         if (this.__keysBuf) {
@@ -455,7 +460,7 @@ if (browserVersion.isIE && browserVersion.ieMode < 11) {
         if (target.nodeName) {
             var tagName = target.nodeName.toLowerCase();
             if ('select' == tagName && target.multiple) {
-                console.log('ox: focus ev remembering selections');
+                ox_log('ox: focus ev remembering selections');
                 var options = target.options;
                 for (var i = 0; i < options.length; i++) {
                     if (options[i]._wasSelected === null || options[i]._wasSelected === undefined) {
@@ -471,7 +476,7 @@ if (browserVersion.isIE && browserVersion.ieMode < 11) {
 }
 
 Recorder.addEventHandler('mousedown', function (ev) {
-    console.log('ox: mousedown ev');
+    ox_log('ox: mousedown ev');
     var target = ev.target;
     this.__mouseDownTarget = {
         el: target,
@@ -483,7 +488,7 @@ Recorder.addEventHandler('mousedown', function (ev) {
         if ('option' == tagName) {
             var parent = target.parentNode;
             if (parent.multiple) {
-                console.log('ox: mousedown ev remembering selections');
+                ox_log('ox: mousedown ev remembering selections');
                 var options = parent.options;
                 for (var i = 0; i < options.length; i++) {
                     options[i]._wasSelected = options[i].selected;
@@ -494,7 +499,7 @@ Recorder.addEventHandler('mousedown', function (ev) {
 }, true);
 
 Recorder.addEventHandler('mouseup', function (ev) {
-    console.log('ox: mouseup ev');
+    ox_log('ox: mouseup ev');
     if (ev.button !== 0) {
         return;
     }
@@ -562,7 +567,7 @@ if (!browserVersion.isIE) {
 // record keystrokes for situations when "change" event is not produced
 // e.g. site handles keyup itself and prevents input's value changes
 Recorder.addEventHandler('keyup', function (ev) {
-    console.log('ox: keyup ev');
+    ox_log('ox: keyup ev');
     var key = ev.key;
     var keycode = ev.keyCode;
 

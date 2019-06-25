@@ -12,18 +12,19 @@ import classNames from 'classnames';
 import warning from 'warning';
 import toArray from 'rc-util/lib/Children/toArray';
 import { polyfill } from 'react-lifecycles-compat';
+import _ from 'lodash';
 
 import { treeContextTypes } from './contextTypes';
 import {
-  convertTreeToEntities, convertDataToTree,
-  getDataAndAria,
-  getPosition, getDragNodesKeys,
-  parseCheckedKeys,
-  conductExpandParent, calcSelectedKeys,
-  calcDropPosition,
-  arrAdd, arrDel, posToArr,
-  mapChildren, conductCheck,
-  warnOnlyTreeNode,
+    convertTreeToEntities, convertDataToTree,
+    getDataAndAria,
+    getPosition, getDragNodesKeys,
+    parseCheckedKeys,
+    conductExpandParent, calcSelectedKeys,
+    calcDropPosition,
+    arrAdd, arrDel, posToArr,
+    mapChildren, conductCheck,
+    warnOnlyTreeNode,
 } from './util';
 
 class Tree extends React.Component {
@@ -61,6 +62,7 @@ class Tree extends React.Component {
     onClick: PropTypes.func,
     onDoubleClick: PropTypes.func,
     onExpand: PropTypes.func,
+    doRefreshScrollBottom: PropTypes.func,
     onCheck: PropTypes.func,
     onSelect: PropTypes.func,
     onLoad: PropTypes.func,
@@ -102,20 +104,26 @@ class Tree extends React.Component {
     defaultCheckedKeys: [],
     defaultSelectedKeys: [],
   };
+  
+  constructor(props){
+    super(props)
 
-  state = {
-    // TODO: Remove this eslint
-    posEntities: {}, // eslint-disable-line react/no-unused-state
-    keyEntities: {},
+    this.state = {
+      // TODO: Remove this eslint
+      posEntities: {}, // eslint-disable-line react/no-unused-state
+      keyEntities: {},
 
-    selectedKeys: [],
-    checkedKeys: [],
-    halfCheckedKeys: [],
-    loadedKeys: [],
-    loadingKeys: [],
+      selectedKeys: [],
+      checkedKeys: [],
+      halfCheckedKeys: [],
+      loadedKeys: [],
+      loadingKeys: [],
 
-    treeNode: [],
-  };
+      treeNode: [],
+    };
+
+    this.delayedCallback = _.debounce(this.debounceOnDrag, 150);
+  }
 
   getChildContext() {
     const {
@@ -298,7 +306,7 @@ class Tree extends React.Component {
     if (!this.dragNode) return;
 
     const dropPosition = calcDropPosition(event, node);
-
+    
     // Skip if drag node is self
     if (
       this.dragNode.props.eventKey === eventKey &&
@@ -318,10 +326,20 @@ class Tree extends React.Component {
     // https://html.spec.whatwg.org/multipage/webappapis.html#clean-up-after-running-script
     setTimeout(() => {
       // Update drag over node
-      this.setState({
-        dragOverNodeKey: eventKey,
-        dropPosition,
-      });
+
+      if(eventKey){
+        this.setState({
+          dragOverNodeKey: eventKey,
+          dropPosition,
+        });
+      } else {
+        if(this.props.rootPath){
+          this.setState({
+            dragOverNodeKey: this.props.rootPath,
+            dropPosition,
+          });
+        }
+      }
 
       // Side effect for delay drag
       if (!this.delayedDragEnterLogic) {
@@ -395,19 +413,14 @@ class Tree extends React.Component {
       return;
     }
 
-    const posArr = posToArr(pos);
 
     const dropResult = {
       event,
       node,
       dragNode: this.dragNode,
-      dragNodesKeys: dragNodesKeys.slice(),
-      dropPosition: dropPosition + Number(posArr[posArr.length - 1]),
+      dragNodesKeys: dragNodesKeys.slice()
     };
 
-    if (dropPosition !== 0) {
-      dropResult.dropToGap = true;
-    }
 
     if (onDrop) {
       onDrop(dropResult);
@@ -531,7 +544,7 @@ class Tree extends React.Component {
         const { loadData, onLoad } = this.props;
         const { eventKey } = treeNode.props;
 
-        if (!loadData || loadedKeys.indexOf(eventKey) !== -1 || loadingKeys.indexOf(eventKey) !== -1) {
+        if (!loadData) {
           // react 15 will warn if return null
           return {};
         }
@@ -566,8 +579,8 @@ class Tree extends React.Component {
   );
 
   onNodeExpand = (e, treeNode) => {
-    let { expandedKeys } = this.state;
-    const { onExpand, loadData } = this.props;
+    let { expandedKeys, loadedKeys } = this.state;
+    const { onExpand, loadData, unWatchFolder, watchFolder } = this.props;
     const { eventKey, expanded } = treeNode.props;
 
     // Update selected keys
@@ -587,6 +600,12 @@ class Tree extends React.Component {
 
     this.setUncontrolledState({ expandedKeys });
 
+    if(expanded){
+      if(unWatchFolder){
+        unWatchFolder(eventKey);
+      }
+    }
+
     if (onExpand) {
       onExpand(expandedKeys, {
         node: treeNode,
@@ -601,6 +620,11 @@ class Tree extends React.Component {
       return loadPromise ? loadPromise.then(() => {
         // [Legacy] Refresh logic
         this.setUncontrolledState({ expandedKeys });
+        loadedKeys.map((item) => {
+          if(watchFolder){
+            watchFolder(item);
+          }
+        })
       }) : null;
     }
 
@@ -671,6 +695,8 @@ class Tree extends React.Component {
       warnOnlyTreeNode();
       return null;
     }
+    
+    const fileCond = child.props.className !== 'file';
 
     let clonedElm = React.cloneElement(child, {
       key,
@@ -684,18 +710,77 @@ class Tree extends React.Component {
       pos,
 
       // [Legacy] Drag props
-      dragOver: dragOverNodeKey === key && dropPosition === 0,
-      dragOverGapTop: dragOverNodeKey === key && dropPosition === -1,
-      dragOverGapBottom: dragOverNodeKey === key && dropPosition === 1,
+      dragOver: fileCond && dragOverNodeKey === key
     });
     return clonedElm;
   };
 
+  onMainDragEnter = (event) => {
+    this.props.onDragEnter(event, this);
+  }
+
+  onDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    this.onNodeDragEnter(e, this);
+  };
+
+  onDragLeave = (e) => {
+    e.stopPropagation();
+    this.onNodeDragLeave(e, this);
+  };
+
+  onDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    this.onNodeDragOver(e, this);
+  };
+
+  onDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    this.onNodeDrop(e, this);
+  };
+
+  onDragEnd = (e) => {
+    e.stopPropagation();
+    this.onNodeDragEnd(e, this);
+  };
+
+  debounceOnDrag = (dragPosition) => {
+    const { doRefreshScrollBottom, doRefreshScrollTop, wrap } = this.props;
+    if(dragPosition < 15) {
+      if(doRefreshScrollTop){
+        doRefreshScrollTop()
+      }
+    }
+
+    if(wrap && wrap.current && wrap.current.clientHeight){
+      const wrapHeight = parseInt(wrap.current.clientHeight / 10);
+
+      if(dragPosition > (wrapHeight - 10)) {
+        if(doRefreshScrollBottom){
+          doRefreshScrollBottom()
+        }
+      }
+    }
+  }
+  onDrag = (e) => {
+    const dragPosition = parseInt(e.clientY / 10);
+
+    if(this.prev && this.prev !== dragPosition){
+      this.delayedCallback(dragPosition);
+    }
+
+    this.prev = dragPosition;
+  }
+
   render() {
-    const { treeNode } = this.state;
+    const { treeNode, dragOverNodeKey } = this.state;
     const {
       prefixCls, className, focusable,
       showLine, tabIndex = 0,
+      draggable, rootPath
     } = this.props;
     const domProps = getDataAndAria(this.props);
 
@@ -704,14 +789,23 @@ class Tree extends React.Component {
       domProps.onKeyDown = this.onKeyDown;
     }
 
+    const dragOver = dragOverNodeKey === rootPath;
+
     return (
       <ul
         {...domProps}
         className={classNames(prefixCls, className, {
           [`${prefixCls}-show-line`]: showLine,
+          'ul-drag-over': dragOver,
         })}
         role="tree"
         unselectable="on"
+        onDragEnter={draggable ? this.onDragEnter : undefined}
+        onDragLeave={draggable ? this.onDragLeave : undefined}
+        onDragOver={draggable ? this.onDragOver : undefined}
+        onDrop={draggable ? this.onDrop : undefined}
+        onDragEnd={draggable ? this.onDragEnd : undefined}
+        onDrag={this.onDrag}
       >
         {mapChildren(treeNode, (node, index) => (
           this.renderTreeNode(node, index)

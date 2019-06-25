@@ -8,14 +8,16 @@
  */
 // @flow
 import React, { Component, Fragment } from 'react';
-import { Modal, Layout, Icon, Row, Col, Tooltip, message } from 'antd';
+import { Modal, Layout, Icon, Row, Col, Tooltip, message, notification } from 'antd';
 /* eslint-disable react/no-did-update-set-state */
 import updateModals from '../../components/updateModals';
 // Dialogs
+import JavaDialog from '../../components/dialogs/JavaDialog';
 import FileRenameDialog from '../../components/dialogs/FileRenameDialog';
 import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
 import SettingsDialog from '../../components/dialogs/SettingsDialog';
+import NeedInstallExtension from '../../components/dialogs/NeedInstallExtension';
 // Other components
 import TextEditor from '../TextEditor';
 import Tabs from '../Tabs';
@@ -24,6 +26,8 @@ import Logger from '../Logger';
 import Toolbar from '../../components/Toolbar';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
+import Landing from '../../components/Landing';
+import Initializing from '../../components/Initializing';
 import Settings from '../Settings';
 import ObjectRepository from '../ObjectRepository';
 import * as Controls from '../../components/Toolbar/controls';
@@ -67,19 +71,37 @@ export default class Workbench extends Component<Props> {
 
   componentDidMount() {
     // start IDE initialization process
-    this.props.initialize();    
+    this.props.initialize();
+    this.props.startRecorderWatcher();
   }
 
-  handleTabChange(key) {
-    this.props.onTabChange(key);
+  componentWillUnmount(){
+    // stop IDE process
+    if(this.props.deactivate){
+      this.props.deactivate();
+    } else {
+      alert('no deactivate');
+    }
+    const { isRecording } = this.props;
+    if (isRecording) {
+      if(this.props.stopRecorder){
+        this.props.stopRecorder();
+      } else {
+        alert('no stopRecorder');
+      }  
+    }
   }
 
-  handleTabClose(key) {
-    this.props.closeFile(key);
+  handleTabChange(key, name = null) {
+    this.props.onTabChange(key, name);
   }
 
-  handleFileContentUpdate(path, content) {
-    this.props.onContentUpdate(path, content);
+  handleTabClose(key, name = null) {
+    this.props.closeFile(key, false, name);
+  }
+
+  handleFileContentUpdate(path, content, name) {
+    this.props.onContentUpdate(path, content, name);
   }
 
   handleBreakpointsUpdate(filePath, breakpoints) {
@@ -95,8 +117,28 @@ export default class Workbench extends Component<Props> {
   }
 
   handleToolbarButtonClick(ctrlId) {
-    if (ctrlId === Controls.TEST_RUN) {      
-      this.props.startTest();
+    if (ctrlId === Controls.TEST_RUN) {     
+      
+      const { editorActiveFile } = this.props;
+
+      console.log('editorActiveFile', editorActiveFile);
+
+      if(editorActiveFile){
+
+        if(editorActiveFile && editorActiveFile.path && editorActiveFile.path ==="unknown"){
+          this.props.createNewRealFile(editorActiveFile);
+        } else {
+          this.props.startTest();
+        }
+
+      } else {
+        this.props.createNewRealFile();
+        notification['error']({
+          message: 'Can\'t record when not opened file',
+          description: 'Please, select some file in the tree to make record possible.'
+        });
+      }
+      
     }
     else if (ctrlId === Controls.TEST_STOP) {
       this.props.stopTest();
@@ -120,7 +162,13 @@ export default class Workbench extends Component<Props> {
       this.props.saveCurrentFile();
     }
     else if (ctrlId === Controls.NEW_FILE) {
-      this.props.showNewFileDialog();      
+      const { settings } = this.props;
+
+      if(this.props.openFakeFile){
+        this.props.openFakeFile();
+      } else {
+        console.warn('no openFakeFile');
+      }
     }
     else if (ctrlId === Controls.TEST_RECORD) {
       const { isRecording } = this.props;
@@ -139,7 +187,6 @@ export default class Workbench extends Component<Props> {
   }
 
   handleToolbarValueChange(ctrlId, value) {
-    console.log('handleToolbarValueChange', ctrlId, value);
     if (ctrlId === Controls.TEST_TARGET) {
       this.props.setTestTarget(value);
     }
@@ -196,6 +243,10 @@ export default class Workbench extends Component<Props> {
     }, 500);
   }
 
+  fileExplorer_onMove(oldPath, newPath){
+    this.props.move(oldPath, newPath)
+  }
+
   /* Logger */
   logger_onHide() {
     this.props.setLoggerVisible(false);
@@ -210,6 +261,11 @@ export default class Workbench extends Component<Props> {
       this.props.createFile(parentPath, name);
     }
   }
+
+  needInstallExtensionOnClose = () => {
+    this.props.hideDialog('DIALOG_NEED_ISTALL_EXTENSION');
+  }
+
   fileCreateDialog_onCancel() {
     this.props.hideDialog('DIALOG_FILE_CREATE');
   }
@@ -238,7 +294,7 @@ export default class Workbench extends Component<Props> {
   }
 
   render() {
-    const { test, settings, dialog } = this.props;
+    const { test, settings, dialog, javaError, initialized, changeShowRecorderMessageValue } = this.props;
     const { runtimeSettings } = test;
     // sidebars state
     const leftSidebarSize = settings.sidebars.left.size;
@@ -248,16 +304,37 @@ export default class Workbench extends Component<Props> {
     const rightSidebarComponent = settings.sidebars.right.component;
     // logger state
     const loggerVisible = settings.logger.visible;
+    const showLanding = settings.showLanding;
+    const showRecorderMessage = settings.showRecorderMessage;
+    
+    if(!initialized){
+      return (
+        <Initializing/>
+      )
+    }
 
     return (
       <div>
+        { javaError && 
+          <JavaDialog 
+            clean={this.props.cleanJavaError}
+            javaError={javaError}
+          />  
+        }
         { dialog && 
         <Fragment>
-          <FileCreateDialog 
-            { ...dialog['DIALOG_FILE_CREATE'] }
-            onSubmit={ ::this.fileCreateDialog_onSubmit }
-            onCancel={ ::this.fileCreateDialog_onCancel } 
-          />
+          { dialog.DIALOG_FILE_CREATE && dialog.DIALOG_FILE_CREATE.visible &&
+            <FileCreateDialog 
+              { ...dialog['DIALOG_FILE_CREATE'] }
+              onSubmit={ ::this.fileCreateDialog_onSubmit }
+              onCancel={ ::this.fileCreateDialog_onCancel } 
+            />
+          }
+          { dialog.DIALOG_NEED_ISTALL_EXTENSION && dialog.DIALOG_NEED_ISTALL_EXTENSION.visible &&
+            <NeedInstallExtension
+              onClose={ this.needInstallExtensionOnClose }
+            />
+          }
           <FileRenameDialog 
             { ...dialog['DIALOG_FILE_RENAME'] } 
             onSubmit={ ::this.fileRenameDialog_onSubmit }
@@ -277,13 +354,19 @@ export default class Workbench extends Component<Props> {
         </Fragment>
         }
         {updateModals.call(this)}
-        <Toolbar 
+        <Toolbar
+          canRecord={ this.props.canRecord }
+          isChromeExtensionEnabled={ this.props.isChromeExtensionEnabled }
+          waitChromeExtension={ this.props.waitChromeExtension }
+          stopWaitChromeExtension={ this.props.stopWaitChromeExtension }
           testMode={ runtimeSettings.testMode }
           testTarget={ runtimeSettings.testTarget }
           stepDelay={ runtimeSettings.stepDelay }
           devices={ test.devices }
           browsers={ test.browsers }
           emulators={ test.emulators }
+          showRecorderMessage={ showRecorderMessage }
+          changeShowRecorderMessageValue={ changeShowRecorderMessageValue }
           controlsState={ this.getToolbarControlsState() } 
           onButtonClick={ ::this.handleToolbarButtonClick }
           onValueChange={ ::this.handleToolbarValueChange } />
@@ -293,21 +376,22 @@ export default class Workbench extends Component<Props> {
           </Col>
 
           <Col style={{ width: '100%' }}>
-            <Layout className="ide-main">
-              <Sidebar 
-                align="left"
-                size={ leftSidebarSize } 
-                visible={ leftSidebarVisible } 
-                onResize={ (size) => ::this.handleSidebarResize('left', size) }
-              >
-                <FileExplorer 
-                  onSelect={ ::this.fileExplorer_onSelect } 
-                  onCreate={ ::this.fileExplorer_onCreate }
-                  onRename={ ::this.fileExplorer_onRename }
-                  onDelete={ ::this.fileExplorer_onDelete }
-                />
-              </Sidebar>
-              <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
+              <Layout className="ide-main">
+                <Sidebar 
+                  align="left"
+                  size={ leftSidebarSize } 
+                  visible={ leftSidebarVisible } 
+                  onResize={ (size) => ::this.handleSidebarResize('left', size) }
+                >
+                  <FileExplorer 
+                    onSelect={ ::this.fileExplorer_onSelect } 
+                    onCreate={ ::this.fileExplorer_onCreate }
+                    onRename={ ::this.fileExplorer_onRename }
+                    onDelete={ ::this.fileExplorer_onDelete }
+                    onMove={ ::this.fileExplorer_onMove }
+                  />
+                </Sidebar>
+                <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
                 <Header className="tabs-container">{/*headerBar*/}
                   <Row>
                     <Col className="sidebar-trigger">                      
@@ -320,25 +404,35 @@ export default class Workbench extends Component<Props> {
                       />
                     </Col>
                     <Col className="tabs-bar-container">
-                      <Tabs onChange={ this.handleTabChange } onClose={ this.handleTabClose } />
+                      <Tabs 
+                        onChange={ this.handleTabChange } 
+                        onClose={ this.handleTabClose } 
+                      />
                     </Col>
                   </Row>
                 </Header>
                 <div className="editor-container">
-                  <TextEditor onBreakpointsUpdate={ ::this.handleBreakpointsUpdate } onContentUpdate={ ::this.handleFileContentUpdate } />
-                  <Logger visible={ loggerVisible } onHide={ ::this.logger_onHide } />
+                  <div id="editors-container-wrap">
+                    <TextEditor
+                      onBreakpointsUpdate={::this.handleBreakpointsUpdate}
+                      onContentUpdate={::this.handleFileContentUpdate}
+                    />
+                  </div>
+                  <Logger
+                    visible={loggerVisible}
+                    onHide={::this.logger_onHide}
+                  />
                 </div>
+                <Sidebar 
+                  align="right"
+                  size={ rightSidebarSize } 
+                  visible={ rightSidebarVisible } 
+                  onResize={ (size) => ::this.handleSidebarResize('right', size) }
+                >
+                  { rightSidebarComponent === 'settings' && <Settings /> } 
+                  { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
+                </Sidebar>
               </Layout>
-              <Sidebar 
-                align="right"
-                size={ rightSidebarSize } 
-                visible={ rightSidebarVisible } 
-                onResize={ (size) => ::this.handleSidebarResize('right', size) }
-              >
-                { rightSidebarComponent === 'settings' && <Settings /> } 
-                { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
-              </Sidebar>
-            </Layout>
           </Col>
         </Row>
       </div>

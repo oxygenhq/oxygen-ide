@@ -34,6 +34,7 @@ const rootReducer = combineReducers({
   wb,
   recorder,
   objrepo,
+  recorder
 });
 
 export default rootReducer;

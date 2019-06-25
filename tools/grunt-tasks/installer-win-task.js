@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-2019 CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,19 +21,17 @@ module.exports = function(grunt) {
             // major.minor.build version types, we convert any RC to the format it can handle
             // using an approach similar to https://github.com/semver/semver/issues/332
             //
-            // X.Y.Z-rcN
-            // 1.8.0-rc1   1.8.10001
-            // 1.8.0-rc2   1.8.10002
-            // 1.8.0-rc3   1.8.10003
-            // 1.8.0       1.8.30000 (here N is 0)
-            // 1.8.1-rc1   1.8.10101
-            // 1.8.1-rc2   1.8.10102
-            // 1.8.1       1.8.30100 (here N is 0)
-            // 1.8.6       1.8.30600 (here N is 0)
-            //
-            // for N > 0: msi_build = 10000 + Z * 100 + N
-            // for N = 0: msi_build = 30000 + Z * 100
-            // (where Z < 300 and N < 100)
+            // X.Y.Z-rc.N
+            // 1.8.0-rc.1  = 1.8.10001
+            // 1.8.0-rc.2  = 1.8.10002
+            // 1.8.0       = 1.8.10100
+            // 1.8.1-rc.1  = 1.8.10101
+            // 1.8.1-rc.2  = 1.8.10102
+            // 1.8.1       = 1.8.10200
+            // 1.8.2-rc.1  = 1.8.10201
+            // 1.8.2-rc.2  = 1.8.10202
+            // 1.8.2       = 1.8.10300
+
             var x, y, z, n;
             if (version.indexOf('-rc') > 0) {
                 var tokens = version.replace('-rc', '').split('.');
@@ -41,10 +39,9 @@ module.exports = function(grunt) {
                 y = tokens[1];
                 z = tokens[2];
                 n = tokens[3];
-                if (z >= 300 || n >= 100) {
+                if (z > 500 || n > 99) {
                     grunt.fail.fatal('Invalid version specified: ' + version);
                 }
-                version = x + '.' + y + '.' + (10000 + parseInt(z) * 100 + parseInt(n));
             } else if (version.indexOf('-') > 0) {
                 grunt.fail.fatal('Invalid version specified: ' + version);
             } else {
@@ -52,8 +49,9 @@ module.exports = function(grunt) {
                 x = tokens[0];
                 y = tokens[1];
                 z = tokens[2];
-                version = x + '.' + y + '.' + (30000 + parseInt(z) * 100);
+                n = 100;
             }
+            version = x + '.' + y + '.' + (10000 + parseInt(z) * 100 + parseInt(n));
             
             cp.execFileSync('heat', 
                             [ 'file', ieAddonRoot + '\\IEAddon.dll',
@@ -80,6 +78,7 @@ module.exports = function(grunt) {
                             [ '-arch', arch,
                               '-dVersion=' + version,
                               '-ext', 'WixFirewallExtension',
+                              '-ext', 'WixUtilExtension',
                               '-o', wixRoot + 'config.wixobj',
                               wixRoot + 'config.wxs'],
                             { stdio : 'inherit'});

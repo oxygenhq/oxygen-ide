@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,12 @@ if (typeof(String.prototype.trim) === 'undefined') {
         return String(this).replace(/^\s+|\s+$/g, '');
     };
 }
+
+var ox_log = function (msg) {
+    if (window.ox_debug) {
+        console.log(msg);
+    }
+};
 
 var BrowserVersion = function () {
     // http://stackoverflow.com/a/9851769/217039

@@ -8,7 +8,97 @@
  */
 import * as types from './types';
 
-export const setSidebarVisible = (sidebar, visible) => ({
+/* Create User  */
+export const createUser = (uuid) => {
+  return {
+    type: types.CREATE_USER,
+    payload: { 
+      uuid
+    }
+  };
+}
+
+/* First Open  */
+export const firstOpen = () => {
+  return {
+    type: types.FIRST_OPEN,
+    payload: null
+  };
+}
+
+
+
+/* Change Cache Used  */
+export const changeShowRecorderMessageValue = (value) => {
+    return {
+      type: types.SHOW_RECORDER_MESSAGE_VALUE,
+      payload: { value },
+    };
+  }
+
+/* Change Cache Used  */
+export const changeCacheUsed = (value) => {
+    return {
+      type: types.CACHE_USED_CHANGE,
+      payload: { value },
+    };
+  }
+
+/* Add file */
+export const addFile = (key,name, content=null) => {
+    return {
+      type: types.TMP_ADD_FILE,
+      payload: { key,name,content },
+    };
+  }
+
+/* Remove file */
+export const removeFile = (key,name) => {
+  return {
+    type: types.TMP_REMOVE_FILE,
+    payload: { key,name },
+  };
+}
+
+/* updateFileContent */
+export const updateFileContent = (path, content, name) => ({
+  type: types.TMP_UPDATE_FILE_CONTENT,
+  payload: { path, content, name },
+});
+
+/* show Landing */
+export const showLanding = () => ({
+  type: types.SHOW_LANDING
+});
+
+/* hide Landing */
+export const hildeLanding = () => ({
+  type: types.HIDE_LANDING
+});
+
+/* zoomIn */
+export const zoomIn = () => ({
+  type: types.EDITOR_ZOOM_IN
+});
+
+/* zoomOut */
+export const zoomOut = () => ({
+  type: types.EDITOR_ZOOM_OUT
+});
+
+/* zoomToDefault */
+export const zoomToDefault = () => ({
+  type: types.EDITOR_ZOOM_TO_DEFAULT
+});
+
+/* zoomToDefault */
+export const setZoom = (zoom) => ({
+  type: types.EDITOR_SET_ZOOM,
+  payload: { zoom }
+});
+
+
+export const setSidebarVisible= (sidebar, visible) => ({
   type: types.SIDEBAR_SET_VISIBLE,
   payload: { target: sidebar, value: visible },
 });

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-2019 CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,21 @@ import * as Const from '../../../const';
 
 const PORT_HTTP = 7778;
 const PORT_HTTPS = 8889;
+
 const RECORDER_DIR = process.env.NODE_ENV === 'production' ?
                         path.resolve(__dirname, 'services', 'RecorderService') :
                         path.resolve(__dirname, '.');
 const RECORDER_EVENT = 'RECORDER_EVENT';
+const CHROME_EXTENSION_ENABLED = 'CHROME_EXTENSION_ENABLED';
 
 export default class RecorderService extends ServiceBase {
     constructor(mainWindow) {
         super(mainWindow);
         this.windowGroups = [];
+    }
+
+    watch() {
+        this.start();
     }
 
     start() {
@@ -34,7 +40,9 @@ export default class RecorderService extends ServiceBase {
             return;
         }
         this.httpSrv = http.createServer(::this._onRequest);
-        this.httpSrv.on('error', (err) => {console.log("Unable to bind recorder's HTTP listener. " + err)});
+        this.httpSrv.on('error', (err) => {
+            console.log("Unable to bind recorder's HTTP listener. " + err)
+        });
 
         var options = {
             key: fs.readFileSync(path.join(RECORDER_DIR, 'cloudbeat-key.pem')),
@@ -43,7 +51,9 @@ export default class RecorderService extends ServiceBase {
             rejectUnauthorized: false
         };
         this.httpsSrv = https.createServer(options, ::this._onRequest);
-        this.httpSrv.on('error', (err) => {console.log("Unable to bind recorder's HTTPS listener " + err)});
+        this.httpsSrv.on('error', (err) => {
+            console.log("Unable to bind recorder's HTTPS listener " + err)
+        });
 
         // here be horrors...
         // 'localhost' might be unavailable in certain situations
@@ -59,8 +69,16 @@ export default class RecorderService extends ServiceBase {
             } else {
                 hostname = 'localhost';
             }
-            this.httpSrv.listen(PORT_HTTP, hostname, function(){ });
-            this.httpsSrv.listen(PORT_HTTPS, hostname, function(){ });
+            try{
+                this.httpSrv.listen(PORT_HTTP, hostname, function(){ });
+            } catch (e){
+                console.log('#71 e', e);
+            }
+            try{
+                this.httpsSrv.listen(PORT_HTTPS, hostname, function(){ });
+            } catch (e){
+                console.log('#76 e', e);
+            }
         });
     }
 
@@ -75,7 +93,7 @@ export default class RecorderService extends ServiceBase {
         }
     }
 
-    _onRequest(request, response) {        
+    _onRequest(request, response) {
         response.setHeader('Access-Control-Allow-Origin', '*');
         response.setHeader("Access-Control-Allow-Headers", "*");
         // disable keep-alive. 
@@ -85,19 +103,22 @@ export default class RecorderService extends ServiceBase {
 
         if (request.method === 'GET') {
             if (request.url === '/ping') {
+                this.notify({
+                    type: CHROME_EXTENSION_ENABLED
+                });
                 response.statusCode = 200;
                 response.statusMessage = 'OK';
             } else {
                 response.statusCode = 404;
                 response.statusMessage = 'Not found';
-            } 
+            }
             response.end();
         } else if (request.method === 'POST') {
             var body = '';
             request.on('data', function (data) {
                 body += data;
             });
-            
+
             request.on('end', function () {
                 if (request.url === '/lastwin_attach') {
                     if (!self.lastWin) {
@@ -143,7 +164,7 @@ export default class RecorderService extends ServiceBase {
             response.statusMessage = 'Not found';
             response.end();
         }
-    }    
+    }
 
     _notify(step) {
         this.notify({

@@ -12,25 +12,45 @@ import Workbench from './Workbench';
 import * as wbActions from '../../store/workbench/actions';
 import * as testActions from '../../store/test/actions';
 import * as settingsActions from '../../store/settings/actions';
-import * as recorderActions from '../../store/recorder/actions';
+import { stopWaitChromeExtension } from '../../store/recorder/actions';
+import { move } from '../../store/fs/actions';
 
 const mapStoreToProps = (state) => {
   const activeNode = state.fs.tree.activeNode;
   const editorActiveFile = state.editor.activeFile;
   const rootPath = state.fs.rootPath || null;
+
+  const { activeFile, activeFileName } = state.editor;
+
+  let fullEditorActiveFile = null;
+ 
+  if(activeFile){
+    if(activeFile === 'unknown'){
+      const key = activeFile+activeFileName;
+      fullEditorActiveFile = state.settings.files.hasOwnProperty(key) ? state.settings.files[key] : null;
+    } else {
+      fullEditorActiveFile = state.fs.files.hasOwnProperty(activeFile) ? state.fs.files[activeFile] : null;
+    }
+  }
+
   return {
+    initialized: state.wb.initialized,
+    javaError: state.wb.javaError,
     isRecording: state.recorder.isRecording,
+    canRecord: state.recorder.canRecord,
+    isChromeExtensionEnabled: state.recorder.isChromeExtensionEnabled,
+    waitChromeExtension: state.recorder.waitChromeExtension,
     settings: state.settings,
     test: state.test,
     dialog: state.dialog,
     treeActiveFile: activeNode && state.fs.files.hasOwnProperty(activeNode) ? state.fs.files[activeNode] : null,
-    editorActiveFile: editorActiveFile && state.fs.files.hasOwnProperty(editorActiveFile) ? state.fs.files[editorActiveFile] : null,
-    rootPath: rootPath,
+    editorActiveFile: fullEditorActiveFile,
+    rootPath: rootPath
   };
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...wbActions, ...testActions, ...settingsActions } , dispatch)
+  bindActionCreators({ ...wbActions, ...testActions, ...settingsActions, move, stopWaitChromeExtension } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Workbench);

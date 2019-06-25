@@ -21,8 +21,11 @@ import '../../css/editor.scss';
 import SupportedExtensions from '../../helpers/file-extensions';
 import editorSubjects from '../../store/editor/subjects';
 import fileSubjects from '../../store/fs/subjects';
+import Landing from '../../components/Landing';
 
 type Props = {
+  editorReadOnly: boolean,
+  fontSize: number,
   activeFile: null | object,
   openFiles: null | {[key: string]: object},
   onBreakpointsUpdate: (Array<any>) => void,
@@ -30,6 +33,29 @@ type Props = {
 };
 
 const DEFAULT_EDITOR_LANGUAGE = 'javascript';
+
+const getKey = (file) => {
+  if(file && file.path && file.name && file.path === "unknown"){
+    return file.path+file.name;
+  }
+  if(file && file.path){
+    return file.path;
+  }
+
+  return +new Date;
+}
+
+const getVisible = (file, activeFile, activeFileName) => {
+  if(activeFile && file && file.path && file.name && file.path === "unknown"){
+    return file.path === activeFile && file.name === activeFileName;
+  }
+
+  if(activeFile && file && file.path){
+    return file.path === activeFile;
+  }
+
+  return false;
+}
 
 export default class TextEditor extends Component<Props> {
   props: Props;
@@ -77,8 +103,8 @@ export default class TextEditor extends Component<Props> {
     }
   }
 
-  handleValueChange(filePath, value) {
-    this.props.onContentUpdate(filePath, value);
+  handleValueChange(filePath, value, name) {
+    this.props.onContentUpdate(filePath, value, name);
   }
 
   handleSelectionChange(filePath, selectedText) {
@@ -86,8 +112,18 @@ export default class TextEditor extends Component<Props> {
   }
 
   render() {
-    const { activeFile, openFiles } = this.props;
+    const { 
+      activeFile, 
+      openFiles, 
+      editorReadOnly, 
+      fontSize,
+      activeFileName
+    } = this.props;
     const self = this;
+
+    if(activeFile === 'welcome'){
+      return (<Landing/>);
+    }
 
     return (
       <Fragment>
@@ -100,17 +136,23 @@ export default class TextEditor extends Component<Props> {
 
           const language = SupportedExtensions[file.ext] || DEFAULT_EDITOR_LANGUAGE;
           // file.language
+
           return (
-            <MonacoEditor 
+            <MonacoEditor
               ref={(ref) => { self.editors[file.path] = ref; }}
-              key={ file.path }
-              value={ file.content }
-              language={ language }
-              activeLine={ file.activeLine }
-              visible={ file.path === activeFile }
-              onBreakpointsUpdate={ (bps) => this.props.onBreakpointsUpdate(file.path, bps) }
-              onValueChange={ (bps) => ::this.handleValueChange(file.path, bps) }
-              onSelectionChange={ (bps) => ::this.handleSelectionChange(file.path, bps) }
+              key={getKey(file)}
+              value={file.content}
+              language={language}
+              activeLine={file.activeLine}
+              visible={getVisible(file, activeFile, activeFileName)}
+              editorReadOnly={editorReadOnly}
+              fontSize={fontSize}
+              saveSettings={this.props.saveSettings}
+              zoomIn={this.props.zoomIn}
+              zoomOut={this.props.zoomOut}
+              onBreakpointsUpdate={(bps) => this.props.onBreakpointsUpdate(file.path, bps)}
+              onValueChange={(bps) => ::this.handleValueChange(file.path, bps, file.name)}
+              onSelectionChange={(bps) => ::this.handleSelectionChange(file.path, bps)}
             />
           );
         })}
@@ -119,12 +161,19 @@ export default class TextEditor extends Component<Props> {
           <div>
             <Icon type="inbox" />
             <p>You have no active opened files</p>
-            <p>Just pick one from your sidebar or open new one</p>
-            <p><b>Ctrl/Command + O</b> - Open folder</p>
-            <p><b>Ctrl/Command + N</b> - New file</p>
-            <p><b>Ctrl/Command + Shift + L</b> - Toggle logger</p>
+            <p>Open a folder first, then select a file or create a new file</p>
+            { process.platform === 'win32' || process.platform === 'linux' ?
+              <div>
+                <p><b>Ctrl + O</b> - Open folder</p>
+                <p><b>Ctrl + N</b> - New file</p>
+              </div>
+            : 
+              <div>
+                <p><b>Command + O</b> - Open folder</p>
+                <p><b>Command + N</b> - New file</p>
+              </div>
+            }
           </div>
-
         </div>
           )}
       </Fragment>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,6 +8,8 @@
  */
 const IDE_URL_HTTP = 'http://localhost:7778';
 const IDE_URL_HTTPS = 'https://localhost:8889';
+
+const SETTINGS_DEBUG = 'SETTINGS_DEBUG';
 
 const MENU_ID_WAITFORTEXT = 'waitForText';
 const MENU_ID_WAITFORVALUE = 'waitForValue';
@@ -20,6 +22,8 @@ const PING_INTERVAL = 1000;
 
 var isIdeRecording = false;
 var isIdeRecordingPrev = false;
+
+var debuggingEnabled = false;
 
 // prevent Content Security Policy by removing CSP response headers
 var filter = {
@@ -39,6 +43,14 @@ function onHeadersReceived(details) {
 
 // disable browser action on browser start
 chrome.browserAction.disable();
+
+// setup context menu for browser_action
+chrome.contextMenus.create({
+    id: SETTINGS_DEBUG,
+    type: 'checkbox',
+    title: 'Enable debug logs',
+    contexts: ['browser_action']
+});
 
 // setup context menu for page
 chrome.contextMenus.create({
@@ -92,7 +104,16 @@ chrome.contextMenus.create({
 let port;
 
 chrome.contextMenus.onClicked.addListener((info) => {
-    port.postMessage({ action: info.menuItemId });
+    if (info.menuItemId === SETTINGS_DEBUG) {
+        debuggingEnabled = info.checked;
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs && tabs.length >= 1) {
+                chrome.tabs.sendMessage(tabs[0].id, { cmd: info.menuItemId, settings: { debuggingEnabled: debuggingEnabled } });
+            }
+        });
+    } else {
+        port.postMessage({ action: info.menuItemId });
+    }
 });
 
 chrome.runtime.onConnect.addListener((_port) => {
@@ -129,7 +150,7 @@ function checkIfRecordingIsActive() {
     } finally {
         if (isIdeRecording && !isIdeRecordingPrev) {
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                chrome.tabs.sendMessage(tabs[0].id, { cmd: 'INJECT_RECORDER' });
+                chrome.tabs.sendMessage(tabs[0].id, { cmd: 'INJECT_RECORDER', settings: { debuggingEnabled: debuggingEnabled } });
             });
         }
         toggleExtension();
@@ -158,7 +179,7 @@ function toggleExtension() {
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.cmd === 'IS_RECORDING') {
-        sendResponse({ result: isIdeRecording });
+        sendResponse({ result: isIdeRecording, settings: { debuggingEnabled: debuggingEnabled } });
     } else {
         sendResponse({ result: 'error', message: 'invalid cmd' });
     }
@@ -174,10 +195,15 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
     if (transType === 'typed' || 
         transType === 'auto_bookmark' || 
         transType === 'generated' ||
-        transType === 'reload') {
-        
+        transType === 'reload' ||
+        (transType === 'link' && 
+            details.transitionQualifiers.length === 2 && 
+            details.transitionQualifiers[1] === 'from_address_bar')) {
+
         // ignore internal Google Chrome urls
-        if (details.url.indexOf('/_/chrome/newtab') > -1 || details.url.indexOf('chrome:') === 0) {
+        if (details.url.indexOf('/_/chrome/newtab') > -1 ||
+            details.url.startsWith('chrome:') ||
+            details.url.startsWith('chrome-search:')) {
             return;
         }
 

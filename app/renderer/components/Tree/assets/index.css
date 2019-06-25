@@ -20,18 +20,10 @@
   -khtml-user-drag: element;
   -webkit-user-drag: element;
 }
-.rc-tree li.drag-over > .draggable {
-  background-color: #316ac5;
-  color: white;
-  border: 1px #316ac5 solid;
-  opacity: 0.8;
+.rc-tree li.drag-over, .ul-drag-over {
+  background-color: #DAD8D0;
 }
-.rc-tree li.drag-over-gap-top > .draggable {
-  border-top: 2px blue solid;
-}
-.rc-tree li.drag-over-gap-bottom > .draggable {
-  border-bottom: 2px blue solid;
-}
+
 .rc-tree li.filter-node > .rc-tree-node-content-wrapper {
   color: #a60000!important;
   font-weight: bold!important;
@@ -41,6 +33,7 @@
   padding: 0 0 0 18px;
 }
 .rc-tree li .rc-tree-node-content-wrapper {
+  width: calc(100% - 16px);
   display: inline-block;
   padding: 1px 3px 0 0;
   margin: 0;
@@ -49,6 +42,23 @@
   text-decoration: none;
   vertical-align: top;
 }
+
+.rc-tree li .rc-tree-node-content-wrapper:hover {
+  background-color: rgba(218, 216, 208, 0.5);
+  padding: 1px 5px !important;
+  margin: 0px -5px !important;
+}
+
+.rc-tree-title {
+  width: calc(100% - 16px);
+  display: inline-block;
+}
+
+.tree-row-title {
+  width: 100%;
+  display: inline-block;
+}
+
 .rc-tree li span.rc-tree-switcher,
 .rc-tree li span.rc-tree-checkbox,
 .rc-tree li span.rc-tree-iconEle {

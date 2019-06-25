@@ -53,9 +53,9 @@ export const setStepDelay = (value) => ({
   payload: { value },
 });
 
-export const setMainFile = (value) => ({
+export const setMainFile = (value, title = null) => ({
   type: ActionTypes.TEST_SET_MAIN,
-  payload: { value },
+  payload: { value, title },
 });
 
 export const setSeleniumReady = (value) => ({

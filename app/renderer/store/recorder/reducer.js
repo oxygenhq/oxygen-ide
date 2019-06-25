@@ -10,22 +10,48 @@ import * as ActionTypes from './types';
 import { success, failure } from '../../helpers/redux';
 
 const defaultState = {
+  canRecord: false,
   isRecording: false,
+  isChromeExtensionEnabled: false,
+  waitChromeExtension: true,
   activeFile: null,
+  activeFileName: null,
   steps: [],
 };
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { path, step, value } = payload;
+  const { path, step, value, cache, name } = payload;
 
   switch (action.type) {
+    case ActionTypes.RECORDER_STOP_WAIT_CHROME_EXTENSION : {
+      return {
+        ...state,
+        waitChromeExtension: false
+      };
+    }
+
+    case ActionTypes.RECORDER_CHANGE_CAN_RECORD : {
+      return {
+        ...state,
+        canRecord: value
+      };
+    }
+
+    case ActionTypes.RECORDER_SET_TIMESTAMP : {
+      return {
+        ...state,
+        isChromeExtensionEnabled: value
+      };
+    }
+
     // RECORDER_START
     case success(ActionTypes.RECORDER_START):
       return {
         ...state,
         isRecording: true,
         activeFile: path,
+        activeFileName: name
       };
 
     // RECORDER_STOP
@@ -36,11 +62,21 @@ export default (state = defaultState, action) => {
       };
 
     // RECORDER_SET_ACTIVE_FILE
+    case ActionTypes.RECORDER_REPLACE_FILE_CREDENTIALS:
+      return {
+        ...state,
+        //$FlowFixMe
+        activeFile: path,
+        activeFileName: name
+      };
+
+    // RECORDER_SET_ACTIVE_FILE
     case ActionTypes.RECORDER_SET_ACTIVE_FILE:
       return {
         ...state,
         //$FlowFixMe
         activeFile: value,
+        activeFileName: null
       };
 
     // RECORDER_ADD_STEP
@@ -52,6 +88,16 @@ export default (state = defaultState, action) => {
           step,
         ],
       };
+
+    case 'FROM_CACHE': 
+      return {
+        ...defaultState,
+        ...cache.recorder
+      }
+
+    case 'RESET': {
+      return defaultState;
+    }
 
     default:
       return state;

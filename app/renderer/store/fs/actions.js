@@ -6,9 +6,26 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
+/* eslint-disable */
 import * as TYPES from './types';
 import dispatchAsync from '../../helpers/dispatchAsync';
 import { success, failure } from '../../helpers/redux';
+
+/* set tree rootPath */
+export const setTreeRootPath = (path) => {
+  return {
+    type: TYPES.FS_SET_TREE_ROOT_PATH,
+    payload: { path },
+  };
+}
+
+/* Add file or folder */
+export const addFileOrFolder = (fileOrFolder) => {
+  return {
+    type: TYPES.FS_ADD_FILE_OR_FOLDER,
+    payload: { fileOrFolder },
+  };
+}
 
 /* fetchFolderContent */
 export const fetchFolderContent = (path) => {
@@ -111,7 +128,7 @@ export const _saveFile_Failure = (path, error) => {
 }
 
 /* saveFileAs */
-export const saveFileAs = (path, content) => {
+export const saveFileAs = (path, content = '') => {
   return {
       type: TYPES.FS_SAVE_FILE_AS,
       payload: { path, content },
@@ -128,6 +145,20 @@ export const _saveFileAs_Failure = (path, error) => {
       type: failure(TYPES.FS_SAVE_FILE_AS),
       payload: { path, error },
   };
+}
+
+export const watchFolder = (folderPath) => {
+  return {
+    type: TYPES.FS_TREE_WATCH_FOLDER,
+    payload: { path: folderPath },
+  };  
+}
+
+export const unWatchFolder = (folderPath) => {
+  return {
+    type: TYPES.FS_TREE_UN_WATCH_FOLDER,
+    payload: { path: folderPath },
+  };  
 }
 
 /* treeLoadNodeChildren */
@@ -173,14 +204,20 @@ export const _rename_Failure = (path, error) => ({
   payload: { path, error },
 });
 
+/* move files/folders to another place */
+export const move = (oldPath, newPath) => ({
+  type: TYPES.FS_MOVE,
+  payload: { oldPath, newPath },
+});
+
 /* delete */
 export const deleteFile = (path) => ({
   type: TYPES.FS_DELETE,
   payload: { path },
 });
-export const _delete_Success = (path) => ({
+export const _delete_Success = (path, showDeleteTitle = false) => ({
   type: success(TYPES.FS_DELETE),
-  payload: { path },
+  payload: { path, showDeleteTitle },
 });
 export const _delete_Failure = (path, error) => ({
   type: failure(TYPES.FS_DELETE),

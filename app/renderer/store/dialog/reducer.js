@@ -23,13 +23,28 @@ const defaultState = {
   },
   [types.DIALOG_SETTINGS]: {
     visible: false,
-  }
+  },
+  [types.DIALOG_NEED_ISTALL_EXTENSION]: {
+    visible: false,
+  },
 };
 
 export default (state = defaultState, action) => {
   const { payload } = action;
-  const { dialog } = payload || {};
+  const { dialog, cache } = payload || {};
 
+  if(action.type === 'RESET'){
+    return defaultState;
+  }
+
+  if(action.type === 'FROM_CACHE'){
+    return {
+      ...defaultState,
+      ...cache.dialog
+    };
+  }
+  
+  
   if (!dialog || !state.hasOwnProperty(dialog)) {
     return state;
   }

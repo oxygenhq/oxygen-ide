@@ -10,22 +10,41 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import TextEditor from './TextEditor';
 import * as editorActions from '../../store/editor/actions';
+import { zoomIn, zoomOut } from '../../store/settings/actions';
+
 
 const mapStoreToProps = (state) => {
   // combine file data and editor related metadata
-  const openFiles = Object.keys(state.editor.openFiles).map(path => ({
-    ...state.fs.files[path],
-    ...state.editor.openFiles[path],
-  }));
+  const openFiles = Object.keys(state.editor.openFiles).map(path => {
+    if(path.startsWith('unknownUntitled')){
+      return {
+        ...state.settings.files[path],
+        ...state.editor.openFiles[path],
+      }
+    } else if(path.endsWith('(deleted from disk)')){
+      return {
+        ...state.settings.files['unknown'+path],
+        ...state.editor.openFiles[path],
+      }
+    } else {
+      return {
+        ...state.fs.files[path],
+        ...state.editor.openFiles[path],
+      }
+    }
+  });
 
   return {
+    editorReadOnly: state.test.isRunning,
     activeFile: state.editor.activeFile,
+    activeFileName: state.editor.activeFileName,
+    fontSize: state.settings.fontSize,
     openFiles: openFiles, //state.editor.openFiles,
   };
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...editorActions } , dispatch)
+  bindActionCreators({ ...editorActions, zoomIn, zoomOut } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(TextEditor);

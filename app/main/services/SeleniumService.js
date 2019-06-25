@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 import path from 'path';
+// import { dialog } from 'electron';
 import cp from 'child_process';
 import detectPort from 'detect-port';
 import ServiceBase from "./ServiceBase";
@@ -21,25 +22,57 @@ const ON_SELENIUM_LOG_ENTRY = 'ON_SELENIUM_LOG_ENTRY';
 
 export default class SeleniumService extends ServiceBase {
     seleniumProc = null;
+    availablePort = null;
 
     constructor() {
         super();
     }
 
-    start() {
+    async start() {
+        let result;
         // prevent from starting the process twice
         if (this.seleniumProc != null) {
-            return;
+            result = 'twice_port=';
+            this.stop();
+            const detectPortResult = await this.detectPort();
+            result+= detectPortResult;
+        } else {
+            const detectPortResult = await this.detectPort();
+            result = detectPortResult;
         }
+
+        return result;
+    }
+
+    detectPort(){
+        let result;
         // get available port
-        detectPort(selSettings.port, (err, availablePort) => {
-            if (err) {
-                console.error(`Port "${port}" on "localhost" is already in use. Please set another port in config.json file.`, err);
-            }
-            else {
-                this._startProcess(availablePort);
-            }
+        return detectPort(selSettings.port)
+        .then(availablePort => {
+            this._startProcess(availablePort);
+            this.availablePort = availablePort;
+            return availablePort;
+        })
+        .catch(err => {
+            result = `Port "${selSettings.port}" on "localhost" is already in use. Please set another port in config.json file.`;
+            console.log(`Port "${selSettings.port}" on "localhost" is already in use. Please set another port in config.json file.`, err);
+            return result;
         });
+
+        //let result;
+        // detectPort(selSettings.port, (err, availablePort) => {
+        //     if (err) {
+        //         result = `Port "${port}" on "localhost" is already in use. Please set another port in config.json file.`;
+        //         console.error(`Port "${port}" on "localhost" is already in use. Please set another port in config.json file.`, err);
+        //     } else {
+                
+        //         this._startProcess(availablePort);
+        //         this.availablePort = availablePort;
+        //         console.log('availablePort', availablePort);
+        //         result = 'availablePort';
+        //     }
+        // });
+        // return result;
     }
 
     stop() {
@@ -54,6 +87,7 @@ export default class SeleniumService extends ServiceBase {
 
     dispose() {
         this.stop();
+        this._killSelenium();
     }
 
     _emitStoppedEvent(failed, msg) {
@@ -65,6 +99,9 @@ export default class SeleniumService extends ServiceBase {
     }
 
     _emitStartedEvent(port) {
+
+        console.log('_emitStartedEvent', port);
+
         this.notify({
             type: ON_SELENIUM_STARTED,
             port: port,
@@ -82,13 +119,16 @@ export default class SeleniumService extends ServiceBase {
         const pltfm = process.platform;
         if (pltfm === 'win32') {
             try {
-                cp.execSync(`wmic process where "CommandLine like '%java%%-jar -Dwebdriver.ie.driver=${pltfm}/IEDriverServer_x86.exe -Dwebdriver.gecko.driver=${pltfm}/geckodriver.exe -Dwebdriver.chrome.driver=${pltfm}/chromedriver.exe ${selSettings.jar} -port%'" Call Terminate`, { stdio: 'pipe' });
+                const str = `wmic process where "CommandLine like '%java%%-jar -Dwebdriver.ie.driver=${pltfm}/IEDriverServer_x86.exe -Dwebdriver.gecko.driver=${pltfm}/geckodriver.exe -Dwebdriver.chrome.driver=${pltfm}/chromedriver.exe ${selSettings.jar} -port ${this.availablePort}%'" Call Terminate`;
+                // dialog.showMessageBox({message: str});
+                // console.log('str', str);
+                cp.execSync(str, { stdio: 'pipe' });
             } catch (e) {
                 console.warn('Failed to kill selenium: ' + e);
             }
         } else {
           try {
-            cp.execSync(`pkill -f "java -jar -Dwebdriver.gecko.driver=${pltfm}/geckodriver -Dwebdriver.chrome.driver=${pltfm}/chromedriver ${selSettings.jar} -port"`, { stdio: 'pipe' });
+            cp.execSync(`pkill -f "java -jar -Dwebdriver.gecko.driver=${pltfm}/geckodriver -Dwebdriver.chrome.driver=${pltfm}/chromedriver ${selSettings.jar} -port ${this.availablePort}"`, { stdio: 'pipe' });
           } catch (e) {
             // ignore. pkill returns 1 status if process doesn't exist
           }
@@ -96,8 +136,8 @@ export default class SeleniumService extends ServiceBase {
     }
 
     _startProcess(port) {
-        // kill any hanging selenium process (sometimes it doesn't die properly when exiting the IDE)
-        this._killSelenium();
+
+        console.log('_startProcess', port);
 
         // initialize Selenium server
         const selArgs = [selSettings.jar].concat(selSettings.args);
@@ -136,12 +176,12 @@ export default class SeleniumService extends ServiceBase {
     _handleProcessEvents() {
         const proc = this.seleniumProc;
         if (!proc) {
-            console.error('Selenium process was not started.');
+            log.error('Selenium process was not started.');
             return;
         }
         // on 'error'
         proc.on('error', (e) => {
-            console.error('Cannot start Selenium process.', e);
+            log.error('Cannot start Selenium process.', e);
             // logGeneral.add('ERROR', 'Unable to find Java.
             // Make sure Java is installed and has been added to the PATH environment variable.');
             this._emitLogEvent(e.toString(), ServiceBase.SEVERITY_ERROR);

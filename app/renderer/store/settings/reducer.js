@@ -9,7 +9,12 @@
 import { remote } from 'electron';
 import * as types from './types';
 
+const FONT_SIZE_MIN = 12;
+const FONT_SIZE_MAX = 36;
+
 const defaultAppSettings = {
+  cache: null,
+  files: {},
   lastSession: {
     tabs: [],
     rootFolder: null,
@@ -18,6 +23,12 @@ const defaultAppSettings = {
 };
 
 const defaultState = {
+  uuid: null,
+  first: true,
+  showRecorderMessage: null,
+  cacheUsed: false,
+  showLanding: false,
+  fontSize: 12,
   navbar: {
     visible: false,
   },
@@ -34,24 +45,120 @@ const defaultState = {
       size: 250,
       component: null,
     },
-    ...defaultAppSettings,
   },
+  ...defaultAppSettings,
 };
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { value, target, settings } = payload;
+  const { value, target, settings, zoom, cache, uuid } = payload;
   switch (action.type) {
+    
+    // // FIRST OPEN
+    // case types.FIRST_OPEN: {
+    //   return { 
+    //     ...state,
+    //     first: false
+    //   }
+    // }
+
+    // CREATE USER
+    case types.CREATE_USER: {
+      return { 
+        ...state,
+        uuid: uuid
+      }
+    }
+
+    // SHOW LANDING
+    case types.SHOW_RECORDER_MESSAGE_VALUE: {
+      return { 
+        ...state,
+        showRecorderMessage: value
+      }
+    }
+
+    // SHOW LANDING
+    case types.SHOW_LANDING: {
+      return { 
+        ...state,
+        showLanding: true
+      }
+    }
+
+    // CACHE USED CHANGE
+    case types.CACHE_USED_CHANGE: {
+      return { 
+        ...state,
+        cacheUsed: value
+      }
+    }
+    
+    // HIDE LANDING
+    case types.HIDE_LANDING: {
+      return { 
+        ...state,
+        showLanding: false
+      }
+    }
+
+    // ZOOM_IN
+    case types.EDITOR_ZOOM_IN: {
+      const newFontSize = state.fontSize+2;
+      if(newFontSize > FONT_SIZE_MAX){
+        return state;
+      } else {
+        return { 
+          ...state,
+          fontSize: newFontSize
+        }
+      }
+    }
+
+    // ZOOM_OUT
+    case types.EDITOR_ZOOM_OUT: {
+      const newFontSize = state.fontSize-2;
+      if(newFontSize < FONT_SIZE_MIN){
+        return state;
+      } else {
+        return { 
+          ...state,
+          fontSize: newFontSize
+        }
+      }
+    }
+
+    // ZOOM_TO_DEFAULT
+    case types.EDITOR_ZOOM_TO_DEFAULT: {
+      return { 
+        ...state,
+        fontSize: defaultState.fontSize
+      }
+    }
+
+    // SET_ZOOM
+    case types.EDITOR_SET_ZOOM: {
+      if(zoom){
+        return { 
+          ...state,
+          fontSize: zoom
+        }
+      } else {
+        return state;
+      }
+    }
+
     // SETTINGS_MERGE
     case types.SETTINGS_MERGE:
       return {
         ...state,
-        ...settings,
+        ...settings
       };
     // LAST_SESSION_SET_ROOT_FOLDER
     case types.LAST_SESSION_SET_ROOT_FOLDER:
       return {
         ...state,
+        showLanding: false,
         lastSession: {
           ...state.lastSession,
           rootFolder: value,
@@ -114,6 +221,17 @@ export default (state = defaultState, action) => {
           visible: value,
         },
       };
+      
+    case 'FROM_CACHE': 
+      // console.log('!FROM_CACHE settings', cache.settings);
+
+      return {
+        ...defaultState,
+        ...cache.settings
+      }
+    case 'RESET': 
+      return defaultState;
+    
     default:
       return state;
   }

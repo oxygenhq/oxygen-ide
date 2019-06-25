@@ -17,6 +17,93 @@ export default class ElectronService extends ServiceBase {
     constructor(mainWindow) {
         super(mainWindow);
     }
+    
+    addFile(key, name, content = ''){
+        const settings = appSettings.get('appSettings');
+
+        const newSettings = { ...settings };
+        if(key, name){
+            newSettings.files = {
+                ...newSettings.files,
+                [key+name] : {
+                    content: content,
+                    ext: ".js",
+                    name: name,
+                    path: key,
+                    type: "file"
+                }
+            }
+        } else {
+            return null;
+        }
+
+        appSettings.set('appSettings', newSettings);
+        
+        return newSettings;
+    }
+
+    removeFile(key, name){
+        const settings = appSettings.get('appSettings');
+
+        const newSettings = { ...settings };
+        if(key && name){
+            let filesCopy = { ... newSettings.files };
+            
+            delete filesCopy[key+name];
+
+            newSettings.files = filesCopy;
+        } else {
+            return null;
+        }
+
+        appSettings.set('appSettings', newSettings);
+        
+        return newSettings;
+    }
+
+    updateFileContent(key, name, content){
+        const settings = appSettings.get('appSettings');
+
+        const newSettings = { ...settings };
+        if(key, name, content){
+            newSettings.files = {
+                ...newSettings.files,
+                [key+name] : {
+                    ...newSettings.files[key+name],
+                    content: content
+                }
+            }
+        } else {
+            return null;
+        }
+
+        appSettings.set('appSettings', newSettings);
+        
+        return newSettings;
+    }
+
+    updateCache(cache) {
+        if(cache){
+            const settings = appSettings.get('appSettings');
+            
+            const newSettings = { ...settings };
+
+            newSettings.cache = cache;
+    
+            appSettings.set('appSettings', newSettings);
+    
+            return newSettings;
+        } else {
+            return;
+        }
+    }
+
+    clearSettings() {
+        appSettings.deleteAll();
+
+        const settings = appSettings.get('appSettings');
+        return settings;
+    }
 
     getSettings() {
         return appSettings.get('appSettings');
@@ -65,6 +152,23 @@ export default class ElectronService extends ServiceBase {
 
     showOpenFolderDialog() {
         return this.showOpenDialog('openDirectory');
+    }
+
+    showMessageBox(title, message, buttons) {
+        return new Promise((resolve, reject) => {
+            dialog.showMessageBox({
+                type: 'warning',
+                buttons: buttons,
+                title: title,
+                message: message
+            },(response) => {
+                resolve(response);
+            });
+        });
+    }
+
+    showConfirmFileChangeBox(title, message, buttons) {
+        return this.showMessageBox(title, message, buttons);
     }
 
     showErrorBox(title, message) {

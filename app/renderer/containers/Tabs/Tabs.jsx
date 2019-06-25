@@ -12,9 +12,9 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { Icon, Tooltip, Modal, Button } from 'antd';
-
-import DraggableTab from './DraggableTab';
+import _ from 'lodash';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
+import DraggableTab from './DraggableTab';
 import '../../css/tabs.scss';
 
 function noop() {}
@@ -23,8 +23,16 @@ type Props = {
   active: null | string,
   tabs: Array,
   onChange: (string) => void,
-  onClose: (string) => void,
+  onClose: (string) => void
 };
+
+const circle = () => {
+  return (
+    <svg height="14" width="14">
+      <circle cx="7" cy="7" r="5" fill="lightblue" />
+    </svg>
+  )
+}
 
 class Tabs extends Component<Props, void> {
   static defaultProps = {
@@ -35,15 +43,36 @@ class Tabs extends Component<Props, void> {
   ps = null
 
   state = {
-    closeTabAsk: false,
-    currentOperatedTab: {},
+    closeTabAsk: false
   }
 
   componentDidMount() {
-    this.ps = new PerfectScrollbar(this.tabsRef, {
-      suppressScrollY: true,
-      useBothWheelAxes: true,
-    });
+    if(this.tabsRef){
+      this.ps = new PerfectScrollbar(this.tabsRef, {
+        suppressScrollY: true,
+        useBothWheelAxes: true,
+      });
+    }
+
+    window.addEventListener('resize', _.debounce((e) => {
+      e.preventDefault();
+      if (this.ps) {
+        this.ps.destroy();
+        if(this.tabsRef){
+          this.ps = new PerfectScrollbar(this.tabsRef, {
+            suppressScrollY: true,
+            useBothWheelAxes: true,
+          });
+        }
+      } else {
+        if(this.tabsRef){
+          this.ps = new PerfectScrollbar(this.tabsRef, {
+            suppressScrollY: true,
+            useBothWheelAxes: true,
+          });
+        }
+      }
+    }, 150), false);
   }
 
   // nextProps, nextState
@@ -64,8 +93,15 @@ class Tabs extends Component<Props, void> {
   }
 
   render() {
-    const { active, tabs } = this.props;
-    const activeTab = active ? tabs.find(x => x.key === active) : null;
+    const { active, tabs, activeTitle } = this.props;
+    let activeTab;
+
+    if(active === "unknown"){
+      activeTab = active ? tabs.find(x => x.key === active && x.title === activeTitle) : null;
+    } else {
+      activeTab = active ? tabs.find(x => x.key === active) : null;
+    }
+    
     let confirmFooter = [
       <Button key="close-without-saving" onClick={this.onCloseWithoutConfirm}>Close without saving</Button>,
       <Button key="just-cancel" type="danger" onClick={this.onCancelClose}>Cancel</Button>,
@@ -99,13 +135,13 @@ class Tabs extends Component<Props, void> {
 
           {tabs.length > 0 && (
           tabs.map((tab, index) => {
-            const itemClass = activeTab && activeTab.key === tab.key ?
+            const itemClass = activeTab && activeTab.key === tab.key && activeTab.title === tab.title ?
             'tabItemElem activeTabitem' : 'tabItemElem';
             return (
               <DraggableTab
                 id={tab.key}
                 index={index}
-                key={tab.key}
+                key={tab.key+tab.title}
                 moveCard={this.changeTabOrder}
               >
                 <div className={itemClass}>
@@ -114,17 +150,26 @@ class Tabs extends Component<Props, void> {
                     placement="top"
                     title={tab.key}
                   >
-                    <button onClick={() => this.props.onChange(tab.key)}>
+                    <button onClick={() => this.props.onChange(tab.key, tab.title)}>
                       {tabs.length < 6 && <Icon type="file" />}
                       <span style={{ marginLeft: 5 }}>{tab.title}</span>
                     </button>
                   </Tooltip>
 
-                  <Icon
-                    className="close-icon"
-                    onClick={() => this.props.onClose(tab.key)}
-                    type={tab.touched ? 'star' : 'close'}
-                  />
+                  { tab.touched &&
+                    <Icon
+                      className="close-icon"
+                      onClick={() => this.props.onClose(tab.key, tab.title)}
+                      component={circle}
+                    />
+                  }
+                  { !tab.touched &&
+                    <Icon
+                      className="close-icon"
+                      onClick={() => this.props.onClose(tab.key, tab.title)}
+                      type={'close'}
+                    />
+                  }
                 </div>
               </DraggableTab>
               );

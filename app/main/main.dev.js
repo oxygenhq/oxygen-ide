@@ -18,14 +18,44 @@
  *
  * @flow
  */
-import { app, BrowserWindow, globalShortcut } from 'electron';
+import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
 import Logger from './Logger';
 import MainProcess from './MainProcess';
+import * as Sentry from '@sentry/electron';
+const path = require('path');
+
+crashReporter.start({
+  companyName: 'no-company-nc',
+  productName: 'ide',
+  ignoreSystemCrashHandler: true,
+  submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f'
+});
+
+Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
 
 global.log = new Logger('debug', 'info');
 
 let mainWindow = null;
 let mainProc = null;
+
+try{
+  const gotTheLock = app.requestSingleInstanceLock()
+  
+  if (!gotTheLock) {
+    app.quit()
+  } else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+      // Someone tried to run a second instance, we should focus our window.
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore()
+        mainWindow.focus();
+      }
+    });
+  }
+} catch(e){
+  alert('Please, open later (2 sec)');
+  console.log(e);
+}
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -78,7 +108,8 @@ app.on('ready', async () => {
     width: 1024,
     height: 728,
     webPreferences: {
-      webSecurity: false
+      webSecurity: false,
+      preload: path.join(__dirname, 'sentry.js')
     },
   });
 
@@ -103,7 +134,11 @@ app.on('ready', async () => {
     disposeMainAndQuit();
   });
 
-  mainProc = new MainProcess(mainWindow);
+  try{
+    mainProc = new MainProcess(mainWindow);
+  } catch(e){
+    console.log('e', e);
+  }
 });
 
 function disposeMainAndQuit() {

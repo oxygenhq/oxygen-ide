@@ -1,5 +1,58 @@
 # CHANGELOG
 
+## v1.6.0 (2019-06-21)
+* Fixed saving recording in a wrong file format deletes the script.
+* Fixed increasing font size does not increase green arrow & red break point.
+* Fixed crash when working in offline mode.
+* Fixed run marker not disappearing when test completes successfully.
+* Bump IEDriverServer 1.141.59.
+* Bump Oxygen 0.45.1.
+
+## v1.5.1 (2019-05-29)
+* Bump Oxygen 0.44.0.
+* Fixed `log` commands not working.
+* Fixed empty files being incorectly saved.
+* Fixed saving newly created files not working in OS X.
+* Fixed test execution not working on OS X and Linux.
+* Fixed IDE crash when opened folder is located on a network drive.
+* Other fixes & improvements.
+
+## v1.5.0 (2019-05-20)
+* Bump Oxygen 0.42.8.
+* Better synchronization for files and directories modified outside the IDE.
+* Landing screen.
+* UIX improvements to the recording process.
+* Reworked file creation process.
+* Preserve unsaved changes across IDE restarts.
+* Check for Java installation.
+* MSI installer improvements.
+* Anonymous analytics.
+* Other fixes & improvements.
+
+## v1.4.0 (2019-03-04)
+* Bump Oxygen 0.42.0.
+* Bump Geckodriver 0.24.0.
+* Bump IEDriverServer 1.141.5.
+* Bump Chromedriver 2.46.0.
+* Allow to set and pause on breakpoints in module files (called by require from the main script).
+* Add more user hints for some script execution errors.
+* Add button for copying general/selenium log content to clipboard.
+* Automatically synchronize file hierarchy and content when files are modified outside of the IDE.
+* Add 'go professional' menu entry.
+* Prevent script editing during execution.
+* Don't allow creating folders files with illegal characters in their names.
+* Add option to change editor's font size.
+* Add support for drag-and-drop inside the file tree.
+* Changed 'modified' tab icon.
+* Update recorder certificates.
+* Print more error details on 'Test Failed' errors.
+* Show message about unsaved file as a warning instead of error.
+* Improve welcome message.
+* Fix selenium process getting killed when opening two instances of the IDE.
+* Fix crash in create file dialog when filename is not specified.
+* Fix general log scrolling issues.
+* Fix tab scroller appearing in the middle of the tabs and not in the bottom of the tabs.
+
 ## v1.3.1 (2019-01-03)
 * Bump Oxygen 0.39.0.
 * Colorize transaction commands.

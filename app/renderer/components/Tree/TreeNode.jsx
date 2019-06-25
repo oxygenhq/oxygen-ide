@@ -164,6 +164,13 @@ class TreeNode extends React.Component {
     }
   };
 
+  onDrag = (event) => {
+    const { onDrag } = this.props;
+    if(onDrag){
+      onDrag(event.clientY);
+    }
+  }
+
   onDragEnter = (e) => {
     const { rcTree: { onNodeDragEnter } } = this.context;
 
@@ -364,6 +371,7 @@ class TreeNode extends React.Component {
 
     return (
       <span
+        onContextMenu={this.onIconContextMenu}
         className={classNames(
           `${prefixCls}-iconEle`,
           `${prefixCls}-icon__${this.getNodeState() || 'docu'}`,
@@ -372,6 +380,13 @@ class TreeNode extends React.Component {
       />
     );
   };
+
+  onIconContextMenu = (e) => {
+    e.preventDefault();
+    if (this.props.onIconContextMenu) {
+      this.props.onIconContextMenu(e);
+    }
+  }
 
   // Icon + Title
   renderSelector = () => {
@@ -420,13 +435,13 @@ class TreeNode extends React.Component {
         )}
         draggable={(!disabled && draggable) || undefined}
         aria-grabbed={(!disabled && draggable) || undefined}
-
         onMouseEnter={this.onMouseEnter}
         onMouseLeave={this.onMouseLeave}
         onContextMenu={this.onContextMenu}
         onClick={this.onSelectorClick}
         onDoubleClick={this.onSelectorDoubleClick}
         onDragStart={draggable ? this.onDragStart : undefined}
+        onDrag={ this.onDrag }
       >
         {$icon}{$title}
       </span>
@@ -501,7 +516,6 @@ class TreeNode extends React.Component {
     } } = this.context;
     const disabled = this.isDisabled();
     const dataOrAriaAttributeProps = getDataAndAria(otherProps);
-
     return (
       <li
         className={classNames(className, {
@@ -513,19 +527,17 @@ class TreeNode extends React.Component {
           [`${prefixCls}-treenode-loading`]: loading,
 
           'drag-over': !disabled && dragOver,
-          'drag-over-gap-top': !disabled && dragOverGapTop,
-          'drag-over-gap-bottom': !disabled && dragOverGapBottom,
-          'filter-node': filterTreeNode && filterTreeNode(this),
+          'filter-node': filterTreeNode && filterTreeNode(this)
         })}
 
         style={style}
 
         role="treeitem"
 
-        onDragEnter={draggable ? this.onDragEnter : undefined}
+        onDragEnter={(!this.isLeaf() && draggable) ? this.onDragEnter : undefined}
         onDragOver={draggable ? this.onDragOver : undefined}
         onDragLeave={draggable ? this.onDragLeave : undefined}
-        onDrop={draggable ? this.onDrop : undefined}
+        onDrop={(!this.isLeaf() && draggable) ? this.onDrop : undefined}
         onDragEnd={draggable ? this.onDragEnd : undefined}
         {...dataOrAriaAttributeProps}
       >

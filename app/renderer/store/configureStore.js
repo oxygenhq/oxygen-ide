@@ -17,6 +17,12 @@ import rootReducer from './reducers';
 import createActionToSubjectMiddleware from './middleware/createActionToSubjectMiddleware';
 import rootSaga from './sagas';
 
+
+import ServicesSingleton from '../services';
+import { dialog } from 'electron';
+const services = ServicesSingleton();
+
+
 const history = createHashHistory();
 
 // initialize Rxjs subject for action to subject middleware
@@ -46,7 +52,10 @@ const configureStore = (initialState?: counterStateType) => {
   // Apply redux-logger if we are in debugging mode
   if (process.env.NODE_ENV === 'development') {
     const { createLogger } = require('redux-logger');
-    middleware.push(createLogger({ collapsed: true }));
+    middleware.push(createLogger({ 
+      collapsed: true,
+      predicate: (getState, action) => !( (action.type === 'MAIN_SERVICE_EVENT' && action.payload && action.payload.event && action.payload.event.type && action.payload.event.type === "CHROME_EXTENSION_ENABLED"))
+    }));
   }
 
   // Apply Rxjs Action to Subject middleware
@@ -65,6 +74,82 @@ const configureStore = (initialState?: counterStateType) => {
   */
   const composeEnhancers = compose;
   /* eslint-enable no-underscore-dangle */
+
+  const ignoreTypes = [
+    'MAIN_SERVICE_EVENT',
+    'RESET'
+  ] 
+
+  async function updateCache(cache, action) {
+    if(action && ignoreTypes.includes(action.type)){
+      return;
+    }
+
+    if(action && action.type.startsWith('RECORDER_')){
+      return;
+    }
+
+    if(action && action.type.startsWith('TEST_')){
+      return;
+    }
+
+    if(action && action.type.startsWith('LOGGER_')){
+      return;
+    }
+
+    const state = { ...cache };
+
+    delete state.cache;
+    delete state.settings.cache;
+    delete state.dialog;
+    delete state.logger;
+    delete state.router;
+    delete state.test;
+    delete state.recorder;
+    delete state.wb;
+
+    // console.log('---');
+    // console.log('action', action);
+    // console.log('state', state);
+    // console.log('---');
+
+    // console.log('new state', state);
+    // console.log('new state stringify', JSON.stringify(state));
+
+    const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [state] );
+
+    // if(result){
+    //   // console.log('---');
+    //   // console.log('cache in', cache);
+    //   // console.log('action', action);
+    //   // console.log('result', result);
+    //   // console.log('result.cache.tabs.list', result.cache.tabs.list);
+    //   // console.log('JSON.stringify result', JSON.stringify(result));
+    //   // console.log('---');
+    // }
+    return state;
+  }
+
+  const cache = store => next => action => {
+    let result = next(action);
+    const state = store.getState();
+    // console.log('str', JSON.stringify(state));
+
+    if(state.settings.cacheUsed){
+      updateCache(state, action);
+      // const cacheStatePromise = updateCache(state, action);
+      // cacheStatePromise.then((cacheState) => {
+      //   if(typeof cacheState !== 'undefined'){
+      //     console.log('cacheState', cacheState);
+      //     console.log('cacheState stringify', JSON.stringify(cacheState));
+      //   }
+      // })
+    }
+
+    return result;
+  }
+  
+  middleware.push(cache);
 
   // Apply Middleware & Compose Enhancers
   enhancers.push(applyMiddleware(...middleware));

@@ -11,6 +11,7 @@ import { putAndTake } from '../../helpers/saga';
 
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import * as testActions from './actions';
+import * as wbActions from '../workbench/actions';
 import * as editorActions from '../editor/actions';
 import * as tabActions from '../tabs/actions';
 import * as loggerActions from '../logger/actions';
@@ -51,6 +52,16 @@ function* handleTestRunnerServiceEvent(event) {
     }
     else if (event.type === 'TEST_ENDED') {
         yield put(testActions.onTestEnded());
+        console.log('event', event);
+
+        if(event && event.result && event.result.summary){
+            const { summary } = event.result;
+            if(summary && summary._status && summary._status ==="passed"){
+                yield put(editorActions.resetActiveLines());
+            }
+            
+            yield call(services.mainIpc.call, 'AnalyticsService', 'playStop', [summary]);
+        }
     }
     else if (event.type === 'LINE_UPDATE') {
         yield put(testActions.onLineUpdate(event.time, event.file, event.line, event.primary));
@@ -87,8 +98,22 @@ function* handleDeviceDiscoveryServiceEvent(event) {
 
 export function* startTest({ payload }) {
     const { mainFile, breakpoints, runtimeSettings } = yield select(state => state.test);
-    // check if main file of the test is saved (e.g. unmodified)
-    const file = mainFile ? yield select(state => state.fs.files[mainFile]) : null;
+
+    const editor = yield select(state => state.editor);
+
+    let file;
+    let saveMainFile;
+
+    if(mainFile){
+        // check if main file of the test is saved (e.g. unmodified)
+        file = yield select(state => state.fs.files[mainFile]);
+        saveMainFile = mainFile;
+    } else if (editor && editor.activeFile){
+        // check if main file of the test is saved (e.g. unmodified)
+        file = yield select(state => state.fs.files[editor.activeFile]);
+        saveMainFile = editor.activeFile;
+    }
+
     if (!file) {
         yield put({
             type: failure(ActionTypes.TEST_START),
@@ -108,11 +133,7 @@ export function* startTest({ payload }) {
         return;
     }
     else if (file.modified) {
-        yield put({
-            type: failure(ActionTypes.TEST_START),
-            payload: { error: { type: ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SAVED } },
-        });
-        return;
+        yield put(wbActions.saveCurrentFile());
     }
     try {        
         // reset active line cursor in all editors
@@ -120,7 +141,9 @@ export function* startTest({ payload }) {
         // reset General log
         yield put(loggerActions.resetGeneralLogs());
         // call TestRunner service to start the test
-        yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ mainFile, breakpoints, runtimeSettings ]);
+        
+        yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', []);
+        const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettings ]);        
         yield put({
             type: success(ActionTypes.TEST_START),
             payload: null,

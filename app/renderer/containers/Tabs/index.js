@@ -15,6 +15,7 @@ const mapStoreToProps = (state) => {
   return {
     tabs: state.tabs.list,
     active: state.tabs.active,
+    activeTitle: state.tabs.activeTitle,
   };
 };
   

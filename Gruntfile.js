@@ -147,6 +147,11 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: 'resources', src: ['app.png'], 
                         dest: OUTDIR + RESOURCES + '/app'
+                    },
+                    { 
+                        expand: true, 
+                        cwd: 'app/main/services/RecorderService', src: ['CARoot.pem'], 
+                        dest: OUTDIR
                     }
                 ]
             },
@@ -156,6 +161,11 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: 'resources', src: ['app.icns'], 
                         dest: OUTDIR + RESOURCES
+                    },
+                    { 
+                        expand: true, 
+                        cwd: 'app/main/services/RecorderService', src: ['CARoot.cer'], 
+                        dest: OUTDIR + '/Electron.app'
                     }
                 ]
             },

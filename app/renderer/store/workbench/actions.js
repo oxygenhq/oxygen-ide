@@ -15,6 +15,80 @@ export const initialize = () => {
     payload: null,
   };
 };
+
+export const deactivate = () => {
+  return {
+    type: ActionTypes.WB_DEACTIVATE,
+    payload: null,
+  };
+};
+
+
+export const reset = () => {
+  return {
+    type: 'RESET',
+    payload: null,
+  };
+};
+
+
+export const restoreFromCache = (cache) => {
+  return {
+    type: 'FROM_CACHE',
+    payload: { cache },
+  };
+};
+
+export const setJavaError = (error) => {
+  return {
+    type: ActionTypes.WB_SET_JAVA_ERROR,
+    payload: { 
+      error: error
+    }
+  }
+}
+
+export const cleanJavaError = () => {
+  return {
+    type: ActionTypes.WB_CLEAN_JAVA_ERROR
+  }
+}
+
+/* createNewRealFile */
+
+export const createNewRealFile = (fakeFile=null) => {
+  return {
+    type: ActionTypes.WB_CREATE_NEW_REAL_FILE,
+    payload: {
+      fakeFile: fakeFile
+    },
+  }
+};
+
+/* openFakeFile */
+
+export const openFakeFile = () => {
+  return {
+    type: ActionTypes.WB_OPEN_FAKE_FILE,
+    payload: null,
+  }
+};
+
+export const _openFakeFile_Success = (key,name) => {
+  return {
+    type: success(ActionTypes.WB_OPEN_FAKE_FILE),
+    payload: { key, name },
+  }
+}
+
+export const _openFakeFile_Failure = (error) => {
+  return {
+    type: failure(ActionTypes.WB_OPEN_FAKE_FILE),
+    payload: { error },
+  }
+}
+
+
 /* openFile */
 export const openFile = (path) => {
   return {
@@ -36,17 +110,17 @@ export const _openFile_Failure = (path, error) => {
 };
 
 /* closeFile */
-export const closeFile = (path, force = false) => {
+export const closeFile = (path, force = false, name = null) => {
   return {
     type: ActionTypes.WB_CLOSE_FILE,
-    payload: { path, force },
+    payload: { path, force, name },
   };
 };
 
-export const _closeFile_Success = (path) => {
+export const _closeFile_Success = (path, name = null) => {
   return {
     type: success(ActionTypes.WB_CLOSE_FILE),
-    payload: { path },
+    payload: { path, name },
   };
 };
 
@@ -163,17 +237,23 @@ export const stopRecorder = () => ({
   type: ActionTypes.WB_STOP_RECORDER,
     payload: { },
 });
+
+/* startRecorderWatcher */
+export const startRecorderWatcher = () => ({
+  type: ActionTypes.WB_RECORDER_START_WATCHER
+});
+
 /* onTabChange */
-export const onTabChange = (key) => {
+export const onTabChange = (key, name = null) => {
   return {
     type: ActionTypes.WB_ON_TAB_CHANGE,
-    payload: { key },
+    payload: { key, name },
   };
 };
 /* onContentUpdate */
-export const onContentUpdate = (path, content) => ({
+export const onContentUpdate = (path, content, name = null) => ({
   type: ActionTypes.WB_ON_CONTENT_UPDATE,
-  payload: { path, content },
+  payload: { path, content, name },
 })
 
 /* showContextMenu */
