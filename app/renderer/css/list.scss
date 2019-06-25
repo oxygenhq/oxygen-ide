@@ -7,6 +7,13 @@
 
     .item-value-wrap {
       padding: 5px 5px;
+      display: flex;
+      align-items: center;
+
+      .control {
+        margin: 2px;
+        min-width: 32px;
+      }
     }
     input.item-value-editing {
       padding: 3px 4px;
@@ -17,4 +24,27 @@
         outline: 0;*/
     }
   }
+}
+
+.list-auto-height {
+  height: auto!important;
+}
+
+.no-data {
+  text-align: center;
+  margin: 1em;
+}
+
+
+.control-wrap {
+  padding: 1em;
+
+  .control {
+    margin: 2px;
+    min-width: 32px;
+  }
+}
+
+.control-wrap-right {
+  text-align: right;
 }

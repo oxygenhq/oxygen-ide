@@ -97,7 +97,6 @@ export const setZoom = (zoom) => ({
   payload: { zoom }
 });
 
-
 export const setSidebarVisible= (sidebar, visible) => ({
   type: types.SIDEBAR_SET_VISIBLE,
   payload: { target: sidebar, value: visible },

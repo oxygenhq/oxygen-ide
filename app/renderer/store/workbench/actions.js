@@ -169,6 +169,56 @@ export const createFile = (path, name) => {
     payload: { path, name },
   };
 };
+
+export const createObject = (path, name) => {
+  return {
+    type: ActionTypes.WB_CREATE_OBJECT,
+    payload: { path, name },
+  };
+};
+
+export const createObjectFolder = (path, name) => {
+  return {
+    type: ActionTypes.WB_CREATE_OBJECT_FOLDER,
+    payload: { path, name },
+  };
+};
+
+export const addLocator = (path, name) => {
+  return {
+    type: ActionTypes.WB_ADD_LOCATOR,
+    payload: { path, name },
+  };
+};
+
+export const deleteLocator = (obj) => {
+  return {
+    type: ActionTypes.WB_DELETE_LOCATOR,
+    payload: { obj },
+  };
+};
+
+export const updateLocatorValue = (path, newValue) => {
+  return {
+    type: ActionTypes.WB_UPDATE_LOCATOR_VALUE,
+    payload: { path, newValue },
+  };
+};
+
+export const updateLocator = (path, newName, oldName) => {
+  return {
+    type: ActionTypes.WB_UPDATE_LOCATOR,
+    payload: { path, newName, oldName },
+  };
+};
+
+export const removeObjectOrFolder = (path, name) => {
+  return {
+    type: ActionTypes.WB_REMOVE_OBJECT_OR_FOLDER,
+    payload: { path, name },
+  };
+};
+
 export const _createFile_Success = (path, name) => {
   return {
     type: success(ActionTypes.WB_CREATE_FILE),
@@ -257,7 +307,7 @@ export const onContentUpdate = (path, content, name = null) => ({
 })
 
 /* showContextMenu */
-export const showContextMenu = (type, event = null) => ({
+export const showContextMenu = (type, event = null, node = null) => ({
   type: ActionTypes.WB_SHOW_CONTEXT_MENU,
-  payload: { type, event },
+  payload: { type, event, node },
 })

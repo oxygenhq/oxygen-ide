@@ -11,6 +11,7 @@ import { default as pathNode } from 'path';
 import ActionTypes from '../types';
 import * as fsActions from './actions';
 import * as settingsActions from './../settings/actions';
+import * as objRepActions from '../obj-repo/actions';
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import { putAndTake } from '../../helpers/saga';
 import fileSubjects from '../../store/fs/subjects';
@@ -149,6 +150,26 @@ export function* handleServiceEvents({ payload }) {
             console.warn('on getFileContent no path');
         }
     }
+
+    if (service === 'FileService' && event === 'ObjectRepoWatcher' ) {
+        if(path && content){
+            const [qwe, ...cont] = content.split('{');
+            const conte = "{"+cont.join("{");
+    
+            const conten = conte.split('};')[0] + "}";
+    
+            const repoRoot = JSON.parse(conten);
+
+            const activeNode = yield select(state => state.objrepo.path);
+            
+            if (activeNode && path && activeNode === path) {
+                yield put(objRepActions.openFile(path, true, repoRoot))
+            } else {
+                console.warn(`${activeNode} === ${path}`);
+            }
+        }
+    }
+
 }
 
 function* addFileOrFolder(fileOrFolder) {

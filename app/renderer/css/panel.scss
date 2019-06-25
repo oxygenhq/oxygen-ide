@@ -1,5 +1,9 @@
 @import 'vars';
 
+.panel-full-height {
+  height: calc(100% - 60px) !important;
+}
+
 .panel-header {
   -webkit-user-select: none;
   cursor: default;
@@ -49,6 +53,11 @@
 
 .panel-body.no-padding {
   padding: 0px !important;
+}
+
+.panel-body.no-borders {
+  border-right: none;
+  border-left: none;
 }
 
 .panel-body:not(> .scroller) {

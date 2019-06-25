@@ -14,6 +14,7 @@ import FlexColumn from '../../components/core/FlexColumn';
 import Panel from '../../components/Panel';
 import ScrollContainer from '../../components/ScrollContainer';
 import ObjectTree from './ObjectTree';
+import SearchRow from './SearchRow';
 import ObjectEditor from './ObjectEditor';
 
 type Props = {
@@ -22,7 +23,14 @@ type Props = {
 };
 
 export default class ObjectRepository extends PureComponent<Props> {
-  props: Props;
+  constructor(props: Props) {
+    super(props: Props);
+    this.state = {
+        searchResults: []
+    };
+
+     this.inputRef = React.createRef();
+  }
 
   static Container = styled(FlexColumn)(props => ({
     height: '100vh',
@@ -35,6 +43,12 @@ export default class ObjectRepository extends PureComponent<Props> {
     this.props.setActive(path);
   }
 
+  setSearchResults = searchResults => {
+    this.setState({
+        searchResults: searchResults
+    })
+  }
+  
   render() {
       const { tree, active, name, selectedObject, setActive } = this.props;
       let repoPanelTitle = 'Repository';
@@ -45,25 +59,44 @@ export default class ObjectRepository extends PureComponent<Props> {
       if (selectedObject && selectedObject.name !== '') {
         editorPanelTitle += ` - ${selectedObject.name}`;
       }
-      console.log('selectedObject', selectedObject)
       return (
         <ObjectRepository.Container>
-            <Panel header={ repoPanelTitle }
+            <Panel 
+                header={ repoPanelTitle }
+                afterHeader = {
+                  <SearchRow
+                    setSearchResults={ this.setSearchResults }
+                    tree={ tree }
+                  />
+                }
                 scroller
-                scrollWrapperClass="tree-wrapper"
+                scrollWrapperClass="tree-wrapper tree-wrapper-half"
                 scrollRefresh={ this.props.refreshScroll }
                 scrollVerticalOnly
             >
                 <ObjectTree
+                    searchResults= { this.state.searchResults }
                     tree={ tree }
                     active={ active }
                     onSelect={ (path) => setActive(path) }
+                    showContextMenu = {this.props.showContextMenu}
                 />
             </Panel>
             { selectedObject &&
-            <Panel header={ editorPanelTitle } noBodyPadding={ true } >
-                <ObjectEditor object={ selectedObject } />
-            </Panel>
+              <Panel 
+                header={ editorPanelTitle } 
+                noBodyPadding={ true } 
+              >
+                <ObjectEditor 
+                  refreshScroll={ this.props.refreshScroll }
+                  addLocator = {this.props.addLocator}
+                  deleteLocator = {this.props.deleteLocator}
+                  updateLocator = {this.props.updateLocator}
+                  updateLocatorValue = {this.props.updateLocatorValue}
+                  removeObjectOrFolder = {this.props.removeObjectOrFolder}
+                  object={ selectedObject } 
+                />
+              </Panel>
             }
         </ObjectRepository.Container>
       );    

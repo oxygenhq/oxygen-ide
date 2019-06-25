@@ -15,6 +15,8 @@ import updateModals from '../../components/updateModals';
 import JavaDialog from '../../components/dialogs/JavaDialog';
 import FileRenameDialog from '../../components/dialogs/FileRenameDialog';
 import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
+import ObjectCreateDialog from '../../components/dialogs/ObjectCreateDialog';
+import ObjectFolderCreateDialog from '../../components/dialogs/ObjectFolderCreateDialog';
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
 import SettingsDialog from '../../components/dialogs/SettingsDialog';
 import NeedInstallExtension from '../../components/dialogs/NeedInstallExtension';
@@ -269,6 +271,25 @@ export default class Workbench extends Component<Props> {
   fileCreateDialog_onCancel() {
     this.props.hideDialog('DIALOG_FILE_CREATE');
   }
+
+  objectCreateDialog_onSubmit(name, type, parentPath) {
+    this.props.hideDialog('DIALOG_OBJECT_CREATE');
+    this.props.createObject(name, parentPath);
+  }
+
+  objectCreateDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_CREATE');
+  }
+
+  objectFolderCreateDialog_onSubmit(name, type, parentPath) {
+    this.props.hideDialog('DIALOG_OBJECT_FOLDER_CREATE');
+    this.props.createObjectFolder(name, parentPath);
+  }
+
+  objectFolderCreateDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_FOLDER_CREATE');
+  }
+
   // Rename
   fileRenameDialog_onSubmit(path, type, newName) {
     this.props.hideDialog('DIALOG_FILE_RENAME');
@@ -333,6 +354,24 @@ export default class Workbench extends Component<Props> {
           { dialog.DIALOG_NEED_ISTALL_EXTENSION && dialog.DIALOG_NEED_ISTALL_EXTENSION.visible &&
             <NeedInstallExtension
               onClose={ this.needInstallExtensionOnClose }
+            />
+          }
+          <ObjectCreateDialog
+            { ...dialog['DIALOG_OBJECT_CREATE'] }
+            onSubmit={ ::this.objectCreateDialog_onSubmit }
+            onCancel={ ::this.objectCreateDialog_onCancel } 
+          />
+          <ObjectFolderCreateDialog
+            { ...dialog['DIALOG_OBJECT_FOLDER_CREATE'] }
+            onSubmit={ ::this.objectFolderCreateDialog_onSubmit }
+            onCancel={ ::this.objectFolderCreateDialog_onCancel } 
+          />
+
+          { dialog.DIALOG_FILE_CREATE && dialog.DIALOG_FILE_CREATE.visible &&
+            <FileCreateDialog 
+              { ...dialog['DIALOG_FILE_CREATE'] }
+              onSubmit={ ::this.fileCreateDialog_onSubmit }
+              onCancel={ ::this.fileCreateDialog_onCancel } 
             />
           }
           <FileRenameDialog 

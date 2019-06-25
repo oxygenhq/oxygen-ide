@@ -16,7 +16,7 @@ import ScrollContainer from './ScrollContainer';
 import '../css/panel.scss';
 
 type Props = {
-  header: string|React.Node,
+  header: any,
   scroller?: boolean,
   scrollWrapperClass?: string,
   scrollRefresh?: boolean,
@@ -36,13 +36,16 @@ export default class Panel extends Component<Props> {
     render() {
         const { 
             header,
+            afterHeader = null,
             scroller = false,
             scrollWrapperClass = null,
             scrollRefresh = false,
             scrollVerticalOnly = false,
             noBodyPadding = false,
             refreshScrollBottom = false,
-            wrapRef
+            wrapRef,
+            noBodyBorders = false,
+            className = null
         } = this.props;
 
         let children = this.props.children;
@@ -51,21 +54,25 @@ export default class Panel extends Component<Props> {
         }
 
         const panelBodyClassNames = 'panel-body' + 
-            (noBodyPadding ? ' no-padding' : '');
+            (noBodyPadding ? ' no-padding' : '') +
+            (noBodyBorders ? ' no-borders' : '');
 
         return (
             <Panel.Container className="panel1">
-            <div 
-                ref={wrapRef ? wrapRef : undefined}
-                className="panel"
-            >
-                <div className="panel-header">
-                    <span>{ header }</span>
+                <div 
+                    ref={wrapRef ? wrapRef : undefined}
+                    className="panel"
+                >
+                    { header && 
+                        <div className="panel-header">
+                            <span>{ header }</span>
+                        </div>
+                    }
+                    { afterHeader }
+                    <div className={ panelBodyClassNames }>
+                        { children }
+                    </div>
                 </div>
-                <div className={ panelBodyClassNames }>
-                    { children }
-                </div>
-            </div>
             </Panel.Container>
         );
     }

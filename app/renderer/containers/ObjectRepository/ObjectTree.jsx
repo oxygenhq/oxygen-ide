@@ -47,7 +47,7 @@ export default class ObjectTree extends PureComponent<Props> {
   }
 
   render() {
-    const { tree, active, onSelect } = this.props;
+    const { tree, active, onSelect, searchResults } = this.props;
     const { selectedKeys } = this.state;
     
     return (
@@ -59,7 +59,7 @@ export default class ObjectTree extends PureComponent<Props> {
             selectedKeys={ selectedKeys }
             onSelect={ ::this.handleSelectNode }
         >
-            { renderTreeNodes.apply(this, [tree]) }
+            { renderTreeNodes.apply(this, [tree, searchResults]) }
         </Tree>
     );
   }

@@ -10,6 +10,7 @@
 /* eslint-disable class-methods-use-this */
 import fs from 'fs';
 import fsExtra from 'fs-extra';
+import beautify from 'js-beautify';
 import path from 'path';
 import rimraf from 'rimraf';
 import junk from 'junk';
@@ -343,9 +344,22 @@ export default class FileService extends ServiceBase {
         return this.saveFileContent(newFilePath, '', 'utf-8', 'wx');
     }
 
-    saveFileContent(filePath, content, encoding = 'utf8', flag = 'w') {
+    saveFileContent(filePath, content, beautifyContent = false, encoding = 'utf8', flag = 'w') {
         return new Promise((resolve, reject) => {
-            fs.writeFile(filePath, content, { encoding, flag }, (error) => {
+            let fileContent;
+            if (beautifyContent) {
+                send({
+                    service: 'FileService',
+                    event: 'ObjectRepoWatcher',
+                    path: filePath,
+                    content: content
+                });
+
+                fileContent = beautify(content, { indent_size: 2, space_in_empty_paren: true });
+            } else {
+                fileContent = content;
+            }
+            fs.writeFile(filePath, fileContent, { encoding, flag }, (error) => {
                 if (error) {
                     reject(this._humanizeErrorCode(error));
                 }
