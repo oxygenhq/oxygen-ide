@@ -153,6 +153,7 @@ export default (state = DEFAULT_STATE, action) => {
       let result;
       if (!state.openFiles.hasOwnProperty(path)) {
         result = state;
+        return result;
       }
       _openFilesClone = {
         ...state.openFiles,
@@ -163,7 +164,7 @@ export default (state = DEFAULT_STATE, action) => {
       _openFilesClone[newPath] = {
         ...DEFAULT_OPEN_FILE_STATE,
       };
-
+      
       if(doUnknown){
         // update activeFile if its path has changed
         _newActiveFile = state.activeFile !== path ? state.activeFile : newPath;
