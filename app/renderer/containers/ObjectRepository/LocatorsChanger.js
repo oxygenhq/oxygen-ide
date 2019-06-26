@@ -1,12 +1,13 @@
 import React, { PureComponent, Fragment } from 'react';
-import { Input, Button } from 'antd';
+import { Input, Button, Icon } from 'antd';
 import '../../css/locators-changer.scss';
 
 export default class LocatorsChanger extends PureComponent<Props> {
   constructor(props: Props) {
     super(props: Props);
     this.state = {
-      text: ''
+      text: '',
+      addLocator: false
     };
 
      this.inputRef = React.createRef();
@@ -37,7 +38,8 @@ export default class LocatorsChanger extends PureComponent<Props> {
     if(this.props.addLocator){
       this.props.addLocator(text);
       this.setState({
-        text: ''
+        text: '',
+        addLocator: !this.state.addLocator
       })
     }
   }
@@ -55,12 +57,70 @@ export default class LocatorsChanger extends PureComponent<Props> {
     }
   }
 
-  render() {
-    const { editing, editStr, addLocator } = this.props;
-    const { text } = this.state;
+  toggleAdd = () => {
+    this.setState({
+      addLocator: !this.state.addLocator
+    })
+  }
+
+  remove = () => {
+    const { 
+      remove,
+      selectedLocatorName 
+    } = this.props;
+
+    if(remove){
+      remove(selectedLocatorName);
+    }
+  }
+
+  edit = () => {
+    const { 
+      startEdit,
+      selectedLocatorName 
+    } = this.props;
+
+    if(startEdit){
+      startEdit(selectedLocatorName);
+    }
+  }
+
+  up = () => {
+    const { 
+      moveLocator,
+      selectedLocatorName 
+    } = this.props;
     
+    if(moveLocator){
+      moveLocator(selectedLocatorName, 'up');
+    }
+  }
+
+  down = () => {
+    const { 
+      moveLocator,
+      selectedLocatorName 
+    } = this.props;
+    
+    if(moveLocator){
+      moveLocator(selectedLocatorName, 'down');
+    }
+  }
+
+  render() {
+    const { 
+      editing, 
+      editStr, 
+      selectedLocatorName, 
+      selectedLocatorIndex,
+      length 
+    } = this.props;
+    const { text, addLocator } = this.state;
+    
+    let child = null;
+
     if(editing){
-      return (
+      child =  (
         <div className="locators-changer-container">
           <Input 
             ref={this.inputRef} 
@@ -78,7 +138,7 @@ export default class LocatorsChanger extends PureComponent<Props> {
     }
 
     if(addLocator){
-      return (
+      child = (
         <div className="locators-changer-container">
           <Input 
             ref={this.inputRef} 
@@ -94,6 +154,35 @@ export default class LocatorsChanger extends PureComponent<Props> {
         </div>
       )
     }
+
+    return (
+      <Fragment>
+        <div className="locators-changer-container">
+          <div onClick={this.toggleAdd} className="control">
+            <Icon type={ addLocator ? "minus" : "plus" } />
+          </div>
+
+          <div className="control-group">
+            <div onClick={this.up} className={`control ${ ( !selectedLocatorName || (selectedLocatorIndex === 0) ) ? 'disabled' : '' }`}>
+              <Icon type="up" />
+            </div>
+            <div onClick={this.down} className={`control ${ ( !selectedLocatorName || (selectedLocatorIndex+1 === length) ) ? 'disabled' : '' }`}>
+              <Icon type="down" />
+            </div>
+          </div>
+
+          <div className="control-group">
+            <div onClick={this.edit} className={`control ${ !selectedLocatorName ? 'disabled' : '' }`}>
+              <Icon type="edit" />
+            </div>
+            <div onClick={this.remove} className={`control ${ !selectedLocatorName ? 'disabled' : '' }`}>
+              <Icon type="delete" />
+            </div>
+          </div>
+        </div>
+        {child}
+      </Fragment>
+    )
 
     return null;
   }

@@ -30,6 +30,8 @@ export default class ObjectEditor extends PureComponent<Props> {
   props: Props;
 
   state = {
+    selectedLocatorName: null,
+    selectedLocatorIndex: null,
     object: null,
     editStr: null,
     editing: false
@@ -59,12 +61,38 @@ export default class ObjectEditor extends PureComponent<Props> {
     }
   }
 
+  select = (selectedName, index) => {
+    const { selectedLocatorName } = this.state;
+    const { object } = this.props;
+    const { path } = object;
+    let newSelectedLocatorName;
+    let newSelectedLocatorIndex;
+
+    if(selectedName === selectedLocatorName){
+      newSelectedLocatorName = null;
+      newSelectedLocatorIndex = null;
+    } else {
+      newSelectedLocatorName = selectedName;
+      newSelectedLocatorIndex = index;
+    }
+
+    this.setState({
+      selectedLocatorName: newSelectedLocatorName,
+      selectedLocatorIndex: index
+    })
+  }
+
   remove = (name) => {
     const { object } = this.props;
     const { path } = object;
 
     if(this.props.removeObjectOrFolder){
       this.props.removeObjectOrFolder(path, name);
+      
+      this.setState({
+        selectedLocatorName: null,
+        selectedLocatorIndex: null
+      });      
     }
   }
 
@@ -93,6 +121,22 @@ export default class ObjectEditor extends PureComponent<Props> {
     })
   }
 
+  moveLocator = (name, direction) => {
+    const { selectedLocatorIndex } = this.state;
+    const { object } = this.props;
+    const { path } = object;
+    
+    this.setState({
+      selectedLocatorName: null,
+      selectedLocatorIndex: null
+    },
+    () => {
+      if(this.props.moveLocator){
+        this.props.moveLocator(path, name, direction, selectedLocatorIndex);
+      }
+    });    
+  }
+
   finishEditLocator = (name) => {
     const { originPath } = this.state;
 
@@ -115,10 +159,20 @@ export default class ObjectEditor extends PureComponent<Props> {
 
   renderLocatorChanger() {
     const { object } = this.props;
+    const { 
+      selectedLocatorName,
+      selectedLocatorIndex
+    } = this.state;
 
     if(object && object.children && object.children.length) {
       return (
         <LocatorsChanger 
+          moveLocator={this.moveLocator}
+          startEdit={this.startEdit}
+          selectedLocatorName={ selectedLocatorName }
+          selectedLocatorIndex={ selectedLocatorIndex }
+          length={ object.children.length }
+          remove={ this.remove }
           editing={ this.state.editing }
           editStr={ this.state.editStr }
           onChangeUpdate={ this.onChangeUpdate }
@@ -131,6 +185,10 @@ export default class ObjectEditor extends PureComponent<Props> {
     if(object && object.children && object.children.length === 0) {
       return(
         <LocatorsChanger 
+          moveLocator={this.moveLocator}
+          startEdit={this.startEdit}
+          selectedLocatorName={ selectedLocatorName }
+          remove={ this.remove }
           addLocator={this.addLocator} 
         />
       )
@@ -139,6 +197,10 @@ export default class ObjectEditor extends PureComponent<Props> {
     if (object && object.hasOwnProperty('locator') && this.state.editing) {
       return(
         <LocatorsChanger 
+          moveLocator={this.moveLocator}
+          startEdit={this.startEdit}
+          selectedLocatorName={ selectedLocatorName }
+          remove={ this.remove }
           editing={ this.state.editing }
           editStr={ this.state.editStr }
           addLocator={this.addLocator} 
@@ -153,6 +215,7 @@ export default class ObjectEditor extends PureComponent<Props> {
 
   renderInner() {
     const { object } = this.props;
+    const { selectedLocatorName } = this.state;
     
     if(object && object.children && object.children.length) {
       return (
@@ -162,22 +225,12 @@ export default class ObjectEditor extends PureComponent<Props> {
                 className="list-item" 
                 key={index}
               >
-                <div className="item-value-wrap">
-                  <Button 
-                    onClick={ () => { this.remove(itm.name) } }
-                    className="control" 
-                    type="primary" 
-                    shape="circle" 
-                    icon="delete" 
-                  />
-                  <Button 
-                    onClick={ () => { this.startEdit(itm.name) } }
-                    className="control" 
-                    type="primary" 
-                    shape="circle" 
-                    icon="edit" 
-                  />
-                  <p className="control" >
+                <div 
+                  className={`item-value-wrap ${itm.name === selectedLocatorName ? 'selected' : ''}`}
+                  onClick={ () => { this.select(itm.name, index) } }
+                  onDoubleClick={ () => { this.startEdit(itm.name) } }
+                >
+                  <p className="control">
                     {itm.name}
                   </p>
                 </div>

@@ -32,9 +32,9 @@ export function convertToObjectTree(repo, rootPath = '') {
         return [];
     }
     const root = [];
-    const sortedKeys = Object.keys(repo).sort();
+    const keys = Object.keys(repo);
 
-    for (let key of sortedKeys) {
+    for (let key of keys) {
         const elm = repo[key];
         const path = rootPath ? `${rootPath}.${key}` : `${key}`;
         if (typeof elm === 'string' || Array.isArray(elm)) {
@@ -257,6 +257,93 @@ export function renameLocatorInRepoRoot(repo, parentPath, newName, originName){
                 tmpValue[newName] = tmpValue[originName];
                 delete tmpValue[originName];
                 newRoot[key] = tmpValue;
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
+
+function arrayMove(arr, fromIndex, toIndex) {
+    var element = arr[fromIndex];
+    arr.splice(fromIndex, 1);
+    arr.splice(toIndex, 0, element);
+
+    return arr;
+}
+
+function orderKey(obj, keyOrder) {
+    const result = {}
+    keyOrder.forEach((k) => {
+      result[k] = obj[k]
+    })
+    return result;
+  }
+
+export function moveLocatorInRepoRoot(repo, parentPath, name, direction, index){
+    if (!repo && !parentPath && !name && !direction) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(parentPath)){
+        pathToObject = parentPath.join(".");
+    } else if(typeof parentPath === "object"){
+        const { path } = parentPath;
+        pathToObject = path;
+    } else if (typeof parentPath === "string") {
+        pathToObject = parentPath;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = moveLocatorInRepoRoot(value, serchStringLast, name, direction, index);
+                newRoot[key] = newChildValue;
+            } else {
+
+                const keys = Object.keys(value);
+                
+                if(direction === 'up'){
+
+                    const indexByValue = keys.indexOf(name);
+                    
+                    const newKeysOrder = arrayMove(keys, indexByValue, indexByValue-1);
+                    
+                    let newValue = orderKey(value,newKeysOrder);
+
+                    newRoot[key] = newValue;
+                }
+
+                if(direction === 'down'){
+
+                    const indexByValue = keys.indexOf(name);
+                    
+                    const newKeysOrder = arrayMove(keys, indexByValue, indexByValue+1);
+                    
+                    let newValue = orderKey(value,newKeysOrder);
+
+                    
+                    newRoot[key] = newValue;
+
+                }
             }
         } else {
             newRoot[key] = value;

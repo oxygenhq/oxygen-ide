@@ -15,6 +15,15 @@
         min-width: 32px;
       }
     }
+
+    .item-value-wrap:hover {
+      cursor: pointer;
+    }
+
+    .item-value-wrap.selected {
+      background: #DAD8D0;
+    }
+    
     input.item-value-editing {
       padding: 3px 4px;
       width: 100%;

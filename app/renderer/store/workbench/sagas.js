@@ -18,7 +18,8 @@ import {
     updateLocatorValueInRepoRoot,
     addLocatorInRepoRoot,
     deleteObjectOrFolder,
-    renameLocatorInRepoRoot
+    renameLocatorInRepoRoot,
+    moveLocatorInRepoRoot
 } from '../../helpers/objrepo';
 
 import SupportedExtensions from '../../helpers/file-extensions';
@@ -69,6 +70,7 @@ export default function* root() {
       takeLatest(ActionTypes.WB_CREATE_OBJECT, createObject),
       takeLatest(ActionTypes.WB_CREATE_OBJECT_FOLDER, createObjectFolder),
       takeLatest(ActionTypes.WB_ADD_LOCATOR, addLocator),
+      takeLatest(ActionTypes.WB_MOVE_LOCATOR, moveLocator),
       takeLatest(ActionTypes.WB_DELETE_LOCATOR, deleteLocator),
       takeLatest(ActionTypes.WB_UPDATE_LOCATOR, updateLocator),
       takeLatest(ActionTypes.WB_UPDATE_LOCATOR_VALUE, updateLocatorValue),
@@ -714,6 +716,24 @@ export function* updateLocator({ payload }) {
     
 
     const result = renameLocatorInRepoRoot(repoRootCopy, path, newName, oldName);
+
+    repoRootCopy = result;
+
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    if(objrepo && objrepo.path){
+        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+    }
+}
+
+export function* moveLocator({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { path, name, direction, index } = payload;
+    
+    const { start, end, repoRoot, parent } = objrepo;
+    let repoRootCopy = { ...repoRoot };
+
+    const result = moveLocatorInRepoRoot(repoRootCopy, path, name, direction, index);
 
     repoRootCopy = result;
 

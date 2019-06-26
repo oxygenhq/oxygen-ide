@@ -90,6 +90,7 @@ export default class ObjectRepository extends PureComponent<Props> {
                 <ObjectEditor 
                   refreshScroll={ this.props.refreshScroll }
                   addLocator = {this.props.addLocator}
+                  moveLocator = {this.props.moveLocator}
                   deleteLocator = {this.props.deleteLocator}
                   updateLocator = {this.props.updateLocator}
                   updateLocatorValue = {this.props.updateLocatorValue}

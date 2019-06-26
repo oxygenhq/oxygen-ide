@@ -2,6 +2,27 @@
   padding: 8px;
   display: flex;
 
+  .control-group {
+    display: flex;
+    margin: 0px 10px;
+  }
+
+  .control {
+    margin: 0px 5px;
+  }
+
+  .control.disabled {
+    opacity: 0.5;
+  }
+
+  .control:hover {
+    cursor: pointer;
+  }
+
+  .control.disabled:hover {
+    cursor: not-allowed;
+  }
+
   .add-btn {
     margin-left: 8px;
   }

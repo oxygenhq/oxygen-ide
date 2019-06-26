@@ -191,6 +191,13 @@ export const addLocator = (path, name) => {
   };
 };
 
+export const moveLocator = (path, name, direction, index) => {
+  return {
+    type: ActionTypes.WB_MOVE_LOCATOR,
+    payload: { path, name, direction, index },
+  };
+};
+
 export const deleteLocator = (obj) => {
   return {
     type: ActionTypes.WB_DELETE_LOCATOR,

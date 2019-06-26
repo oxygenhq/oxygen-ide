@@ -11,7 +11,15 @@ import { bindActionCreators } from 'redux';
 import ObjectRepository from './ObjectRepository';
 import * as orActions from '../../store/obj-repo/actions';
 import { findObject } from '../../helpers/objrepo';
-import { showContextMenu, addLocator, deleteLocator, updateLocator, removeObjectOrFolder, updateLocatorValue } from '../../store/workbench/actions';
+import { 
+  showContextMenu, 
+  addLocator, 
+  moveLocator,
+  deleteLocator, 
+  updateLocator, 
+  removeObjectOrFolder, 
+  updateLocatorValue 
+} from '../../store/workbench/actions';
 
 const mapStoreToProps = (state) => {
   return {
@@ -23,7 +31,16 @@ const mapStoreToProps = (state) => {
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...orActions, showContextMenu, addLocator, deleteLocator, updateLocator, removeObjectOrFolder, updateLocatorValue } , dispatch)
+  bindActionCreators({ 
+    ...orActions, 
+    showContextMenu, 
+    addLocator, 
+    moveLocator,
+    deleteLocator, 
+    updateLocator, 
+    removeObjectOrFolder, 
+    updateLocatorValue 
+  } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(ObjectRepository);
