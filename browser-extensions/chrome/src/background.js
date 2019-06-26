@@ -25,6 +25,9 @@ var isIdeRecordingPrev = false;
 
 var debuggingEnabled = false;
 
+var lastWindow = null;
+var windowGroups = [];
+
 // prevent Content Security Policy by removing CSP response headers
 var filter = {
     urls: ['*://*/*'],
@@ -193,29 +196,46 @@ function postToIDEAsync(url, data) {
     }
 }
 
+function lastWindowUpdate(newLastWin) {
+    var tmpLastWin = lastWindow;
+    lastWindow = newLastWin;
+
+    // find top window for the previous window
+    var top;
+    for (var group of windowGroups) {
+        if (group.indexOf(tmpLastWin) >= 0) {
+            top = group.substring(group.length - 20);
+            break;
+        }
+    }
+    // check whether new window has same top as the previous one
+    var sameGroup = false;
+    for (var group of windowGroups) {
+        if (group.indexOf(newLastWin) >= 0 && group.indexOf(top) >= 0) {
+            sameGroup = true;
+        }
+    }
+
+    return {
+        hash: tmpLastWin ? tmpLastWin : '',
+        sameGroup: sameGroup
+    };
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.cmd === 'IS_RECORDING') {
         sendResponse({ result: isIdeRecording, settings: { debuggingEnabled: debuggingEnabled } });
     } else if (msg.cmd === 'RECORDER_LASTWIN') {
-        postToIDEAsync(IDE_URL_HTTP + '/lastwin_attach', msg.data);
+        if (!lastWindow) {
+            lastWindow = msg.data;
+        }
     } else if (msg.cmd === 'RECORDER_WINDOW_GROUP_ADD') {
-        postToIDEAsync(IDE_URL_HTTP + '/windowgroup_add', msg.data);
+        windowGroups.push(msg.data);
     } else if (msg.cmd === 'RECORDER_COMMAND') {
         postToIDEAsync(IDE_URL_HTTP, msg.data);
     } else if (msg.cmd === 'RECORDER_LASTWIN_UPDATE') {
-        try {
-            var req = new XMLHttpRequest();
-            req.open('POST', IDE_URL_HTTP + '/lastwin_update', false);
-            req.send(msg.data);
-            if (req.status != 200) {
-                console.error('ox: error posting to ' + IDE_URL_HTTP + '/lastwin_update' + ': ' + req.statusText);
-            } else {
-                var lastWindow = req.responseText ? JSON.parse(req.responseText) : null;
-                sendResponse({ result: lastWindow });
-            }
-        } catch (e) {
-            console.error('ox: error posting to ' + IDE_URL_HTTP + '/lastwin_update' + ': ' + e);
-        }
+        var lw = lastWindowUpdate(msg.data);
+        sendResponse({ result: lw });
     } else {
         sendResponse({ result: 'error', message: 'invalid cmd' });
     }
