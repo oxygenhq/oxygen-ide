@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,22 +104,6 @@ ElementFinder.prototype.locateElementById = function(identifier, inDocument, inW
             inDocument.createNSResolver ?
             inDocument.createNSResolver(inDocument.documentElement) : this._namespaceResolver);
         return nodes.length === 1 ? element : null;
-    } else if (browserVersion.isIE) {
-        var elements = inDocument.getElementsByTagName('*');
-        
-        for (var i = 0, n = elements.length; i < n; ++i) {
-            element = elements[i];
-            
-            if (element.tagName.toLowerCase() == 'form') {
-                if (element.attributes.id.nodeValue == identifier) {
-                    return element;
-                }
-            } else if (element.getAttribute('id') == identifier) {
-                return element;
-            }
-        }
-        
-        return null;
     } else {
         return null;
     }

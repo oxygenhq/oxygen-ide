@@ -101,11 +101,6 @@ function normalizeNewlines(text) {
  * Replace multiple sequential spaces with a single space, and then convert &nbsp; to space.
  */
 function normalizeSpaces(text) {
-    // IE has already done this conversion, so doing it again will remove multiple nbsp
-    if (browserVersion.isIE) {
-        return text;
-    }
-
     // Replace multiple spaces with a single space
     // TODO - this shouldn't occur inside PRE elements
     text = text.replace(/\ +/g, ' ');

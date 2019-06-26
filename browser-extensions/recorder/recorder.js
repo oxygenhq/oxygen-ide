@@ -418,62 +418,32 @@ Recorder.addEventHandler('change', function (ev) {
     }
 });
 
-if (browserVersion.isIE && browserVersion.ieMode < 11) {
-    // IE 9 Quirks mode. To simulate 'change' event we catch focusin/out and handle those.
-    // TODO: select multiselect
-    Recorder.addEventHandler('focusin', function (ev) {
-        ox_log('ox: focusin ev');
-        var target = ev.target;
 
-        if (target.nodeName.toLowerCase() === 'input' || target.nodeName.toLowerCase() === 'textarea') {
-            this.activeElementValue = target.value;
-        } else if (target.nodeName.toLowerCase() == 'select') {
-            this.activeElementValue = target.options[target.selectedIndex];
-        }
-    });
+Recorder.addEventHandler('focus', function (ev) {
+    ox_log('ox: focus ev');
+    var target = ev.target;
 
-    Recorder.addEventHandler('focusout', function (ev) {
-        ox_log('ox: focusout ev');
-        if (!this.activeElementValue) {
-            return;
-        }
+    if (this.__keysBuf) {
+        this.record('type', this.findLocators(this.__keysBuf.el), this.__keysBuf.keys.join(''));
+        this.__keysBuf = null;
+    }
 
-        var target = ev.target;
-
-        if (target.nodeName.toLowerCase() === 'select' ||
-            target.nodeName.toLowerCase() === 'input') {
-            Recorder.eventHandlers.change.call(this, ev, true);
-        }
-
-        this.activeElementValue = null;
-    });
-} else {
-    Recorder.addEventHandler('focus', function (ev) {
-        ox_log('ox: focus ev');
-        var target = ev.target;
-
-        if (this.__keysBuf) {
-            this.record('type', this.findLocators(this.__keysBuf.el), this.__keysBuf.keys.join(''));
-            this.__keysBuf = null;
-        }
-
-        if (target.nodeName) {
-            var tagName = target.nodeName.toLowerCase();
-            if ('select' == tagName && target.multiple) {
-                ox_log('ox: focus ev remembering selections');
-                var options = target.options;
-                for (var i = 0; i < options.length; i++) {
-                    if (options[i]._wasSelected === null || options[i]._wasSelected === undefined) {
-                        // is the focus was gained by mousedown event, _wasSelected would be already set
-                        options[i]._wasSelected = options[i].selected;
-                    }
+    if (target.nodeName) {
+        var tagName = target.nodeName.toLowerCase();
+        if ('select' == tagName && target.multiple) {
+            ox_log('ox: focus ev remembering selections');
+            var options = target.options;
+            for (var i = 0; i < options.length; i++) {
+                if (options[i]._wasSelected === null || options[i]._wasSelected === undefined) {
+                    // is the focus was gained by mousedown event, _wasSelected would be already set
+                    options[i]._wasSelected = options[i].selected;
                 }
-            } else if (tagName === 'input' || tagName === 'textarea') {
-                this.activeElementValue = target.value;
             }
+        } else if (tagName === 'input' || tagName === 'textarea') {
+            this.activeElementValue = target.value;
         }
-    }, true);
-}
+    }
+}, true);
 
 Recorder.addEventHandler('mousedown', function (ev) {
     ox_log('ox: mousedown ev');
@@ -557,12 +527,11 @@ Recorder.addEventHandler('mouseout', function (ev) {
  * 3. Once the id is received, 'content' notifies the page that it can proceed recording. i.e. sends
  *    CONTEXT_MENU_RECORD with with action name.
  */
-if (!browserVersion.isIE) {
-    Recorder.addEventHandler('contextmenu', function(ev){
-        this.__contextmenuEl = ev.target;
-        window.postMessage(JSON.stringify({type: 'CONTEXT_MENU'}), '*');
-    }, true);
-}
+Recorder.addEventHandler('contextmenu', function(ev){
+    this.__contextmenuEl = ev.target;
+    window.postMessage(JSON.stringify({type: 'CONTEXT_MENU'}), '*');
+}, true);
+
 
 // record keystrokes for situations when "change" event is not produced
 // e.g. site handles keyup itself and prevents input's value changes
