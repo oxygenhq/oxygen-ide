@@ -50,6 +50,29 @@ window.addEventListener(
             // There can be only one! --Highlander
             port.onMessage.removeListener(handler);
             port.onMessage.addListener(handler);
+        } else if (msg.cmd === 'RECORDER_LASTWIN') {
+            chrome.runtime.sendMessage(msg);
+        } else if (msg.cmd === 'RECORDER_WINDOW_GROUP_ADD') {
+            chrome.runtime.sendMessage(msg);
+        } else if (msg.cmd === 'RECORDER_COMMAND') {
+            chrome.runtime.sendMessage(msg);
+        } else if (msg.cmd === 'RECORDER_LASTWIN_UPDATE') {
+            /*
+                1. JS posts RECORDER_LASTWIN_UPDATE to Content
+                2. Content relays the message to Background
+                3. Background sends lastwin_update to IDE
+                3. Background receives reply from IDE and replies to Content
+                5. Content posts RECORD_COMMAND to JS with lastWindow data
+                6. JS generates selectWindow/selectFrame if needed, and posts the command to Content
+                7. Content relays the message to Background
+                8. Background sends to IDE
+            */
+            chrome.runtime.sendMessage(msg, (response) => {
+                e.source.postMessage(JSON.stringify({
+                    type: 'RECORD_COMMAND',
+                    lastWindow: response.result
+                }), '*');
+            });
         }
     },
     false

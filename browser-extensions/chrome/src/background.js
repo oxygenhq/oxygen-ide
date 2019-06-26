@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 const IDE_URL_HTTP = 'http://localhost:7778';
-const IDE_URL_HTTPS = 'https://localhost:8889';
 
 const SETTINGS_DEBUG = 'SETTINGS_DEBUG';
 
@@ -19,6 +18,7 @@ const MENU_ID_ASSERVALUE = 'assertValue';
 const MENU_ID_ASSERTITLE = 'assertTitle';
 
 const PING_INTERVAL = 1000;
+const XHR_TIMEOUT = 2000;
 
 var isIdeRecording = false;
 var isIdeRecordingPrev = false;
@@ -177,9 +177,45 @@ function toggleExtension() {
     chrome.contextMenus.update(MENU_ID_ASSERTITLE, { enabled: isIdeRecording });
 }
 
+function postToIDEAsync(url, data) {
+    try {
+        var req = new XMLHttpRequest();
+        req.open('POST', url);
+        req.timeout = XHR_TIMEOUT;
+        req.onreadystatechange = function() {
+            if (req.readyState === 4 && req.status != 200) {
+                console.error('ox: error posting to ' + url + ': ' + req.statusText);
+            }
+        };
+        req.send(data);
+    } catch (e) {
+        console.error('ox: error posting to ' + url + ': ' + e);
+    }
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.cmd === 'IS_RECORDING') {
         sendResponse({ result: isIdeRecording, settings: { debuggingEnabled: debuggingEnabled } });
+    } else if (msg.cmd === 'RECORDER_LASTWIN') {
+        postToIDEAsync(IDE_URL_HTTP + '/lastwin_attach', msg.data);
+    } else if (msg.cmd === 'RECORDER_WINDOW_GROUP_ADD') {
+        postToIDEAsync(IDE_URL_HTTP + '/windowgroup_add', msg.data);
+    } else if (msg.cmd === 'RECORDER_COMMAND') {
+        postToIDEAsync(IDE_URL_HTTP, msg.data);
+    } else if (msg.cmd === 'RECORDER_LASTWIN_UPDATE') {
+        try {
+            var req = new XMLHttpRequest();
+            req.open('POST', IDE_URL_HTTP + '/lastwin_update', false);
+            req.send(msg.data);
+            if (req.status != 200) {
+                console.error('ox: error posting to ' + IDE_URL_HTTP + '/lastwin_update' + ': ' + req.statusText);
+            } else {
+                var lastWindow = req.responseText ? JSON.parse(req.responseText) : null;
+                sendResponse({ result: lastWindow });
+            }
+        } catch (e) {
+            console.error('ox: error posting to ' + IDE_URL_HTTP + '/lastwin_update' + ': ' + e);
+        }
     } else {
         sendResponse({ result: 'error', message: 'invalid cmd' });
     }
@@ -216,7 +252,7 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
 
         try {
             var req = new XMLHttpRequest();
-            req.open('POST', details.url.startsWith('https:') ? IDE_URL_HTTPS : IDE_URL_HTTP);
+            req.open('POST', IDE_URL_HTTP);
             req.onload = function (e) {
                 if (req.readyState === 4 && req.status != 200) {
                     console.error('ox: error sending open cmd: ' + req.statusText);
