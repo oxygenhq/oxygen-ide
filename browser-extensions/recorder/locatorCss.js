@@ -353,6 +353,8 @@ function sort(paths) {
 function optimize(path, input) {
     var i, newPath;
     return __generator(this, function (_a) {
+        // Note: black magic. without the following unused assignment, this iterator hangs in some cases
+        var npLength = newPath.length;
         switch (_a.label) {
             case 0:
                 if (!(path.length > 2 && path.length > config.optimizedMinLength)) return [3 /*break*/, 5];
