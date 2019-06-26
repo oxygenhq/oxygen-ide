@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-// https://github.com/mathiasbynens/cssesc v2.0.0
+// https://github.com/mathiasbynens/cssesc v3.0.0
 
 var regexExcessiveSpaces = /(^|\\+)?(\\[A-F0-9]{1,6})\x20(?![a-fA-F0-9\x20])/g;
 
@@ -35,7 +35,7 @@ var cssesc = function(string) {
             }
             value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
         } else {
-            if (/[\t\n\f\r\x0B:]/.test(character)) {
+            if (/[\t\n\f\r\x0B]/.test(character)) {
                 value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
             } else if (character == '\\') {
                 value = '\\' + character;
@@ -46,11 +46,7 @@ var cssesc = function(string) {
         output += value;
     }
 
-    if (/^_/.test(output)) {
-        // Prevent IE6 from ignoring the rule altogether (in case this is for an
-        // identifier used as a selector)
-        output = '\\_' + output.slice(1);
-    } else if (/^-[-\d]/.test(output)) {
+    if (/^-[-\d]/.test(output)) {
         output = '\\-' + output.slice(1);
     } else if (/\d/.test(firstChar)) {
         output = '\\3' + firstChar + ' ' + output.slice(1);
@@ -242,6 +238,10 @@ function unique(path) {
     }
 }
 function id(input) {
+    // Note: added by CB
+    if (!input.getAttribute) {
+        return null;
+    }
     var elementId = input.getAttribute('id');
     if (elementId && config.idName(elementId)) {
         return {
@@ -362,7 +362,7 @@ function optimize(path, input) {
                 if (!(i < path.length - 1)) return [3 /*break*/, 5];
                 newPath = path.slice();
                 newPath.splice(i, 1);
-                if (!(unique(newPath) && same(newPath, input))) return [3 /*break*/, 4];
+                if (!(unique(newPath) && rootDocument.querySelector(selector(newPath)) === input)) return [3 /*break*/, 4];
                 return [4 /*yield*/, newPath];
             case 2:
                 _a.sent();
@@ -376,7 +376,4 @@ function optimize(path, input) {
             case 5: return [2 /*return*/];
         }
     });
-}
-function same(path, input) {
-    return rootDocument.querySelector(selector(path)) === input;
 }
