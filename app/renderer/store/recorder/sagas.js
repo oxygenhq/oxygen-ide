@@ -120,6 +120,7 @@ export function* wbCloseFileSuccess({ payload }) {
     return;
 }
 
+
 export function* handleServiceEvents({ payload }) {
     const { service, event } = payload;
 
@@ -132,21 +133,7 @@ export function* handleServiceEvents({ payload }) {
         waitChromeExtension = recorder.waitChromeExtension;
         lastExtensionTime = Date.now();
     }
-    if (service === 'RecorderService' && event.type === 'RECORDER_EVENT') {          
-        const step = {
-            module: event.module,
-            cmd: event.cmd,
-            target: event.target || null,
-            locators: event.targetLocators || null,
-            value: event.value || null,
-            timestamp: event.timestamp || (new Date()).getTime(),
-        };
-
-
-        console.log('-----------------------------RECORDER_EVENT');
-        console.log(step);
-
-
+    if (service === 'RecorderService' && event.type === 'RECORDER_EVENT') {
         const recorder = yield select(state => state.recorder);
 
         const { activeFile, activeFileName, isRecording } = recorder;
@@ -156,7 +143,31 @@ export function* handleServiceEvents({ payload }) {
             return;
         }
         
-        yield put(recorderActions.addStep(step));
+        let generatedCode = '';
+        const steps = [];
+
+        if(event.stepsArray && Array.isArray(event.stepsArray)){
+
+            yield all(
+                event.stepsArray.map((item) => call(function* () {
+                    const step = {
+                        module: item.module,
+                        cmd: item.cmd,
+                        target: item.target || null,
+                        locators: item.targetLocators || null,
+                        value: item.value || null,
+                        timestamp: item.timestamp || (new Date()).getTime(),
+                    };
+
+                    // generated code
+                    generatedCode += toOxygenCode([ step ]);
+
+                    steps.push(step);
+                }))
+            );
+        }
+        
+        yield put(recorderActions.addSteps(steps));
         
         if(activeFile === 'unknown'){
             
@@ -172,12 +183,8 @@ export function* handleServiceEvents({ payload }) {
                 yield stopRecorderAfterFileClose();
                 return;
             }
-            // generated code
-            const generatedCode = toOxygenCode([ step ]);
             // current code, before update (make sure to include new line at the end of the content)
             let prevContent = file.content;
-
-            console.log('prevContent', prevContent);
 
             if(!prevContent){
                 prevContent = '';
@@ -190,8 +197,6 @@ export function* handleServiceEvents({ payload }) {
             if (prevContent.indexOf('web.init') === -1) {
                 prevContent += 'web.init();\n';
             }
-
-            console.log('generatedCode', generatedCode);
 
             const newContent = `${prevContent}${generatedCode}`;
             // append newly recorded content
@@ -209,8 +214,6 @@ export function* handleServiceEvents({ payload }) {
                 return;
             }
     
-            // generated code
-            const generatedCode = toOxygenCode([ step ]);
             // current code, before update (make sure to include new line at the end of the content)
             let prevContent = file.content;
 

@@ -62,6 +62,11 @@ export const addStep = (step) => ({
   payload: { step },
 });
 
+export const addSteps = (steps) => ({
+  type: ActionTypes.RECORDER_ADD_STEPS,
+  payload: { steps },
+});
+
 export const startRecorderWatcher = () => ({
   type: ActionTypes.RECORDER_START_WATCHER
 });

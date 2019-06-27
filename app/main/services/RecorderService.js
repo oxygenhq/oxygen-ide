@@ -106,17 +106,17 @@ export default class RecorderService extends ServiceBase {
         }
     }
 
-    _notify(step) {
-        this.notify({
-            type: RECORDER_EVENT,
-            ...step,
-            module: step.module || 'web',   // use default module (Web) if module name is not returned by recorder extension
-        });
-    }
-
-    _emit(steps) {
+    _emit = (steps) => {
+        let stepsArray = []
         for (var step of steps) {
-            this._notify(step);
+            stepsArray.push({
+                ...step,
+                module: step.module || 'web',   // use default module (Web) if module name is not returned by recorder extension
+            });
        }
+       this.notify({
+            type: RECORDER_EVENT,
+            stepsArray
+       });
     }
 }

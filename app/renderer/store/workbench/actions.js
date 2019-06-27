@@ -252,7 +252,6 @@ export const onTabChange = (key, name = null) => {
 };
 /* onContentUpdate */
 export const onContentUpdate = (path, content, name = null) => {
-  console.log(' path, content, name ',  path, content, name );
   return {
     type: ActionTypes.WB_ON_CONTENT_UPDATE,
     payload: { path, content, name },
