@@ -7,20 +7,13 @@
  * (at your option) any later version.
  */
 import http from 'http';
-import https from 'https';
-import fs from 'fs';
-import path from 'path';
 import dns from 'dns';
 
 import ServiceBase from "../ServiceBase";
 import * as Const from '../../../const';
 
 const PORT_HTTP = 7778;
-const PORT_HTTPS = 8889;
 
-const RECORDER_DIR = process.env.NODE_ENV === 'production' ?
-                        path.resolve(__dirname, 'services', 'RecorderService') :
-                        path.resolve(__dirname, '.');
 const RECORDER_EVENT = 'RECORDER_EVENT';
 const CHROME_EXTENSION_ENABLED = 'CHROME_EXTENSION_ENABLED';
 
@@ -36,23 +29,12 @@ export default class RecorderService extends ServiceBase {
 
     start() {
         // prevent starting the recorder twice
-        if (this.httpSrv || this.httpsSrv) {
+        if (this.httpSrv) {
             return;
         }
         this.httpSrv = http.createServer(::this._onRequest);
         this.httpSrv.on('error', (err) => {
             console.log("Unable to bind recorder's HTTP listener. " + err)
-        });
-
-        var options = {
-            key: fs.readFileSync(path.join(RECORDER_DIR, 'cloudbeat-key.pem')),
-            cert: fs.readFileSync(path.join(RECORDER_DIR, 'cloudbeat-cert.pem')),
-            requestCert: false,
-            rejectUnauthorized: false
-        };
-        this.httpsSrv = https.createServer(options, ::this._onRequest);
-        this.httpsSrv.on('error', (err) => {
-            console.log("Unable to bind recorder's HTTPS listener " + err)
         });
 
         // here be horrors...
@@ -72,12 +54,7 @@ export default class RecorderService extends ServiceBase {
             try{
                 this.httpSrv.listen(PORT_HTTP, hostname, function(){ });
             } catch (e){
-                console.log('#71 e', e);
-            }
-            try{
-                this.httpsSrv.listen(PORT_HTTPS, hostname, function(){ });
-            } catch (e){
-                console.log('#76 e', e);
+                console.error('Unable to open ' + hostname + ':' + PORT_HTTP, e);
             }
         });
     }
@@ -86,10 +63,6 @@ export default class RecorderService extends ServiceBase {
         if (this.httpSrv) {
             this.httpSrv.close();
             this.httpSrv = null;
-        }
-        if (this.httpsSrv) {
-            this.httpsSrv.close();
-            this.httpsSrv = null;
         }
     }
 
@@ -120,39 +93,7 @@ export default class RecorderService extends ServiceBase {
             });
 
             request.on('end', function () {
-                if (request.url === '/lastwin_attach') {
-                    if (!self.lastWin) {
-                        self.lastWin = body;
-                    }
-                } else if (request.url === '/lastwin_update') {
-                    var tmpLastWin = self.lastWin;
-                    self.lastWin = body;
-
-                    // find top window for the previous window
-                    var top;
-                    for (var group of self.windowGroups) {
-                        if (group.indexOf(tmpLastWin) >= 0) {
-                            top = group.substring(group.length - 20);
-                            break;
-                        }
-                    }
-                    // check whether new window has same top as the previous one
-                    var sameGroup = false;
-                    for (var group of self.windowGroups) {
-                        if (group.indexOf(body) >= 0 && group.indexOf(top) >= 0) {
-                            sameGroup = true;
-                        }
-                    }
-
-                    response.write(JSON.stringify({
-                        hash: tmpLastWin ? tmpLastWin : '',
-                        sameGroup: sameGroup
-                    }));
-                } else if (request.url === '/windowgroup_add') {
-                    self.windowGroups.push(body);
-                } else {
-                    self._emit(JSON.parse(body));
-                }
+                self._emit(JSON.parse(body));
                 response.end();
             });
         } else if (request.method === 'OPTIONS') {

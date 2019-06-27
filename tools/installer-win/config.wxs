@@ -107,6 +107,7 @@
             <ComponentGroupRef Id="ApplicationFiles" />
             <ComponentRef Id="ApplicationShortcut" />
             <ComponentRef Id="ApplicationShortcutDesktop" />
+            <ComponentRef Id="IEExt" />
         </Feature>
         
         <Feature Id="ChromeExt"
@@ -117,36 +118,6 @@
             <ComponentRef Id="ChromeExt" />
         </Feature>
         
-        <Feature Id="IEExt"
-                 Title="Internet Explorer add-on"
-                 Level="1"
-                 AllowAdvertise="no"
-                 Description="Enables recording support for IE 10-11.">
-            <ComponentGroupRef Id="IEAddonDLL" />
-            <ComponentRef Id="IEExt" />
-        </Feature>
-        
-        <!-- cannot install silently into user store with iis:Certificate hence this hack -->
-        <SetProperty Id="InstallCertificates"
-                     Value="&quot;[SystemFolder]certutil&quot; –addstore –f Root &quot;[INSTALLFOLDER]resources\app\main\services\RecorderService\CARoot.cer&quot;"
-                     Sequence="execute"
-                     Before="InstallCertificates" />
-        <CustomAction Id="InstallCertificates"
-                      BinaryKey="WixCA"
-                      DllEntry="WixQuietExec"
-                      Impersonate="no"
-                      Execute="deferred"
-                      Return="check" />
-        
-        <SetProperty Id="RemoveCertificates" 
-                     Value="&quot;[SystemFolder]certutil&quot; -delstore root &quot;DO_NOT_TRUST_CloudBeatRoot&quot;"
-                     Sequence="execute" Before="RemoveCertificates" />
-        <CustomAction Id="RemoveCertificates"
-                      BinaryKey="WixCA"
-                      DllEntry="WixQuietExec"
-                      Impersonate="no"
-                      Execute="deferred"
-                      Return="ignore" />
         <UI>
             <UIRef Id="WixUI_FeatureTree" />
             <Publish Dialog="ExitDialog"
@@ -185,8 +156,6 @@
 
         <InstallExecuteSequence>
             <Custom Action="WixCloseApplications" Before="LaunchConditions"></Custom>
-            <Custom Action="InstallCertificates" After="InstallFiles"><![CDATA[&IEExt=3 OR &ChromeExt=3]]></Custom>
-            <Custom Action="RemoveCertificates" After="RemoveFiles" />
         </InstallExecuteSequence>
     </Product>
 </Wix>

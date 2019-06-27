@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ module.exports = function(grunt) {
         defaultTasks.push('chmod:geckodriver');
         defaultTasks.push('chmod:oxygendarwin');
     } else if (process.platform === 'win32') {
-        defaultTasks.push('copy:windows');
     }
     defaultTasks.push('rebrand');
 
@@ -58,7 +57,6 @@ module.exports = function(grunt) {
     const CHROME_EXT_SRC = 'browser-extensions/chrome/src/';
     const CHROME_EXT_DIST = 'browser-extensions/chrome/dist/';
     const RECORDER = 'browser-extensions/recorder/';
-    const IE_EXT_DIST = 'browser-extensions/ie/';
 
     // get production dependencies. instead of using '**' we get the actual deps list
     // because ** and tons of ingores (from modclean task) don't play along nicely
@@ -105,7 +103,7 @@ module.exports = function(grunt) {
                     RECORDER + 'locatorBuilders.js',
                     RECORDER + 'recorder.js',
                     RECORDER + 'engineXpath.js'],
-            dest: [CHROME_EXT_DIST + 'recorder.js', IE_EXT_DIST + 'recorder.js' ]
+            dest: [CHROME_EXT_DIST + 'recorder.js']
         },
         copy: {
             main: {
@@ -128,8 +126,6 @@ module.exports = function(grunt) {
                         cwd: 'app', src: ['dist/**',
                                         'renderer/img/**',
                                         'main/selenium/*.jar',
-                                        'main/services/RecorderService/*.cer',
-                                        'main/services/RecorderService/*.pem',
                                         'main/selenium/' + process.platform + '/**',
                                         'renderer/app.html',
                                         'main/recorder/**',
@@ -147,11 +143,6 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: 'resources', src: ['app.png'], 
                         dest: OUTDIR + RESOURCES + '/app'
-                    },
-                    { 
-                        expand: true, 
-                        cwd: 'app/main/services/RecorderService', src: ['CARoot.pem'], 
-                        dest: OUTDIR
                     }
                 ]
             },
@@ -161,20 +152,6 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: 'resources', src: ['app.icns'], 
                         dest: OUTDIR + RESOURCES
-                    },
-                    { 
-                        expand: true, 
-                        cwd: 'app/main/services/RecorderService', src: ['CARoot.cer'], 
-                        dest: OUTDIR + '/Electron.app'
-                    }
-                ]
-            },
-            windows: {
-                files: [
-                    { 
-                        expand: true, 
-                        cwd: 'browser-extensions/ie/bin/Release', src: ['IEAddon.dll'], 
-                        dest: OUTDIR
                     }
                 ]
             },

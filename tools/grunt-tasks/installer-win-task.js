@@ -14,7 +14,6 @@ module.exports = function(grunt) {
         if (os.platform() === 'win32') {
             var cfg = grunt.config.get('installer-win');
             var wixRoot = 'tools\\installer-win\\';
-            var ieAddonRoot = 'browser-extensions\\ie\\bin\\Release';
             var arch = cfg.arch === 'x64' ? 'x64' : 'x86';
             var version = cfg.version;
             // since MSI doesn't support semantic versioning and only supports
@@ -54,14 +53,6 @@ module.exports = function(grunt) {
             version = x + '.' + y + '.' + (10000 + parseInt(z) * 100 + parseInt(n));
             
             cp.execFileSync('heat', 
-                            [ 'file', ieAddonRoot + '\\IEAddon.dll',
-                              '-srd',
-                              '-gg',
-                              '-cg', 'IEAddonDLL',
-                              '-out', wixRoot + 'ie_addon.wxs'],
-                            { stdio : 'inherit'});
-                                        
-            cp.execFileSync('heat', 
                             [ 'dir', 'dist\\temp',
                               '-o', wixRoot + 'files.wxs',
                               '-scom',
@@ -90,13 +81,6 @@ module.exports = function(grunt) {
                               wixRoot + 'files.wxs'],
                             { stdio : 'inherit'});
                             
-            cp.execFileSync('candle', 
-                            [ '-arch', 'x86',
-                              '-ext', 'WixFirewallExtension',
-                              '-o', wixRoot + 'ie_addon.wixobj',
-                              wixRoot + 'ie_addon.wxs'],
-                            { stdio : 'inherit'});
-                            
             cp.execFileSync('light', 
                             [ '-ext', 'WixNetFxExtension',
                               '-ext', 'WixUIExtension',
@@ -105,11 +89,9 @@ module.exports = function(grunt) {
                               '-spdb',
                               '-sice:ICE60',
                               '-b', 'dist\\temp',
-                              '-b', ieAddonRoot,
                               '-o', 'dist\\oxygen-' + cfg.version + '-win-' + cfg.arch + '.msi',
                               wixRoot + 'config.wixobj',
-                              wixRoot + 'files.wixobj',
-                              wixRoot + 'ie_addon.wixobj'],
+                              wixRoot + 'files.wixobj'],
                             { stdio : 'inherit'});
         }
     });
