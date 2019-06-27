@@ -153,7 +153,9 @@ function checkIfRecordingIsActive() {
     } finally {
         if (isIdeRecording && !isIdeRecordingPrev) {
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                chrome.tabs.sendMessage(tabs[0].id, { cmd: 'INJECT_RECORDER', settings: { debuggingEnabled: debuggingEnabled } });
+                if (tabs && tabs.length >= 1) {
+                    chrome.tabs.sendMessage(tabs[0].id, { cmd: 'INJECT_RECORDER', settings: { debuggingEnabled: debuggingEnabled } });
+                }
             });
         }
         toggleExtension();
@@ -187,12 +189,12 @@ function postToIDEAsync(url, data) {
         req.timeout = XHR_TIMEOUT;
         req.onreadystatechange = function() {
             if (req.readyState === 4 && req.status != 200) {
-                console.error('ox: error posting to ' + url + ': ' + req.statusText);
+                console.warn('ox: error posting to ' + url + ': ' + req.statusText);
             }
         };
         req.send(data);
     } catch (e) {
-        console.error('ox: error posting to ' + url + ': ' + e);
+        console.warn('ox: error posting to ' + url + ': ' + e);
     }
 }
 
