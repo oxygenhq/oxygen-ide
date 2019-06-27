@@ -142,6 +142,11 @@ export function* handleServiceEvents({ payload }) {
             timestamp: event.timestamp || (new Date()).getTime(),
         };
 
+
+        console.log('-----------------------------RECORDER_EVENT');
+        console.log(step);
+
+
         const recorder = yield select(state => state.recorder);
 
         const { activeFile, activeFileName, isRecording } = recorder;
@@ -172,6 +177,8 @@ export function* handleServiceEvents({ payload }) {
             // current code, before update (make sure to include new line at the end of the content)
             let prevContent = file.content;
 
+            console.log('prevContent', prevContent);
+
             if(!prevContent){
                 prevContent = '';
             }
@@ -183,6 +190,9 @@ export function* handleServiceEvents({ payload }) {
             if (prevContent.indexOf('web.init') === -1) {
                 prevContent += 'web.init();\n';
             }
+
+            console.log('generatedCode', generatedCode);
+
             const newContent = `${prevContent}${generatedCode}`;
             // append newly recorded content
             yield put(wbActions.onContentUpdate(activeFile, newContent, activeFileName));
