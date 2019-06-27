@@ -9,8 +9,7 @@
 import http from 'http';
 import dns from 'dns';
 
-import ServiceBase from "../ServiceBase";
-import * as Const from '../../../const';
+import ServiceBase from './ServiceBase';
 
 const PORT_HTTP = 7778;
 
