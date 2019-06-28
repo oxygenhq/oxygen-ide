@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import { notification } from 'antd';
-import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
+import { all, put, select, takeLatest, take, call, actionChannel } from 'redux-saga/effects';
 import { putAndTake } from '../../helpers/saga';
 import { toOxygenCode } from '../../helpers/recorder';
 
@@ -70,6 +70,7 @@ export default function* root() {
       takeLatest(ActionTypes.RECORDER_START_WATCHER, startRecorderWatcher),
       takeLatest(success(ActionTypes.WB_CLOSE_FILE), wbCloseFileSuccess),
       takeLatest('MAIN_SERVICE_EVENT', handleServiceEvents),
+      takeLatest('RECORDER_SERVICE_ADD_STEP', recorderAddStep),
       takeLatest('RESET', initialize)
     ]);
 }
@@ -121,33 +122,34 @@ export function* wbCloseFileSuccess({ payload }) {
 }
 
 
-export function* handleServiceEvents({ payload }) {
-    const { service, event } = payload;
+export function* recorderAddStep({ payload }) {
+    const channel = yield actionChannel("RECORDER_SERVICE_ADD_STEP");
 
-    if (!event) {
-        return;
+    while(true) {
+        const { payload } = yield take(channel);
+        const resp = yield call(handleRequest, payload)
     }
-    if (service === 'RecorderService' && event.type === 'CHROME_EXTENSION_ENABLED') {
-        const recorder = yield select(state => state.recorder);
 
-        waitChromeExtension = recorder.waitChromeExtension;
-        lastExtensionTime = Date.now();
-    }
-    if (service === 'RecorderService' && event.type === 'RECORDER_EVENT') {
-        const recorder = yield select(state => state.recorder);
+}
 
+function* handleRequest(payload) {
+    try {
+
+        const { event } = payload;
+    
+        const recorder = yield select(state => state.recorder);
+    
         const { activeFile, activeFileName, isRecording } = recorder;
-
+    
         if(!isRecording){
             //ignore messages from RecorderService because recording process not started
             return;
         }
         
         let generatedCode = '';
-        const steps = [];
-
+        const steps = [];    
         if(event.stepsArray && Array.isArray(event.stepsArray)){
-
+    
             yield all(
                 event.stepsArray.map((item) => call(function* () {
                     const step = {
@@ -158,16 +160,14 @@ export function* handleServiceEvents({ payload }) {
                         value: item.value || null,
                         timestamp: item.timestamp || (new Date()).getTime(),
                     };
-
+    
                     // generated code
                     generatedCode += toOxygenCode([ step ]);
-
+    
                     steps.push(step);
                 }))
             );
         }
-        
-        yield put(recorderActions.addSteps(steps));
         
         if(activeFile === 'unknown'){
             
@@ -175,9 +175,9 @@ export function* handleServiceEvents({ payload }) {
                 yield stopRecorderAfterFileClose();
                 return;
             }
-
+    
             const file = yield select(state => state.settings.files[activeFile+activeFileName]);
-
+    
             
             if (!file) {
                 yield stopRecorderAfterFileClose();
@@ -185,11 +185,11 @@ export function* handleServiceEvents({ payload }) {
             }
             // current code, before update (make sure to include new line at the end of the content)
             let prevContent = file.content;
-
+    
             if(!prevContent){
                 prevContent = '';
             }
-
+    
             if (!prevContent.endsWith('\n') && prevContent !== '') {
                 prevContent += '\n';
             }
@@ -197,11 +197,12 @@ export function* handleServiceEvents({ payload }) {
             if (prevContent.indexOf('web.init') === -1) {
                 prevContent += 'web.init();\n';
             }
-
+    
             const newContent = `${prevContent}${generatedCode}`;
-            // append newly recorded content
-            yield put(wbActions.onContentUpdate(activeFile, newContent, activeFileName));
-
+            yield all([
+                put(wbActions.onContentUpdate(activeFile, newContent, activeFileName)),
+                put(recorderActions.addSteps(steps))
+            ])
         } else {
             if (!activeFile) {
                 yield stopRecorderAfterFileClose();
@@ -216,11 +217,11 @@ export function* handleServiceEvents({ payload }) {
     
             // current code, before update (make sure to include new line at the end of the content)
             let prevContent = file.content;
-
+    
             if(!prevContent){
                 prevContent = '';
             }
-
+    
             if (!prevContent.endsWith('\n') && prevContent !== '') {
                 prevContent += '\n';
             }
@@ -230,9 +231,28 @@ export function* handleServiceEvents({ payload }) {
             }
             const newContent = `${prevContent}${generatedCode}`;
             // append newly recorded content
-            yield put(wbActions.onContentUpdate(activeFile, newContent));
-        }
+            yield all([
+                put(wbActions.onContentUpdate(activeFile, newContent)),
+                put(recorderActions.addSteps(steps))
+            ])
+        }    
+    } catch(e) {
+        console.log('e', e);
+    }
+}
 
+
+export function* handleServiceEvents({ payload }) {
+    const { service, event } = payload;
+
+    if (!event) {
+        return;
+    }
+    if (service === 'RecorderService' && event.type === 'CHROME_EXTENSION_ENABLED') {
+        const recorder = yield select(state => state.recorder);
+
+        waitChromeExtension = recorder.waitChromeExtension;
+        lastExtensionTime = Date.now();
     }
 }
 
