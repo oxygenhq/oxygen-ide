@@ -27,6 +27,9 @@ const defaultState = {
   [types.DIALOG_NEED_ISTALL_EXTENSION]: {
     visible: false,
   },
+  [types.DIALOG_CLOUD_PROVIDERS]: {
+    visible: false,
+  },
 };
 
 export default (state = defaultState, action) => {

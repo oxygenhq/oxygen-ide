@@ -345,16 +345,29 @@ export default class Toolbar extends Component<Props> {
           </span>
         }
 
-        <span 
-          className={ this._isSelected(Controls.TEST_SETTINGS) ? 'control selectable active' : 'control selectable' }
-          style={{ marginLeft: 'auto' }}
-        >
-          <Icon
-            style={ getOpacity(this._isEnabled(Controls.TEST_SETTINGS)) }
-            onClick={ () => ::this.handleClickEvent(Controls.TEST_SETTINGS) }
-            type="setting"
-            title="Test Settings"
-          />
+        <span style={{ marginLeft: 'auto' }}>             
+          <span 
+            className={ this._isSelected(Controls.TEST_SETTINGS) ? 'control selectable active' : 'control selectable' }
+            style={{ float: 'right' }}
+          >
+            <Icon
+              style={ getOpacity(this._isEnabled(Controls.TEST_SETTINGS)) }
+              onClick={ () => ::this.handleClickEvent(Controls.TEST_SETTINGS) }
+              type="setting"
+              title="Test Settings"
+            />
+          </span>
+          <span 
+            className={ this._isSelected(Controls.CLOUD_PROVIDER_SETTINGS) ? 'control selectable active' : 'control selectable' }
+            style={{ float: 'right' }}
+          >
+            <Icon
+              style={ getOpacity(this._isEnabled(Controls.CLOUD_PROVIDER_SETTINGS)) }
+              onClick={ () => ::this.handleClickEvent(Controls.CLOUD_PROVIDER_SETTINGS) }
+              type="cloud"
+              title="Cloud Providers"
+            />
+          </span>
         </span>
       </div>
     );
