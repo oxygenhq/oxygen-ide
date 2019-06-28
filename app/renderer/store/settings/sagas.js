@@ -78,7 +78,7 @@ export function* tmpRemoveFile({ payload }) {
 }
 
 export function* tmpUpdateFileContent({ payload }) {
-    if (payload && payload.path && payload.name && payload.content) {
+    if (payload && payload.path && payload.name && typeof payload.content !== 'undefined') {
         const { path, name, content } = payload;
         try {            
             const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'updateFileContent', [path, name, content]);
