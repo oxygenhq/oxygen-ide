@@ -242,9 +242,19 @@ export default class TestRunnerService extends ServiceBase {
             const { lineNumber, fileName } = breakpoint;
             const { getScriptContentLineOffset } = this.oxRunner;
             // if no fileName is received from the debugger (not suppose to happen), assume we are in the main script file
-            const editorFile = fileName ? fileName : this.mainFilePath;
+            
+            // TODO: check this egain after fix bug with oxygen runner;
+            // const editorFile = fileName ? fileName : this.mainFilePath;
+           
+            const editorFile = this.mainFilePath;
             // if we are in the main script file, adjust line number according to script boilerplate offset
-            let editorLine = editorFile !== this.mainFilePath ? lineNumber : lineNumber - getScriptContentLineOffset;
+
+            
+            // TODO: check this egain after fix bug with oxygen runner;
+            // let editorLine = editorFile !== this.mainFilePath ? lineNumber : lineNumber - getScriptContentLineOffset;
+
+            let editorLine = lineNumber - getScriptContentLineOffset;
+
             // set event time
             const time = moment.utc().unix();
             // make sure to mark breakpoint line with current line mark
