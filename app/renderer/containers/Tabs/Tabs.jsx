@@ -93,7 +93,7 @@ class Tabs extends Component<Props, void> {
   }
 
   render() {
-    const { active, tabs, activeTitle } = this.props;
+    const { active, tabs, recorder, activeTitle } = this.props;
     let activeTab;
 
     if(active === "unknown"){
@@ -135,8 +135,22 @@ class Tabs extends Component<Props, void> {
 
           {tabs.length > 0 && (
           tabs.map((tab, index) => {
-            const itemClass = activeTab && activeTab.key === tab.key && activeTab.title === tab.title ?
+    
+            let itemClass = activeTab && activeTab.key === tab.key && activeTab.title === tab.title ?
             'tabItemElem activeTabitem' : 'tabItemElem';
+
+            const { isRecording, activeFile, activeFileName } = recorder;
+
+            if(isRecording){
+              if(activeFile === 'unknown'){
+                if(activeFile === tab.key && activeFileName === tab.title){
+                  itemClass += ' green-bg';
+                }
+              } else if(activeFile === tab.key){
+                itemClass += ' green-bg';
+              }
+            }
+
             return (
               <DraggableTab
                 id={tab.key}

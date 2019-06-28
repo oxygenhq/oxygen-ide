@@ -335,7 +335,7 @@ export default class Toolbar extends Component<Props> {
 
         { !waitChromeExtension && canRecord &&
           <span
-            className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
+            className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active green-bg' : 'control selectable' }
             title="Record"
           >
             <FaMicrophone

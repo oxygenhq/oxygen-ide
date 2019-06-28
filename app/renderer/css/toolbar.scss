@@ -52,6 +52,10 @@
 .appTollbar .control.selectable.active {
   background-color: #fff;
 }
+.appTollbar .control.selectable.active.green-bg,
+.tabs-bar-wrapper .tabItemElem.green-bg {
+  background-color: #e8f5e9;
+}
 
 .appTollbar button.control.button {
   padding: 0;

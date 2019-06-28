@@ -67,6 +67,11 @@
     cursor: pointer;
     outline: none;
     text-align: left;
+    display: flex;
+
+    .anticon {
+      margin-top: -2px;
+    }
   }
 }
 
