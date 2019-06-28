@@ -61,11 +61,11 @@ export default class ElectronService extends ServiceBase {
         return newSettings;
     }
 
-    updateFileContent(key, name, content){
+    updateFileContent(key, name, content = ''){
         const settings = appSettings.get('appSettings');
 
         const newSettings = { ...settings };
-        if(key, name, content){
+        if(key && name && typeof content !== 'undefined'){
             newSettings.files = {
                 ...newSettings.files,
                 [key+name] : {
