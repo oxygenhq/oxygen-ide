@@ -8,6 +8,7 @@
  */
 import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
 import * as ActionTypes from './types';
+import * as types from '../types';
 import * as tabActions from '../tabs/actions';
 import * as editorActions from '../editor/actions';
 import * as settingsActions from './actions';
@@ -28,8 +29,30 @@ export default function* root() {
       takeLatest(ActionTypes.TMP_REMOVE_FILE, tmpRemoveFile),
       takeLatest(ActionTypes.TMP_UPDATE_FILE_CONTENT, tmpUpdateFileContent),
       takeLatest(ActionTypes.FIRST_OPEN, firstOpen),
-      takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
+      takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),,
+      takeLatest(types.TEST_UPDATE_BREAKPOINTS, testUpdateBreakpoints)
     ]);
+}
+
+
+export function* testUpdateBreakpoints({ payload }){
+        
+    const FONT_SIZE_MIN = 12;
+    const FONT_SIZE_MAX = 36;
+
+    const settings = yield select(state => state.settings);
+    
+    if(
+        settings && 
+        settings.fontSize && 
+        parseInt(settings.fontSize) && 
+        settings.fontSize >= FONT_SIZE_MIN && 
+        settings.fontSize <= FONT_SIZE_MAX
+    ) {
+        // ignore, all good
+    } else {
+        yield put(settingsActions.setZoom(FONT_SIZE_MIN));
+    }
 }
 
 export function* firstOpen({ payload }){

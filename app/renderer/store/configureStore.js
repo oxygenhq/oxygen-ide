@@ -93,7 +93,9 @@ const configureStore = (initialState?: counterStateType) => {
       return;
     }
 
-    if(action && action.type.startsWith('LOGGER_')){
+    if(action && action.type === 'LOGGER_SET_VISIBLE'){
+      // add to save cache
+    } else if(action && action.type.startsWith('LOGGER_')){
       return;
     }
 
