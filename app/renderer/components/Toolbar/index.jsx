@@ -263,7 +263,7 @@ export default class Toolbar extends Component<Props> {
 
         { this._isVisible(Controls.TEST_CONTINUE) && (
           <Icon
-            className="control button"
+            className="control button forward"
             style={ getOpacity(this._isEnabled(Controls.TEST_CONTINUE)) }
             onClick={ () => ::this.handleClickEvent(Controls.TEST_CONTINUE) }
             type="forward"
