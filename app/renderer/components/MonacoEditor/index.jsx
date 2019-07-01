@@ -17,6 +17,11 @@ import * as helpers from './helpers';
 import onDidChangeModelContent from './onDidChangeModelContent';
 import onDidChangeCursorSelection from './onDidChangeCursorSelection';
 
+const RATIO = 1.58;
+const DEFAULT_FONT_SIZE = 12;
+const FONT_SIZE_MIN = 12;
+const FONT_SIZE_MAX = 36;
+
 // load Monaco Editor module
 function uriFromPath(_path) {
   let pathName = path.resolve(_path).replace(/\\/g, '/');
@@ -80,7 +85,6 @@ export default class MonacoEditor extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const RATIO = 1.58;
     let updateFontSize = false;
     let updateActiveLine = false;
 
@@ -282,7 +286,19 @@ export default class MonacoEditor extends React.Component {
 
   initMonaco() {
     const value = this.props.value !== null ? this.props.value : this.props.defaultValue;
-    const { language, theme, options } = this.props;
+    const { language, theme, fontSize } = this.props;
+
+    let saveFontSize = DEFAULT_FONT_SIZE;
+
+    if(
+      fontSize &&
+      parseInt(fontSize) &&
+      fontSize >= FONT_SIZE_MIN && 
+      fontSize <= FONT_SIZE_MAX
+    ) {
+      saveFontSize = fontSize;
+    }
+
     if (this.editorContainer) {
       // Before initializing monaco editor
       this.editorWillMount();
@@ -308,7 +324,8 @@ export default class MonacoEditor extends React.Component {
         value,
         language,
         ...MONACO_DEFAULT_OPTIONS,
-        ...options
+        fontSize: saveFontSize,
+        lineHeight: saveFontSize*RATIO
       });
       oxygenIntellisense();
       if (theme) {
