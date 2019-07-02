@@ -148,7 +148,7 @@
         </Condition>
 
         <util:CloseApplication Id="CloseChrome"
-                               CloseMessage="yes"
+                               CloseMessage="no"
                                Target="chrome.exe"
                                RebootPrompt="no"
                                PromptToContinue="yes"
