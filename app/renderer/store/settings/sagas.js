@@ -74,7 +74,6 @@ export function* tmpAddFile({ payload }) {
         const { key, name, content } = payload;
         try {            
             const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'addFile', [key, name, content]);
-            
             if(newSettings){
                 yield put(settingsActions.mergeSettings(newSettings));
             }
