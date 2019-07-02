@@ -111,7 +111,6 @@ module.exports = function(grunt) {
                     { 
                         expand: true, 
                         cwd: 'app/node_modules', src: prodDeps.concat(['!fibers/src/**',
-                                                                   '!oxygen-cli/dotnet/**',
                                                                    '!oxygen-cli/lib/reporters/pdf/**',
                                                                    '!oxygen-cli/lib/reporters/html/**',
                                                                    '!**/obj/**',
@@ -208,11 +207,7 @@ module.exports = function(grunt) {
                     {x: 442, y: 210, type: 'link', path: '/Applications'},
                     {x: 186, y: 210, type: 'file', path: path.join(OUTDIR, 'Oxygen.app')},
                 ],
-                format: 'UDBZ',
-                'code-sign': {
-                    'signing-identity': '62CADA6FF6C358E1BC6023535D6A192B98390B76',
-                    identifier: 'org.oxygen.ide'
-                }
+                format: 'UDBZ'
             },
             target: {
                 dest:  'dist/oxygen-' + pkg.version + '-osx-x64.dmg'
