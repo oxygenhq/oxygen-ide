@@ -122,6 +122,7 @@
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-compress": "^1.4.3",
     "grunt-contrib-copy": "^1.0.0",
+    "grunt-stripcomments": "0.7.2",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^22.1.4",
     "mini-css-extract-plugin": "^0.4.3",
