@@ -135,6 +135,17 @@ export function* startTest({ payload }) {
     else if (file.modified) {
         yield put(wbActions.saveCurrentFile());
     }
+    // clone runtime settings and add cloud provider information, if a provider was selected
+    const runtimeSettingsClone = {
+        ...runtimeSettings
+    };
+    console.log('runtimeSettings.testProvider', runtimeSettings.testProvider)
+    if (runtimeSettings.testProvider) {
+        const cloudProviders = yield select(state => state.settings.cloudProviders);
+        console.log('cloudProviders', cloudProviders)
+        runtimeSettingsClone.testProvider = cloudProviders.hasOwnProperty(runtimeSettings.testProvider) ? { ...cloudProviders[runtimeSettings.testProvider], id: runtimeSettings.testProvider } : null;
+    }
+    
     try {        
         // reset active line cursor in all editors
         yield put(editorActions.resetActiveLines());
@@ -143,7 +154,7 @@ export function* startTest({ payload }) {
         // call TestRunner service to start the test
         
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', []);
-        const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettings ]);        
+        const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
         yield put({
             type: success(ActionTypes.TEST_START),
             payload: null,

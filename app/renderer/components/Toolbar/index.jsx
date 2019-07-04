@@ -24,6 +24,7 @@ import * as Controls from './controls';
 import NoChromeDialog from './NoChromeDialog';
 import WorkingChromeDialog from './WorkingChromeDialog';
 import { type DeviceInfo } from '../../types/DeviceInfo';
+import { type CloudProvider } from '../../types/CloudProvider';
 import { type BrowserInfo } from '../../types/BrowserInfo';
 
 type ControlState = {
@@ -37,6 +38,7 @@ type Props = {
   browsers: Array<BrowserInfo>,
   devices: Array<DeviceInfo>,
   emulators: Array<string>,
+  providers: Array<CloudProvider>,
   controlsState: { [string]: ControlState },
   onValueChange: (string, string) => void,
   onButtonClick: (string) => void
@@ -132,6 +134,8 @@ export default class Toolbar extends Component<Props> {
       devices, 
       browsers, 
       emulators, 
+      providers = [],
+      testProvider = null,
       stepDelay,
       isChromeExtensionEnabled,
       canRecord,
@@ -144,6 +148,7 @@ export default class Toolbar extends Component<Props> {
       showNoChromeDialog,
       showWorkingChromeDialog
     } = this.state;
+
     return (
       <div className="appTollbar">
         { typeof showNoChromeDialog !== 'undefined' && showNoChromeDialog && 
@@ -229,7 +234,7 @@ export default class Toolbar extends Component<Props> {
           }
           {
             testMode === 'mob' && devices.map((device) => (
-              <Option key={ device.id } value={ device.id }>
+              <Option key={ device.id } value={ device.id } title={ device.name }>
                 { device.name }
               </Option>
             ))
@@ -285,6 +290,24 @@ export default class Toolbar extends Component<Props> {
             /> 
             <span>Stop</span>
           </button>
+        )}
+
+        { (Array.isArray(providers) && providers.length > 0) && (
+        <Select
+          className="control select"
+          value={ testProvider || '' }
+          style={{ width: 120 }}
+          onChange={ (value) => ::this.handleValueChange(Controls.TEST_PROVIDER, value) }
+        >
+          <Option key='' value=''>-- Local --</Option>
+          {
+            testMode === 'web' && providers.map((provider) => (
+              <Option key={ provider.id } value={ provider.id }>
+                { provider.title }
+              </Option>
+            ))
+          }
+        </Select>
         )}
 
         <div className="separator" />

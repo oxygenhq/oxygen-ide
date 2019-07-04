@@ -22,6 +22,7 @@ const defaultState = {
   runtimeSettings: {
     testMode: 'web',
     testTarget: 'chrome',
+    testProvider: null,
     stepDelay: 0,
     reopenSession: false,   // indicates if Selenium session must be re-opened for each iteration
     seleniumPort: null,     // holds Selenium server port number
@@ -259,6 +260,16 @@ export default (state = defaultState, action) => {
         runtimeSettings: {
           ...state.runtimeSettings,
           ...settings
+        },
+      };
+
+    // TEST_SET_PROVIDER
+    case ActionTypes.TEST_SET_PROVIDER:
+      return {
+        ...state,
+        runtimeSettings: {
+          ...state.runtimeSettings,
+          testProvider: value
         },
       };
 

@@ -216,7 +216,7 @@ export function* initialize() {
     // start Selenium server
     services.mainIpc.call('SeleniumService', 'start').then(() => {});
     // start Android and iOS device watcher
-    services.mainIpc.call('DeviceDiscoveryService', 'start').then(() => {});
+    services.mainIpc.call('DeviceDiscoveryService', 'start').then(() => {}).catch((e) => console.error(e.message));
 
     /* sync variant
 

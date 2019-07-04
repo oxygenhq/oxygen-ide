@@ -62,8 +62,9 @@ export default class TestRunnerService extends ServiceBase {
             iterations,
             reopenSession,
             dbgPort,
-            testMode,
+            testMode,            
             testTarget,
+            testProvider,
             seleniumPort,
             stepDelay,
         } = testConfig;
@@ -87,6 +88,19 @@ export default class TestRunnerService extends ServiceBase {
             allowGlobal: true
         };
         options.reopenSession = reopenSession || false;
+
+        // add provider specific options, if cloud provider was selected
+        if (testProvider && testProvider.id) {
+            switch (testProvider.id) {
+                case 'sauceLabs':
+                    options.seleniumUrl = testProvider.url;
+                    options.wdioOpts = {
+                        user: testProvider.username,
+                        key: testProvider.accessKey
+                    };
+            }
+        }
+        
         
         // prepare module parameters
         const caps = {};
@@ -107,7 +121,9 @@ export default class TestRunnerService extends ServiceBase {
         }
         else if (testMode === 'web') {
             options.mode = 'web';
-            options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
+            if (!options.seleniumUrl) {
+                options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
+            }
             options.browserName = testTarget;
             // @FIXME: this option should be exposed in reports settings
             options.screenshots = 'never';
@@ -119,7 +135,7 @@ export default class TestRunnerService extends ServiceBase {
         
         try {
             this._emitLogEvent(SEVERITY_INFO, 'Initializing...');
-
+            console.log('options', options)
             await this.oxRunner.init(options);
             this._emitTestStarted();
             // assign user-set breakpoints

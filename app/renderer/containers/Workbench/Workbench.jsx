@@ -199,6 +199,9 @@ export default class Workbench extends Component<Props> {
         intVal >= 0 && this.props.setStepDelay(intVal);
       }      
     }
+    else if (ctrlId === Controls.TEST_PROVIDER) {
+      this.props.setTestProvider(value);
+    }
   }
 
   getToolbarControlsState() {
@@ -317,6 +320,18 @@ export default class Workbench extends Component<Props> {
     const loggerVisible = settings.logger.visible;
     const showLanding = settings.showLanding;
     const showRecorderMessage = settings.showRecorderMessage;
+
+    // convert providers dictionary to an array - add only providers marked as 'in use'
+    const providers = [];
+    for (let providerKey of Object.keys(cloudProviders)) {
+      const provider = cloudProviders[providerKey];
+      if (provider.inUse) {
+        providers.push({
+          ...cloudProviders[providerKey],
+          id: providerKey
+        });
+      }      
+    }
     
     if(!initialized){
       return (
@@ -378,10 +393,12 @@ export default class Workbench extends Component<Props> {
           stopWaitChromeExtension={ this.props.stopWaitChromeExtension }
           testMode={ runtimeSettings.testMode }
           testTarget={ runtimeSettings.testTarget }
+          testProvider={ runtimeSettings.testProvider }
           stepDelay={ runtimeSettings.stepDelay }
           devices={ test.devices }
           browsers={ test.browsers }
           emulators={ test.emulators }
+          providers={ providers }
           showRecorderMessage={ showRecorderMessage }
           changeShowRecorderMessageValue={ changeShowRecorderMessageValue }
           controlsState={ this.getToolbarControlsState() } 

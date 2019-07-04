@@ -7,44 +7,185 @@
  * (at your option) any later version.
  */
 import ADB from 'appium-adb';
-import ServiceBase from "./ServiceBase";
+import { instrumentsUtils } from 'appium-ios-driver';
+import ServiceBase from './ServiceBase';
 
 const DEVICE_CONNECTED = 'DEVICE_CONNECTED';
 const DEVICE_DISCONNECTED = 'DEVICE_DISCONNECTED';
-const CHECK_INTERVAL = 2000;
+const DEVICE_MONITOR_INTERVAL = 30000;
 
 let isError = function(e){
     return e && e.stack && e.message;
 }
 
-export default class DeviceDiscoveryService extends ServiceBase {
+const DEVICE_INFO = {
+    os: {
+        name: null,
+        version: null,
+        apiLevel: null
+    },
+    product: {
+        brand: null,
+        manufacturer: null,
+        model: null,
+        code: null
+    }
+};
+
+export default class DeviceDiscoveryService2 extends ServiceBase {
     devices = {};
+    updatingDeviceList = false;
+    devListInterval = null;
 
     constructor() {
         super();
     }
 
     async start() {
-        let result;
-        // limit the number of retries in order to prevent console spamming when adb is not installed for example
-        this.retries = 3;
-        result = await this._getConnectedDevices();
-
-        // console.log('result', result);
-
-        if(isError(result)){
-            // console.log('result.message', result.message);
-            return result.message;
-        } else {
-            return result;
-        }
-
+        await this._updateDeviceList();
+        
+        const self = this;
+        this.devListInterval = setInterval(function() {
+            // do not update devices if previous update call is not finished yet
+            if (!self.updatingDeviceList) {
+                self._updateDeviceList();
+            }
+        },  DEVICE_MONITOR_INTERVAL);
+        
+        return this.devices;
     }
+
+    async _updateDeviceList() {
+        // prevent duplicated calls to this function
+        if (this.updatingDeviceList) {
+            return;
+        }        
+        this.updatingDeviceList = true;    
+        var timestamp = (new Date()).getTime();
+    
+        await this._updateAndroidDevices(timestamp);
+        //await this._updateIOSDevices(timestamp);
+    
+        // go through all the devices and see which one is not connected anymore
+        var uuids = Object.keys(this.devices);
+        for (var i = 0; i < uuids.length; i++) {
+            var device = this.devices[uuids[i]];
+            if (device.timestamp < timestamp) {
+                device.new = false;
+                device.connected = false;
+                this._emitDeviceDisconnected(device);
+            }
+            else if (device.new) {
+                this._emitDeviceConnected(device);
+            }
+        }
+        this.updatingDeviceList = false;    
+    };
 
     async stop() {
         // FIXME: should cancel the timeout
     }
+    
+    async _updateAndroidDevices(timestamp) {
+        const adb = await ADB.createADB();
+    
+        const connectedDevices = await adb.getConnectedDevices();
+        for (var i = 0; i < connectedDevices.length; i++) {
+            const uuid = connectedDevices[i].udid;
+            if (!uuid) {
+                continue;
+            }
+            // previously seen device
+            if (this.devices[uuid]) {
+                this.devices[uuid].new = this.devices[uuid].connected == false;
+                this.devices[uuid].connected = true;
+                this.devices[uuid].timestamp = timestamp;
+            } else {    // new device                
+                // determine if this is a real device or an emulator
+                var isReal = uuid.indexOf('emulator') != 0 && uuid.indexOf(':') == -1;
+                const info = await this._getAndroidDeviceInfo(uuid);
+                // add new device
+                this.devices[uuid] = {
+                    new: true,
+                    id: uuid,
+                    name: `${info.product.model} [${info.os.name} ${info.os.version}]`,
+                    connected: true,
+                    real: isReal,
+                    changed: true,
+                    timestamp: timestamp,
+                    ios: false,
+                    android: true,
+                    info: info
+                };
+            }
+        }
+    };
 
+    async _getAndroidDeviceInfo(uuid) {
+        const adb = await ADB.createADB();
+    
+        const devInfo = { ...DEVICE_INFO };
+        // set device id
+        adb.setDeviceId(uuid);
+        // platform and version
+        devInfo.os.name = 'Android';
+        devInfo.os.version = await adb.getPlatformVersion();
+        devInfo.os.apiLevel = await adb.getApiLevel();
+        // product related
+        devInfo.product.brand = await adb.shell(['getprop', 'ro.product.brand']);
+        devInfo.product.manufacturer = await adb.shell(['getprop', 'ro.product.manufacturer']);
+        devInfo.product.model = await adb.shell(['getprop', 'ro.product.model']);
+        devInfo.product.code = await adb.shell(['getprop', 'ril.product_code']);
+        devInfo.product.battery = await adb.shell(['dumpsys', 'battery']);
+
+        return devInfo;
+    }
+    
+    async _updateIOSDevices(timestamp) {
+        const connectedDevices = await instrumentsUtils.getAvailableDevices();
+        for (var i = 0; i < connectedDevices.length; i++) {
+            var devInfoStr = connectedDevices[i];
+            var info = this._extractIOSDeviceInfo(devInfoStr);
+            if (info == null)
+                continue;
+            var uuid = info.uuid;
+            var realDevice = devInfoStr.indexOf('(Simulator)') == -1;
+            var isTablet = devInfoStr.indexOf('iPad') > -1;
+            // previously seen device
+            if (this.devices[uuid]) {
+                this.devices[uuid].new = this.devices[uuid].connected == false;
+                this.devices[uuid].connected = true;
+                this.devices[uuid].timestamp = timestamp;
+            } else {    
+                // add new device                
+                this.devices[uuid] = {
+                    id: uuid,
+                    name: `${info.name} [iOS ${info.version}]`,
+                    connected: true,
+                    new: true,
+                    real: realDevice,
+                    tablet: isTablet,
+                    timestamp: timestamp,
+                    ios: true,
+                    android: false,
+                    info: {
+                        name: info.name,
+                        os: {
+                            name: 'iOS',
+                            version: info.version
+                        },
+                        product: {
+                            brand: 'Apple',
+                            manufacturer: 'Apple',
+                            model: info.name,    // this should give us a unique model id for iOS device
+                            code: 'n/a'
+                        }
+                    }
+                };
+            }
+        }
+    };
+    
     _emitDeviceConnected(device) {
         this.notify({
             type: DEVICE_CONNECTED,
@@ -66,53 +207,41 @@ export default class DeviceDiscoveryService extends ServiceBase {
         });
     }
 
-    _getConnectedDevices() {
-        var self = this;
-        return ADB.createADB().then((adb) => {
-            adb.getConnectedDevices().then((devices) => {
-                console.log('#egetConnectedDevices ', devices);
-                const currentDevices = {};
-                // notify about any new device
-                for (const dev of devices) {
-                    if (!self.devices[dev.udid]) {
-                        self._emitDeviceConnected({ id: dev.udid });
-                    }
-                    currentDevices[dev.udid] = true;
-                }
-
-                // notify about removed devices
-                for (const oldDev in self.devices) {
-                    if (!currentDevices[oldDev]) {
-                        self._emitDeviceDisconnected({ id: oldDev });
-                    }
-                }
-
-                self.devices = currentDevices;
-
-                return self._delay(CHECK_INTERVAL).then(function() {
-                    return self._getConnectedDevices();
-                });
-            })
-            .catch((e) => {
-                console.log('#e getConnectedDevices e', devices);
-                console.debug(e);
-                if (self.retries-- === 0) {
-                    Promise.resolve(e);
-                }
-                return self._delay(CHECK_INTERVAL).then(function() {
-                    return self._getConnectedDevices();
-                });
-            })
-        })
-        .catch((e) => {
-            // console.log('#ee ', e);
-            // console.debug(e);
-            if (self.retries-- === 0) {
-                return Promise.resolve(e);
-            }
-            return self._delay(CHECK_INTERVAL).then(function() {
-                return self._getConnectedDevices();
-            });
-        });
+    _extractIOSDeviceInfo(devstr) {
+        if (!devstr)
+            return null;
+        const reDevNameOnly = new RegExp('(.*?) \\((.*?)\\) \\[(.*?)\\]');
+        const reDevNamePlusSize = new RegExp('(.+? \\(.+? inch\\)) \\((.+?)\\) \\[(.+?)\\]');
+        const reDevNamePlusWatch = new RegExp('(.+?) \\((.+?)\\) \\+ (.+?) \\((.+?)\\) \\[(.+?)\\]');
+        var info = {
+            name: null,
+            version: null,
+            uuid: null
+        };
+        var matches;
+        if (devstr.indexOf('inch') > -1) {
+            matches = reDevNamePlusSize.exec(devstr);
+            if (!matches || matches.length != 4)
+                return null;
+            info.name = matches[1];
+            info.version = matches[2];
+            info.uuid = matches[3];
+        } else if (devstr.indexOf('+') > -1) {
+            matches = reDevNamePlusWatch.exec(devstr);
+            if (!matches || matches.length != 6)
+                return null;
+            info.name = matches[1] + ' + ' + matches[3];
+            info.version = matches[2] + ' + ' + matches[4];
+            info.uuid = matches[5];
+        } else {
+            matches = reDevNameOnly.exec(devstr);
+            if (!matches || matches.length != 4)
+                return null;
+            info.name = matches[1];
+            info.version = matches[2];
+            info.uuid = matches[3];
+        }
+        return info;
     }
 }
+
