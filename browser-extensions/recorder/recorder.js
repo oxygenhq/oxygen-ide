@@ -308,17 +308,23 @@ Recorder.prototype.recordSendCommand = function (lastWindow) {
 
     var validCommands = 0;
     if (this._ox_command) {
+cmdsLoop:
         for (var i = 0; i < this._ox_command.length; i++) {
             var c = this._ox_command[i];
 
             // ignore any actions on html and body elements 
             // as 'click' cannot be executed by webdriver on html or body
             // and assertText/waitForText sometimes erroneously generated for html/body pulling whole page html as text string
-            if (c.target === 'css=body' ||
-                c.target === 'css=html' ||
-                c.target === '//body' ||
-                c.target === '//html') {
-                continue;
+            if (c.target.constructor === Array && c.target.length > 0) {
+                for (var s = 0; s < c.target.length; s++) {
+                    var trg = c.target[s][0];
+                    if (trg === 'css=body' ||
+                        trg === 'css=html' ||
+                        trg === '//body' ||
+                        trg === '//html') {
+                        continue cmdsLoop;
+                    }
+                }
             }
 
             cmds.push(Recorder.cmdPrepare(c.command, c.target, c.value));
