@@ -29,7 +29,7 @@ XPathEngine.prototype.selectNodes = function(xpath, contextNode, namespaceResolv
     try {
         xpathResult = contextNode.evaluate(xpath, contextNode, namespaceResolver, 0, null);
     } catch (e) {
-        console.error('ox: invalid xpath [1]: ' + (ex.message || ex));
+        console.error('ox: invalid xpath [1]: ' + (e.message || e));
         return null;
     }
 
