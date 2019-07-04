@@ -7,25 +7,6 @@
  * (at your option) any later version.
  */
 
-// on IE8-9 console is undefined unless dev tools are open
-if (typeof(console) === 'undefined') {
-    console = { log: function (msg) { }, error: function (msg) { }};
-}
-
-// not defined in IE11
-if (typeof(String.prototype.startsWith) === 'undefined') {
-    String.prototype.startsWith = function (str) {
-        return this.indexOf(str) === 0;
-    };
-}
-
-// not defined in IE8
-if (typeof(String.prototype.trim) === 'undefined') {
-    String.prototype.trim = function() {
-        return String(this).replace(/^\s+|\s+$/g, '');
-    };
-}
-
 var ox_log = function (msg) {
     if (window.ox_debug) {
         console.log(msg);
@@ -47,10 +28,9 @@ var browserVersion = new BrowserVersion();
 
 /*
  * Returns the text in this element
- */ 
+ */
 function getText(element) {
-    var text = element.textContent ? element.textContent /*all current browsers*/ : element.innerText /*IE<=8*/;
-    text = normalizeNewlines(text);
+    var text = normalizeNewlines(element.textContent);
     text = normalizeSpaces(text);
     text = applyTextTransformation(element, text);
     return text.trim();
