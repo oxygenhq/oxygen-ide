@@ -15,7 +15,7 @@ function XPathEngine() {
 
 XPathEngine.prototype.selectSingleNode = function(xpath, contextNode, namespaceResolver) {
     var nodes = this.selectNodes(xpath, contextNode, namespaceResolver);
-    return (nodes.length > 0 ? nodes[0] : null);
+    return (nodes && nodes.length > 0 ? nodes[0] : null);
 };
 
 XPathEngine.prototype.selectNodes = function(xpath, contextNode, namespaceResolver) {
@@ -29,12 +29,13 @@ XPathEngine.prototype.selectNodes = function(xpath, contextNode, namespaceResolv
     try {
         xpathResult = contextNode.evaluate(xpath, contextNode, namespaceResolver, 0, null);
     } catch (e) {
-        throw new RecorderError('Invalid xpath [1]: ' + (ex.message || ex));
-    } finally {
-        if (xpathResult === null) {
-            // If the result is null, we should still throw an Error.
-            throw new RecorderError('Invalid xpath [2]: ' + xpath); 
-        }
+        console.error('ox: invalid xpath [1]: ' + (ex.message || ex));
+        return null;
+    }
+
+    if (xpathResult === null) {
+        console.error('ox: invalid xpath [2]: ' + xpath);
+        return null;
     }
     
     var node = xpathResult.iterateNext();

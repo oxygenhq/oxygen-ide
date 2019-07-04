@@ -41,7 +41,8 @@ ElementFinder.prototype._registerAllLocatorFunctions = function() {
     this.findElementBy = function(locatorType, locator, inDocument, inWindow, unique) {
         var locatorFunction = this.locationStrategies[locatorType];
         if (!locatorFunction) {
-            throw new RecorderError("Unrecognised locator type: '" + locatorType + "'");
+            console.error("Unrecognised locator type: '" + locatorType + "'");
+            return null;
         }
         return locatorFunction.call(this, locator, inDocument, inWindow, unique);
     };
@@ -87,9 +88,6 @@ ElementFinder.prototype.findElement = function(locator, win, unique) {
         win = this.getCurrentWindow();
     }
     var element = this.findElementRecursive(locatorParsed.type, locatorParsed.string, win.document, win, unique);
-    if (element === null) {
-        throw new RecorderError('Element ' + locator + ' not found');
-    }
     return element;
 };
 
@@ -103,7 +101,7 @@ ElementFinder.prototype.locateElementById = function(identifier, inDocument, inW
         var nodes = this.xpathEvaluator.selectNodes('//*[@id="' + identifier + '"]', inDocument,
             inDocument.createNSResolver ?
             inDocument.createNSResolver(inDocument.documentElement) : this._namespaceResolver);
-        return nodes.length === 1 ? element : null;
+        return nodes && nodes.length === 1 ? element : null;
     } else {
         return null;
     }
@@ -157,6 +155,10 @@ ElementFinder.prototype.locateElementByName = function(locator, inDocument, inWi
         elements = this.selectElements(filter, elements, 'value');
     }
 
+    if (!elements) {
+        return null;
+    }
+
     if (unique && elements.length === 1 ||
         !unique && elements.length > 0) {
         return elements[0];
@@ -196,7 +198,7 @@ ElementFinder.prototype._namespaceResolver = function(prefix) {
 ElementFinder.prototype.selectElementsBy = function(filterType, filter, elements) {
     var filterFunction = ElementFinder.filterFunctions[filterType];
     if (!filterFunction) {
-        throw new RecorderError("Unrecognised element-filter type: '" + filterType + "'");
+        return null;
     }
 
     return filterFunction(filter, elements);
@@ -227,10 +229,12 @@ ElementFinder.filterFunctions.value = function(value, elements) {
 ElementFinder.filterFunctions.index = function(index, elements) {
     index = Number(index);
     if (isNaN(index) || index < 0) {
-        throw new RecorderError('Illegal Index: ' + index);
+        console.error('ox: illegal index: ' + index);
+        return null;
     }
     if (elements.length <= index) {
-        throw new RecorderError('Index out of range: ' + index);
+        console.error('ox: index out of range: ' + index);
+        return null;
     }
     return [elements[index]];
 };
