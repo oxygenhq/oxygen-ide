@@ -384,6 +384,10 @@ LocatorBuilders.add('xpath:position', function(e, opt_contextNode) {
         }
 
         current = current.parentNode;
+
+        if (current.nodeType === Node.DOCUMENT_NODE) {
+            break;
+        }
     }
     return null;
 });
