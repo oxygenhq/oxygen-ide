@@ -325,6 +325,9 @@ cmdsLoop:
                         continue cmdsLoop;
                     }
                 }
+            } else if (c.target.constructor === Array && c.target.length === 0) {
+                // no locators were found
+                continue;
             }
 
             cmds.push(Recorder.cmdPrepare(c.command, c.target, c.value));
