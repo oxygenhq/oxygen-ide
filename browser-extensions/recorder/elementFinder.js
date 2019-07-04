@@ -92,7 +92,7 @@ ElementFinder.prototype.findElement = function(locator, win, unique) {
 };
 
 /**
- * Find the element with id - can't rely on getElementById, coz it returns by name as well in IE..
+ * Find the element with id
  */
 ElementFinder.prototype.locateElementById = function(identifier, inDocument, inWindow, unique) {
     var element = inDocument.getElementById(identifier);
