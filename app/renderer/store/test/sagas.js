@@ -52,7 +52,6 @@ function* handleTestRunnerServiceEvent(event) {
     }
     else if (event.type === 'TEST_ENDED') {
         yield put(testActions.onTestEnded());
-        console.log('event', event);
 
         if(event && event.result && event.result.summary){
             const { summary } = event.result;
@@ -139,13 +138,18 @@ export function* startTest({ payload }) {
     const runtimeSettingsClone = {
         ...runtimeSettings
     };
-    console.log('runtimeSettings.testProvider', runtimeSettings.testProvider)
+    // add test provider information
     if (runtimeSettings.testProvider) {
         const cloudProviders = yield select(state => state.settings.cloudProviders);
-        console.log('cloudProviders', cloudProviders)
         runtimeSettingsClone.testProvider = cloudProviders.hasOwnProperty(runtimeSettings.testProvider) ? { ...cloudProviders[runtimeSettings.testProvider], id: runtimeSettings.testProvider } : null;
     }
-    
+    // add device information 
+    if (runtimeSettings.testTarget && runtimeSettings.testMode === 'mob') {
+        const devices = yield select(state => state.test.devices);
+        const targetDevice = devices.find(x => x.id === runtimeSettings.testTarget);
+        runtimeSettingsClone.testTarget = targetDevice;
+    }
+
     try {        
         // reset active line cursor in all editors
         yield put(editorActions.resetActiveLines());

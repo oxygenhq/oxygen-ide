@@ -64,7 +64,7 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
         var timestamp = (new Date()).getTime();
     
         await this._updateAndroidDevices(timestamp);
-        //await this._updateIOSDevices(timestamp);
+        await this._updateIOSDevices(timestamp);
     
         // go through all the devices and see which one is not connected anymore
         var uuids = Object.keys(this.devices);
@@ -87,37 +87,41 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
     }
     
     async _updateAndroidDevices(timestamp) {
-        const adb = await ADB.createADB();
-    
-        const connectedDevices = await adb.getConnectedDevices();
-        for (var i = 0; i < connectedDevices.length; i++) {
-            const uuid = connectedDevices[i].udid;
-            if (!uuid) {
-                continue;
+        try {
+            const adb = await ADB.createADB();
+            const connectedDevices = await adb.getConnectedDevices();
+            for (var i = 0; i < connectedDevices.length; i++) {
+                const uuid = connectedDevices[i].udid;
+                if (!uuid) {
+                    continue;
+                }
+                // previously seen device
+                if (this.devices[uuid]) {
+                    this.devices[uuid].new = this.devices[uuid].connected == false;
+                    this.devices[uuid].connected = true;
+                    this.devices[uuid].timestamp = timestamp;
+                } else {    // new device                
+                    // determine if this is a real device or an emulator
+                    var isReal = uuid.indexOf('emulator') != 0 && uuid.indexOf(':') == -1;
+                    const info = await this._getAndroidDeviceInfo(uuid);
+                    // add new device
+                    this.devices[uuid] = {
+                        new: true,
+                        id: uuid,
+                        name: `${info.product.model} [${info.os.name} ${info.os.version}]`,
+                        connected: true,
+                        real: isReal,
+                        changed: true,
+                        timestamp: timestamp,
+                        ios: false,
+                        android: true,
+                        info: info
+                    };
+                }
             }
-            // previously seen device
-            if (this.devices[uuid]) {
-                this.devices[uuid].new = this.devices[uuid].connected == false;
-                this.devices[uuid].connected = true;
-                this.devices[uuid].timestamp = timestamp;
-            } else {    // new device                
-                // determine if this is a real device or an emulator
-                var isReal = uuid.indexOf('emulator') != 0 && uuid.indexOf(':') == -1;
-                const info = await this._getAndroidDeviceInfo(uuid);
-                // add new device
-                this.devices[uuid] = {
-                    new: true,
-                    id: uuid,
-                    name: `${info.product.model} [${info.os.name} ${info.os.version}]`,
-                    connected: true,
-                    real: isReal,
-                    changed: true,
-                    timestamp: timestamp,
-                    ios: false,
-                    android: true,
-                    info: info
-                };
-            }
+        }
+        catch (e) {
+            console.error('Unable to retrieve Android device list.', e);
         }
     };
 
@@ -142,47 +146,52 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
     }
     
     async _updateIOSDevices(timestamp) {
-        const connectedDevices = await instrumentsUtils.getAvailableDevices();
-        for (var i = 0; i < connectedDevices.length; i++) {
-            var devInfoStr = connectedDevices[i];
-            var info = this._extractIOSDeviceInfo(devInfoStr);
-            if (info == null)
-                continue;
-            var uuid = info.uuid;
-            var realDevice = devInfoStr.indexOf('(Simulator)') == -1;
-            var isTablet = devInfoStr.indexOf('iPad') > -1;
-            // previously seen device
-            if (this.devices[uuid]) {
-                this.devices[uuid].new = this.devices[uuid].connected == false;
-                this.devices[uuid].connected = true;
-                this.devices[uuid].timestamp = timestamp;
-            } else {    
-                // add new device                
-                this.devices[uuid] = {
-                    id: uuid,
-                    name: `${info.name} [iOS ${info.version}]`,
-                    connected: true,
-                    new: true,
-                    real: realDevice,
-                    tablet: isTablet,
-                    timestamp: timestamp,
-                    ios: true,
-                    android: false,
-                    info: {
-                        name: info.name,
-                        os: {
-                            name: 'iOS',
-                            version: info.version
-                        },
-                        product: {
-                            brand: 'Apple',
-                            manufacturer: 'Apple',
-                            model: info.name,    // this should give us a unique model id for iOS device
-                            code: 'n/a'
+        try {
+            const connectedDevices = await instrumentsUtils.getAvailableDevices();
+            for (var i = 0; i < connectedDevices.length; i++) {
+                var devInfoStr = connectedDevices[i];
+                var info = this._extractIOSDeviceInfo(devInfoStr);
+                if (info == null)
+                    continue;
+                var uuid = info.uuid;
+                var realDevice = devInfoStr.indexOf('(Simulator)') == -1;
+                var isTablet = devInfoStr.indexOf('iPad') > -1;
+                // previously seen device
+                if (this.devices[uuid]) {
+                    this.devices[uuid].new = this.devices[uuid].connected == false;
+                    this.devices[uuid].connected = true;
+                    this.devices[uuid].timestamp = timestamp;
+                } else {    
+                    // add new device                
+                    this.devices[uuid] = {
+                        id: uuid,
+                        name: `${info.name} [iOS ${info.version}]`,
+                        connected: true,
+                        new: true,
+                        real: realDevice,
+                        tablet: isTablet,
+                        timestamp: timestamp,
+                        ios: true,
+                        android: false,
+                        info: {
+                            name: info.name,
+                            os: {
+                                name: 'iOS',
+                                version: info.version
+                            },
+                            product: {
+                                brand: 'Apple',
+                                manufacturer: 'Apple',
+                                model: info.name,    // this should give us a unique model id for iOS device
+                                code: 'n/a'
+                            }
                         }
-                    }
-                };
+                    };
+                }
             }
+        }
+        catch (e) {
+            console.error('Unable to retrieve iOS device list.', e);
         }
     };
     

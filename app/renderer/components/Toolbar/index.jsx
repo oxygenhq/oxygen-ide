@@ -234,8 +234,8 @@ export default class Toolbar extends Component<Props> {
           }
           {
             testMode === 'mob' && devices.map((device) => (
-              <Option key={ device.id } value={ device.id } title={ device.name }>
-                { device.name }
+              <Option key={ device.id } value={ device.id } title={ device.title }>
+                { device.title }
               </Option>
             ))
           }

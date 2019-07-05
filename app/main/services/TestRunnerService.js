@@ -110,14 +110,28 @@ export default class TestRunnerService extends ServiceBase {
             caps.version = '*';
             caps['goog:chromeOptions'] = {
                 mobileEmulation: {
-                deviceName: testTarget
+                    deviceName: testTarget
                 }
             };
         }
         else if (testMode === 'mob') {
             options.mode = 'mob';
-            caps.deviceName = testTarget;
-            caps.deviceOS = 'Android';
+            let deviceName = null;
+            let platformName = 'Android';
+            let platformVersion = null;
+            // in mobile mode, testTarget shall be an object that includes device information (id, osName and osVersion)
+            if (typeof testTarget === 'object') {
+                deviceName = testTarget.name || testTarget.id;
+                platformName = testTarget.osName;
+                platformVersion = testTarget.osVersion;
+            }
+            else if (typeof testTarget === 'string') {
+                deviceName = testTarget;
+            }
+            caps.deviceName = deviceName;
+            caps.platformName = platformName;
+            caps.platformVersion = platformVersion;
+            //caps.deviceOS = 'Android';
         }
         else if (testMode === 'web') {
             options.mode = 'web';
@@ -135,7 +149,6 @@ export default class TestRunnerService extends ServiceBase {
         
         try {
             this._emitLogEvent(SEVERITY_INFO, 'Initializing...');
-            console.log('options', options)
             await this.oxRunner.init(options);
             this._emitTestStarted();
             // assign user-set breakpoints
