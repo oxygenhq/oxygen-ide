@@ -16,6 +16,8 @@ import { message } from 'antd';
 import _ from 'lodash';
 import { type LogEntry } from '../types/LogEntry';
 import ScrollContainer from './ScrollContainer';
+import { AutoSizer, Grid } from 'react-virtualized';
+import 'react-virtualized/styles.css';
 
 type Props = {
     logs: Array<LogEntry>,
@@ -34,7 +36,9 @@ export default class LogViewer extends PureComponent<Props> {
       refreshScroll: false,
       keyKeys: [],
       selected: false,
-      copyValue: ''
+      copyValue: '',
+      lines: [],
+      maxWidth: 1
     };
   }
 
@@ -43,15 +47,64 @@ export default class LogViewer extends PureComponent<Props> {
   }
 
   componentWillReceiveProps(nextProps) {
-    const diff = _.difference(nextProps.logs, this.props.logs);
+    const diff = _.difference(nextProps.logs, this.props.logs);   
+    let newState = {};
+    let maxWidth = 1;
+
     if ((this.props.category !== nextProps.category) || diff && diff.length) {
-      this.setState({
+      newState = {
         refreshScroll: !this.state.refreshScroll,
         keyKeys: [],
         selected: false,
-        copyValue: ''
-      });
+        copyValue: '',
+        lines: [],
+        maxWidth: 1
+      };
     }
+
+    if(diff && diff.length){
+
+      const { logs } = nextProps;
+
+      const lines = [];
+  
+      if(logs && logs.map){
+        logs.map((log) => {
+          const messageSplit = log.message.split('\n');
+  
+          if(messageSplit && messageSplit.map){
+            messageSplit.map((item, i) => {
+              
+              if(
+                item &&
+                item.length &&
+                maxWidth < item.length
+              ) {
+                maxWidth = item.length;
+              }
+
+              lines.push({
+                message: item,
+                timestamp: log.timestamp+''+i
+              });
+            })
+          } else {
+            lines.push({
+              message: log.message,
+              timestamp: log.timestamp
+            });
+          }
+        });
+
+        newState.lines = lines;
+        newState.maxWidth = maxWidth;
+      }
+      
+    }
+
+    this.setState(
+      newState
+    );
   }
 
   componentDidUpdate() {
@@ -127,18 +180,37 @@ export default class LogViewer extends PureComponent<Props> {
 
   render() {
     const { height, logs, category } = this.props;
-    const { refreshScroll, selected, copyValue } = this.state;
-    const lines = logs ? logs.map(log => {
-      return {
-        message: log.message,
-        timestamp: log.timestamp
-      };
-    }) : [];
+    const { refreshScroll, selected, copyValue, lines, maxWidth } = this.state;
+    
+    const getRowHeight = ({index}) => {
+      if(index){
+        return 15;
+      } else {
+        return 20;
+      }
+    }
+
+    const cellRenderer = ({
+      columnIndex,
+      key,
+      rowIndex,
+      style,
+    }) => {
+      const line = lines[rowIndex];
+      
+      return (
+        <div className="auto-sizer-wrapper-row" style={{...style, paddingTop: rowIndex ? '0px': '5px'}} key={`log-${category}-line-${line.timestamp}`}>
+          {line.message}
+        </div>
+      );
+    };
+
+    const columnWidth = 10+7.3*maxWidth;
+
     return (
       <div className="logs-container">
         <ScrollContainer
           refreshScroll={refreshScroll}
-          disableHorizontal
           classes="scroller"
         >
           {() => (
@@ -148,15 +220,32 @@ export default class LogViewer extends PureComponent<Props> {
               onKeyDown={this.onKeyPressed}
               tabIndex="1"
               style={{
-                height: height - 40,
-                minHeight: height - 39,
+                height: height - 32,
+                minHeight: height - 32,
               }}
             >
-              { lines.map((line) => (
-                <Fragment key={`log-${category}-line-${line.timestamp}`}>
-                  <pre style={{ marginBottom: '0px', whiteSpace: 'pre-wrap' }}><span>{line.message}</span></pre>
-                </Fragment>
-              ))}
+              <div 
+                className="auto-sizer-wrapper"
+                style={{
+                  height: height - 32,
+                  minHeight: height - 32,
+                }}
+              >
+                <AutoSizer>
+                  {({width, height}) => (
+                    <Grid
+                      className="auto-sizer-wrapper-list"
+                      height={height}
+                      rowCount={lines.length}
+                      rowHeight={getRowHeight}
+                      cellRenderer={cellRenderer}
+                      columnCount={1}
+                      columnWidth={columnWidth}
+                      width={width}
+                    />
+                  )}
+                </AutoSizer>
+              </div>
             </div>
           )}
         </ScrollContainer>
