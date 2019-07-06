@@ -123,7 +123,7 @@ export function* wbCloseFileSuccess({ payload }) {
     }
 
     if(tabs.active !== editor.activeFile && tabs.activeTitle !== editor.activeFileName){
-        yield put(editorActions.setActiveFile(abs.active, tabs.activeTitle));
+        yield put(editorActions.setActiveFile(tabs.active, tabs.activeTitle));
     }
 
     return;
