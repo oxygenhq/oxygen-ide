@@ -69,8 +69,10 @@ export default (state = defaultState, action, dispatch) => {
         return state;
       }
       let newTab = { key, title };
-      let tabListClone = [...state.list, newTab];
+      
 
+      let tabListClone = [...state.list, newTab];
+      
       return { 
         ...state, 
         list: tabListClone,
