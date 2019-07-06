@@ -13,6 +13,7 @@ import { toOxygenCode } from '../../helpers/recorder';
 
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import * as recorderActions from './actions';
+import * as editorActions from '../editor/actions';
 import * as wbActions from '../workbench/actions';
 import ActionTypes from '../types';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
@@ -102,6 +103,8 @@ export function* stopRecorderAfterFileClose(){
 
 export function* wbCloseFileSuccess({ payload }) {
     const recorder = yield select(state => state.recorder);
+    const editor = yield select(state => state.editor);
+    const tabs = yield select(state => state.tabs);
 
     const { activeFile, activeFileName, isRecording } = recorder;
 
@@ -118,6 +121,11 @@ export function* wbCloseFileSuccess({ payload }) {
             }
         }
     }
+
+    if(tabs.active !== editor.activeFile && tabs.activeTitle !== editor.activeFileName){
+        yield put(editorActions.setActiveFile(abs.active, tabs.activeTitle));
+    }
+
     return;
 }
 

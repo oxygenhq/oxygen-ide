@@ -156,7 +156,7 @@ export default class TextEditor extends Component<Props> {
             />
           );
         })}
-        {!activeFile && (
+        {(!activeFile || openFiles.length === 0) && (
         <div className="noFilesPlaceholder">
           <div>
             <Icon type="inbox" />
