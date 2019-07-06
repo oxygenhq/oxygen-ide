@@ -11,7 +11,7 @@ export default class JavaDialog extends PureComponent {
 
   processLink = (event) => {
     event.preventDefault();
-    const javaUrl = 'https://www.oracle.com/technetwork/java/javaee/downloads/jdk8-downloads-2133151.html';
+    const javaUrl = 'https://www.java.com/en/download/';
     electron.shell.openExternal(javaUrl);
   }
   
@@ -20,18 +20,16 @@ export default class JavaDialog extends PureComponent {
       javaError
     } = this.props;
     
-    // console.log('javaError', javaError);
-
     let message;
 
     if(javaError && javaError.message && javaError.reason === 'bad-version'){
-      message = (<p>{javaError.message} <a onClick={this.processLink}>Java JDK 8</a></p>);
+      message = (<p>{javaError.message} <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE"</p>);
     } else if(javaError && javaError.message && javaError.reason === 'not-found'){
-      message = (<p>{javaError.message} <a onClick={this.processLink}>Java JDK 8</a></p>);
+      message = (<p>{javaError.message} <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE"</p>);
     } else if(javaError && javaError.message){
-      message = (<p>{javaError.message}, try to install/reinstall <a onClick={this.processLink}>Java JDK 8</a></p>);
+      message = (<p>{javaError.message}, try to install/reinstall <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE"</p>);
     } else {
-      message = (<p>Uncatched error with Java, try to install/reinstall <a onClick={this.processLink}>Java JDK 8</a></p>);
+      message = (<p>Uncatched error with Java, try to install/reinstall <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE"</p>);
     }
 
     return (
@@ -49,7 +47,6 @@ export default class JavaDialog extends PureComponent {
       >
         <div>
           { message }
-          { javaError && javaError.stack && <pre>{javaError.stack}</pre> }
         </div>
       </Modal>
     );
