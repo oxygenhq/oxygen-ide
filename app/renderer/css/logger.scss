@@ -55,6 +55,17 @@
     font-family: "Fira Code";
     font-size: 12px;
   }
+
+  .auto-sizer-wrapper {
+    flex: 1 1 auto;
+  }
+
+  .auto-sizer-wrapper-row {
+    overflow: hidden;
+    padding-left: 10px;
+    white-space: pre-wrap;
+  }
+
   .logger-textarea.selected span {
     background: #4286f4;
     color: white;
@@ -62,8 +73,8 @@
 
   .copy-btn {    
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: -31px;
+    right: 30px;
     opacity: 0.9;
     font-family: Helvetica;
     font-size: 12px !important;
@@ -111,11 +122,8 @@
     color: $loggerFontColor;
     font-size: 15px;
     line-height: 16px;
-    padding-left: 10px;
-    padding-top: 5px;
     font-family: 'Fira Code';
     font-variant-ligatures: contextual;
-    overflow: auto;
     position: relative;
   }
   .logs-container:before,
