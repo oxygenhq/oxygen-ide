@@ -211,8 +211,9 @@ export function* deactivate() {
 
 export function* initialize() {
 
-    // start check for update
-    services.mainIpc.call('UpdateService', 'start').then(() => {});
+
+    // start check for update	
+    services.mainIpc.call('UpdateService', 'start', [false]).then(() => {});
     // start Selenium server
     services.mainIpc.call('SeleniumService', 'start').then(() => {});
     // start Android and iOS device watcher
