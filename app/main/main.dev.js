@@ -18,18 +18,26 @@
  *
  * @flow
  */
-import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
+
+import { app, BrowserWindow, globalShortcut } from 'electron';
+
 import Logger from './Logger';
 import MainProcess from './MainProcess';
 import * as Sentry from '@sentry/electron';
 const path = require('path');
 
-crashReporter.start({
-  companyName: 'no-company-nc',
-  productName: 'ide',
-  ignoreSystemCrashHandler: true,
-  submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f'
-});
+try {
+  const crashReporter = require('electron').crashReporter;
+  crashReporter.start({
+    companyName: 'no-company-nc',
+    productName: 'ide',
+    ignoreSystemCrashHandler: true,
+    submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f',
+    uploadToServer: true
+  });
+} catch(e){
+  console.warn('crashReporter error', e);
+}
 
 Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
 
