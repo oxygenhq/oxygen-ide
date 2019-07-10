@@ -22,7 +22,7 @@ module.exports = function(grunt) {
                                 'browser', 
                                 '*.txt',
                                 'gruntfile.js',
-                                'quick-test.js', 'build.js',
+                                'quick-test.js',
                                 '*.c', '*.cpp',
                                 '*.d.ts',
                                 '*.html', '*.htm', '*.png', '*.map'],
