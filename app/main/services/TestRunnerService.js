@@ -79,7 +79,8 @@ export default class TestRunnerService extends ServiceBase {
         }
         // set iterations count
         testsuite.testcases[0].iterationCount = iterations;
-        // prepare launch options
+        // prepare launch options and capabilities
+        const caps = {};
         const options = {};
         options.debugPort = dbgPort;
         options.debugPortIde = dbgPort;
@@ -94,16 +95,16 @@ export default class TestRunnerService extends ServiceBase {
             switch (testProvider.id) {
                 case 'sauceLabs':
                     options.seleniumUrl = testProvider.url;
-                    options.wdioOpts = {
+                    /*options.wdioOpts = {
                         user: testProvider.username,
                         key: testProvider.accessKey
-                    };
+                    };*/
+                    caps.username = testProvider.username;
+                    caps.accessKey = testProvider.accessKey;
             }
         }
-        
-        
-        // prepare module parameters
-        const caps = {};
+                
+        // prepare module parameters        
         if (testMode === 'resp') {
             options.mode = 'web';
             caps.browserName = 'chrome';

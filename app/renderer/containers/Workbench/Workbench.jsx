@@ -118,10 +118,7 @@ export default class Workbench extends Component<Props> {
 
   handleToolbarButtonClick(ctrlId) {
     if (ctrlId === Controls.TEST_RUN) {     
-      
       const { editorActiveFile } = this.props;
-
-      console.log('editorActiveFile', editorActiveFile);
 
       if(editorActiveFile){
 

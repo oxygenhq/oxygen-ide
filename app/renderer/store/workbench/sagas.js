@@ -66,6 +66,8 @@ export default function* root() {
       takeLatest(ActionTypes.WB_ON_CONTENT_UPDATE, contentUpdate),      
       takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
       takeLatest(success(ActionTypes.FS_DELETE), handleFileDelete),
+      takeLatest(ActionTypes.UPDATE_CLOUD_PROVIDERS_SETTINGS, handleUpdatedCloudProvidersSettings),
+      takeLatest(ActionTypes.TEST_UPDATE_RUN_SETTINGS, handleUpdatedRunSettings),      
       takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
       takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
       takeLatest(JAVA_ERROR_INFO, handleJavaError),
@@ -206,7 +208,6 @@ export function* clearAll() {
 export function* deactivate() {
     // stop Selenium server
     let SeleniumServiceStopResult = yield call(services.mainIpc.call, 'SeleniumService', 'stop');
-    console.log('SeleniumServiceStopResult', SeleniumServiceStopResult);
 }
 
 export function* initialize() {
@@ -236,8 +237,6 @@ export function* initialize() {
 
     // get app settings from the store
     let appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');
-
-    console.log('appSettings', appSettings);
 
     if(appSettings && appSettings.cache){
         yield put(wbActions.restoreFromCache(appSettings.cache));
@@ -392,15 +391,11 @@ export function* changeTab({ payload }) {
 }
 
 export function* createNewRealFile({ payload }){
-    console.log('createNewRealFile', payload);
-    
     const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, null, [ 
         { name: 'JavaScript file', extensions:['js'] },
         { name: 'All Files', extensions: ['*'] } 
     ]]);
     
-    console.log('saveAsPath', saveAsPath);
-
     if (!saveAsPath) {
         return; // Save As dialog was canceled by user
     }
@@ -409,7 +404,6 @@ export function* createNewRealFile({ payload }){
     let folderPath = saveAsPath.split("\\");
     folderPath.pop();
     folderPath = folderPath.join("\\");
-    console.log('folderPath', folderPath);
 
     let content = '';
     
@@ -439,16 +433,9 @@ export function* createNewRealFile({ payload }){
 
 
         if(payload && payload.fakeFile){
-
             const { path, name } = payload.fakeFile;
-
             const files = yield select(state => state.settings.files);
-
-            console.log('files', files);
-
             const currentFile = files[path+name];
-
-            console.log('currentFile', currentFile);
 
             if(currentFile){
                 yield closeTmpFile(currentFile);
@@ -456,9 +443,7 @@ export function* createNewRealFile({ payload }){
         }
 
         const fs = yield select(state => state.fs);
-        
-        console.log('fs', fs);
-        
+                
         if(fs && typeof typeof fs.rootPath !== 'undefined' && fs.rootPath === null){
             const { error } = yield putAndTake(
                 fsActions.treeOpenFolder(folderPath)
@@ -512,8 +497,6 @@ export function* openFakeFile(){
     let tabs = yield select(state => state.tabs);
     let idenity;
 
-    // console.log('tabs', tabs);
-
     if(tabs && tabs.list && Array.isArray(tabs.list)){
         idenity = tabs.list.filter((tab) => tab.key === "unknown");
         if(!idenity){
@@ -523,21 +506,14 @@ export function* openFakeFile(){
         idenity = [];
     }
 
-    // console.log('idenity', idenity);
-    
-
     const key = "unknown";
     let name = "Untitled-"+(idenity.length+1);
 
     
     const tmpFileExist = tabs.list.some((tab) => tab.key === key && tab.title === name );
 
-    // console.log('tmpFileExist', tmpFileExist);
     if(tmpFileExist){
-        // console.log('in if');
         const index = getMaxIndex(tabs.list);
-        // console.log('tabs.list', tabs.list);
-        // console.log('index', index);
         if(index === 0){
             const timestamp = + new Date();
             name = "Untitled-"+(timestamp);
@@ -754,8 +730,6 @@ export function* contentUpdate({ payload }) {
 }
 
 export function* closeTmpFile(file){
-    console.log('file', file);
-
     yield put(editorActions.closeFile(file.path, false, file.name));
     yield put(tabActions.removeTab(file.path, file.name));
     yield put(settingsActions.removeFile(file.path, file.name));
@@ -827,8 +801,6 @@ export function* saveCurrentFile({ payload }) {
 
             const fs = yield select(state => state.fs);
             
-            // console.log('fs', fs);
-
             if(fs && typeof typeof fs.rootPath !== 'undefined' && fs.rootPath === null){
                 const { error } = yield putAndTake(
                     fsActions.treeOpenFolder(folderPath)
@@ -858,16 +830,11 @@ export function* saveCurrentFile({ payload }) {
     } else {
         const files = yield select(state => state.fs.files);
 
-        // console.log('files', files);
-    
         if (!activeFile || !files.hasOwnProperty(activeFile)) {
             return;
         }
 
         const currentFile = files[activeFile];
-
-        // console.log('currentFile', currentFile);
-        // console.log('prompt', prompt);
 
         // prompt user with "Save As" dialog before saving the file
         if (prompt) {
@@ -923,11 +890,7 @@ export function* saveCurrentFile({ payload }) {
                         yield put(tabActions.setTabTouched(activeFile, false));
                     }
                 }
-                // console.log('tab', tab);
             }
-            
-            // console.log('tabsFiles', tabsFiles);
-
         }
     }
 }
@@ -1128,6 +1091,18 @@ export function* getOrFetchFileInfo(path) {
         console.warn(`Cannot fetch file information: ${path}`, error);
     }
     return { response, error };
+}
+
+export function* handleUpdatedCloudProvidersSettings(payload) {
+    const settings = yield select(state => state.settings);
+    // persiste settings in the Electron store
+    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
+}
+
+export function* handleUpdatedRunSettings(payload) {
+    const settings = yield select(state => state.settings);
+    // persiste settings in the Electron store
+    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
 }
 
 function getUnsavedFiles(files) {

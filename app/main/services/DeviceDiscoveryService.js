@@ -121,7 +121,7 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
             }
         }
         catch (e) {
-            console.error('Unable to retrieve Android device list.', e);
+            console.warn('Unable to retrieve Android device list.', e);
         }
     };
 
@@ -191,7 +191,7 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
             }
         }
         catch (e) {
-            console.error('Unable to retrieve iOS device list.', e);
+            console.warn('Unable to retrieve iOS device list.', e);
         }
     };
     

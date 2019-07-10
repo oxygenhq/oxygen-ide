@@ -11,7 +11,7 @@ import * as types from './types';
 
 const FONT_SIZE_MIN = 12;
 const FONT_SIZE_MAX = 36;
-const SAUCELABS_HUB_DEFAULT_URL = 'https://ondemand.us-east-1.saucelabs.com:443/wd/hub';
+const SAUCELABS_HUB_DEFAULT_URL = 'https://ondemand.saucelabs.com:443/wd/hub';
 
 const defaultAppSettings = {
   cache: null,
