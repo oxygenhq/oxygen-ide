@@ -61,10 +61,14 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
             return;
         }        
         this.updatingDeviceList = true;    
-        var timestamp = (new Date()).getTime();
-    
+        const timestamp = (new Date()).getTime();        
+
         await this._updateAndroidDevices(timestamp);
-        await this._updateIOSDevices(timestamp);
+        // do not try to retrieve iOS device on Windows and Linux
+        const isMacOS = process.platform === 'darwin';
+        if (isMacOS) {
+            await this._updateIOSDevices(timestamp);
+        }        
     
         // go through all the devices and see which one is not connected anymore
         var uuids = Object.keys(this.devices);
@@ -83,7 +87,10 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
     };
 
     async stop() {
-        // FIXME: should cancel the timeout
+        if (this.devListInterval) {
+            clearInterval(this.devListInterval);
+            this.devListInterval = null;
+        }
     }
     
     async _updateAndroidDevices(timestamp) {

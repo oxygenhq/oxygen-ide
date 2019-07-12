@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import React, { PureComponent, Fragment } from 'react';
-import { Form, Input, Select, Modal, InputNumber, Switch } from 'antd';
+import { Form, Input, Select, Modal, InputNumber, Switch, Checkbox } from 'antd';
 import { capitalizeFirst } from '../../helpers/general';
 import FormItem from 'antd/lib/form/FormItem';
 
@@ -94,6 +94,20 @@ class CloudProvidersDialog extends PureComponent<Props> {
       }
     });
   }
+
+  onChangeSauceLabsExtendedDebugging(value) {
+    const { providers = {} } = this.state || {};
+    const { sauceLabs = {} } = providers;
+    this.setState({
+      providers: {
+        ...this.state.providers,
+        sauceLabs: {
+          ...this.state.providers.sauceLabs,
+          extendedDebugging: value,
+        }
+      }
+    });
+  }
   
   onUseSauceLabsChange(value) {
     const { providers = {} } = this.state || {};
@@ -170,6 +184,12 @@ class CloudProvidersDialog extends PureComponent<Props> {
                   <Input
                     value={ sauceLabs.accessKey }
                     onChange={ (e) => ::this.onChangeSauceLabsAccessKey(e.target.value) }
+                  />
+                </Form.Item>
+                <Form.Item label="Extended Debugging" {...formItemLayout} >
+                  <Checkbox
+                    checked={ sauceLabs.extendedDebugging || false }
+                    onChange={ (e) => ::this.onChangeSauceLabsExtendedDebugging(e.target.checked) }
                   />
                 </Form.Item>
               </Fragment>

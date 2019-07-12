@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 import { util, Runner } from 'oxygen-cli';
+import path from 'path';
 import moment from 'moment';
 import cfg from '../config.json';
 import ServiceBase from "./ServiceBase";
@@ -51,7 +52,9 @@ export default class TestRunnerService extends ServiceBase {
         // store mainFilePath for later, so when we receive LINE_UPDATE event from Oxygen, 
         // we can bubble it up and include the file name in addition to line number (Oxygen sends only a line number)
         this.mainFilePath = mainFilePath;
+        const filename = path.basename(this.mainFilePath, '.js');
         const testConfig = {
+            testName: filename,
             seleniumPort: selenium.port,    // this is default selenium port, found in config file
             dbgPort: TestRunnerService._getRandomPort(),
             ...runtimeSettings,             // selenium port can also come from runtime setttings (over)
@@ -67,6 +70,7 @@ export default class TestRunnerService extends ServiceBase {
             testProvider,
             seleniumPort,
             stepDelay,
+            testName,
         } = testConfig;
         let testsuite = null;
 
@@ -95,12 +99,11 @@ export default class TestRunnerService extends ServiceBase {
             switch (testProvider.id) {
                 case 'sauceLabs':
                     options.seleniumUrl = testProvider.url;
-                    /*options.wdioOpts = {
-                        user: testProvider.username,
-                        key: testProvider.accessKey
-                    };*/
+                    caps.name = testName || null;
                     caps.username = testProvider.username;
                     caps.accessKey = testProvider.accessKey;
+                    caps.extendedDebugging = testProvider.extendedDebugging || false;
+                    caps.capturePerformance = testProvider.capturePerformance || false;
             }
         }
                 

@@ -22,6 +22,8 @@ const defaultAppSettings = {
       url: SAUCELABS_HUB_DEFAULT_URL,
       username: null,
       accessKey: null,
+      extendedDebugging: false,
+      capturePerformance: false,
       inUse: false,
     }
   },
