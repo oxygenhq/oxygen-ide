@@ -52,7 +52,6 @@ function* handleTestRunnerServiceEvent(event) {
     }
     else if (event.type === 'TEST_ENDED') {
         yield put(testActions.onTestEnded());
-        console.log('event', event);
 
         if(event && event.result && event.result.summary){
             const { summary } = event.result;
@@ -135,6 +134,22 @@ export function* startTest({ payload }) {
     else if (file.modified) {
         yield put(wbActions.saveCurrentFile());
     }
+    // clone runtime settings and add cloud provider information, if a provider was selected
+    const runtimeSettingsClone = {
+        ...runtimeSettings
+    };
+    // add test provider information
+    if (runtimeSettings.testProvider) {
+        const cloudProviders = yield select(state => state.settings.cloudProviders);
+        runtimeSettingsClone.testProvider = cloudProviders.hasOwnProperty(runtimeSettings.testProvider) ? { ...cloudProviders[runtimeSettings.testProvider], id: runtimeSettings.testProvider } : null;
+    }
+    // add device information 
+    if (runtimeSettings.testTarget && runtimeSettings.testMode === 'mob') {
+        const devices = yield select(state => state.test.devices);
+        const targetDevice = devices.find(x => x.id === runtimeSettings.testTarget);
+        runtimeSettingsClone.testTarget = targetDevice;
+    }
+
     try {        
         // reset active line cursor in all editors
         yield put(editorActions.resetActiveLines());
@@ -143,7 +158,7 @@ export function* startTest({ payload }) {
         // call TestRunner service to start the test
         
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', []);
-        const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettings ]);        
+        const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
         yield put({
             type: success(ActionTypes.TEST_START),
             payload: null,

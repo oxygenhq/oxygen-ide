@@ -60,7 +60,7 @@ export default class ServiceDispatcher {
             const retval = methodRef.apply(serviceRef, args);
             Promise.resolve(retval)
             .then( result => e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, retval: result }) )
-            .catch( err => e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: err }) );
+            .catch( err => { e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: err }); console.error(err); } );
         }
         catch (error) {
             // dont send Error object as it's won't be properly serialized

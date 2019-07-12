@@ -33,6 +33,7 @@ import * as Controls from '../../components/Toolbar/controls';
 // Styles
 import '../../css/common.scss';
 import '../../css/workbench.scss';
+import CloudProvidersDialog from '../../components/dialogs/CloudProvidersDialog';
 
 const { Header } = Layout;
 
@@ -117,10 +118,7 @@ export default class Workbench extends Component<Props> {
 
   handleToolbarButtonClick(ctrlId) {
     if (ctrlId === Controls.TEST_RUN) {     
-      
       const { editorActiveFile } = this.props;
-
-      console.log('editorActiveFile', editorActiveFile);
 
       if(editorActiveFile){
 
@@ -157,6 +155,9 @@ export default class Workbench extends Component<Props> {
     else if (ctrlId === Controls.OPEN_FOLDER) {
       this.props.showDialog('OPEN_FOLDER');
     }
+    else if (ctrlId === Controls.CLOUD_PROVIDER_SETTINGS) {
+      this.props.showDialog('DIALOG_CLOUD_PROVIDERS');
+    }
     else if (ctrlId === Controls.SAVE_FILE) {
       this.props.saveCurrentFile();
     }
@@ -182,7 +183,6 @@ export default class Workbench extends Component<Props> {
       //this.toggleSidebarVisible('right');
       this.props.showDialog('DIALOG_SETTINGS');
     }
-    console.log('handleToolbarButtonClick', ctrlId)
   }
 
   handleToolbarValueChange(ctrlId, value) {
@@ -196,10 +196,13 @@ export default class Workbench extends Component<Props> {
         intVal >= 0 && this.props.setStepDelay(intVal);
       }      
     }
+    else if (ctrlId === Controls.TEST_PROVIDER) {
+      this.props.setTestProvider(value);
+    }
   }
 
   getToolbarControlsState() {
-    const { test, isRecording, settings, editorActiveFile } = this.props;
+    const { test, isRecording, settings, dialog, editorActiveFile } = this.props;
     return {
       [Controls.TEST_RUN]: {
         visible: !test.isRunning,
@@ -218,7 +221,10 @@ export default class Workbench extends Component<Props> {
         selected: isRecording,
       },
       [Controls.TEST_SETTINGS]: {
-        selected: settings.sidebars.right.visible,
+        selected: false,
+      },
+      [Controls.CLOUD_PROVIDER_SETTINGS]: {
+        selected: false,
       },
     };
   }
@@ -293,9 +299,18 @@ export default class Workbench extends Component<Props> {
   settingsDialog_onCancel() {
     this.props.hideDialog('DIALOG_SETTINGS');
   }
+  // Cloud Providers
+  providersDialog_onSubmit(providers) {
+    this.props.hideDialog('DIALOG_CLOUD_PROVIDERS');
+    this.props.updateCloudProvidersSettings(providers);    
+  }
+  providersDialog_onCancel() {
+    this.props.hideDialog('DIALOG_CLOUD_PROVIDERS');
+  }
 
   render() {
-    const { test, settings, dialog, javaError, initialized, changeShowRecorderMessageValue } = this.props;
+    const { test, settings = {}, dialog, javaError, initialized, changeShowRecorderMessageValue } = this.props;
+    const { cloudProviders = {} } = settings;
     const { runtimeSettings } = test;
     // sidebars state
     const leftSidebarSize = settings.sidebars.left.size;
@@ -305,6 +320,18 @@ export default class Workbench extends Component<Props> {
     const loggerVisible = settings.logger.visible;
     const showLanding = settings.showLanding;
     const showRecorderMessage = settings.showRecorderMessage;
+
+    // convert providers dictionary to an array - add only providers marked as 'in use'
+    const providers = [];
+    for (let providerKey of Object.keys(cloudProviders)) {
+      const provider = cloudProviders[providerKey];
+      if (provider.inUse) {
+        providers.push({
+          ...cloudProviders[providerKey],
+          id: providerKey
+        });
+      }      
+    }
     
     if(!initialized){
       return (
@@ -350,6 +377,12 @@ export default class Workbench extends Component<Props> {
             onSubmit={ ::this.updateDialog_onSubmit }
             onCancel={ ::this.updateDialog_onCancel }
           />
+          <CloudProvidersDialog
+            { ...dialog['DIALOG_CLOUD_PROVIDERS'] }
+            providers={ cloudProviders }
+            onSubmit={ ::this.providersDialog_onSubmit }
+            onCancel={ ::this.providersDialog_onCancel }
+          />
         </Fragment>
         }
         {updateModals.call(this)}
@@ -360,10 +393,12 @@ export default class Workbench extends Component<Props> {
           stopWaitChromeExtension={ this.props.stopWaitChromeExtension }
           testMode={ runtimeSettings.testMode }
           testTarget={ runtimeSettings.testTarget }
+          testProvider={ runtimeSettings.testProvider }
           stepDelay={ runtimeSettings.stepDelay }
           devices={ test.devices }
           browsers={ test.browsers }
           emulators={ test.emulators }
+          providers={ providers }
           showRecorderMessage={ showRecorderMessage }
           changeShowRecorderMessageValue={ changeShowRecorderMessageValue }
           controlsState={ this.getToolbarControlsState() } 

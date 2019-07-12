@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 import { util, Runner } from 'oxygen-cli';
+import path from 'path';
 import moment from 'moment';
 import cfg from '../config.json';
 import ServiceBase from "./ServiceBase";
@@ -51,7 +52,9 @@ export default class TestRunnerService extends ServiceBase {
         // store mainFilePath for later, so when we receive LINE_UPDATE event from Oxygen, 
         // we can bubble it up and include the file name in addition to line number (Oxygen sends only a line number)
         this.mainFilePath = mainFilePath;
+        const filename = path.basename(this.mainFilePath, '.js');
         const testConfig = {
+            testName: filename,
             seleniumPort: selenium.port,    // this is default selenium port, found in config file
             dbgPort: TestRunnerService._getRandomPort(),
             ...runtimeSettings,             // selenium port can also come from runtime setttings (over)
@@ -62,10 +65,12 @@ export default class TestRunnerService extends ServiceBase {
             iterations,
             reopenSession,
             dbgPort,
-            testMode,
+            testMode,            
             testTarget,
+            testProvider,
             seleniumPort,
             stepDelay,
+            testName,
         } = testConfig;
         let testsuite = null;
 
@@ -78,7 +83,8 @@ export default class TestRunnerService extends ServiceBase {
         }
         // set iterations count
         testsuite.testcases[0].iterationCount = iterations;
-        // prepare launch options
+        // prepare launch options and capabilities
+        const caps = {};
         const options = {};
         options.debugPort = dbgPort;
         options.debugPortIde = dbgPort;
@@ -87,27 +93,55 @@ export default class TestRunnerService extends ServiceBase {
             allowGlobal: true
         };
         options.reopenSession = reopenSession || false;
-        
-        // prepare module parameters
-        const caps = {};
+
+        // add provider specific options, if cloud provider was selected
+        if (testProvider && testProvider.id) {
+            switch (testProvider.id) {
+                case 'sauceLabs':
+                    options.seleniumUrl = testProvider.url;
+                    caps.name = testName || null;
+                    caps.username = testProvider.username;
+                    caps.accessKey = testProvider.accessKey;
+                    caps.extendedDebugging = testProvider.extendedDebugging || false;
+                    caps.capturePerformance = testProvider.capturePerformance || false;
+            }
+        }
+                
+        // prepare module parameters        
         if (testMode === 'resp') {
             options.mode = 'web';
             caps.browserName = 'chrome';
             caps.version = '*';
             caps['goog:chromeOptions'] = {
                 mobileEmulation: {
-                deviceName: testTarget
+                    deviceName: testTarget
                 }
             };
         }
         else if (testMode === 'mob') {
             options.mode = 'mob';
-            caps.deviceName = testTarget;
-            caps.deviceOS = 'Android';
+            let deviceName = null;
+            let platformName = 'Android';
+            let platformVersion = null;
+            // in mobile mode, testTarget shall be an object that includes device information (id, osName and osVersion)
+            if (typeof testTarget === 'object') {
+                deviceName = testTarget.name || testTarget.id;
+                platformName = testTarget.osName;
+                platformVersion = testTarget.osVersion;
+            }
+            else if (typeof testTarget === 'string') {
+                deviceName = testTarget;
+            }
+            caps.deviceName = deviceName;
+            caps.platformName = platformName;
+            caps.platformVersion = platformVersion;
+            //caps.deviceOS = 'Android';
         }
         else if (testMode === 'web') {
             options.mode = 'web';
-            options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
+            if (!options.seleniumUrl) {
+                options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
+            }
             options.browserName = testTarget;
             // @FIXME: this option should be exposed in reports settings
             options.screenshots = 'never';
@@ -119,7 +153,6 @@ export default class TestRunnerService extends ServiceBase {
         
         try {
             this._emitLogEvent(SEVERITY_INFO, 'Initializing...');
-
             await this.oxRunner.init(options);
             this._emitTestStarted();
             // assign user-set breakpoints

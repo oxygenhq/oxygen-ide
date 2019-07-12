@@ -123,3 +123,8 @@ export const setLastSessionRootFolder = value => ({
   type: types.LAST_SESSION_SET_ROOT_FOLDER,
   payload: { value },
 });
+
+export const updateCloudProvidersSettings = providers => ({
+  type: types.UPDATE_CLOUD_PROVIDERS_SETTINGS,
+  payload: { providers }
+})

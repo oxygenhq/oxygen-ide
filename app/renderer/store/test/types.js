@@ -11,6 +11,7 @@ export const TEST_STOP = 'TEST_STOP';
 export const TEST_CONTINUE = 'TEST_CONTINUE';
 export const TEST_SET_MAIN = 'TEST_SET_MAIN';
 export const TEST_SET_TARGET = 'TEST_SET_TARGET';
+export const TEST_SET_PROVIDER = 'TEST_SET_PROVIDER';
 export const TEST_SET_MODE = 'TEST_SET_MODE';
 export const TEST_SET_STEP_DELAY = 'TEST_SET_STEP_DELAY';
 export const TEST_ADD_DEVICE = 'TEST_ADD_DEVICE';
