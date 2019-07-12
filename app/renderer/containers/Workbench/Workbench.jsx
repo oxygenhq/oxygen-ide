@@ -199,11 +199,14 @@ export default class Workbench extends Component<Props> {
   }
 
   getToolbarControlsState() {
-    const { test, isRecording, settings } = this.props;
+    const { test, isRecording, settings, editorActiveFile } = this.props;
     return {
       [Controls.TEST_RUN]: {
         visible: !test.isRunning,
-        enabled: !isRecording,
+        enabled: !isRecording && 
+                 !!editorActiveFile && 
+                 editorActiveFile.ext && 
+                 editorActiveFile.ext === ".js" 
       },
       [Controls.TEST_STOP]: {
         visible: test.isRunning,
