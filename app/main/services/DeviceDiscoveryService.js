@@ -9,6 +9,7 @@
 import ADB from 'appium-adb';
 import { instrumentsUtils } from 'appium-ios-driver';
 import ServiceBase from './ServiceBase';
+import cp from 'child_process';
 
 const DEVICE_CONNECTED = 'DEVICE_CONNECTED';
 const DEVICE_DISCONNECTED = 'DEVICE_DISCONNECTED';
@@ -95,35 +96,52 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
     
     async _updateAndroidDevices(timestamp) {
         try {
-            const adb = await ADB.createADB();
-            const connectedDevices = await adb.getConnectedDevices();
-            for (var i = 0; i < connectedDevices.length; i++) {
-                const uuid = connectedDevices[i].udid;
-                if (!uuid) {
-                    continue;
+            let adb;
+            try {
+                if (process.platform === 'win32') {                        
+                    const out = cp.execSync('echo %PATH%');
+                    const output = out.toString();
+
+                    if(output && output.includes('adb.exe')){
+                        adb = await ADB.createADB();
+                    }
+                } else {
+                    adb = await ADB.createADB();
                 }
-                // previously seen device
-                if (this.devices[uuid]) {
-                    this.devices[uuid].new = this.devices[uuid].connected == false;
-                    this.devices[uuid].connected = true;
-                    this.devices[uuid].timestamp = timestamp;
-                } else {    // new device                
-                    // determine if this is a real device or an emulator
-                    var isReal = uuid.indexOf('emulator') != 0 && uuid.indexOf(':') == -1;
-                    const info = await this._getAndroidDeviceInfo(uuid);
-                    // add new device
-                    this.devices[uuid] = {
-                        new: true,
-                        id: uuid,
-                        name: `${info.product.model} [${info.os.name} ${info.os.version}]`,
-                        connected: true,
-                        real: isReal,
-                        changed: true,
-                        timestamp: timestamp,
-                        ios: false,
-                        android: true,
-                        info: info
-                    };
+            } catch (e) {
+                console.warn('Unable to createADB', e);
+            }
+
+            if(adb){
+                const connectedDevices = await adb.getConnectedDevices();
+                for (var i = 0; i < connectedDevices.length; i++) {
+                    const uuid = connectedDevices[i].udid;
+                    if (!uuid) {
+                        continue;
+                    }
+                    // previously seen device
+                    if (this.devices[uuid]) {
+                        this.devices[uuid].new = this.devices[uuid].connected == false;
+                        this.devices[uuid].connected = true;
+                        this.devices[uuid].timestamp = timestamp;
+                    } else {    // new device                
+                        // determine if this is a real device or an emulator
+                        var isReal = uuid.indexOf('emulator') != 0 && uuid.indexOf(':') == -1;
+                        const info = await this._getAndroidDeviceInfo(uuid);
+                        // add new device
+                        this.devices[uuid] = {
+                            new: true,
+                            id: uuid,
+                            name: `${info.product.model} [${info.os.name} ${info.os.version}]`,
+                            connected: true,
+                            real: isReal,
+                            changed: true,
+                            timestamp: timestamp,
+                            ios: false,
+                            android: true,
+                            info: info
+                        };
+                    }
                 }
             }
         }
