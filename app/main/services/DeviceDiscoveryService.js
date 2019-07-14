@@ -98,18 +98,9 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
         try {
             let adb;
             try {
-                if (process.platform === 'win32') {                        
-                    const out = cp.execSync('echo %PATH%');
-                    const output = out.toString();
-
-                    if(output && output.includes('adb.exe')){
-                        adb = await ADB.createADB();
-                    }
-                } else {
-                    adb = await ADB.createADB();
-                }
+                adb = await ADB.createADB();
             } catch (e) {
-                console.warn('Unable to createADB', e);
+                console.warn('Unable to retrieve Android device list.', e);
             }
 
             if(adb){

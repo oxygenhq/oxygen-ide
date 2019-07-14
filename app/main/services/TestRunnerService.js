@@ -72,6 +72,7 @@ export default class TestRunnerService extends ServiceBase {
             stepDelay,
             testName,
         } = testConfig;
+
         let testsuite = null;
 
         try {
@@ -124,18 +125,17 @@ export default class TestRunnerService extends ServiceBase {
             let platformName = 'Android';
             let platformVersion = null;
             // in mobile mode, testTarget shall be an object that includes device information (id, osName and osVersion)
-            if (typeof testTarget === 'object') {
+            if (testTarget && typeof testTarget === 'object') {
                 deviceName = testTarget.name || testTarget.id;
                 platformName = testTarget.osName;
                 platformVersion = testTarget.osVersion;
             }
-            else if (typeof testTarget === 'string') {
+            else if (testTarget && typeof testTarget === 'string') {
                 deviceName = testTarget;
             }
             caps.deviceName = deviceName;
             caps.platformName = platformName;
             caps.platformVersion = platformVersion;
-            //caps.deviceOS = 'Android';
         }
         else if (testMode === 'web') {
             options.mode = 'web';
