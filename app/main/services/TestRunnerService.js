@@ -279,7 +279,7 @@ export default class TestRunnerService extends ServiceBase {
             // if we are in the main script file, adjust line number according to script boilerplate offset
             let editorLine = editorFile !== this.mainFilePath ? lineNumber : lineNumber - getScriptContentLineOffset;
             // set event time
-            const time = moment.utc().unix();
+            const time = moment.utc().valueOf();
             // make sure to mark breakpoint line with current line mark
             this.notify({
                 type: EVENT_LINE_UPDATE,
