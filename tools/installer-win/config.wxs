@@ -143,7 +143,7 @@
           <RegistrySearch Id="JRE_VER_REGSEARCH_32" Root="HKLM" Key="SOFTWARE\JavaSoft\Java Runtime Environment" Name="CurrentVersion" Type="raw" Win64="no" />
         </Property>
 
-        <Condition Message="Java Runtime Environment is not installed.&#xD;&#xA;&#xD;&#xA;Please install JRE 8, 9, or 10&#xD;&#xA;(or JDK if you wish to execute mobile tests)">
+        <Condition Message="Java Runtime Environment is not installed.&#xD;&#xA;&#xD;&#xA;Please download and install JRE 8 from:&#xD;&#xA;https://www.java.com/en/download">
             <![CDATA[Installed OR JAVA_VER_32 OR JAVA_VER_64]]>
         </Condition>
 
