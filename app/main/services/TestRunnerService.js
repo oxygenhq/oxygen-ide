@@ -150,37 +150,43 @@ export default class TestRunnerService extends ServiceBase {
         if (stepDelay) {
             options.delay = stepDelay;
         }
-        
+        // initialize Oxygen Runner
         try {
             this._emitLogEvent(SEVERITY_INFO, 'Initializing...');
             await this.oxRunner.init(options);
-            this._emitTestStarted();
-            // assign user-set breakpoints
-            testsuite.testcases[0].breakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
-            return this.oxRunner.run(testsuite, null, caps).then((result) => {
-                // eslint-disable-line
-                this._emitTestEnded(result);
-                // @TODO: update UI elements
-                return this.dispose();
-            })
-            .catch((e) => {
-                if (e.line) {
-                    this._emitLogEvent(SEVERITY_ERROR, `${e.message} at line ${e.line}`);
-                } else {
-                    this._emitLogEvent(SEVERITY_ERROR, `ERROR: ${e.message}. ${e.stack || ''}`);
-                }
-                this._emitLogEvent(SEVERITY_FATAL, 'Test Failed!');
-                this._emitTestEnded(null, e);
-                return this.dispose();
-            });
         } catch (e) {
             // the error at .init stage can be caused by parallel call to .kill() method
             // make sure in case we are in the middle of stopping the test to ignore any error at this stage
             if (!this.isStopping) {
                 this._emitLogEvent(SEVERITY_ERROR, `Test Failed!: ${e.message}. ${e.stack || ''}`);
-                return this.dispose();
+                await this.dispose();
+                return; // if initialization has failed, then do not try to run the test
             }
         }
+        this._emitTestStarted();
+        // assign user-set breakpoints
+        testsuite.testcases[0].breakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
+        // run the test
+        try {
+            const result = await this.oxRunner.run(testsuite, null, caps);
+            // dispose Oxygen Runner and mark the state as not running, before updating the UI
+            await this.dispose();
+            // eslint-disable-line
+            this._emitTestEnded(result);            
+        }
+        catch (e) {
+            if (e.line) {
+                this._emitLogEvent(SEVERITY_ERROR, `${e.message} at line ${e.line}`);
+            } else {
+                this._emitLogEvent(SEVERITY_ERROR, `ERROR: ${e.message}. ${e.stack || ''}`);
+            }
+            this._emitLogEvent(SEVERITY_FATAL, 'Test Failed!');
+            this._emitTestEnded(null, e);
+            try {
+                await this.dispose();
+            }
+            catch (e) { console.warn('Call to dispose() method of TestRunnerService failed.', e); }
+        }        
     }
 
     async stop() {
