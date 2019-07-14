@@ -13,7 +13,7 @@ import cp from 'child_process';
 
 const DEVICE_CONNECTED = 'DEVICE_CONNECTED';
 const DEVICE_DISCONNECTED = 'DEVICE_DISCONNECTED';
-const DEVICE_MONITOR_INTERVAL = 30000;
+const DEVICE_MONITOR_INTERVAL = 10000;
 
 let isError = function(e){
     return e && e.stack && e.message;
