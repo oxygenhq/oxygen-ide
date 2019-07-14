@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.6.1 (2019-07-xx)
+## v1.7.0 (2019-07-14)
 * [BREAKING] Oxygen IDE requires now Chrome Oxygen Extension v0.64.0 or later.
 * Fixed an issue with Run button being disabled when recording stopped abruptly.
 * Fixed an issue with externally removed files remaining in the IDE in unusable state.
@@ -8,7 +8,10 @@
 * Highlight currently active file used for recording.
 * Highlight 'Continue' button when reaching a breakpoint.
 * Don't show error if automatic update check has failed.
-* Bump Oxygen 0.46.2.
+* Fixed number of issues with breakpoints and run marker.
+* Add support for Sauce Labs provider.
+* Add support for monitoring of iOS devices.
+* Bump Oxygen 0.46.4.
 
 ## v1.6.0 (2019-06-21)
 * Fixed saving recording in a wrong file format deletes the script.
