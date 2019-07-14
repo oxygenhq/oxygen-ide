@@ -187,7 +187,9 @@ export default class Workbench extends Component<Props> {
 
   handleToolbarValueChange(ctrlId, value) {
     if (ctrlId === Controls.TEST_TARGET) {
-      this.props.setTestTarget(value);
+      if (value !== '-') {
+        this.props.setTestTarget(value);
+      }      
     }
     else if (ctrlId === Controls.TEST_STEP_DELAY) {
       // convert string value to number

@@ -148,6 +148,11 @@ export default class Toolbar extends Component<Props> {
       showNoChromeDialog,
       showWorkingChromeDialog
     } = this.state;
+    // prevDevice and iOSAndroidSeparator are used to add a separator between Android and iOS devices
+    let prevDevice = null;
+    const iOSAndroidSeparator = (
+      <Option key='-' value='-'>---------------</Option>
+    );
 
     return (
       <div className="appTollbar">
@@ -233,13 +238,20 @@ export default class Toolbar extends Component<Props> {
             ))
           }
           {
-            testMode === 'mob' && devices.map((device) => (
-              <Option key={ device.id } value={ device.id } title={ device.title }>
-                { device.title }
-              </Option>
-            ))
+            testMode === 'mob' && sortDevices(devices).map(device => {
+              const options = [];
+              if (prevDevice && prevDevice.osName === 'Android' && device.osName === 'iOS') {
+                options.push(iOSAndroidSeparator);
+              }
+              prevDevice = device;
+              options.push(
+                <Option key={ device.id } value={ device.id } title={ device.name }>
+                  { device.name }
+                </Option>
+              );
+              return options;
+            })
           }
-
           {
             testMode === 'resp' && emulators.map((emulator) => (
               <Option key={emulator} value={emulator}>
@@ -399,4 +411,24 @@ export default class Toolbar extends Component<Props> {
 
 function getOpacity(enabled) {
   return { opacity: (enabled ? 1 : 0.5) };
+}
+function sortDevices(devices) {
+  if (!Array.isArray(devices)) {
+    return [];
+  }
+  const sorted = devices.sort((a, b) => {
+    if (a.osName === 'Android' && b.osName === 'iOS') {
+      return -1;
+    }
+    else if (a.osName === 'iOS' && b.osName === 'Android') {
+      return 1;
+    }
+    else {
+      if (a.name === b.name) {
+        return 0;
+      }
+      return a.name < b.name ? -1 : 1;
+    }
+  });
+  return sorted;
 }

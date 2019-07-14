@@ -202,8 +202,7 @@ export default (state = defaultState, action) => {
           ...state.devices,
           {
             id: device.id,
-            name: device.info.name || null,
-            title: device.name || device.id, 
+            name: device.name || device.info.name || device.id,
             osName: device.info.os.name,
             osVersion: device.info.os.version,
           },
