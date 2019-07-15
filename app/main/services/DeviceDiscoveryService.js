@@ -101,6 +101,7 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
                 adb = await ADB.createADB();
             } catch (e) {
                 console.warn('Unable to retrieve Android device list.', e);
+                await this.stop();
             }
 
             if(adb){
