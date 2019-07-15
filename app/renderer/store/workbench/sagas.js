@@ -239,7 +239,13 @@ export function* initialize() {
     let appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');
 
     if(appSettings && appSettings.cache){
-        yield put(wbActions.restoreFromCache(appSettings.cache));
+        const fromCache = yield putAndTake(wbActions.restoreFromCache(appSettings.cache));
+
+        try{
+            yield call(services.javaService.checkJavaVersion);
+        } catch(e){
+            console.log('e', e);
+        }
 
         if(appSettings.cache.settings && appSettings.cache.settings.uuid){
             yield call(services.mainIpc.call, 'AnalyticsService', 'setUser', [appSettings.cache.settings.uuid]);

@@ -39,6 +39,13 @@ export const restoreFromCache = (cache) => {
   };
 };
 
+export const _restoreFromCache_Success = () => {
+  return {
+    type: success('FROM_CACHE'),
+    payload: {},
+  };
+}
+
 export const setJavaError = (error) => {
   return {
     type: ActionTypes.WB_SET_JAVA_ERROR,

@@ -11,6 +11,7 @@ import { default as pathNode } from 'path';
 import ActionTypes from '../types';
 import * as fsActions from './actions';
 import * as settingsActions from './../settings/actions';
+import * as workbenchActions from './../workbench/actions';
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import { putAndTake } from '../../helpers/saga';
 import fileSubjects from '../../store/fs/subjects';
@@ -220,6 +221,7 @@ export function* fromCache({ payload }) {
     if(rootPath){
         yield call(services.mainIpc.call, 'FileService', 'createWatchOnFilesChannel', [rootPath]);
     }
+    yield put(workbenchActions._restoreFromCache_Success());
 }
 
 export function* watchOnSubFiles(path){
