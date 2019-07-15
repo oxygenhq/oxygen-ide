@@ -52,7 +52,6 @@ function* handleTestRunnerServiceEvent(event) {
     }
     else if (event.type === 'TEST_ENDED') {
         yield put(testActions.onTestEnded());
-        console.log('event', event);
 
         if(event && event.result && event.result.summary){
             const { summary } = event.result;
@@ -64,7 +63,24 @@ function* handleTestRunnerServiceEvent(event) {
         }
     }
     else if (event.type === 'LINE_UPDATE') {
-        yield put(testActions.onLineUpdate(event.time, event.file, event.line, event.primary));
+        const editor = yield select(state => state.editor);
+
+        try {
+            if( editor && 
+                editor.openFiles &&
+                event &&
+                event.file &&
+                editor.openFiles[event.file] && 
+                editor.openFiles[event.file].activeLine &&
+                event.line === editor.openFiles[event.file].activeLine
+            ) {
+                yield call(services.mainIpc.call, 'TestRunnerService', 'continue');
+            } else {
+                yield put(testActions.onLineUpdate(event.time, event.file, event.line, event.primary));
+            }
+        } catch(e){
+            console.log('e', e);
+        }
     }
     else if (event.type === 'BREAKPOINT') {
         yield put(testActions.onBreakpoint(event.file, event.line));
@@ -135,6 +151,22 @@ export function* startTest({ payload }) {
     else if (file.modified) {
         yield put(wbActions.saveCurrentFile());
     }
+    // clone runtime settings and add cloud provider information, if a provider was selected
+    const runtimeSettingsClone = {
+        ...runtimeSettings
+    };
+    // add test provider information
+    if (runtimeSettings.testProvider) {
+        const cloudProviders = yield select(state => state.settings.cloudProviders);
+        runtimeSettingsClone.testProvider = cloudProviders.hasOwnProperty(runtimeSettings.testProvider) ? { ...cloudProviders[runtimeSettings.testProvider], id: runtimeSettings.testProvider } : null;
+    }
+    // add device information 
+    if (runtimeSettings.testTarget && runtimeSettings.testMode === 'mob') {
+        const devices = yield select(state => state.test.devices);
+        const targetDevice = devices.find(x => x.id === runtimeSettings.testTarget);
+        runtimeSettingsClone.testTarget = targetDevice;
+    }
+
     try {        
         // reset active line cursor in all editors
         yield put(editorActions.resetActiveLines());
@@ -143,7 +175,7 @@ export function* startTest({ payload }) {
         // call TestRunner service to start the test
         
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', []);
-        const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettings ]);        
+        const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
         yield put({
             type: success(ActionTypes.TEST_START),
             payload: null,

@@ -18,21 +18,20 @@
  *
  * @flow
  */
+
 import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
+
 import Logger from './Logger';
 import MainProcess from './MainProcess';
 import * as Sentry from '@sentry/electron';
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-crashReporter.start({
-  companyName: 'no-company-nc',
-  productName: 'ide',
-  ignoreSystemCrashHandler: true,
-  submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f'
-});
-
-Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
-
+try {
+  initializeCrashReporterAndSentry();
+} catch(e){
+  console.warn('Cannot initialize CrashReporter and Sentry', e);
+}
 global.log = new Logger('debug', 'info');
 
 let mainWindow = null;
@@ -149,3 +148,34 @@ function disposeMainAndQuit() {
     mainProc = null;
   }
 }
+
+function initializeCrashReporterAndSentry() {
+  const crashesDirectory = crashReporter.getCrashesDirectory();
+  const completedDirectory = path.join(crashesDirectory, 'completed');
+  const newDirectory = path.join(crashesDirectory, 'new');
+  const pendingDirectory = path.join(crashesDirectory, 'pending');
+  // make sure crashesDirectory and its sub folders exist, otherwise we will get an error while initializing Sentry
+  if (!fs.existsSync(crashesDirectory)){
+    fs.mkdirSync(crashesDirectory);
+  }
+  if (!fs.existsSync(completedDirectory)){
+    fs.mkdirSync(completedDirectory);
+  }
+  if (!fs.existsSync(newDirectory)){
+    fs.mkdirSync(newDirectory);
+  }
+  if (!fs.existsSync(pendingDirectory)){
+    fs.mkdirSync(pendingDirectory);
+  }
+  // start CrashReporter
+  crashReporter.start({
+    companyName: 'no-company-nc',
+    productName: 'ide',
+    ignoreSystemCrashHandler: true,
+    submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f',
+    uploadToServer: true
+  });
+  // initialize Sentry
+  Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
+}
+

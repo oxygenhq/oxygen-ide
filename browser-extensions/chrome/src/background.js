@@ -254,9 +254,7 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
         transType === 'auto_bookmark' || 
         transType === 'generated' ||
         transType === 'reload' ||
-        (transType === 'link' && 
-            details.transitionQualifiers.length === 2 && 
-            details.transitionQualifiers[1] === 'from_address_bar')) {
+        (transType === 'link' && details.transitionQualifiers.includes('from_address_bar'))) {
 
         // ignore internal Google Chrome urls
         if (details.url.indexOf('/_/chrome/newtab') > -1 ||
@@ -264,6 +262,13 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
             details.url.startsWith('chrome-search:')) {
             return;
         }
+
+        // FIXME note:
+        // chrome sometimes produces two events when entering URL into address bar and pressing enter:
+        // link and typed
+        // as the result, web.open will be recorded twice
+        // this cannot be reliably fixed in the extension itself
+        // and needs to be looked at the IDE side...
 
         var data = JSON.stringify([{
             module: 'web',

@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 import { util, Runner } from 'oxygen-cli';
+import path from 'path';
 import moment from 'moment';
 import cfg from '../config.json';
 import ServiceBase from "./ServiceBase";
@@ -51,7 +52,9 @@ export default class TestRunnerService extends ServiceBase {
         // store mainFilePath for later, so when we receive LINE_UPDATE event from Oxygen, 
         // we can bubble it up and include the file name in addition to line number (Oxygen sends only a line number)
         this.mainFilePath = mainFilePath;
+        const filename = path.basename(this.mainFilePath, '.js');
         const testConfig = {
+            testName: filename,
             seleniumPort: selenium.port,    // this is default selenium port, found in config file
             dbgPort: TestRunnerService._getRandomPort(),
             ...runtimeSettings,             // selenium port can also come from runtime setttings (over)
@@ -62,11 +65,14 @@ export default class TestRunnerService extends ServiceBase {
             iterations,
             reopenSession,
             dbgPort,
-            testMode,
+            testMode,            
             testTarget,
+            testProvider,
             seleniumPort,
             stepDelay,
+            testName,
         } = testConfig;
+
         let testsuite = null;
 
         try {
@@ -78,7 +84,8 @@ export default class TestRunnerService extends ServiceBase {
         }
         // set iterations count
         testsuite.testcases[0].iterationCount = iterations;
-        // prepare launch options
+        // prepare launch options and capabilities
+        const caps = {};
         const options = {};
         options.debugPort = dbgPort;
         options.debugPortIde = dbgPort;
@@ -87,27 +94,54 @@ export default class TestRunnerService extends ServiceBase {
             allowGlobal: true
         };
         options.reopenSession = reopenSession || false;
-        
-        // prepare module parameters
-        const caps = {};
+
+        // add provider specific options, if cloud provider was selected
+        if (testProvider && testProvider.id) {
+            switch (testProvider.id) {
+                case 'sauceLabs':
+                    options.seleniumUrl = testProvider.url;
+                    caps.name = testName || null;
+                    caps.username = testProvider.username;
+                    caps.accessKey = testProvider.accessKey;
+                    caps.extendedDebugging = testProvider.extendedDebugging || false;
+                    caps.capturePerformance = testProvider.capturePerformance || false;
+            }
+        }
+                
+        // prepare module parameters        
         if (testMode === 'resp') {
             options.mode = 'web';
             caps.browserName = 'chrome';
             caps.version = '*';
             caps['goog:chromeOptions'] = {
                 mobileEmulation: {
-                deviceName: testTarget
+                    deviceName: testTarget
                 }
             };
         }
         else if (testMode === 'mob') {
             options.mode = 'mob';
-            caps.deviceName = testTarget;
-            caps.deviceOS = 'Android';
+            let deviceName = null;
+            let platformName = 'Android';
+            let platformVersion = null;
+            // in mobile mode, testTarget shall be an object that includes device information (id, osName and osVersion)
+            if (testTarget && typeof testTarget === 'object') {
+                deviceName = testTarget.name || testTarget.id;
+                platformName = testTarget.osName;
+                platformVersion = testTarget.osVersion;
+            }
+            else if (testTarget && typeof testTarget === 'string') {
+                deviceName = testTarget;
+            }
+            caps.deviceName = deviceName;
+            caps.platformName = platformName;
+            caps.platformVersion = platformVersion;
         }
         else if (testMode === 'web') {
             options.mode = 'web';
-            options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
+            if (!options.seleniumUrl) {
+                options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
+            }
             options.browserName = testTarget;
             // @FIXME: this option should be exposed in reports settings
             options.screenshots = 'never';
@@ -116,38 +150,43 @@ export default class TestRunnerService extends ServiceBase {
         if (stepDelay) {
             options.delay = stepDelay;
         }
-        
+        // initialize Oxygen Runner
         try {
             this._emitLogEvent(SEVERITY_INFO, 'Initializing...');
-
             await this.oxRunner.init(options);
-            this._emitTestStarted();
-            // assign user-set breakpoints
-            testsuite.testcases[0].breakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
-            return this.oxRunner.run(testsuite, null, caps).then((result) => {
-                // eslint-disable-line
-                this._emitTestEnded(result);
-                // @TODO: update UI elements
-                return this.dispose();
-            })
-            .catch((e) => {
-                if (e.line) {
-                    this._emitLogEvent(SEVERITY_ERROR, `${e.message} at line ${e.line}`);
-                } else {
-                    this._emitLogEvent(SEVERITY_ERROR, `ERROR: ${e.message}. ${e.stack || ''}`);
-                }
-                this._emitLogEvent(SEVERITY_FATAL, 'Test Failed!');
-                this._emitTestEnded(null, e);
-                return this.dispose();
-            });
         } catch (e) {
             // the error at .init stage can be caused by parallel call to .kill() method
             // make sure in case we are in the middle of stopping the test to ignore any error at this stage
             if (!this.isStopping) {
                 this._emitLogEvent(SEVERITY_ERROR, `Test Failed!: ${e.message}. ${e.stack || ''}`);
-                return this.dispose();
+                await this.dispose();
+                return; // if initialization has failed, then do not try to run the test
             }
         }
+        this._emitTestStarted();
+        // assign user-set breakpoints
+        testsuite.testcases[0].breakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
+        // run the test
+        try {
+            const result = await this.oxRunner.run(testsuite, null, caps);
+            // dispose Oxygen Runner and mark the state as not running, before updating the UI
+            await this.dispose();
+            // eslint-disable-line
+            this._emitTestEnded(result);            
+        }
+        catch (e) {
+            if (e.line) {
+                this._emitLogEvent(SEVERITY_ERROR, `${e.message} at line ${e.line}`);
+            } else {
+                this._emitLogEvent(SEVERITY_ERROR, `ERROR: ${e.message}. ${e.stack || ''}`);
+            }
+            this._emitLogEvent(SEVERITY_FATAL, 'Test Failed!');
+            this._emitTestEnded(null, e);
+            try {
+                await this.dispose();
+            }
+            catch (e) { console.warn('Call to dispose() method of TestRunnerService failed.', e); }
+        }        
     }
 
     async stop() {
@@ -246,7 +285,7 @@ export default class TestRunnerService extends ServiceBase {
             // if we are in the main script file, adjust line number according to script boilerplate offset
             let editorLine = editorFile !== this.mainFilePath ? lineNumber : lineNumber - getScriptContentLineOffset;
             // set event time
-            const time = moment.utc().unix();
+            const time = moment.utc().valueOf();
             // make sure to mark breakpoint line with current line mark
             this.notify({
                 type: EVENT_LINE_UPDATE,

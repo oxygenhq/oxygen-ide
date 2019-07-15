@@ -130,7 +130,7 @@ export default (state = DEFAULT_STATE, action) => {
       _newActiveFileName = state.activeFileName;
       // make sure we select another file, if active file has been closed
 
-      let newActiveFile = null;
+      let newActiveFile = state.activeFile;
 
       if(path === "unknown"){
         if (path === state.activeFile && name === state.activeFileName) {
@@ -143,15 +143,19 @@ export default (state = DEFAULT_STATE, action) => {
           newActiveFile = fileKeys.length > 0 ? fileKeys[fileKeys.length - 1] : null;
         }
       }
-
-      if(newActiveFile){
-        if(newActiveFile.startsWith("unknown") || newActiveFile.endsWith('(deleted from disk)')){
-          _newActiveFile = "unknown";
-          _newActiveFileName = newActiveFile;
-        } else {
-          _newActiveFile = newActiveFile;
-          _newActiveFileName = null;
-        }
+      if(
+        (newActiveFile && 
+        newActiveFile.startsWith && 
+        newActiveFile.startsWith("unknown")) || 
+        (newActiveFile && 
+        newActiveFile.endsWith && 
+        newActiveFile.endsWith('(deleted from disk)'))
+      ){
+        _newActiveFile = "unknown";
+        _newActiveFileName = newActiveFile;
+      } else {
+        _newActiveFile = newActiveFile;
+        _newActiveFileName = null;
       }
 
       const newState = { 

@@ -24,6 +24,7 @@ import * as Controls from './controls';
 import NoChromeDialog from './NoChromeDialog';
 import WorkingChromeDialog from './WorkingChromeDialog';
 import { type DeviceInfo } from '../../types/DeviceInfo';
+import { type CloudProvider } from '../../types/CloudProvider';
 import { type BrowserInfo } from '../../types/BrowserInfo';
 
 type ControlState = {
@@ -37,6 +38,7 @@ type Props = {
   browsers: Array<BrowserInfo>,
   devices: Array<DeviceInfo>,
   emulators: Array<string>,
+  providers: Array<CloudProvider>,
   controlsState: { [string]: ControlState },
   onValueChange: (string, string) => void,
   onButtonClick: (string) => void
@@ -132,6 +134,8 @@ export default class Toolbar extends Component<Props> {
       devices, 
       browsers, 
       emulators, 
+      providers = [],
+      testProvider = null,
       stepDelay,
       isChromeExtensionEnabled,
       canRecord,
@@ -144,6 +148,12 @@ export default class Toolbar extends Component<Props> {
       showNoChromeDialog,
       showWorkingChromeDialog
     } = this.state;
+    // prevDevice and iOSAndroidSeparator are used to add a separator between Android and iOS devices
+    let prevDevice = null;
+    const iOSAndroidSeparator = (
+      <Option key='-' value='-'>---------------</Option>
+    );
+
     return (
       <div className="appTollbar">
         { typeof showNoChromeDialog !== 'undefined' && showNoChromeDialog && 
@@ -228,13 +238,20 @@ export default class Toolbar extends Component<Props> {
             ))
           }
           {
-            testMode === 'mob' && devices.map((device) => (
-              <Option key={ device.id } value={ device.id }>
-                { device.name }
-              </Option>
-            ))
+            testMode === 'mob' && sortDevices(devices).map(device => {
+              const options = [];
+              if (prevDevice && prevDevice.osName === 'Android' && device.osName === 'iOS') {
+                options.push(iOSAndroidSeparator);
+              }
+              prevDevice = device;
+              options.push(
+                <Option key={ device.id } value={ device.id } title={ device.name }>
+                  { device.name }
+                </Option>
+              );
+              return options;
+            })
           }
-
           {
             testMode === 'resp' && emulators.map((emulator) => (
               <Option key={emulator} value={emulator}>
@@ -285,6 +302,24 @@ export default class Toolbar extends Component<Props> {
             /> 
             <span>Stop</span>
           </button>
+        )}
+
+        { (Array.isArray(providers) && providers.length > 0) && (
+        <Select
+          className="control select"
+          value={ testProvider || '' }
+          style={{ width: 120 }}
+          onChange={ (value) => ::this.handleValueChange(Controls.TEST_PROVIDER, value) }
+        >
+          <Option key='' value=''>-- Local --</Option>
+          {
+            testMode === 'web' && providers.map((provider) => (
+              <Option key={ provider.id } value={ provider.id }>
+                { provider.title }
+              </Option>
+            ))
+          }
+        </Select>
         )}
 
         <div className="separator" />
@@ -345,16 +380,29 @@ export default class Toolbar extends Component<Props> {
           </span>
         }
 
-        <span 
-          className={ this._isSelected(Controls.TEST_SETTINGS) ? 'control selectable active' : 'control selectable' }
-          style={{ marginLeft: 'auto' }}
-        >
-          <Icon
-            style={ getOpacity(this._isEnabled(Controls.TEST_SETTINGS)) }
-            onClick={ () => ::this.handleClickEvent(Controls.TEST_SETTINGS) }
-            type="setting"
-            title="Test Settings"
-          />
+        <span style={{ marginLeft: 'auto' }}>             
+          <span 
+            className={ this._isSelected(Controls.TEST_SETTINGS) ? 'control selectable active' : 'control selectable' }
+            style={{ float: 'right' }}
+          >
+            <Icon
+              style={ getOpacity(this._isEnabled(Controls.TEST_SETTINGS)) }
+              onClick={ () => ::this.handleClickEvent(Controls.TEST_SETTINGS) }
+              type="setting"
+              title="Test Settings"
+            />
+          </span>
+          <span 
+            className={ this._isSelected(Controls.CLOUD_PROVIDER_SETTINGS) ? 'control selectable active' : 'control selectable' }
+            style={{ float: 'right' }}
+          >
+            <Icon
+              style={ getOpacity(this._isEnabled(Controls.CLOUD_PROVIDER_SETTINGS)) }
+              onClick={ () => ::this.handleClickEvent(Controls.CLOUD_PROVIDER_SETTINGS) }
+              type="cloud"
+              title="Cloud Providers"
+            />
+          </span>
         </span>
       </div>
     );
@@ -363,4 +411,24 @@ export default class Toolbar extends Component<Props> {
 
 function getOpacity(enabled) {
   return { opacity: (enabled ? 1 : 0.5) };
+}
+function sortDevices(devices) {
+  if (!Array.isArray(devices)) {
+    return [];
+  }
+  const sorted = devices.sort((a, b) => {
+    if (a.osName === 'Android' && b.osName === 'iOS') {
+      return -1;
+    }
+    else if (a.osName === 'iOS' && b.osName === 'Android') {
+      return 1;
+    }
+    else {
+      if (a.name === b.name) {
+        return 0;
+      }
+      return a.name < b.name ? -1 : 1;
+    }
+  });
+  return sorted;
 }

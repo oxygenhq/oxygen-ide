@@ -43,6 +43,11 @@ export const setTestTarget = (value) => ({
   payload: { value },
 });
 
+export const setTestProvider = (value) => ({
+  type: ActionTypes.TEST_SET_PROVIDER,
+  payload: { value },
+});
+
 export const setTestMode = (value) => ({
   type: ActionTypes.TEST_SET_MODE,
   payload: { value },
