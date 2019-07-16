@@ -53,6 +53,21 @@ export function* testUpdateBreakpoints({ payload }){
     } else {
         yield put(settingsActions.setZoom(FONT_SIZE_MIN));
     }
+
+    const test = yield select(state => state.test);
+
+    const { isRunning } = test;
+    const { breakpoints, path } = payload;
+
+    const testBreakpoints = test.breakpoints;
+
+    if(isRunning){
+        // right now run test
+        if(testBreakpoints && testBreakpoints[path]){
+            // the file where breackpoints changed in files, where test runs
+            const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'updateBreakpoints', [ breakpoints, path ]);
+        }
+    }
 }
 
 export function* firstOpen({ payload }){
