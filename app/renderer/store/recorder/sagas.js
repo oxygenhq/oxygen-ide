@@ -267,9 +267,9 @@ export function* handleServiceEvents({ payload }) {
 export function* startRecorder({ payload }) {
     const editor = yield select(state => state.editor);
     const { activeFile, activeFileName } = editor;
-
+    
     // if no file is currently open (no open tabs), then ignore the recording
-    if (!activeFile) {
+    if (!activeFile || activeFile === 'welcome') {
         
         const resp = yield putAndTake(wbActions.openFakeFile());
         
