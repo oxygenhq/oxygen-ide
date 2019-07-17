@@ -51,7 +51,7 @@ const send = data => {
 const processChange = (eventPath, folderPath, type) => {
     const filePart = eventPath.split(folderPath);
     // FIXME: handle properly case when eventPath === folderPath
-    if (filePart && filePart[1]) {
+    if (Array.isArray(filePart) && filePart.length > 1) {
         // anylize file location
         if (eventPath && !eventPath.endsWith('.DS_Store')) {  
             //  file or folder was deleted or renamed
@@ -74,11 +74,7 @@ const processChange = (eventPath, folderPath, type) => {
                     data: fileInfo
                 });
             }
-        } else {
-            // console.warn(`bad eventPath: ${eventPath}`);
         }
-    } else {
-        console.warn(`Bad split result with eventPath: ${eventPath} and folderPath: ${folderPath}`);
     }
 };
 
