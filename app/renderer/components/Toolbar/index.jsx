@@ -139,6 +139,7 @@ export default class Toolbar extends Component<Props> {
       stepDelay,
       isChromeExtensionEnabled,
       canRecord,
+      testRunning,
       waitChromeExtension,
       showRecorderMessage,
       changeShowRecorderMessageValue
@@ -345,7 +346,7 @@ export default class Toolbar extends Component<Props> {
           </span>
            */
         }
-        { waitChromeExtension &&
+        { (waitChromeExtension || testRunning) &&
           <span
             style={ getOpacity(false) }
             className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
@@ -357,7 +358,7 @@ export default class Toolbar extends Component<Props> {
           </span>
         }
 
-        { !waitChromeExtension && !canRecord && 
+        { !(waitChromeExtension || testRunning) && !canRecord && 
           <span
             className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable not-work active' : 'control selectable not-work' }
             title="Record"
@@ -368,7 +369,7 @@ export default class Toolbar extends Component<Props> {
             />
           </span>}
 
-        { !waitChromeExtension && canRecord &&
+        { !(waitChromeExtension || testRunning) && canRecord &&
           <span
             className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active green-bg' : 'control selectable' }
             title="Record"
