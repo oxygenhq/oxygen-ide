@@ -158,7 +158,11 @@ export default class TestRunnerService extends ServiceBase {
             // the error at .init stage can be caused by parallel call to .kill() method
             // make sure in case we are in the middle of stopping the test to ignore any error at this stage
             if (!this.isStopping) {
-                this._emitLogEvent(SEVERITY_ERROR, `Test Failed!: ${e.message}. ${e.stack || ''}`);
+                if(typeof e === 'string'){
+                    this._emitLogEvent(SEVERITY_ERROR, `Test Failed!: ${e}`);
+                } else {
+                    this._emitLogEvent(SEVERITY_ERROR, `Test Failed!: ${e.message}. ${e.stack || ''}`);
+                }
                 await this.dispose();
                 return; // if initialization has failed, then do not try to run the test
             }
@@ -203,6 +207,12 @@ export default class TestRunnerService extends ServiceBase {
             this.isRunning = false;
             this.mainFilePath = null;
             this._emitLogEvent(SEVERITY_INFO, 'Test finished with status --> CANCELED');
+        }
+    }
+
+    updateBreakpoints(breakpoints, filePath) {        
+        if (this.oxRunner && breakpoints && filePath) {
+            this.oxRunner.updateBreakpoints(breakpoints, filePath);
         }
     }
 
