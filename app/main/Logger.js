@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ export default class Logger {
         }
         console.log = (...args) => log.info.apply(log, formatArgs(args));
         console.info = (...args) => log.info.apply(log, formatArgs(args));
-        console.warn = (...args) => log.warn.apply(log, formatArgs(args));
+        console.warn = (...args) => log.info.apply(log, formatArgs(args));
         console.error = (...args) => log.error.apply(log, formatArgs(args));
         console.debug = (...args) => log.debug.apply(log, formatArgs(args));
     }
