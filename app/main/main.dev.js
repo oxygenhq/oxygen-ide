@@ -28,7 +28,18 @@ import fs from 'fs';
 import path from 'path';
 
 try {
-  initializeCrashReporterAndSentry();
+  if (
+    typeof process !== 'undefined' && 
+    process && 
+    process.env && 
+    process.env.NODE_ENV && 
+    process.env.NODE_ENV === 'development'
+  ) {
+    // dev mode
+    // ignore sentry logging
+  } else {
+    initializeCrashReporterAndSentry();
+  }
 } catch(e){
   console.warn('Cannot initialize CrashReporter and Sentry', e);
 }
