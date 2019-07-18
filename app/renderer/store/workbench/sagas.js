@@ -437,8 +437,8 @@ export function* createNewRealFile({ payload }){
             const files = yield select(state => state.settings.files);
             const currentFile = files[path+name];
 
-            if(currentFile){
-                yield closeTmpFile(currentFile);
+            if(currentFile && saveAsFile && saveAsFile.path){
+                yield closeTmpFile(currentFile, saveAsFile.path);
             }
         }
 
