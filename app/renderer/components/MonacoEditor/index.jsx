@@ -71,10 +71,6 @@ export default class MonacoEditor extends React.Component {
     amdRequire(['vs/editor/editor.main'], () => {
       this.initMonaco();
     });
-
-    this.elem = document.getElementById('editors-container-wrap');
-    this.elem.addEventListener("keydown", this.keydownCallback);
-    this.elem.addEventListener("keyup", this.keyupCallback);
   }
 
   shouldComponentUpdate(nextProps, nextState) {    
@@ -96,10 +92,6 @@ export default class MonacoEditor extends React.Component {
         fontSize: this.props.fontSize,
         lineHeight: this.props.fontSize*RATIO
       });
-
-      // save electron settings
-      this.props.saveSettings();
-
     }
     if (this.props.value !== this.__current_value) {
       // Always refer to the latest value
@@ -164,8 +156,6 @@ export default class MonacoEditor extends React.Component {
 
   componentWillUnmount() {
     this.destroyMonaco();
-    this.elem.removeEventListener("keydown", this.keydownCallback);
-    this.elem.removeEventListener("keyup", this.keyupCallback);
   }
   
   addLnToLnArray(ln){
@@ -182,41 +172,7 @@ export default class MonacoEditor extends React.Component {
         return item !== ln;
       })
     }
-  }
-
-  wheelCallback = (e) => {
-    e.stopPropagation()
-    if(e && e.deltaY && e.deltaY < 0){
-      //up
-      if(this.props.zoomIn){
-        this.props.zoomIn();
-      }
-    }
-    if(e && e.deltaY && e.deltaY > 0){
-      //down
-      if(this.props.zoomOut){
-        this.props.zoomOut();
-      }
-    }
-  }
-  
-  keydownCallback = (e) => {
-    if(e.key === 'Control'){
-      if(!this.on){
-        e.stopPropagation()
-        this.elem.addEventListener('wheel', this.wheelCallback , true);
-        this.on = true;
-      }
-    }
-  }
-  
-  keyupCallback = (e) => {
-    if(e.key === 'Control'){
-      e.stopPropagation()
-      this.elem.removeEventListener('wheel',  this.wheelCallback , true)
-      this.on = 0;
-    }
-  }
+  }  
 
   determineUpdatedProps(diffProps) {
     return {
@@ -264,6 +220,12 @@ export default class MonacoEditor extends React.Component {
         this.props.onValueChange(value, event);
       }
     });
+
+    if(this.props.fontSize && this.props.breakpoints && Array.isArray(this.props.breakpoints) && this.props.breakpoints.length > 0){     
+      this.props.breakpoints.map((item) => {
+        helpers.addBreakpointMarker(this.editor, item, this.props.fontSize);
+      })
+    }
   }
 
   trigger(trigger) {

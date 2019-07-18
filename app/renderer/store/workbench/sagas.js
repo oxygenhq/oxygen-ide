@@ -735,10 +735,11 @@ export function* contentUpdate({ payload }) {
     }
 }
 
-export function* closeTmpFile(file){
+export function* closeTmpFile(file, realFilePath){
     yield put(editorActions.closeFile(file.path, false, file.name));
     yield put(tabActions.removeTab(file.path, file.name));
     yield put(settingsActions.removeFile(file.path, file.name));
+    yield put(testActions.moveBreakpointsFromTmpFileToRealFile(file.path, file.name, realFilePath));
 }
 
 export function* saveCurrentFile({ payload }) {
@@ -747,7 +748,6 @@ export function* saveCurrentFile({ payload }) {
     const recorder = yield select(state => state.recorder);
 
     const { activeFile, activeFileName } = editor;
-
 
     if(activeFile === "unknown"){
         const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, null, [ 
@@ -802,7 +802,7 @@ export function* saveCurrentFile({ payload }) {
             // open newly saved file (as it's not necessary open) - e.g. open it in a new tab
 
             if(currentFile){
-                yield closeTmpFile(currentFile);
+                yield closeTmpFile(currentFile, saveAsPath);
             }
 
             const fs = yield select(state => state.fs);

@@ -90,6 +90,59 @@ export default class Workbench extends Component<Props> {
         alert('no stopRecorder');
       }  
     }
+    
+    if(this.elem && this.elem.addEventListener){
+      this.elem.removeEventListener("keydown", this.keydownCallback);
+      this.elem.removeEventListener("keyup", this.keyupCallback);
+    }
+  }
+
+  componentDidUpdate(){
+    if(!this.elem){
+      this.elem = document.getElementById('editors-container-wrap');
+
+      if(this.elem && this.elem.addEventListener){
+        this.elem.addEventListener("keydown", this.keydownCallback);
+        this.elem.addEventListener("keyup", this.keyupCallback);
+      } else {
+        console.log('bad editors-container-wrap', this.elem);
+      }
+    }
+  }
+
+  keydownCallback = (e) => {
+    if(e.key === 'Control'){
+      if(!this.on){
+        e.stopPropagation()
+        this.elem.addEventListener('wheel', this.wheelCallback , true);
+        this.on = true;
+      }
+    }
+  }
+  
+  keyupCallback = (e) => {
+    if(e.key === 'Control'){
+      e.stopPropagation()
+      this.elem.removeEventListener('wheel',  this.wheelCallback , true)
+      this.on = 0;
+    }
+  }
+
+  wheelCallback = (e) => {
+    e.stopPropagation();
+    
+    if(e && e.deltaY && e.deltaY < 0){
+      //up
+      if(this.props.zoomIn){
+        this.props.zoomIn();
+      }
+    }
+    if(e && e.deltaY && e.deltaY > 0){
+      //down
+      if(this.props.zoomOut){
+        this.props.zoomOut();
+      }
+    }
   }
 
   handleTabChange(key, name = null) {
@@ -104,8 +157,8 @@ export default class Workbench extends Component<Props> {
     this.props.onContentUpdate(path, content, name);
   }
 
-  handleBreakpointsUpdate(filePath, breakpoints) {
-    this.props.updateBreakpoints(filePath, breakpoints);
+  handleBreakpointsUpdate(filePath, breakpoints, name) {
+    this.props.updateBreakpoints(filePath, breakpoints, name);
   }
 
   handleSidebarResize(sidebar, newSize) {
