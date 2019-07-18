@@ -152,6 +152,9 @@ export default (state = defaultState, action) => {
       if (state.runtimeSettings.testMode === value) {
         return state;
       }
+
+      let newTestProvider = state.runtimeSettings.testProvider;
+
       // determine new testTarget value, depending on the selected test mode
       let newTestTarget = null;
       if (value === 'web') {
@@ -161,6 +164,7 @@ export default (state = defaultState, action) => {
         newTestTarget = state.devices.length > 0 ? state.devices[0].id : null;
       }
       else if (value === 'resp') {
+        newTestProvider = "";
         newTestTarget = state.emulators.length > 0 ? state.emulators[0] : null;
       }
       return {
@@ -169,6 +173,7 @@ export default (state = defaultState, action) => {
           ...state.runtimeSettings,
           testMode: value,
           testTarget: newTestTarget,
+          testProvider: newTestProvider
         },
       };
 
