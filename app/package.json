@@ -14,9 +14,9 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
-    "@sentry/electron": "0.17.1",
+    "@sentry/electron": "0.17.3",
     "appium-ios-driver": "4.3.0",
-    "chokidar": "2.1.5",
+    "chokidar": "2.1.6",
     "monaco-editor": "0.14.3",
     "oxygen-cli": "0.46.6",
     "xml2json": "0.11.2"
