@@ -222,6 +222,21 @@ export default class TestRunnerService extends ServiceBase {
         }
     }
 
+    stepOver() {
+
+        console.log('___ stepOver ___');
+        console.log('this.oxRunner', this.oxRunner);
+        console.log('this.oxRunner.stepOver', this.oxRunner.stepOver);
+
+        if (this.oxRunner) {
+            try{
+                this.oxRunner.stepOver();
+            } catch(e){
+                console.warn('e', e);
+            }
+        }
+    }
+
     async dispose() {
         if (this.oxRunner) {
             await this.oxRunner.dispose();

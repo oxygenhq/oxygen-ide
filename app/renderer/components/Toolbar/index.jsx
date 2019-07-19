@@ -27,6 +27,14 @@ import { type DeviceInfo } from '../../types/DeviceInfo';
 import { type CloudProvider } from '../../types/CloudProvider';
 import { type BrowserInfo } from '../../types/BrowserInfo';
 
+const stepOver = () => {
+  return (
+    <svg focusable="false" aria-hidden="true" fill="currentColor" width="1em" height="1em" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <path d="M512 597.333333a85.333333 85.333333 0 0 1 85.333333 85.333334 85.333333 85.333333 0 0 1-85.333333 85.333333 85.333333 85.333333 0 0 1-85.333333-85.333333 85.333333 85.333333 0 0 1 85.333333-85.333334m488.96-219.306666l-67.84 293.973333L640 604.16l162.133333-101.546667A340.138667 340.138667 0 0 0 512 341.333333c-168.533333 0-308.48 122.026667-336.213333 282.88l-84.053334-14.933333C126.293333 408.746667 301.226667 256 512 256c152.746667 0 287.146667 80.64 362.666667 201.386667l126.293333-79.36z" fill="" />
+    </svg>
+  )
+}
+
 type ControlState = {
   visible?: boolean,
   enabled?: boolean
@@ -286,6 +294,16 @@ export default class Toolbar extends Component<Props> {
             onClick={ () => ::this.handleClickEvent(Controls.TEST_CONTINUE) }
             type="forward"
             title="Continue"
+          />
+        )}
+
+        { this._isVisible(Controls.TEST_CONTINUE) && (
+          <Icon
+            component={stepOver}
+            className="control button forward"
+            style={ getOpacity(this._isEnabled(Controls.TEST_CONTINUE)) }
+            onClick={ () => ::this.handleClickEvent(Controls.TEST_STEP_OVER) }
+            title="Step Over"
           />
         )}
 

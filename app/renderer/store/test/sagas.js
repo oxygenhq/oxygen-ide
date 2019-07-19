@@ -25,6 +25,7 @@ export default function* root() {
       takeLatest(ActionTypes.TEST_START, startTest),
       takeLatest(ActionTypes.TEST_STOP, stopTest),
       takeLatest(ActionTypes.TEST_CONTINUE, continueTest),
+      takeLatest(ActionTypes.TEST_STEP_OVER, stepOver),
       takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
       takeLatest(ActionTypes.TEST_EVENT_LINE_UPDATE, handleOnLineUpdate)
     ]);
@@ -74,7 +75,8 @@ function* handleTestRunnerServiceEvent(event) {
                 editor.openFiles[event.file].activeLine &&
                 event.line === editor.openFiles[event.file].activeLine
             ) {
-                yield call(services.mainIpc.call, 'TestRunnerService', 'continue');
+                // wait before solve problem with stepOver
+                // yield call(services.mainIpc.call, 'TestRunnerService', 'continue');
             } else {
                 yield put(testActions.onLineUpdate(event.time, event.file, event.line, event.primary));
             }
@@ -203,6 +205,24 @@ export function* stopTest({ payload }) {
         /* istanbul ignore next */
         yield put({
             type: failure(ActionTypes.TEST_STOP),
+            payload: { error: err },
+        });
+    }
+}
+
+export function* stepOver({ payload }) {
+    try {
+        // call TestRunner service to stop the test
+        yield call(services.mainIpc.call, 'TestRunnerService', 'stepOver');
+        yield put({
+            type: success(ActionTypes.TEST_STEP_OVER),
+            payload: null,
+        });
+    }
+    catch (err) {
+        /* istanbul ignore next */
+        yield put({
+            type: failure(ActionTypes.TEST_STEP_OVER),
             payload: { error: err },
         });
     }

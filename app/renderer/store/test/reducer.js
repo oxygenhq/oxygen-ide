@@ -102,6 +102,13 @@ export default (state = defaultState, action) => {
         isRunning: true,
         isPaused: false,
       };
+    // TEST_STEP_OVER
+    case ActionTypes.TEST_STEP_OVER:
+      return {
+        ...state,
+        isRunning: true,
+        isPaused: false,
+      };
     // TEST_EVENT_ENDED
     case ActionTypes.TEST_EVENT_ENDED:
       return {

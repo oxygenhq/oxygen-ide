@@ -23,6 +23,11 @@ export const continueTest = () => ({
   payload: null,
 });
 
+export const stepOver = () => ({
+  type: ActionTypes.TEST_STEP_OVER,
+  payload: null,
+});
+
 export const onTestEnded = () => ({
   type: ActionTypes.TEST_EVENT_ENDED,
   payload: null,

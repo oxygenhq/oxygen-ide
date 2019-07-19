@@ -9,6 +9,7 @@
 export const TEST_START = 'TEST_START';
 export const TEST_STOP = 'TEST_STOP';
 export const TEST_CONTINUE = 'TEST_CONTINUE';
+export const TEST_STEP_OVER = 'STEP_OVER';
 export const TEST_SET_MAIN = 'TEST_SET_MAIN';
 export const TEST_SET_TARGET = 'TEST_SET_TARGET';
 export const TEST_SET_PROVIDER = 'TEST_SET_PROVIDER';

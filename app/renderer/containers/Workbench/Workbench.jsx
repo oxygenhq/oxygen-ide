@@ -143,6 +143,9 @@ export default class Workbench extends Component<Props> {
     else if (ctrlId === Controls.TEST_CONTINUE) {
       this.props.continueTest();
     }
+    else if (ctrlId === Controls.TEST_STEP_OVER) {
+      this.props.stepOver();
+    }
     else if (ctrlId === Controls.TEST_MODE_MOB) {
       this.props.setTestMode('mob');
     }
