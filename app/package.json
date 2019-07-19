@@ -18,7 +18,7 @@
     "appium-ios-driver": "4.3.0",
     "chokidar": "2.1.5",
     "monaco-editor": "0.14.3",
-    "oxygen-cli": "0.46.5",
+    "oxygen-cli": "0.46.6",
     "xml2json": "0.11.2"
   }
 }
