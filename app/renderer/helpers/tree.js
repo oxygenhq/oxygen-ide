@@ -7,7 +7,8 @@
  * (at your option) any later version.
  */
 import path from 'path';
-import _ from 'lodash';
+import uniqWith from 'lodash.uniqwith';
+import isEqual from 'lodash.isequal';
 import fileFolderSorter from '../../main/helpers/fileFolderSorter';
 
 export function checkEmpty(data) {
@@ -30,7 +31,7 @@ export function clearDublicatesInChildArray(element) {
     if (element && element.children && element.children.length > 1) {
         return {
             ...element,
-            children: _.uniqWith(element.children, _.isEqual)
+            children: uniqWith(element.children, isEqual)
         };
     }
     return element;
@@ -105,7 +106,7 @@ export function addTreeNode(root, fsInfo, rootPath = '') {
         ) {
             newRoot.push(fsInfo);
             newRoot.sort(fileFolderSorter);
-            newRoot = _.uniqWith(newRoot, _.isEqual);
+            newRoot = uniqWith(newRoot, isEqual);
         } else {
             newRoot = [fsInfo];
         }
@@ -119,7 +120,7 @@ export function addTreeNode(root, fsInfo, rootPath = '') {
                         childrenClone = [...elm.children];
                     }
                     childrenClone.push(fsInfo);
-                    childrenClone = [..._.uniqWith(childrenClone, _.isEqual)];
+                    childrenClone = [...uniqWith(childrenClone, isEqual)];
                     childrenClone.sort(fileFolderSorter);
                     newRoot.push(clearDublicatesInChildArray({
                         ...elm,

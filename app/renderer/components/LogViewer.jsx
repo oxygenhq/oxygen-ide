@@ -13,7 +13,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { message } from 'antd';
-import _ from 'lodash';
+import difference from 'lodash.difference';
 import { type LogEntry } from '../types/LogEntry';
 import ScrollContainer from './ScrollContainer';
 import { AutoSizer, Grid } from 'react-virtualized';
@@ -47,7 +47,7 @@ export default class LogViewer extends PureComponent<Props> {
   }
 
   componentWillReceiveProps(nextProps) {
-    const diff = _.difference(nextProps.logs, this.props.logs);   
+    const diff = difference(nextProps.logs, this.props.logs);   
     let newState = {};
     let maxWidth = 1;
 
