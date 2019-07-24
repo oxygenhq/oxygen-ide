@@ -65,6 +65,8 @@ export default class Workbench extends Component<Props> {
   constructor(props) {
     super(props);
 
+    this.on = false;
+
     this.handleTabChange = this.handleTabChange.bind(this);
     this.handleTabClose = this.handleTabClose.bind(this);
   }
@@ -124,7 +126,7 @@ export default class Workbench extends Component<Props> {
     if(e.key === 'Control'){
       e.stopPropagation()
       this.elem.removeEventListener('wheel',  this.wheelCallback , true)
-      this.on = 0;
+      this.on = false;
     }
   }
 
