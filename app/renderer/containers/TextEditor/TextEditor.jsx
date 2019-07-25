@@ -148,8 +148,6 @@ export default class TextEditor extends Component<Props> {
               editorReadOnly={editorReadOnly}
               fontSize={fontSize}
               breakpoints={file.breakpoints || []}
-              zoomIn={this.props.zoomIn}
-              zoomOut={this.props.zoomOut}
               onBreakpointsUpdate={(bps) => this.props.onBreakpointsUpdate(file.path, bps, file.name)}
               onValueChange={(bps) => ::this.handleValueChange(file.path, bps, file.name)}
               onSelectionChange={(bps) => ::this.handleSelectionChange(file.path, bps)}
