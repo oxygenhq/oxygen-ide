@@ -104,42 +104,45 @@ export function breakpointMarkersToLineNumbers(editor) {
     return bpMarkers.map(bpMarker => getMarkerLine(bpMarker));
 }
 
-export function updateActiveLineMarker(editor, line, fontSize=null) {
-    
-    // try to convert string value of line to number if possible (line support to be integer)
-    if (line && !Number.isInteger(line) && typeof line === 'string' && !isNaN(line)) {
-        try { line = parseInt(line); }
-        // ignore this call if line is not null and not a number
-        catch (e) { return; }
-    }
-    const columnNum = Number.isInteger(line) ? editor.getModel().getLineFirstNonWhitespaceColumn(line) : null;
-    // line value can be null, if we want to remove the active cursor completely
-    
-    let fontSizeClassName = '';
-
-    if(fontSize && Number.isInteger(fontSize)){
-        fontSizeClassName = 'currentLineDecoratorStyle'+fontSize;
-    }
-    
-    const updatedLineDecorator = Number.isInteger(line) ? {
-        range: new monaco.Range(line, columnNum, line, columnNum),
-        options: {
-          isWholeLine: true,
-          className: 'myContentClass',
-          linesDecorationsClassName: 'currentLineDecoratorStyle '+fontSizeClassName
+export function updateActiveLineMarker(editor, line, fontSize=null) {    
+    try{
+        // try to convert string value of line to number if possible (line support to be integer)
+        if (line && !Number.isInteger(line) && typeof line === 'string' && !isNaN(line)) {
+            try { line = parseInt(line); }
+            // ignore this call if line is not null and not a number
+            catch (e) { return; }
         }
-    } : null;
+        const columnNum = Number.isInteger(line) ? editor.getModel().getLineFirstNonWhitespaceColumn(line) : null;
+        // line value can be null, if we want to remove the active cursor completely
+        
+        let fontSizeClassName = '';
 
-    const allMarkers = getAllMarkers(editor);
-    
-    const decoratorsToRemove = [
-        ...allMarkers.filter((item) => item.options.linesDecorationsClassName.startsWith('currentLineDecoratorStyle')),
-    ];
+        if(fontSize && Number.isInteger(fontSize)){
+            fontSizeClassName = 'currentLineDecoratorStyle'+fontSize;
+        }
+        
+        const updatedLineDecorator = Number.isInteger(line) ? {
+            range: new monaco.Range(line, columnNum, line, columnNum),
+            options: {
+            isWholeLine: true,
+            className: 'myContentClass',
+            linesDecorationsClassName: 'currentLineDecoratorStyle '+fontSizeClassName
+            }
+        } : null;
 
-    const newDecorators = [];
-    if (updatedLineDecorator) {
-        newDecorators.push(updatedLineDecorator);
+        const allMarkers = getAllMarkers(editor);
+        
+        const decoratorsToRemove = [
+            ...allMarkers.filter((item) => item.options.linesDecorationsClassName.startsWith('currentLineDecoratorStyle')),
+        ];
+
+        const newDecorators = [];
+        if (updatedLineDecorator) {
+            newDecorators.push(updatedLineDecorator);
+        }
+
+        editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
+    } catch(e){
+        console.error('err', e);
     }
-
-    editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
 }
