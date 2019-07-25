@@ -87,7 +87,6 @@ export default class TestRunnerService extends ServiceBase {
         // prepare launch options and capabilities
         const caps = {};
         const options = {};
-        options.debugPort = dbgPort;
         options.debugPortIde = dbgPort;
         options.require = {
             allow: true,
