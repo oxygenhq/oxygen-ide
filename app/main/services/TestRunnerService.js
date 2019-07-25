@@ -259,30 +259,21 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _hookToOxygenEvents() {
-        this.oxRunner.on('line-update', (line, stack, time) => {
-            // send LINE_UPDATE event for each file in the stack
-            if (stack && Array.isArray(stack)) {
-                const primaryFile  = stack.length > 0 ? stack[0].file : null;
-                for (const call of stack) {
-                    this.notify({
-                        type: EVENT_LINE_UPDATE,
-                        time: time,
-                        file: call.file,
-                        line: call.line,
-                        // determine if this stack call is the top (primary) one in the stack (so we can open the relevant tab)
-                        primary: primaryFile === call.file, 
-                    });
-                }
-            }
-            else {
+        this.oxRunner.on('line-update', (stack, time) => {
+            // first entry in the stack is the current file
+            // (which can be the primary file or a file loaded via `require`)
+            // last entry is the primary file.
+            if (Array.isArray(stack) && stack.length > 0) {
+                const primaryFile = stack[stack.length - 1].file;
                 this.notify({
                     type: EVENT_LINE_UPDATE,
                     time: time,
-                    file: this.mainFilePath,
-                    line: line,
-                    primary: true,
+                    file: stack[0].file,
+                    line: stack[0].line,
+                    // determine if this the primary file or not (so we can open the relevant tab)
+                    primary: primaryFile === stack[0].file
                 });
-            }            
+            }
         });
 
         // @params breakpoint, testcase
