@@ -46,7 +46,7 @@ module.exports = function(grunt) {
     } else if (process.platform === 'win32') {
         defaultTasks.push('installer-win');
     } else if (process.platform === 'darwin') {
-        defaultTasks.push('appdmg');
+        defaultTasks.push('installer-dmg');
     }
 
     grunt.registerTask('default', defaultTasks);
@@ -128,7 +128,11 @@ module.exports = function(grunt) {
                                                                    '!monaco-editor/dev/**',
                                                                    '!monaco-editor/esm/**',
                                                                    '!codepage/bits/**',
-                                                                   '!moment/src/**']),
+                                                                   '!moment/src/**',
+                                                                   '!node-idevice/apps/TestApp.ipa',
+                                                                   '!appium-ios-driver/instruments-iwd/iwd4/**',
+                                                                   '!appium-ios-driver/instruments-iwd/iwd5/**',
+                                                                   '!appium-ios-driver/instruments-iwd/iwd6/**']),
                         dest: OUTDIR + RESOURCES + '/app/node_modules' 
                     },
                     { 
@@ -208,7 +212,7 @@ module.exports = function(grunt) {
                 ]
             }
         },
-        appdmg: {
+        'installer-dmg': {
             options: {
                 title: 'Oxygen IDE ' + pkg.version,
                 icon: 'resources/app.icns',
@@ -221,8 +225,10 @@ module.exports = function(grunt) {
                 format: 'UDBZ'
             },
             target: {
-                dest:  'dist/oxygen-' + pkg.version + '-osx-x64.dmg'
+                dest:  'dist/oxygen-' + pkg.version + '-osx-x64.dmg',
+                'sign-identity': '21E9DBB193EBE7B9422F830962C2604A65233A02'
             }
+            
         },
         'installer-win': {
             version: pkg.version,
