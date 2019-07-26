@@ -283,8 +283,9 @@ export default class TestRunnerService extends ServiceBase {
             // if no fileName is received from the debugger (not suppose to happen), assume we are in the main script file
             const editorFile = fileName ? fileName : this.mainFilePath;
             // if we are in the main script file, adjust line number according to script boilerplate offset
-            let editorLine = editorFile !== this.mainFilePath ? lineNumber : lineNumber - getScriptContentLineOffset;
-            // set event time
+            // if we are in the secondary file (loaded via `require`) add 1 since BP indices are 0-based.
+            let editorLine = editorFile !== this.mainFilePath ? lineNumber + 1 : lineNumber - getScriptContentLineOffset;
+            
             const time = moment.utc().valueOf();
             // make sure to mark breakpoint line with current line mark
             this.notify({
