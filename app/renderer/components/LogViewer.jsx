@@ -199,7 +199,11 @@ export default class LogViewer extends PureComponent<Props> {
       const line = lines[rowIndex];
       
       return (
-        <div className="auto-sizer-wrapper-row" style={{...style, paddingTop: rowIndex ? '0px': '5px'}} key={`log-${category}-line-${line.timestamp}`}>
+        <div 
+          className="auto-sizer-wrapper-row" 
+          style={{...style, paddingTop: rowIndex ? '0px': '5px'}} 
+          key={key}
+        >
           {line.message}
         </div>
       );
@@ -242,6 +246,8 @@ export default class LogViewer extends PureComponent<Props> {
                       columnCount={1}
                       columnWidth={columnWidth}
                       width={width}
+                      scrollToRow={lines.length-1}
+                      scrollToIndex={lines.length-1}
                     />
                   )}
                 </AutoSizer>
