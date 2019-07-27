@@ -15,26 +15,25 @@ export default class JavaDialog extends PureComponent {
     electron.shell.openExternal(javaUrl);
   }
   
-  render() {    
+  render() {
     const {
       javaError
     } = this.props;
     
+    let title;
     let message;
 
-    if(javaError && javaError.message && javaError.reason === 'bad-version'){
-      message = (<p>{javaError.message} <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE"</p>);
-    } else if(javaError && javaError.message && javaError.reason === 'not-found'){
-      message = (<p>{javaError.message} <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE"</p>);
-    } else if(javaError && javaError.message){
-      message = (<p>{javaError.message}, try to install/reinstall <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE"</p>);
+    if (javaError.reason === 'bad-version') {
+      title = 'Unsupported Java version';
+      message = (<p>Oxygen IDE requires Java 8-10 version.<br/>Your version: {javaError.version}.<br/><br/>Install <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE.</p>);
     } else {
-      message = (<p>Uncatched error with Java, try to install/reinstall <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE"</p>);
+      title = 'Unable to find Java';
+      message = (<p>Install <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE.</p>);
     }
 
     return (
       <Modal
-        title="Error with Java"
+        title={title}
         width={400}
         visible={true}
         onCancel={this.clean}

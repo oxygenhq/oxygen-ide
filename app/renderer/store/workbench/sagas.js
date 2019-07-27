@@ -29,7 +29,7 @@ import { success, failure, successOrFailure } from '../../helpers/redux';
 
 import ActionTypes from '../types';
 import { MAIN_MENU_EVENT, MAIN_SERVICE_EVENT } from '../../services/MainIpc';
-import { JAVA_ERROR_INFO, JAVA_NOT_FOUND, JAVA_BAD_VERSION } from '../../services/JavaService';
+import { JAVA_NOT_FOUND, JAVA_BAD_VERSION } from '../../services/JavaService';
 
 import ServicesSingleton from '../../services';
 import editorSubjects from '../editor/subjects';
@@ -70,7 +70,6 @@ export default function* root() {
       takeLatest(ActionTypes.TEST_UPDATE_RUN_SETTINGS, handleUpdatedRunSettings),      
       takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
       takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
-      takeLatest(JAVA_ERROR_INFO, handleJavaError),
       takeLatest(JAVA_NOT_FOUND, handleJavaNotFound),
       takeLatest(JAVA_BAD_VERSION, handleJavaBadVersion),
     ]);
@@ -152,47 +151,18 @@ export function* handleServiceEvents({ payload }) {
     }
 }
 
-export function* handleJavaError({ payload }){
-    if(payload.err){
-        yield put(wbActions.setJavaError(payload.err));
-    } else {
-        yield put(wbActions.setJavaError());
-    }
-}
-
 export function* handleJavaNotFound(inner){
-    if(payload.message){
-        yield put(wbActions.setJavaError({
-            reason: 'not-found',
-            message: payload.message
-        }));
-    } else {
-        yield put(wbActions.setJavaError());
-    }
+    yield put(wbActions.setJavaError({
+        reason: 'not-found'
+    }));
 }
 
 export function* handleJavaBadVersion({ payload }){
-
-    const { message, version } = payload;
-
-    if(payload.message){
-        if(version){
-            const versionInt = parseInt(version);
-
-            if(versionInt < 8 || versionInt > 10){
-                yield put(wbActions.setJavaError({
-                    reason: 'bad-version',
-                    message: message
-                }));
-            } else {
-                // ignore, version is correct
-                return;
-            }
-        }
-    } else {
-        yield put(wbActions.setJavaError());
-    }
-    return;
+    const { version } = payload;
+    yield put(wbActions.setJavaError({
+        reason: 'bad-version',
+        version: version
+    }));
 }
 
 function* handleUpdateServiceEvent(event) {
@@ -211,29 +181,12 @@ export function* deactivate() {
 }
 
 export function* initialize() {
-
-
-    // start check for update	
+    // start check for update
     services.mainIpc.call('UpdateService', 'start', [false]).then(() => {});
     // start Selenium server
     services.mainIpc.call('SeleniumService', 'start').then(() => {});
     // start Android and iOS device watcher
     services.mainIpc.call('DeviceDiscoveryService', 'start').then(() => {}).catch((e) => console.error(e.message));
-
-    /* sync variant
-
-    let UpdateServiceStartResult = yield call(services.mainIpc.call, 'UpdateService', 'start');
-    console.log('UpdateServiceStartResult', UpdateServiceStartResult);
-
-    // start Selenium server
-    let SeleniumServiceStartResult = yield call(services.mainIpc.call, 'SeleniumService', 'start');
-    console.log('SeleniumServiceStartResult', SeleniumServiceStartResult);
-
-    // start Android and iOS device watcher
-    let DeviceDiscoveryServiceStartResult = yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'start');
-    console.log('DeviceDiscoveryServiceStartResult', DeviceDiscoveryServiceStartResult);
-
-    */
 
     // get app settings from the store
     let appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');
@@ -244,7 +197,7 @@ export function* initialize() {
         try{
             yield call(services.javaService.checkJavaVersion);
         } catch(e){
-            console.log('e', e);
+            console.log('Failure checking Java', e);
         }
 
         if(appSettings.cache.settings && appSettings.cache.settings.uuid){
