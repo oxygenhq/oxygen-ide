@@ -76,10 +76,13 @@ export default class TestRunnerService extends ServiceBase {
         let testsuite = null;
 
         try {
-            testsuite = await oxutil.generateTestSuiteFromJSFile(mainFilePath, paramFilePath, paramMode);
-        }
-        catch (e) {
-            this._emitLogEvent(SEVERITY_ERROR, `Cannot generate test suite from JS file: ${e.message}`);
+            testsuite = await oxutil.generateTestSuiteFromJSFile(mainFilePath, paramFilePath, paramMode, true);
+        } catch (e) {
+            // could get exception only if param file loading fails
+            this._emitLogEvent(SEVERITY_ERROR, `Test Failed! Unable to load parameters file: ${e.message}`);
+            this._emitTestEnded(null, e);
+            this.isRunning = false; // oxygen crashed - nothing to oxRunner.dispose(), so just unset local vars
+            this.oxRunner = null;
             return;
         }
         // set iterations count
@@ -183,7 +186,7 @@ export default class TestRunnerService extends ServiceBase {
             } else {
                 this._emitLogEvent(SEVERITY_ERROR, `ERROR: ${e.message}. ${e.stack || ''}`);
             }
-            this._emitLogEvent(SEVERITY_FATAL, 'Test Failed!');
+            this._emitLogEvent(SEVERITY_ERROR, 'Test Failed!');
             this._emitTestEnded(null, e);
             try {
                 await this.dispose();
