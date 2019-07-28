@@ -9,6 +9,7 @@
 import { util, Runner } from 'oxygen-cli';
 import path from 'path';
 import moment from 'moment';
+import detectPort from 'detect-port';
 import cfg from '../config.json';
 import ServiceBase from "./ServiceBase";
 
@@ -34,7 +35,7 @@ export default class TestRunnerService extends ServiceBase {
     mainFilePath = null;
 
     constructor() {
-        super();        
+        super();
     }
     /**
      * @param  {String} scriptFilename | path to script file
@@ -56,7 +57,7 @@ export default class TestRunnerService extends ServiceBase {
         const testConfig = {
             testName: filename,
             seleniumPort: selenium.port,    // this is default selenium port, found in config file
-            dbgPort: TestRunnerService._getRandomPort(),
+            dbgPort: await detectPort(10205),
             ...runtimeSettings,             // selenium port can also come from runtime setttings (over)
         };
         const {
@@ -231,12 +232,6 @@ export default class TestRunnerService extends ServiceBase {
             this.mainFilePath = null;
             this.isRunning = false;
         }
-    }
-
-    static _getRandomPort() {
-        const portMin = 1024;
-        const portMax = 65535;
-        return Math.floor(Math.random() * (portMax - portMin)) + portMin;
     }
 
     _emitTestStarted() {
