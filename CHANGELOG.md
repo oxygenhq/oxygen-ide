@@ -1,17 +1,19 @@
 # CHANGELOG
 
 ## v1.8.0 (2019-07-xx)
-* Fix breakpoints to work with nested files.
 * Allow setting/removing breakpoint after the test has been already started.
 * Allow setting breakpoints in unsaved files.
-* Fix possible crash when synchronizing files.
-* Do not allow starting recording while test is running.
-* Fix switching between local and Sauce Labs mode.
-* Fix crash when running certain nested tests.
-* Fix mouse scroll wheel occasionally performing zoom-in/out instead of scrolling.
-* Notarize OS X builds.
 * Scroll log window when new content is added.
-* Bump Oxygen 0.47.0
+* Do not allow starting recording while test is running.
+* Fixed breakpoints to work with nested files.
+* Fixed possible crash when synchronizing files.
+* Fixed switching between local and Sauce Labs mode.
+* Fixed crash when running certain nested tests.
+* Fixed mouse scroll wheel occasionally performing zoom-in/out instead of scrolling.
+* Fixed Java check during startup.
+* Fixed handling of invalid parameters files.
+* Notarize OS X builds.
+* Bump Oxygen 0.47.2
 
 ## v1.7.0 (2019-07-14)
 * [BREAKING] Oxygen IDE requires now Chrome Oxygen Extension v0.64.0 or later.
