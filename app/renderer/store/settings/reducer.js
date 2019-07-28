@@ -18,7 +18,7 @@ const defaultAppSettings = {
   files: {},
   cloudProviders: {
     sauceLabs: {
-      title: 'SauceLabs',
+      title: 'Sauce Labs',
       url: SAUCELABS_HUB_DEFAULT_URL,
       username: null,
       accessKey: null,

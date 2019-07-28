@@ -163,7 +163,7 @@ class CloudProvidersDialog extends PureComponent<Props> {
         bodyStyle={ { overflow: 'hidden', overflowY: 'hidden', height: '425px' } }
       >
           <Form>
-            <Form.Item label="SauceLabs" {...formItemLayout} extra="Use SauceLabs to run your tests in cloud." >
+            <Form.Item label="Sauce Labs" {...formItemLayout} extra="Use Sauce Labs to run your tests in cloud." >
               <Switch onChange={ ::this.onUseSauceLabsChange } checked={ sauceLabs.inUse } />
             </Form.Item>
             { sauceLabs && sauceLabs.inUse &&
