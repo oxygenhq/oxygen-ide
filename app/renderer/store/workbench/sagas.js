@@ -279,7 +279,9 @@ export function* openFolder({ payload }) {
     const { path } = payload;
     // check if there are any unsaved files - if so, prompt user and ask whether to proceed.
     const files = yield select(state => state.fs.files);
-    const unsaved = getUnsavedFiles(files);
+    const tabs = yield select(state => state.tabs);
+
+    const unsaved = getUnsavedFiles(files, tabs);
     
     if (unsaved && unsaved.length > 0) {
         let fileNamesStr = '';
@@ -1064,7 +1066,7 @@ export function* handleUpdatedRunSettings(payload) {
     yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
 }
 
-function getUnsavedFiles(files) {
+function getUnsavedFiles(files, tabs) {
     if (!files) {
         return;
     }
@@ -1072,7 +1074,14 @@ function getUnsavedFiles(files) {
     for (let filePath of Object.keys(files)) {
         const file = files[filePath];
         if (file && file.modified) {
-            unsavedFiles.push(file);
+            if(
+                tabs && 
+                tabs.list && 
+                tabs.list.some && 
+                tabs.list.some(({key}) => key === file.path)
+            ){
+                unsavedFiles.push(file);
+            }
         }
     }
     return unsavedFiles;
