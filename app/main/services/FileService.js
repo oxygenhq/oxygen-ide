@@ -228,6 +228,39 @@ export default class FileService extends ServiceBase {
         };
     }
 
+    returnFileContent(filePath){
+
+        let response;
+
+        try {
+            if (filePath && fs.existsSync(filePath)) {
+                //file exists
+
+                var data = fs.readFileSync(filePath, 'utf8');
+
+                if(!data){
+                    // sometimes readFileSync return empty data on not emty file :-?
+                    setTimeout(function() { 
+                        var data = fs.readFileSync(filePath, 'utf8');
+                        response = data;
+                    }, 100);
+                } else {
+                    response = data;
+                }
+
+            } else {
+                response = false;
+            }
+        } catch(err) {
+            console.log('Error in returnFileContent method with filePath '+filePath+' :', err);
+        }
+
+        return {
+            filePath: filePath,
+            content: response
+        };
+    }
+
     getFileContent(filePath) {
         var data = fs.readFileSync(filePath, 'utf8');
         if(!data){
