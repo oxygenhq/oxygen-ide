@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.8.0 (2019-07-xx)
+## v1.8.0 (2019-07-30)
 * Allow setting/removing breakpoint after the test has been already started.
 * Allow setting breakpoints in unsaved files.
 * Scroll log window when new content is added.
