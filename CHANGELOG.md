@@ -6,13 +6,15 @@
 * Scroll log window when new content is added.
 * Do not allow starting recording while test is running.
 * Fixed breakpoints to work with nested files.
-* Fixed possible crash when synchronizing files.
+* Fixed number of issues related to file synchronization.
 * Fixed switching between local and Sauce Labs mode.
 * Fixed crash when running certain nested tests.
 * Fixed mouse scroll wheel occasionally performing zoom-in/out instead of scrolling.
 * Fixed Java check during startup.
 * Fixed handling of invalid parameters files.
-* Notarize OS X builds.
+* Fixed rare crash when executing tests due to debugger port being unavailable.
+* Fixed crash when executing unsaved file on OS X under certain conditions.
+* Notarize OS X builds. Prevents security warnings on OS X 10.14.4 and later.
 * Bump Oxygen 0.47.2
 
 ## v1.7.0 (2019-07-14)
