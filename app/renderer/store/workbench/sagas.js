@@ -361,17 +361,23 @@ export function* createNewRealFile({ payload }){
     
     let folderPath;
 
-    if (process.platform === 'win32') {
-        // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
-        folderPath = saveAsPath.split("\\");
-        folderPath.pop();
-        folderPath = folderPath.join("\\");
-    } else {
-        // /Users/developer/Downloads/f.js => /Users/developer/Downloads
-        folderPath = saveAsPath.split("/");
-        folderPath.pop();
-        folderPath = folderPath.join("/");
-    }
+    console.log('pathHelper.sep', pathHelper.sep);
+
+    folderPath = saveAsPath.split(pathHelper.sep);
+    folderPath.pop();
+    folderPath = folderPath.join(pathHelper.sep);
+
+    // if (process.platform === 'win32') {
+    //     // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
+    //     folderPath = saveAsPath.split("\\");
+    //     folderPath.pop();
+    //     folderPath = folderPath.join("\\");
+    // } else {
+    //     // /Users/developer/Downloads/f.js => /Users/developer/Downloads
+    //     folderPath = saveAsPath.split("/");
+    //     folderPath.pop();
+    //     folderPath = folderPath.join("/");
+    // }
 
 
     let content = '';
@@ -724,17 +730,22 @@ export function* saveCurrentFile({ payload }) {
 
         let folderPath;
 
-        if (process.platform === 'win32') {
-            // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
-            folderPath = saveAsPath.split("\\");
-            folderPath.pop();
-            folderPath = folderPath.join("\\");
-        } else {
-            // /Users/developer/Downloads/f.js => /Users/developer/Downloads
-            folderPath = saveAsPath.split("/");
-            folderPath.pop();
-            folderPath = folderPath.join("/");
-        }
+        console.log('pathHelper.sep', pathHelper.sep);
+        folderPath = saveAsPath.split(pathHelper.sep);
+        folderPath.pop();
+        folderPath = folderPath.join(pathHelper.sep);
+        
+        // if (process.platform === 'win32') {
+        //     // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
+        //     folderPath = saveAsPath.split("\\");
+        //     folderPath.pop();
+        //     folderPath = folderPath.join("\\");
+        // } else {
+        //     // /Users/developer/Downloads/f.js => /Users/developer/Downloads
+        //     folderPath = saveAsPath.split("/");
+        //     folderPath.pop();
+        //     folderPath = folderPath.join("/");
+        // }
 
         const files = yield select(state => state.settings.files);
         
