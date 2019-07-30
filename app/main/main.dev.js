@@ -48,24 +48,30 @@ global.log = new Logger('debug', 'info');
 let mainWindow = null;
 let mainProc = null;
 
-try{
-  const gotTheLock = app.requestSingleInstanceLock()
-  
-  if (!gotTheLock) {
-    app.quit()
-  } else {
-    app.on('second-instance', (event, commandLine, workingDirectory) => {
-      // Someone tried to run a second instance, we should focus our window.
-      if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore()
-        mainWindow.focus();
-      }
-    });
-  }
-} catch(e){
-  alert('Please, open later (2 sec)');
-  console.log(e);
+const requestSingleInstanceLock = () => {
+  try{
+    const gotTheLock = app.requestSingleInstanceLock()
+    
+    if (!gotTheLock) {
+      alert('Sorry, we support only one IDE instance');
+      app.quit()
+    } else {
+      app.on('second-instance', (event, commandLine, workingDirectory) => {
+        // Someone tried to run a second instance, we should focus our window.
+        if (mainWindow) {
+          alert('Sorry, we support only one IDE instance');
+          if (mainWindow.isMinimized()) mainWindow.restore()
+          mainWindow.focus();
+        }
+      });
+    }
+  } catch(e){
+    alert('Please, open later (2 sec)');
+    console.log('requestSingleInstanceLock error: ', e);
+  }  
 }
+
+requestSingleInstanceLock();
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -106,6 +112,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', async () => {
+  requestSingleInstanceLock();
   /*
   if (
     process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
@@ -126,13 +133,23 @@ app.on('ready', async () => {
   // Prevent refresh
   // @FIXME: it'll cause preventing refreshesh for all windows
   // https://stackoverflow.com/questions/51187602/electron-js-prevent-refresh-for-created-window
-  globalShortcut.register('CommandOrControl+R', () => false);
-  globalShortcut.register('F5', () => false);
+  
+  try{
+    if(globalShortcut){
+      globalShortcut.register('CommandOrControl+R', () => false);
+      globalShortcut.register('F5', () => false);
+    }
+  } catch(e){
+    console.log('Error when try register shortcuts: ', e);
+  }
   mainWindow.loadURL(`file://${__dirname}/../renderer/app.html`);
 
   // @TODO: Use 'ready-to-show' event
   // https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
   mainWindow.webContents.on('did-finish-load', () => {
+
+    requestSingleInstanceLock();
+
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
@@ -150,6 +167,21 @@ app.on('ready', async () => {
     console.log('e', e);
   }
 });
+
+app.on('will-quit', () => {
+  try{
+    // Unregister a shortcut.
+    if(globalShortcut){
+      globalShortcut.unregister('CommandOrControl+R')
+      globalShortcut.unregister('F5')
+  
+      // Unregister all shortcuts.
+      globalShortcut.unregisterAll()
+    }
+  } catch(e){
+    console.log('Error when app on will-quit: ', e);
+  }
+})
 
 function disposeMainAndQuit() {
   if (mainProc) {
