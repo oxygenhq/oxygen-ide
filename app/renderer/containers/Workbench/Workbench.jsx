@@ -93,7 +93,7 @@ export default class Workbench extends Component<Props> {
       }  
     }
     
-    if(this.elem && this.elem.addEventListener){
+    if(this.elem && this.elem.removeEventListener){
       this.elem.removeEventListener("keydown", this.keydownCallback);
       this.elem.removeEventListener("keyup", this.keyupCallback);
     }
@@ -106,8 +106,6 @@ export default class Workbench extends Component<Props> {
       if(this.elem && this.elem.addEventListener){
         this.elem.addEventListener("keydown", this.keydownCallback);
         this.elem.addEventListener("keyup", this.keyupCallback);
-      } else {
-        console.log('bad editors-container-wrap', this.elem);
       }
     }
   }

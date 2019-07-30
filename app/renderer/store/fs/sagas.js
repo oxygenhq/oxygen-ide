@@ -255,6 +255,7 @@ export function* initializeSuccess() {
             fs.files[path]
         ) {
             const folder = fs.files[path];
+            const rootPath = fs.rootPath;
 
             if(folder && folder.children){
                 yield put(fsActions._treeOpenFolder_Success(path, folder.children));
@@ -263,37 +264,99 @@ export function* initializeSuccess() {
 
                 const editorState = yield select(state => state.editor);
                 
-                if(editorState && editorState.openFiles){
+                if(editorState && editorState.openFiles && rootPath){
+                    
+                    const fileContentArray = [];
 
-                    let allResults = yield all(Object.keys(editorState.openFiles).map(openFilePath =>{
+                    let allResults = yield all(Object.keys(editorState.openFiles).map(openFilePath => {
 
-                        const result = allFiles.some(file => {
-                            return file.path === openFilePath;
-                        })
+                        if(!openFilePath.startsWith('unknown') && openFilePath.startsWith(rootPath) && openFilePath.split(rootPath) && openFilePath.split(rootPath)[1]){
 
-                        if(!result && !openFilePath.startsWith('unknown')){
-                            // file removed from folder, but content in cache;
-
-                            if(fs && fs.files && fs.files[openFilePath] && fs.files[openFilePath]['content']){
-                                let unlinkedFileContent = fs.files[openFilePath]['content']|| '';
-                                
-                                const pathSplit = openFilePath.split(pathLib.sep);
-                                
-                                const name = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
-                                
-                                const key = 'unknown';
-
-                                const pRes = all([
-                                    put(tabActions.renameTab(openFilePath, key, name)),
-                                    put(editorActions.renameFile(openFilePath, name, true)),
-                                    put(settingsActions.addFile(key, name, unlinkedFileContent))
-                                ]);
-
-                                return pRes;
-                            }
+                            const innerPath = openFilePath.split(rootPath)[1];
+                            const innerPathArray = innerPath.split('\\');
+                            innerPathArray.shift();
                             
+                            let result = true;
+
+                            if(innerPathArray && innerPathArray.length === 1){
+                                // in root folder
+
+                                result = allFiles.some(file => {
+                                    return file.path === openFilePath;
+                                })
+
+                            } else {
+                                // not in root folder
+                                
+                                const resp = call(
+                                    services.mainIpc.call,
+                                    'FileService',
+                                    'returnFileContent',
+                                    [openFilePath]
+                                );
+
+                                fileContentArray.push(resp);
+                                
+                            }
+    
+                            if(!result){
+                                // file removed from folder, but content in cache;
+    
+                                if(fs && fs.files && fs.files[openFilePath]){
+                                    let unlinkedFileContent = fs.files[openFilePath]['content'] || '';
+                                    
+                                    const pathSplit = openFilePath.split(pathLib.sep);
+                                    
+                                    const name = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
+                                    
+                                    const key = 'unknown';
+    
+                                    const pRes = all([
+                                        put(tabActions.renameTab(openFilePath, key, name)),
+                                        put(editorActions.renameFile(openFilePath, name, true)),
+                                        put(settingsActions.addFile(key, name, unlinkedFileContent))
+                                    ]);
+    
+                                    return pRes;
+                                }
+                                
+                            }
                         }
                     }))
+
+                    try{
+                        if(fileContentArray && Array.isArray(fileContentArray) && fileContentArray.length > 0){
+                            const filesResults = yield all(fileContentArray);
+    
+                            filesResults.map(file => {
+                                if(
+                                    file && 
+                                    file.filePath && 
+                                    typeof file.content === 'string'
+                                ){
+                                    // file exist
+                                } else {
+                                    let unlinkedFileContent = fs.files[file.filePath]['content']|| '';
+                                    const pathSplit = file.filePath.split(pathLib.sep);
+                                    
+                                    const name = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
+                                    
+                                    const key = 'unknown';
+    
+                                    const pRes = all([
+                                        put(tabActions.renameTab(file.filePath, key, name)),
+                                        put(editorActions.renameFile(file.filePath, name, true)),
+                                        put(settingsActions.addFile(key, name, unlinkedFileContent))
+                                    ]);
+    
+                                    allResults.push(pRes);
+                                }
+                            })
+                        }
+                    } catch(e){
+                        console.log('Error when try create deleted from disk file', e);
+                    }
+
 
                     allResults = allResults.filter(function (el) {
                         return el != null;
