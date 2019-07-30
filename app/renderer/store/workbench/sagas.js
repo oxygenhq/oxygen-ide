@@ -361,10 +361,9 @@ export function* createNewRealFile({ payload }){
         return; // Save As dialog was canceled by user
     }
     
-    // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
-    let folderPath = saveAsPath.split("\\");
+    let folderPath = saveAsPath.split(pathHelper.sep);
     folderPath.pop();
-    folderPath = folderPath.join("\\");
+    folderPath = folderPath.join(pathHelper.sep);
 
     let content = '';
     
@@ -713,20 +712,10 @@ export function* saveCurrentFile({ payload }) {
         if (!saveAsPath) {
             return; // Save As dialog was canceled by user
         }
-
-        let folderPath;
-
-        if (process.platform === 'win32') {
-            // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
-            folderPath = saveAsPath.split("\\");
-            folderPath.pop();
-            folderPath = folderPath.join("\\");
-        } else {
-            // /Users/developer/Downloads/f.js => /Users/developer/Downloads
-            folderPath = saveAsPath.split("/");
-            folderPath.pop();
-            folderPath = folderPath.join("/");
-        }
+        
+        let folderPath = saveAsPath.split(pathHelper.sep);
+        folderPath.pop();
+        folderPath = folderPath.join(pathHelper.sep);
 
         const files = yield select(state => state.settings.files);
         
@@ -742,7 +731,7 @@ export function* saveCurrentFile({ payload }) {
             fsActions.saveFileAs(saveAsPath, saveContent)
         );
         
-        if (!error) {            
+        if (!error) {
             // re-retrieve all files, as Saved As file info has been just added to the File Cache.
             const updatedFiles = yield select(state => state.fs.files);
             // retrieve file info for the newly saved file
