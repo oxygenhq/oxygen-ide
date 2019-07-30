@@ -37,6 +37,7 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
     devices = {};
     updatingDeviceList = false;
     devListInterval = null;
+    adbPresent = true;
 
     constructor() {
         super();
@@ -60,16 +61,18 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
         // prevent duplicated calls to this function
         if (this.updatingDeviceList) {
             return;
-        }        
-        this.updatingDeviceList = true;    
-        const timestamp = (new Date()).getTime();        
+        }
+        this.updatingDeviceList = true;
+        const timestamp = (new Date()).getTime();
 
-        await this._updateAndroidDevices(timestamp);
+        if (this.adbPresent) {
+            await this._updateAndroidDevices(timestamp);
+        }
+
         // do not try to retrieve iOS device on Windows and Linux
-        const isMacOS = process.platform === 'darwin';
-        if (isMacOS) {
+        if (process.platform === 'darwin') {
             await this._updateIOSDevices(timestamp);
-        }        
+        }
     
         // go through all the devices and see which one is not connected anymore
         var uuids = Object.keys(this.devices);
@@ -96,48 +99,43 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
     
     async _updateAndroidDevices(timestamp) {
         try {
-            let adb;
-            try {
-                adb = await ADB.createADB();
-            } catch (e) {
-                console.warn('Unable to retrieve Android device list.', e);
-            }
-
-            if(adb){
-                const connectedDevices = await adb.getConnectedDevices();
-                for (var i = 0; i < connectedDevices.length; i++) {
-                    const uuid = connectedDevices[i].udid;
-                    if (!uuid) {
-                        continue;
-                    }
-                    // previously seen device
-                    if (this.devices[uuid]) {
-                        this.devices[uuid].new = this.devices[uuid].connected == false;
-                        this.devices[uuid].connected = true;
-                        this.devices[uuid].timestamp = timestamp;
-                    } else {    // new device                
-                        // determine if this is a real device or an emulator
-                        var isReal = uuid.indexOf('emulator') != 0 && uuid.indexOf(':') == -1;
-                        const info = await this._getAndroidDeviceInfo(uuid);
-                        // add new device
-                        this.devices[uuid] = {
-                            new: true,
-                            id: uuid,
-                            name: `${info.product.model} [${info.os.name} ${info.os.version}]`,
-                            connected: true,
-                            real: isReal,
-                            changed: true,
-                            timestamp: timestamp,
-                            ios: false,
-                            android: true,
-                            info: info
-                        };
-                    }
+            let adb = await ADB.createADB();
+            const connectedDevices = await adb.getConnectedDevices();
+            for (var i = 0; i < connectedDevices.length; i++) {
+                const uuid = connectedDevices[i].udid;
+                if (!uuid) {
+                    continue;
+                }
+                // previously seen device
+                if (this.devices[uuid]) {
+                    this.devices[uuid].new = this.devices[uuid].connected == false;
+                    this.devices[uuid].connected = true;
+                    this.devices[uuid].timestamp = timestamp;
+                } else {    // new device
+                    // determine if this is a real device or an emulator
+                    var isReal = uuid.indexOf('emulator') != 0 && uuid.indexOf(':') == -1;
+                    const info = await this._getAndroidDeviceInfo(uuid);
+                    // add new device
+                    this.devices[uuid] = {
+                        new: true,
+                        id: uuid,
+                        name: `${info.product.model} [${info.os.name} ${info.os.version}]`,
+                        connected: true,
+                        real: isReal,
+                        changed: true,
+                        timestamp: timestamp,
+                        ios: false,
+                        android: true,
+                        info: info
+                    };
                 }
             }
-        }
-        catch (e) {
+        } catch (e) {
             console.warn('Unable to retrieve Android device list.', e);
+            // if adb could not be found then stop the service as there is no point running it again
+            if (e.message && e.message.startsWith("Could not find 'adb")) {
+                this.adbPresent = false;
+            }
         }
     };
 
