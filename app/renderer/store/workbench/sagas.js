@@ -34,8 +34,6 @@ import { JAVA_NOT_FOUND, JAVA_BAD_VERSION } from '../../services/JavaService';
 import ServicesSingleton from '../../services';
 import editorSubjects from '../editor/subjects';
 
-import pathLib from 'path';
-
 const services = ServicesSingleton();
 /**
  * Workbench Sagas
@@ -584,7 +582,7 @@ export function* closeFile({ payload }) {
     }
 
     if(showDeleteTitle && path){
-        const pathSplit = path.split(pathLib.sep);
+        const pathSplit = path.split(pathHelper.sep);
 
         if(pathSplit && pathSplit.length){
             const newName = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
@@ -712,7 +710,7 @@ export function* saveCurrentFile({ payload }) {
         if (!saveAsPath) {
             return; // Save As dialog was canceled by user
         }
-        
+
         let folderPath = saveAsPath.split(pathHelper.sep);
         folderPath.pop();
         folderPath = folderPath.join(pathHelper.sep);
