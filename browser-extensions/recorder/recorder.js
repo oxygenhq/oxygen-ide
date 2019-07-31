@@ -502,6 +502,8 @@ Recorder.addEventHandler('mouseup', function (ev) {
     this.__mouseDownTarget = null;
 }, true);
 
+Recorder.prototype.meaningfulAttrs = new Set(['href', 'src', 'id', 'name', 'class', 'type', 'alt', 'title', 'value', 'action', 'onclick']);
+
 /*
  * Used to save element's attributes so we can generate proper locators later on on click
  */
@@ -514,7 +516,9 @@ Recorder.addEventHandler('mouseover', function (ev) {
     };
     var attrs = target.attributes;
     for (var i = attrs.length - 1; i >= 0; i--) {
-        this.__originalAttrs.attrs.push({name: attrs[i].name, value: attrs[i].value});
+        if (this.meaningfulAttrs.has(attrs[i].name)) {
+            this.__originalAttrs.attrs.push({name: attrs[i].name, value: attrs[i].value});
+        }
     }
 }, true);
 
@@ -598,17 +602,21 @@ Recorder.prototype.recordClick = function (target) {
         var oldAttrs = this.__originalAttrs.attrs;
         var newAttrs = {};
 
+        // restore original attributes
         for (var i = oldAttrs.length - 1; i >= 0; i--) {
             var old = oldAttrs[i];
-            newAttrs[old.name] = target.getAttribute(old.name);
-            target.setAttribute(old.name, old.value);
+            // restore only if the attribute value has changed
+            if (target.getAttribute(old.name) !== old.value) {
+                newAttrs[old.name] = target.getAttribute(old.name);
+                target.setAttribute(old.name, old.value);
+            }
         }
 
         this.record('click', this.findLocators(target), '');
 
         // revert attribute changes
         Object.keys(newAttrs).forEach(function(key) {
-            target.setAttribute(key, newAttrs[key]); ;
+            target.setAttribute(key, newAttrs[key]);
         });
     } else {
         this.record('click', this.findLocators(target), '');
