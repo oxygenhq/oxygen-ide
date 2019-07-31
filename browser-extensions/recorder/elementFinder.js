@@ -16,8 +16,6 @@ var ElementFinder = function() {
     this._registerAllLocatorFunctions();
 };
 
-ElementFinder.prototype.getCurrentWindow = function() {};
-
 ElementFinder.prototype._registerAllLocatorFunctions = function() {
     // TODO - don't do this in the constructor - only needed once ever
     this.locationStrategies = {};
@@ -80,13 +78,10 @@ ElementFinder.prototype.findElementRecursive = function(locatorType, locatorStri
 };
 
 /*
-* Finds an element on the current page, using various lookup protocols
+* Finds an element on the specified page, using various lookup protocols
 */
 ElementFinder.prototype.findElement = function(locator, win, unique) {
     var locatorParsed = parseLocator(locator);
-    if (!win) {
-        win = this.getCurrentWindow();
-    }
     var element = this.findElementRecursive(locatorParsed.type, locatorParsed.string, win.document, win, unique);
     return element;
 };
