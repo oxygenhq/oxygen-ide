@@ -185,8 +185,8 @@ module.exports = function(grunt) {
             },
             chromedriver: {
                 src: [process.platform === 'linux' ? 
-                        OUTDIR + RESOURCES + '/app/main/selenium/linux/chromedriver' :
-                        OUTDIR + RESOURCES + '/app/main/selenium/darwin/chromedriver']
+                        OUTDIR + RESOURCES + '/app/main/selenium/linux/**/chromedriver' :
+                        OUTDIR + RESOURCES + '/app/main/selenium/darwin/**/chromedriver']
             },
             geckodriver: {
                 src: [process.platform === 'linux' ? 
