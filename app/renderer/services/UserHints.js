@@ -53,6 +53,14 @@ export default class UserHintsService {
                 testMode && testMode === 'mob') {
                 alert('Invalid test mode selected: Mobile.\n\nTo run Web tests please select Web or Responsive mode.');
             }
+        } else if (message.includes('SELENIUM_RUNTIME_ERROR') &&
+            (message.includes('This version of ChromeDriver only supports Chrome version') ||
+                message.includes('Chrome version must be between'))) {
+                // for ChromeDriver 2.46 and below
+                //SELENIUM_RUNTIME_ERROR - session not created: Chrome version must be between 71 and 75
+                // for newer versions
+                //SELENIUM_RUNTIME_ERROR - session not created: This version of ChromeDriver only supports Chrome version 74
+                alert('Current version of ChromeDriver does not support current version of Chrome.');
         }
     }
 
