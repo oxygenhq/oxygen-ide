@@ -128,17 +128,19 @@ export default class SeleniumService extends ServiceBase {
             chromedriver = await this.findLocalChromeDriver(chromeDriverVersion);
             if (chromedriver) {
                 console.log('Found matching ChromeDriver at ' + chromedriver);
+            } else {
+                throw new Error('Cannot find it localy');
             }
         } catch (e) {
             console.warn('Failure setting up ChromeDriver', e);
             // if something bad happens, check if user has placed the driver manually
             // findLocalChromeDriver without arguments will try to resolve driver located at the root folder
-            chromedriver = this.findLocalChromeDriver();
+            chromedriver = await this.findLocalChromeDriver();
             if (chromedriver) {
                 console.log('Using user placed ChromeDriver from ' + chromedriver);
             } else {
                 // if no user placed driver then use, the latest bundled version
-                chromedriver = this.findLocalChromeDriver(versions[0].driverVersion);
+                chromedriver = await this.findLocalChromeDriver(versions[0].driverVersion);
                 console.log('Using latest bundled ChromeDriver from ' + chromedriver);
             }
         }
@@ -273,6 +275,7 @@ export default class SeleniumService extends ServiceBase {
             for (let version of versions) {
                 if (version.chromeMin >= chromeVersion && version.chromeMax <= chromeVersion) {
                     resolve(version.driverVersion);
+                    return;
                 }
             }
 
@@ -342,6 +345,7 @@ export default class SeleniumService extends ServiceBase {
             fs.access(driverBin, err => {
                 if (err) {
                     resolve(null);
+                    return;
                 }
                 resolve(driverBin);
             });
