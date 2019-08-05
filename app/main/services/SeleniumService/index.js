@@ -351,18 +351,13 @@ export default class SeleniumService extends ServiceBase {
     findLocalChromeDriver(driverVersion) {
         return new Promise((resolve, reject) => {
             var driverBin = this.getChromeDriverBinnaryPath(driverVersion);
-            try {
-                fs.access(driverBin, err => {
-                    if (err) {
-                        resolve(null);
-                        return;
-                    }
-                    resolve(driverBin);
-                });
-            } catch (e) {
-                // errors are ignored
-                resolve(null);
-            }
+            fs.access(driverBin, err => {
+                if (err) {
+                    resolve(null);
+                    return;
+                }
+                resolve(driverBin);
+            });
         });
     }
 
