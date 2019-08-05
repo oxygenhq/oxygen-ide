@@ -28,7 +28,7 @@ const ON_SELENIUM_STOPPED = 'SELENIUM_STOPPED';
 const ON_SELENIUM_LOG_ENTRY = 'ON_SELENIUM_LOG_ENTRY';
 const ON_CHROME_DRIVER_ERROR = 'ON_CHROME_DRIVER_ERROR';
 
-const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.googleapis.com'
+const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.ggoogleapis.com'
 
 export default class SeleniumService extends ServiceBase {
     seleniumProc = null;
@@ -113,6 +113,39 @@ export default class SeleniumService extends ServiceBase {
         }
     }
 
+    async getChromeDriverVersionAndChromeVersion(){
+        const result = {};
+        var chromedriver;
+        try {
+            const chromeVersion = await this.getChromeVersion();
+            console.log('Found Chrome version: ' + chromeVersion);
+
+            result.chromeVersion = chromeVersion;
+
+            var chromeDriverVersion = await this.getChromeDriverVersion(chromeVersion);
+            console.log('Required ChromeDriver version: ' + chromeDriverVersion);
+
+            result.chromeDriverVersion = chromeDriverVersion;
+
+            chromedriver = await this.findLocalChromeDriver(chromeDriverVersion);
+
+
+            if (chromedriver) {
+                console.log('Found matching ChromeDriver at ' + chromedriver);
+
+                result.error = false;
+                
+            } else {
+                result.error = true;
+            }
+
+            return result;
+        } catch (e) {
+            console.warn('Failure setting up ChromeDriver', e);
+        }
+    }
+
+
     async _startProcess(port) {
         const cwd = process.env.NODE_ENV === 'production' ? path.resolve(__dirname, 'selenium') : path.resolve(__dirname, '..', '..', 'selenium');
 
@@ -130,14 +163,6 @@ export default class SeleniumService extends ServiceBase {
             if (chromedriver) {
                 console.log('Found matching ChromeDriver at ' + chromedriver);
             } else {
-                if(chromeVersion && chromeDriverVersion){
-                    this.notify({
-                        type: ON_CHROME_DRIVER_ERROR,
-                        chromeVersion: chromeVersion,
-                        chromeDriverVersion: chromeDriverVersion,
-                    });
-                }
-
                 throw new Error('Cannot find it localy');
             }
         } catch (e) {

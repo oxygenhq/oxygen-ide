@@ -62,6 +62,20 @@ function* handleSeleniumServiceEvent(event) {
     }
 }
 
-function* handleSeleniumRuntimeError() {
-    yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION));
+function* handleSeleniumRuntimeError(event) {
+
+    const result = yield services.mainIpc.call('SeleniumService', 'getChromeDriverVersionAndChromeVersion');
+
+
+    if(result){
+        const {
+            chromeDriverVersion,
+            chromeVersion,
+            error
+        } = result;
+
+        if(error && chromeDriverVersion && chromeVersion){
+            yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, {chromeDriverVersion, chromeVersion}));
+        }
+    }
 }
