@@ -30,6 +30,18 @@ const defaultState = {
   [types.DIALOG_CLOUD_PROVIDERS]: {
     visible: false,
   },
+  [types.DIALOG_INCORECT_CHROME_DRIVER_VERSION]: {
+    visible: false
+  },
+  [types.DIALOG_DOWNLOADING_CHROME_DRIVER]: {
+    visible: false
+  },
+  [types.DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS]: {
+    visible: false
+  },
+  [types.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED]: {
+    visible: false
+  },
 };
 
 export default (state = defaultState, action) => {

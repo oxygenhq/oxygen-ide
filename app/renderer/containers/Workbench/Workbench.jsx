@@ -18,6 +18,12 @@ import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
 import SettingsDialog from '../../components/dialogs/SettingsDialog';
 import NeedInstallExtension from '../../components/dialogs/NeedInstallExtension';
+import CloudProvidersDialog from '../../components/dialogs/CloudProvidersDialog';
+import ChromeDriverDialog from '../../components/dialogs/ChromeDriverDialog';
+import ChromeDriverDownloadingDialog from '../../components/dialogs/ChromeDriverDownloadingDialog';
+import ChromeDriverDownloadingSuccessDialog from '../../components/dialogs/ChromeDriverDownloadingSuccessDialog';
+import ChromeDriverDownloadingFailedDialog from '../../components/dialogs/ChromeDriverDownloadingFailedDialog';
+
 // Other components
 import TextEditor from '../TextEditor';
 import Tabs from '../Tabs';
@@ -33,7 +39,6 @@ import * as Controls from '../../components/Toolbar/controls';
 // Styles
 import '../../css/common.scss';
 import '../../css/workbench.scss';
-import CloudProvidersDialog from '../../components/dialogs/CloudProvidersDialog';
 
 const { Header } = Layout;
 
@@ -363,6 +368,24 @@ export default class Workbench extends Component<Props> {
     this.props.hideDialog('DIALOG_CLOUD_PROVIDERS');
   }
 
+  chromeDrivers_onSubmit = (chromeDriverVersion) => {
+    this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
+    this.props.startDownloadChromeDriver(chromeDriverVersion);
+  }
+
+  chromeDrivers_onCancel = () => {
+    this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
+  }
+
+  chromeDriversSuccess_onClose = () => {
+    this.props.hideDialog('DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS');
+  }
+
+  chromeDriversFailed_onClose = () => {
+    this.props.hideDialog('DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED');
+  }
+  
+
   render() {
     const { test, settings = {}, dialog, javaError, initialized, changeShowRecorderMessageValue } = this.props;
     const { cloudProviders = {} } = settings;
@@ -414,6 +437,30 @@ export default class Workbench extends Component<Props> {
           { dialog.DIALOG_NEED_ISTALL_EXTENSION && dialog.DIALOG_NEED_ISTALL_EXTENSION.visible &&
             <NeedInstallExtension
               onClose={ this.needInstallExtensionOnClose }
+            />
+          }
+          { dialog.DIALOG_INCORECT_CHROME_DRIVER_VERSION && dialog.DIALOG_INCORECT_CHROME_DRIVER_VERSION.visible &&
+            <ChromeDriverDialog
+              { ...dialog['DIALOG_INCORECT_CHROME_DRIVER_VERSION'] }
+              onSubmit={ this.chromeDrivers_onSubmit }
+              onCancel={ this.chromeDrivers_onCancel }
+            />
+          }
+          { dialog.DIALOG_DOWNLOADING_CHROME_DRIVER && dialog.DIALOG_DOWNLOADING_CHROME_DRIVER.visible &&
+            <ChromeDriverDownloadingDialog
+              { ...dialog['DIALOG_DOWNLOADING_CHROME_DRIVER'] }
+            />
+          }
+          { dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS && dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS.visible &&
+            <ChromeDriverDownloadingSuccessDialog
+              { ...dialog['DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS'] }
+              onClose={ this.chromeDriversSuccess_onClose  }
+            />
+          }
+          { dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED && dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED.visible &&
+            <ChromeDriverDownloadingFailedDialog
+              { ...dialog['DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED'] }
+              onClose={ this.chromeDriversFailed_onClose  }
             />
           }
           <FileRenameDialog 

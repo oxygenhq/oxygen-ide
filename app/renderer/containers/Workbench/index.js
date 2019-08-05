@@ -14,6 +14,7 @@ import * as testActions from '../../store/test/actions';
 import * as settingsActions from '../../store/settings/actions';
 import { stopWaitChromeExtension } from '../../store/recorder/actions';
 import { move } from '../../store/fs/actions';
+import { startDownloadChromeDriver } from '../../store/dialog/actions';
 
 const mapStoreToProps = (state) => {
   const activeNode = state.fs.tree.activeNode;
@@ -50,7 +51,7 @@ const mapStoreToProps = (state) => {
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...wbActions, ...testActions, ...settingsActions, move, stopWaitChromeExtension } , dispatch)
+  bindActionCreators({ ...wbActions, ...testActions, ...settingsActions, move, stopWaitChromeExtension, startDownloadChromeDriver } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Workbench);

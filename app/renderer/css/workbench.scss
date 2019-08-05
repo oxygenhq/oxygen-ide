@@ -57,3 +57,9 @@
   padding-top: 0;
   background-color: $layoutBg;
 }
+
+.ant-modal.hide-x-button {
+  .ant-modal-close {
+    display: none!important;
+  }
+}

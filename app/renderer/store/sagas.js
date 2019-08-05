@@ -14,6 +14,7 @@ import editor from './editor/sagas';
 import test from './test/sagas';
 import recorder from './recorder/sagas';
 import settings from './settings/sagas';
+import dealog from './dialog/sagas';
 
 // services
 import ServicesSingleton from '../services';
@@ -30,6 +31,7 @@ export default function* root() {
     fork(test),
     fork(recorder),
     fork(settings),
+    fork(dealog),
   ];
   // check if any service has saga functions as well
   if (services && Object.keys(services).length > 0) {
