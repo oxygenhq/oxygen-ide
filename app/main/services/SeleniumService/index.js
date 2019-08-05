@@ -28,7 +28,7 @@ const ON_SELENIUM_STOPPED = 'SELENIUM_STOPPED';
 const ON_SELENIUM_LOG_ENTRY = 'ON_SELENIUM_LOG_ENTRY';
 const ON_CHROME_DRIVER_ERROR = 'ON_CHROME_DRIVER_ERROR';
 
-const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.ggoogleapis.com'
+const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.googleapis.com'
 
 export default class SeleniumService extends ServiceBase {
     seleniumProc = null;
