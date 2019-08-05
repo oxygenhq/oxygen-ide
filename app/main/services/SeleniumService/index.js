@@ -36,6 +36,8 @@ export default class SeleniumService extends ServiceBase {
 
     constructor() {
         super();
+
+        this.downloadChromeDriver = this.downloadChromeDriver.bind(this);
     }
 
     async start() {
@@ -328,7 +330,7 @@ export default class SeleniumService extends ServiceBase {
         });
     }
 
-    getChromeDriverDownloadUrl(driverVersion) {
+    getChromeDriverDownloadUrl = (driverVersion) => {
         var zipFilename;
         switch (process.platform) {
             case 'win32':
@@ -360,14 +362,14 @@ export default class SeleniumService extends ServiceBase {
         return new Promise((resolve, reject) => {
             if (process.platform === 'win32') {
                 const cp = spawn('taskkill', ['/IM', 'chromedriver.exe', '/F']);
-                cp.on('exit', () => resolve());
+                cp.on('exit', () => resolve(true));
                 // ignore errors since the process does not necessary exists at all
-                cp.on('error', () => resolve());
+                cp.on('error', () => resolve(true));
             } else {
                 const cp = spawn('killall', ['chromedriver']);
-                cp.on('exit', () => resolve());
+                cp.on('exit', () => resolve(true));
                 // ignore errors since the process does not necessary exists at all
-                cp.on('error', () => resolve());
+                cp.on('error', () => resolve(true));
             }
         });
     }
@@ -386,83 +388,169 @@ export default class SeleniumService extends ServiceBase {
         });
     }
 
-    downloadChromeDriver(driverVersion) {
+    fetchChromeDriver(downloadUrl){
         return new Promise((resolve, reject) => {
-            const downloadUrl = this.getChromeDriverDownloadUrl(driverVersion);
-            console.log('Downloading ' + downloadUrl);
+            try{
+                fetch(downloadUrl)
+                .then(res => {
+                    if (!res.ok) {
+                        return new Error('Unable to download ChromeDriver: ' + res.statusText);
+                    }
+
+                    if(res && res.buffer){
+                        return res.buffer();
+                    } else {
+                        return new Error('res.buffer is not defined');
+                    }
+                })
+                .then(buffer => {
+                    if(buffer instanceof Error){
+                        resolve(buffer);
+                    } else {
+                        var zipPath = tmp.tmpNameSync();
+                        fs.writeFile(zipPath, buffer, err => {
+                            if (err) {
+                                console.log('writeFile error', err);
+                                resolve(err);
+                            }
+                            resolve(zipPath);
+                        });
+                    }                         
+                }).catch(err => {
+                    console.log('fetchChromeDriver fetch error', err);
+                    resolve(err);
+                });
+            } catch(error){
+                console.log('fetchChromeDriver error', error);
+                resolve(error);
+            }    
+        });  
+    }
+
+    decompressZip(driverVersion, zipPath){
+        return new Promise((resolve, reject) => {
+            try{
+                var driverDir = path.join(this.getDriversRootPath(), 'chromedriver-' + driverVersion);
+    
+                var unzip = new DecompressZip(zipPath);
+    
+                unzip.on('error', (err) => {
+                    console.log('unzip error', error);
+                    resolve(err);
+                });
+    
+                unzip.on('extract', (log) => {
+                    resolve(driverDir);
+                });
+    
+                unzip.extract({
+                    path: driverDir,
+                    strip: 1
+                });
+            } catch(error){
+                console.log('decompressZip error', error);
+                resolve(error);
+            }
+        });
+    }
+
+    chmodChromeDriver(driverDir){
+        return new Promise((resolve, reject) => {
+            try{
+                var driverBin = path.join(driverDir, 'chromedriver' + (process.platform === 'win32' ? '.exe' : ''));
+                // chmod +x on POSIX
+                if (process.platform !== 'win32') {
+                    console.log('chmod +x ' + driverBin);
+                    fs.chmod(driverBin, mode, err => {
+                        if (err) {
+                            console.log('fs.chmod error', err);
+                            resolve(err);
+                        } else {
+                            resolve(driverBin);
+                        }
+                    });
+                } else {
+                    resolve(driverBin);
+                }
+            } catch(error){
+                console.log('chmodChromeDriver error', error);
+                resolve(error);
+            }
+        });
+    }
+    
+    async downloadChromeDriver(driverVersion){
+        return new Promise(async (resolve, reject) => {
 
             try{
-                this._killChromeDriverProcess()
-                .then(() => {
-                    return fetch(downloadUrl)
-                        .then(res => {
-                            if (!res.ok) {
-                                reject(new Error('Unable to download ChromeDriver: ' + res.statusText));
-                            }
-                            return res.buffer();
-                        })
-                        .then(buffer => {
-                            return new Promise((resolve, reject) => {
-                                var zipPath = tmp.tmpNameSync();
-                                fs.writeFile(zipPath, buffer, err => {
-                                    if (err) {
-                                        reject(err);
-                                    }
-                                    resolve(zipPath);
-                                });
-                            });
-                        })
-                        .then(zipPath => {
-                            return new Promise((resolve, reject) => {
-                                var driverDir = path.join(this.getDriversRootPath(), 'chromedriver-' + driverVersion);
+                const downloadUrl = this.getChromeDriverDownloadUrl(driverVersion);
+                console.log('Downloading ' + downloadUrl);
 
-                                var unzip = new DecompressZip(zipPath);
+                if(downloadUrl){
 
-                                unzip.on('error', (err) => {
-                                    reject(err);
-                                });
+                    let killResult;
+                    try {
+                        killResult = await this._killChromeDriverProcess();
+                    } catch (error) {
+                        console.log('_killChromeDriverProcess error', error);
+                        resolve(error);
+                    }
+    
+                    if(killResult){
+                        let zipPath;
+                        try {
+                            zipPath = await this.fetchChromeDriver(downloadUrl);
+                        } catch (error) {
+                            resolve(error);
+                        }
 
-                                unzip.on('extract', (log) => {
-                                    resolve(driverDir);
-                                });
+                        if(zipPath){
+                            if(zipPath instanceof Error){
+                                resolve(zipPath);
+                            } else {
+                                let driverDir;
 
-                                try{
-                                    unzip.extract({
-                                        path: driverDir,
-                                        strip: 1
-                                    });
-                                } catch(e){
-                                    console.log('Unzip extract error', e);
+                                try {
+                                    driverDir = await this.decompressZip(driverVersion, zipPath);
+                                } catch (error) {
+                                    resolve(error);
                                 }
-                            });
-                        })
-                        .then(driverDir => {
-                            if(driverDir){
-                                var driverBin = path.join(driverDir, 'chromedriver' + (process.platform === 'win32' ? '.exe' : ''));
 
-                                // chmod +x on POSIX
-                                if (process.platform !== 'win32') {
-                                    console.log('chmod +x ' + driverBin);
-                                    fs.chmod(driverBin, mode, err => {
-                                        if (err) {
-                                            reject(err);
-                                        } else {
-                                            resolve(driverBin);
+                                if(driverDir){
+                                    if(driverDir instanceof Error){
+                                        resolve(driverDir);
+                                    } else {
+                                        let driverBin;
+                                        
+                                        try {
+                                            driverBin = await this.chmodChromeDriver(driverDir);
+                                        } catch (error) {
+                                            resolve(error);
                                         }
-                                    });
+
+                                        if(driverBin){
+                                            // Final stage
+                                            resolve(driverBin);
+                                        } else {
+                                            resolve(new Error('driverBin is not defined', driverBin));
+                                        }
+                                    }
                                 } else {
-                                    resolve(driverBin);
+                                    resolve(new Error('driverDir is not defined', driverDir));
                                 }
                             }
-                        })
-                        .catch(err => {
-                            console.log('downloadChromeDriver error', err);
-                            resolve(err)
-                        });
-                });
-                
-            } catch(err) {
-                console.log('downloadChromeDriver error', err);
+                        } else {
+                            resolve(new Error('zipPath is not defined', zipPath));
+                        }
+                    } else {
+                        resolve(new Error('killResult is not defined', killResult));
+                    }
+                } else {
+                    resolve(new Error('downloadUrl is not defined', downloadUrl));
+                }
+            } catch(error) {
+                console.log('downloadChromeDriver error', error);
+                resolve(error);
             }
         });
     }

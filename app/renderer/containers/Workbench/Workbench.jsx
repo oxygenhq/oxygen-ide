@@ -385,6 +385,10 @@ export default class Workbench extends Component<Props> {
     this.props.hideDialog('DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED');
   }
   
+  chromeDrivers_onNoChromeDriverSubmit = () => {
+    this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
+    this.props.showDownloadChromeDriverError();
+  }
 
   render() {
     const { test, settings = {}, dialog, javaError, initialized, changeShowRecorderMessageValue } = this.props;
@@ -444,6 +448,7 @@ export default class Workbench extends Component<Props> {
               { ...dialog['DIALOG_INCORECT_CHROME_DRIVER_VERSION'] }
               onSubmit={ this.chromeDrivers_onSubmit }
               onCancel={ this.chromeDrivers_onCancel }
+              onNoChromeDriverSubmit={ this.chromeDrivers_onNoChromeDriverSubmit }
             />
           }
           { dialog.DIALOG_DOWNLOADING_CHROME_DRIVER && dialog.DIALOG_DOWNLOADING_CHROME_DRIVER.visible &&

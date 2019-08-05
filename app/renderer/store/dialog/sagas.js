@@ -9,6 +9,7 @@ import { success, failure, successOrFailure } from '../../helpers/redux';
 export default function* root() {
     yield all([
         takeLatest(ActionTypes.DIALOG_START_DOWNLOAD_CHROME_DRIVER, startDownloadChromeDriver),
+        takeLatest(ActionTypes.DIALOG_SHOW_DOWNLOADING_CHROME_DRIVER_FAILED, showDownloadChromeDriverFailed),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
         takeLatest('SELENIUM_RUNTIME_ERROR', handleSeleniumRuntimeError)
     ]);
@@ -47,9 +48,21 @@ export function* startDownloadChromeDriver({ payload }) {
             }
         } catch(e){
             console.warn('startDownloadChromeDriver error in saga', e);
+            const path = yield services.mainIpc.call('SeleniumService', 'getDriversRootPath');
+            if(path){
+                yield put(actions.hideDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER));
+                yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED, {path}));
+            }
         }
     }
     
+}
+
+function* showDownloadChromeDriverFailed(){
+    const path = yield services.mainIpc.call('SeleniumService', 'getDriversRootPath');
+    if(path){
+        yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED, {path}));
+    }
 }
 
 function* handleSeleniumServiceEvent(event) {
@@ -75,7 +88,9 @@ function* handleSeleniumRuntimeError(event) {
         } = result;
 
         if(error && chromeDriverVersion && chromeVersion){
-            yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, {chromeDriverVersion, chromeVersion}));
+             yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, {chromeDriverVersion, chromeVersion}));
+        } else if(error && chromeVersion){
+            yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, { chromeVersion }));
         }
     }
 }
