@@ -138,13 +138,15 @@ export default class SeleniumService extends ServiceBase {
                 result.error = false;
                 
             } else {
+                console.log('Not Found matching ChromeDriver at ' + chromedriver);
                 result.error = true;
             }
-
-            return result;
         } catch (e) {
-            console.warn('Failure setting up ChromeDriver', e);
+            console.log('Failure setting up ChromeDriver', e);
+            result.error = true;
         }
+
+        return result;
     }
 
 
