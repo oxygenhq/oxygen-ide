@@ -14,7 +14,7 @@ export default class ChromeDriverDownloadingSuccessDialog extends PureComponent 
             <Modal
                 className="hide-x-button"
                 success
-                width={400}
+                width={490}
                 visible={true}
                 footer={(
                     <Fragment>

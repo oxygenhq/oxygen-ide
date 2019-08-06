@@ -29,9 +29,10 @@ export default class ChromeDriverDownloadingFailedDialog extends PureComponent {
 
         return (
             <Modal
+                title="Unable to download the driver"
                 className="hide-x-button"
                 success
-                width={400}
+                width={490}
                 visible={true}
                 footer={(
                     <Fragment>
@@ -43,11 +44,8 @@ export default class ChromeDriverDownloadingFailedDialog extends PureComponent {
                         </Button>
                     </Fragment>
                 )}
-
-            >  
+            >
                 <div>
-                    <h3>{`Unable to download the driver.`}</h3>
-
                     <p>{`Download the appropriate driver for your version of Chrome from`} <a href='https://chromedriver.chromium.org/downloads' onClick={this.processLink}>here.</a></p>
                     <p>{`Extract the archive.`}</p>
                     <p>{`Place the ChromeDriver executable directly into ${path}`}</p>

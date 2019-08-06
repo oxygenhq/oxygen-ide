@@ -9,7 +9,7 @@ export default class ChromeDriverDownloadingDialog extends PureComponent {
         return (
             <Modal
                 className="hide-x-button"
-                width={400}
+                width={490}
                 visible={true}
                 footer={null}
             >

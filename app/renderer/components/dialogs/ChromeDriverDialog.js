@@ -27,8 +27,9 @@ export default class ChromeDriverDialog extends PureComponent {
 
         return (
             <Modal
-                title="ChromeDriver error"
-                width={400}
+                title="ChromeDriver Error"
+                className="hide-x-button"
+                width={490}
                 visible={true}
                 footer={(
                     <Fragment>
