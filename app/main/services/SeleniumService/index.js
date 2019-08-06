@@ -463,7 +463,7 @@ export default class SeleniumService extends ServiceBase {
                 // chmod +x on POSIX
                 if (process.platform !== 'win32') {
                     console.log('chmod +x ' + driverBin);
-                    fs.chmod(driverBin, mode, err => {
+                    fs.chmod(driverBin, fs.constants.S_IXUSR | fs.constants.S_IXGRP, err => {
                         if (err) {
                             console.log('fs.chmod error', err);
                             resolve(err);
