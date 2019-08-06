@@ -195,8 +195,8 @@ export default class SeleniumService extends ServiceBase {
             geckodriver = 'linux/geckodriver';
         }
     
-        selArgs.unshift(`-Dwebdriver.chrome.driver=${chromedriver}`);
-        selArgs.unshift(`-Dwebdriver.gecko.driver=${geckodriver}`);
+        selArgs.unshift(`-Dwebdriver.chrome.driver="${chromedriver}"`);
+        selArgs.unshift(`-Dwebdriver.gecko.driver="${geckodriver}"`);
     
         if (process.platform === 'win32') {
             selArgs.unshift('-Dwebdriver.ie.driver=win32/IEDriverServer_x86.exe');
@@ -417,7 +417,7 @@ export default class SeleniumService extends ServiceBase {
                             }
                             resolve(zipPath);
                         });
-                    }                         
+                    }
                 }).catch(err => {
                     console.log('fetchChromeDriver fetch error', err);
                     resolve(err);
@@ -425,8 +425,8 @@ export default class SeleniumService extends ServiceBase {
             } catch(error){
                 console.log('fetchChromeDriver error', error);
                 resolve(error);
-            }    
-        });  
+            }
+        });
     }
 
     decompressZip(driverVersion, zipPath){
