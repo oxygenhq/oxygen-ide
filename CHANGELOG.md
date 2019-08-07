@@ -1,6 +1,7 @@
 # CHANGELOG
 
-## v1.8.0 (2019-07-30)
+## v1.8.0 (2019-08-07)
+* Added mechanism for ChromeDriver version management.
 * Allow setting/removing breakpoint after the test has been already started.
 * Allow setting breakpoints in unsaved files.
 * Scroll log window when new content is added.
