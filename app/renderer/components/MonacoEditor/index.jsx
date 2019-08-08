@@ -323,9 +323,11 @@ export default class MonacoEditor extends React.Component {
         const ln = position.lineNumber;
         editor.setSelection(new monaco.Selection(1, 2, 1, 2));
         editor.focus();
+
+        const marker = helpers.getBreakpointMarker(editor, ln);
+
         // if user clicks on line-number panel, handle it as adding or removing a breakpoint at this line
         if (editor.getModel().getLineContent(ln).trim().length > 0) {
-          let marker = helpers.getBreakpointMarker(editor, ln);
           if (!marker) {
             if (helpers.addBreakpointMarker(editor, ln, this.props.fontSize)) {
               this.addLnToLnArray(ln);
@@ -339,7 +341,14 @@ export default class MonacoEditor extends React.Component {
             }
           }
         } else {
-          console.warn('Breakpoint cannot be set at the empty line.')
+          if(!marker){
+            console.warn('Breakpoint cannot be added at the empty line.')
+          } else {
+            if (helpers.removeBreakpointMarker(editor, ln)) {
+              this.removeLnfromLnArray(ln);
+              this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+            }
+          }
         }
       }
     });
