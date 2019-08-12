@@ -12,6 +12,7 @@ import * as types from './types';
 const FONT_SIZE_MIN = 12;
 const FONT_SIZE_MAX = 36;
 const SAUCELABS_HUB_DEFAULT_URL = 'https://ondemand.saucelabs.com:443/wd/hub';
+const TESTINGBOT_HUB_DEFAULT_URL = 'https://hub.testingbot.com/wd/hub';
 
 const defaultAppSettings = {
   cache: null,
@@ -24,6 +25,14 @@ const defaultAppSettings = {
       accessKey: null,
       extendedDebugging: false,
       capturePerformance: false,
+      inUse: false,
+    },
+    testingBot: {
+      title: 'TestingBot',
+      url: TESTINGBOT_HUB_DEFAULT_URL,
+      key: null,
+      secret: null,
+      extendedDebugging: false,
       inUse: false,
     }
   },
