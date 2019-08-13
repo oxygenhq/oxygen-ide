@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ try{
   const gotTheLock = app.requestSingleInstanceLock()
   
   if (!gotTheLock) {
-    app.quit()
+    app.exit()
   } else {
     app.on('second-instance', (event, commandLine, workingDirectory) => {
       // Someone tried to run a second instance, we should focus our window.
@@ -154,7 +154,7 @@ app.on('ready', async () => {
 function disposeMainAndQuit() {
   if (mainProc) {
     // dispose main process and all its services
-    mainProc.dispose().then(() => app.quit());
+    mainProc.dispose().then(() => app.exit());
     // make sure we set mainProc to null to prevent duplicated calls to this function
     mainProc = null;
   }
