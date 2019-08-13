@@ -122,6 +122,76 @@ class CloudProvidersDialog extends PureComponent<Props> {
       }
     });
   }
+
+  onChangeTestingBotUrl(value) {
+    const { providers = {} } = this.state || {};
+    const { testingBot = {} } = providers;
+    this.setState({
+      providers: {
+        ...this.state.providers,
+        testingBot: {
+          ...this.state.providers.testingBot,
+          url: value,
+        }
+      }
+    });
+  }
+
+  onChangeTestingBotKey(value) {
+    const { providers = {} } = this.state || {};
+    const { testingBot = {} } = providers;
+    this.setState({
+      providers: {
+        ...this.state.providers,
+        testingBot: {
+          ...this.state.providers.testingBot,
+          key: value,
+        }
+      }
+    });
+  }
+
+  onChangeTestingBotSecret(value) {
+    const { providers = {} } = this.state || {};
+    const { testingBot = {} } = providers;
+    this.setState({
+      providers: {
+        ...this.state.providers,
+        testingBot: {
+          ...this.state.providers.testingBot,
+          secret: value,
+        }
+      }
+    });
+  }
+
+  onChangeTestingBotExtendedDebugging(value) {
+    const { providers = {} } = this.state || {};
+    const { testingBot = {} } = providers;
+    this.setState({
+      providers: {
+        ...this.state.providers,
+        testingBot: {
+          ...this.state.providers.testingBot,
+          extendedDebugging: value,
+        }
+      }
+    });
+  }
+
+  onUseTestingBotChange(value) {
+    const { providers = {} } = this.state || {};
+    const { testingBot = {} } = providers;
+    this.setState({
+      providers: {
+        ...this.state.providers,
+        testingBot: {
+          ...this.state.providers.testingBot,
+          inUse: value,
+        }
+      }
+    });
+  }
   
   handleOk() {
     const { providers } = this.state;
@@ -143,7 +213,8 @@ class CloudProvidersDialog extends PureComponent<Props> {
       providers = {}
     } = this.state;
     const {
-      sauceLabs = {}
+      sauceLabs = {},
+      testingBot = {}
     } = providers;
     // form layout settings
     const formItemLayout = {
@@ -165,6 +236,9 @@ class CloudProvidersDialog extends PureComponent<Props> {
           <Form>
             <Form.Item label="Sauce Labs" {...formItemLayout} extra="Use Sauce Labs to run your tests in cloud." >
               <Switch onChange={ ::this.onUseSauceLabsChange } checked={ sauceLabs.inUse } />
+            </Form.Item>
+            <Form.Item label="TestingBot" {...formItemLayout} extra="Use TestingBot to run your tests in cloud." >
+              <Switch onChange={ ::this.onUseTestingBotChange } checked={ testingBot.inUse } />
             </Form.Item>
             { sauceLabs && sauceLabs.inUse &&
               <Fragment>
@@ -190,6 +264,34 @@ class CloudProvidersDialog extends PureComponent<Props> {
                   <Checkbox
                     checked={ sauceLabs.extendedDebugging || false }
                     onChange={ (e) => ::this.onChangeSauceLabsExtendedDebugging(e.target.checked) }
+                  />
+                </Form.Item>
+              </Fragment>
+            }
+            { testingBot && testingBot.inUse &&
+              <Fragment>
+                <Form.Item label="Cloud URL" {...formItemLayout} >
+                  <Input
+                    value={ testingBot.url }
+                    onChange={ (e) => ::this.onChangeTestingBotUrl(e.target.value) }
+                  />
+                </Form.Item>
+                <Form.Item label="Key" {...formItemLayout} >
+                  <Input
+                    value={ testingBot.key }
+                    onChange={ (e) => ::this.onChangeTestingBotKey(e.target.value) }
+                  />
+                </Form.Item>
+                <Form.Item label="Secret" {...formItemLayout} >
+                  <Input
+                    value={ testingBot.secret }
+                    onChange={ (e) => ::this.onChangeTestingBotSecret(e.target.value) }
+                  />
+                </Form.Item>
+                <Form.Item label="Extended Debugging" {...formItemLayout} >
+                  <Checkbox
+                    checked={ testingBot.extendedDebugging || false }
+                    onChange={ (e) => ::this.onChangeTestingBotExtendedDebugging(e.target.checked) }
                   />
                 </Form.Item>
               </Fragment>

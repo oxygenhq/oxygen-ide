@@ -108,6 +108,12 @@ export default class TestRunnerService extends ServiceBase {
                     caps.accessKey = testProvider.accessKey;
                     caps.extendedDebugging = testProvider.extendedDebugging || false;
                     caps.capturePerformance = testProvider.capturePerformance || false;
+                case 'testingBot':
+                    options.seleniumUrl = testProvider.url;
+                    caps.name = testName || null;
+                    caps.key = testProvider.key;
+                    caps.secret = testProvider.secret;
+                    caps.extendedDebugging = testProvider.extendedDebugging || false;
             }
         }
                 
