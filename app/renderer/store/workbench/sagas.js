@@ -640,12 +640,11 @@ export function* showDialog({ payload }) {
         const paths = yield call(services.mainIpc.call, 'ElectronService', 'showOpenFolderDialog', []);
 
         if (paths && Array.isArray(paths) && paths.length > 0) {
-
             const path = paths[0];
             const splitResult = path.split('\\');
 
             if(splitResult && splitResult.length === 2 && !splitResult[1]){
-                alert('Sorry, we don\'t support open full disc, please select some folder');
+                alert('Sorry, we don\'t support opening root disks. Please select a folder.');
             } else {
                 yield openFolder({ payload: { path: paths[0] }});
             }
@@ -656,7 +655,7 @@ export function* showDialog({ payload }) {
         if (paths && Array.isArray(paths) && paths.length > 0) {
             for (let path of paths) {
                 yield put(wbActions.openFile(path));
-            }            
+            }
         }
     }
     else {
