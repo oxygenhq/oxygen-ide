@@ -226,6 +226,7 @@ class CloudProvidersDialog extends PureComponent<Props> {
     return (
       <Modal
         title={`Cloud Providers`}
+        className="scroll-y"
         okText="Save &amp; Close"
         width={700}
         visible={visible}
@@ -241,7 +242,8 @@ class CloudProvidersDialog extends PureComponent<Props> {
               <Switch onChange={ ::this.onUseTestingBotChange } checked={ testingBot.inUse } />
             </Form.Item>
             { sauceLabs && sauceLabs.inUse &&
-              <Fragment>
+              <div className="cloud-providers-form-wrap cloud-providers-form-wrap-margin-bottom">
+                <Form.Item label="Sauce Labs settings" {...formItemLayout}/>
                 <Form.Item label="Device Cloud URL" {...formItemLayout} >
                   <Input
                     value={ sauceLabs.url }
@@ -266,10 +268,11 @@ class CloudProvidersDialog extends PureComponent<Props> {
                     onChange={ (e) => ::this.onChangeSauceLabsExtendedDebugging(e.target.checked) }
                   />
                 </Form.Item>
-              </Fragment>
+              </div>
             }
             { testingBot && testingBot.inUse &&
-              <Fragment>
+              <div className="cloud-providers-form-wrap">
+                <Form.Item label="TestingBot settings" {...formItemLayout}/>
                 <Form.Item label="Cloud URL" {...formItemLayout} >
                   <Input
                     value={ testingBot.url }
@@ -294,7 +297,7 @@ class CloudProvidersDialog extends PureComponent<Props> {
                     onChange={ (e) => ::this.onChangeTestingBotExtendedDebugging(e.target.checked) }
                   />
                 </Form.Item>
-              </Fragment>
+              </div>
             }
           </Form>
       </Modal>
