@@ -9,9 +9,9 @@
 // @flow
 export type CloudProvider = {
     id: string,
-    title: string,
-    url: string,
-    username: string | null,
-    accessKey: string | null,
+    title: string | null | void,
+    url: string | void,
+    username: string | null | void,
+    accessKey: string | null | void,
     inUse: boolean,
 };
