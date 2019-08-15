@@ -146,6 +146,7 @@ module.exports = function(grunt) {
                                         'renderer/index.js',
                                         'main/main.prod.*',
                                         'main/config.json',
+                                        'main/sentry.js',
                                         'package.json'],
                         dest: OUTDIR + RESOURCES + '/app' 
                     }
