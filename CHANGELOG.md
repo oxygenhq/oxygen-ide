@@ -1,9 +1,9 @@
 # CHANGELOG
 
-## v1.9.0 (2019-08-xx)
-* Added TestingBot as cloud provider (on behalf of jochen).
+## v1.9.0 (2019-08-15)
+* Added TestingBot as cloud provider [on behalf of jochen].
 * Prevent crash when relaunching the IDE while it's already running in the background.
-* Fixed break points not being removed from empty lines.
+* Fixed not being able to remove breakpoints from empty lines.
 * Other minor fixes.
 
 ## v1.8.0 (2019-08-07)
