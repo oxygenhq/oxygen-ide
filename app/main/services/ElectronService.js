@@ -17,7 +17,7 @@ export default class ElectronService extends ServiceBase {
     constructor(mainWindow) {
         super(mainWindow);
     }
-    
+
     addFile(key, name, content = ''){
         const settings = appSettings.get('appSettings');
 

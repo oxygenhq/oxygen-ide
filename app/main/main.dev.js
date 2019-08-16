@@ -37,6 +37,7 @@ try {
   ) {
     // dev mode
     // ignore sentry logging
+    initializeCrashReporterAndSentry();
   } else {
     initializeCrashReporterAndSentry();
   }
@@ -65,6 +66,10 @@ try{
 } catch(e){
   alert('Please, open later (2 sec)');
   console.log(e);
+
+  if(Sentry && Sentry.captureException){
+    Sentry.captureException(e);
+  }
 }
 
 if (process.env.NODE_ENV === 'production') {
@@ -117,8 +122,7 @@ app.on('ready', async () => {
     width: 1024,
     height: 728,
     webPreferences: {
-      webSecurity: false,
-      preload: path.join(__dirname, 'sentry.js')
+      webSecurity: false
     },
   });
 
@@ -146,6 +150,11 @@ app.on('ready', async () => {
   try{
     mainProc = new MainProcess(mainWindow);
   } catch(e){
+    
+    if(Sentry && Sentry.captureException){
+      Sentry.captureException(e);
+    }
+    
     console.log('e', e);
   }
 });
@@ -185,7 +194,7 @@ function initializeCrashReporterAndSentry() {
     submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f',
     uploadToServer: true
   });
-  // initialize Sentry
-  Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
+   // initialize Sentry
+   Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
 }
 

@@ -24,6 +24,10 @@ export default merge.smart(baseConfig, {
   },
 
   plugins: [
+    new webpack.DefinePlugin({
+      'process.type': '"browser"'
+    }),
+    
     new UglifyJSPlugin({
       parallel: true,
       sourceMap: true

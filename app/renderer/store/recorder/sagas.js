@@ -15,6 +15,7 @@ import { success, failure, successOrFailure } from '../../helpers/redux';
 import * as recorderActions from './actions';
 import * as editorActions from '../editor/actions';
 import * as wbActions from '../workbench/actions';
+import { reportError } from '../sentry/actions';
 import ActionTypes from '../types';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 
@@ -23,7 +24,6 @@ const services = ServicesSingleton();
 
 let lastExtensionTime = 0;
 let canRecord = false;
-let stopWaitChromeExtension = false;
 let waitChromeExtension = true;
 
 const timer = () => {
@@ -70,7 +70,7 @@ export default function* root() {
       takeLatest(ActionTypes.RECORDER_STOP, stopRecorder),
       takeLatest(ActionTypes.RECORDER_START_WATCHER, startRecorderWatcher),
       takeLatest(success(ActionTypes.WB_CLOSE_FILE), wbCloseFileSuccess),
-      takeLatest('MAIN_SERVICE_EVENT', handleServiceEvents),
+      takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
       takeLatest('RECORDER_SERVICE_ADD_STEP', recorderAddStep),
       takeLatest('RESET', initialize)
     ]);
@@ -80,7 +80,6 @@ export default function* root() {
 export function* initialize() {
     lastExtensionTime = 0;
     canRecord = false;
-    stopWaitChromeExtension = false;
     waitChromeExtension = true;
 
     if(window.intervalId){
@@ -245,6 +244,7 @@ function* handleRequest(payload) {
             ])
         }    
     } catch(e) {
+        yield put(reportError(e));
         console.log('e', e);
     }
 }

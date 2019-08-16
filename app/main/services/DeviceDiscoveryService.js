@@ -10,6 +10,7 @@ import ADB from 'appium-adb';
 import { instrumentsUtils } from 'appium-ios-driver';
 import ServiceBase from './ServiceBase';
 import cp from 'child_process';
+import * as Sentry from '@sentry/electron';
 
 const DEVICE_CONNECTED = 'DEVICE_CONNECTED';
 const DEVICE_DISCONNECTED = 'DEVICE_DISCONNECTED';
@@ -135,6 +136,8 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
             // if adb could not be found then stop the service as there is no point running it again
             if (e.message && e.message.startsWith("Could not find 'adb")) {
                 this.adbPresent = false;
+            } else {
+                Sentry.captureException(e);
             }
         }
     };
@@ -206,6 +209,7 @@ export default class DeviceDiscoveryService2 extends ServiceBase {
         }
         catch (e) {
             console.warn('Unable to retrieve iOS device list.', e);
+            Sentry.captureException(e);
         }
     };
     

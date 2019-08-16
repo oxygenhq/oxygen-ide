@@ -1,0 +1,1 @@
+export const UNIVERSAL_ERROR = 'UNIVERSAL_ERROR';
