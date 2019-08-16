@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,10 +10,8 @@ import { util, Runner } from 'oxygen-cli';
 import path from 'path';
 import moment from 'moment';
 import detectPort from 'detect-port';
-import cfg from '../config.json';
 import ServiceBase from "./ServiceBase";
 
-const { selenium } = cfg;
 const oxutil = util;
 
 // Events
@@ -56,9 +54,8 @@ export default class TestRunnerService extends ServiceBase {
         const filename = path.basename(this.mainFilePath, '.js');
         const testConfig = {
             testName: filename,
-            seleniumPort: selenium.port,    // this is default selenium port, found in config file
             dbgPort: await detectPort(10205),
-            ...runtimeSettings,             // selenium port can also come from runtime setttings (over)
+            ...runtimeSettings,
         };
         const {
             paramFilePath, 
@@ -66,7 +63,7 @@ export default class TestRunnerService extends ServiceBase {
             iterations,
             reopenSession,
             dbgPort,
-            testMode,            
+            testMode,
             testTarget,
             testProvider,
             seleniumPort,
