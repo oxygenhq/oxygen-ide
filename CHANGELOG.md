@@ -1,9 +1,10 @@
 # CHANGELOG
 
-## v1.9.0 (2019-08-15)
+## v1.9.0 (2019-08-19)
 * Added TestingBot as cloud provider [on behalf of jochen].
 * Prevent crash when relaunching the IDE while it's already running in the background.
 * Fixed not being able to remove breakpoints from empty lines.
+* Bundle ChromeDriver v77.
 * Other minor fixes.
 
 ## v1.8.0 (2019-08-07)
