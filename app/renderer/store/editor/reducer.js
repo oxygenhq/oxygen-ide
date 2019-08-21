@@ -25,7 +25,7 @@ const DEFAULT_OPEN_FILE_STATE = {
 
 export default (state = DEFAULT_STATE, action) => {
   const { file, name, path, newPath, line, time , cache, doUnknown } = action.payload || {};
-  let _openFilesClone, _newActiveFile;
+  let _openFilesClone, _newActiveFile, _newActiveFileName;
 
   switch (action.type) {
     // SET_ACTIVE_LINE
@@ -113,11 +113,11 @@ export default (state = DEFAULT_STATE, action) => {
     }
 
     // CLOSE_FILE
-    case types.EDITOR_CLOSE_FILE: {
+    case types.EDITOR_CLOSE_FILE: {   
       _openFilesClone = {};
       for (let filePath of Object.keys(state.openFiles)) {
         if(path === "unknown"){
-          if (filePath !== path+name) {
+          if ((filePath !== path+name) && (filePath !== name)) {
             _openFilesClone[filePath] = state.openFiles[filePath];
           }
         } else {
@@ -127,32 +127,54 @@ export default (state = DEFAULT_STATE, action) => {
         }
       }
       _newActiveFile = state.activeFile;
+      _newActiveFileName = state.activeFileName;
       // make sure we select another file, if active file has been closed
+
+      let newActiveFile = state.activeFile;
+
       if(path === "unknown"){
         if (path === state.activeFile && name === state.activeFileName) {
           const fileKeys = Object.keys(_openFilesClone);
-          _newActiveFile = fileKeys.length > 0 ? fileKeys[fileKeys.length - 1] : null;
+          newActiveFile = fileKeys.length > 0 ? fileKeys[fileKeys.length - 1] : null;
         }
       } else {
         if (path === state.activeFile) {
           const fileKeys = Object.keys(_openFilesClone);
-          _newActiveFile = fileKeys.length > 0 ? fileKeys[fileKeys.length - 1] : null;
+          newActiveFile = fileKeys.length > 0 ? fileKeys[fileKeys.length - 1] : null;
         }
+      }
+      if(
+        (newActiveFile && 
+        newActiveFile.startsWith && 
+        newActiveFile.startsWith("unknown")) || 
+        (newActiveFile && 
+        newActiveFile.endsWith && 
+        newActiveFile.endsWith('(deleted from disk)'))
+      ){
+        _newActiveFile = "unknown";
+        _newActiveFileName = newActiveFile;
+      } else {
+        _newActiveFile = newActiveFile;
+        _newActiveFileName = null;
       }
 
       const newState = { 
         ...state, 
         openFiles: _openFilesClone,
         activeFile: _newActiveFile,
+        activeFileName: _newActiveFileName
       };
       return newState;
     }
 
     // RENAME_FILE
     case types.EDITOR_RENAME_FILE: {
+
+
       let result;
       if (!state.openFiles.hasOwnProperty(path)) {
         result = state;
+        return result;
       }
       _openFilesClone = {
         ...state.openFiles,
@@ -163,24 +185,35 @@ export default (state = DEFAULT_STATE, action) => {
       _openFilesClone[newPath] = {
         ...DEFAULT_OPEN_FILE_STATE,
       };
-
+      
       if(doUnknown){
+
         // update activeFile if its path has changed
-        _newActiveFile = state.activeFile !== path ? state.activeFile : newPath;
+        if(state.activeFile === path){
+          _newActiveFile = 'unknown';
+          _newActiveFileName = newPath;
+        } else {
+          _newActiveFile = state.activeFile;
+          _newActiveFileName = state.activeFileName;
+        }
+        
         result = {
           ...state,
-          activeFile: 'unknown',
-          activeFileName: _newActiveFile,
+          activeFile: _newActiveFile,
+          activeFileName: _newActiveFileName,
           openFiles: _openFilesClone,
         };
+        
       } else {
         // update activeFile if its path has changed
         _newActiveFile = state.activeFile !== path ? state.activeFile : newPath;
         result = {
           ...state,
           activeFile: _newActiveFile,
+          activeFileName: null,
           openFiles: _openFilesClone,
         };
+        
       }
 
       return result;

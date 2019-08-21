@@ -39,6 +39,13 @@ export const restoreFromCache = (cache) => {
   };
 };
 
+export const _restoreFromCache_Success = () => {
+  return {
+    type: success('FROM_CACHE'),
+    payload: {},
+  };
+}
+
 export const setJavaError = (error) => {
   return {
     type: ActionTypes.WB_SET_JAVA_ERROR,
@@ -308,11 +315,12 @@ export const onTabChange = (key, name = null) => {
   };
 };
 /* onContentUpdate */
-export const onContentUpdate = (path, content, name = null) => ({
-  type: ActionTypes.WB_ON_CONTENT_UPDATE,
-  payload: { path, content, name },
-})
-
+export const onContentUpdate = (path, content, name = null) => {
+  return {
+    type: ActionTypes.WB_ON_CONTENT_UPDATE,
+    payload: { path, content, name },
+  }
+}
 /* showContextMenu */
 export const showContextMenu = (type, event = null, node = null) => ({
   type: ActionTypes.WB_SHOW_CONTEXT_MENU,

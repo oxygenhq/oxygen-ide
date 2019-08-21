@@ -21,7 +21,7 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { path, step, value, cache, name } = payload;
+  const { path, step, steps, value, cache, name } = payload;
 
   switch (action.type) {
     case ActionTypes.RECORDER_STOP_WAIT_CHROME_EXTENSION : {
@@ -86,6 +86,16 @@ export default (state = defaultState, action) => {
         steps: [
           ...state.steps,
           step,
+        ],
+      };
+
+    // RECORDER_ADD_STEP
+    case ActionTypes.RECORDER_ADD_STEPS:
+      return {
+        ...state,
+        steps: [
+          ...state.steps,
+          ...steps,
         ],
       };
 

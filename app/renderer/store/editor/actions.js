@@ -53,7 +53,7 @@ export const setActiveFile = (path, name = null) => ({
 /* setActiveLine */
 export const setActiveLine = (time, path, line) => ({
   type: ActionTypes.EDITOR_SET_ACTIVE_LINE,
-  payload: { time: time || moment.utc().unix(), path, line },
+  payload: { time: time || moment.utc().valueOf(), path, line },
 });
 
 /* setActiveLine */

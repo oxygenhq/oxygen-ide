@@ -8,7 +8,7 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import _ from 'lodash';
+import uniq from 'lodash.uniq';
 import FileExplorer from './FileExplorer';
 import * as actions from '../../store/fs/actions';
 import { showContextMenu } from '../../store/workbench/actions';
@@ -20,7 +20,7 @@ const mapStoreToProps = (state) => {
         state.fs.files.hasOwnProperty(state.fs.rootPath)
             ? state.fs.files[state.fs.rootPath].name
             : null,
-        treeData: _.uniq(state.fs.tree.data),
+        treeData: uniq(state.fs.tree.data),
         activeNodePath: state.fs.tree.activeNode,
         expandedKeys: state.fs.tree.expandedKeys,
         refreshScroll: state.fs.refreshScroll,

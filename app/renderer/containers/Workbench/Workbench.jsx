@@ -20,6 +20,12 @@ import ObjectFolderCreateDialog from '../../components/dialogs/ObjectFolderCreat
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
 import SettingsDialog from '../../components/dialogs/SettingsDialog';
 import NeedInstallExtension from '../../components/dialogs/NeedInstallExtension';
+import CloudProvidersDialog from '../../components/dialogs/CloudProvidersDialog';
+import ChromeDriverDialog from '../../components/dialogs/ChromeDriverDialog';
+import ChromeDriverDownloadingDialog from '../../components/dialogs/ChromeDriverDownloadingDialog';
+import ChromeDriverDownloadingSuccessDialog from '../../components/dialogs/ChromeDriverDownloadingSuccessDialog';
+import ChromeDriverDownloadingFailedDialog from '../../components/dialogs/ChromeDriverDownloadingFailedDialog';
+
 // Other components
 import TextEditor from '../TextEditor';
 import Tabs from '../Tabs';
@@ -67,6 +73,8 @@ export default class Workbench extends Component<Props> {
   constructor(props) {
     super(props);
 
+    this.on = false;
+
     this.handleTabChange = this.handleTabChange.bind(this);
     this.handleTabClose = this.handleTabClose.bind(this);
   }
@@ -92,6 +100,57 @@ export default class Workbench extends Component<Props> {
         alert('no stopRecorder');
       }  
     }
+    
+    if(this.elem && this.elem.removeEventListener){
+      this.elem.removeEventListener("keydown", this.keydownCallback);
+      this.elem.removeEventListener("keyup", this.keyupCallback);
+    }
+  }
+
+  componentDidUpdate(){
+    if(!this.elem){
+      this.elem = document.getElementById('editors-container-wrap');
+
+      if(this.elem && this.elem.addEventListener){
+        this.elem.addEventListener("keydown", this.keydownCallback);
+        this.elem.addEventListener("keyup", this.keyupCallback);
+      }
+    }
+  }
+
+  keydownCallback = (e) => {
+    if(e.key === 'Control'){
+      if(!this.on){
+        e.stopPropagation()
+        this.elem.addEventListener('wheel', this.wheelCallback , true);
+        this.on = true;
+      }
+    }
+  }
+  
+  keyupCallback = (e) => {
+    if(e.key === 'Control'){
+      e.stopPropagation()
+      this.elem.removeEventListener('wheel',  this.wheelCallback , true)
+      this.on = false;
+    }
+  }
+
+  wheelCallback = (e) => {
+    e.stopPropagation();
+    
+    if(e && e.deltaY && e.deltaY < 0){
+      //up
+      if(this.props.zoomIn){
+        this.props.zoomIn();
+      }
+    }
+    if(e && e.deltaY && e.deltaY > 0){
+      //down
+      if(this.props.zoomOut){
+        this.props.zoomOut();
+      }
+    }
   }
 
   handleTabChange(key, name = null) {
@@ -106,8 +165,8 @@ export default class Workbench extends Component<Props> {
     this.props.onContentUpdate(path, content, name);
   }
 
-  handleBreakpointsUpdate(filePath, breakpoints) {
-    this.props.updateBreakpoints(filePath, breakpoints);
+  handleBreakpointsUpdate(filePath, breakpoints, name) {
+    this.props.updateBreakpoints(filePath, breakpoints, name);
   }
 
   handleSidebarResize(sidebar, newSize) {
@@ -120,10 +179,7 @@ export default class Workbench extends Component<Props> {
 
   handleToolbarButtonClick(ctrlId) {
     if (ctrlId === Controls.TEST_RUN) {     
-      
       const { editorActiveFile } = this.props;
-
-      console.log('editorActiveFile', editorActiveFile);
 
       if(editorActiveFile){
 
@@ -160,6 +216,9 @@ export default class Workbench extends Component<Props> {
     else if (ctrlId === Controls.OPEN_FOLDER) {
       this.props.showDialog('OPEN_FOLDER');
     }
+    else if (ctrlId === Controls.CLOUD_PROVIDER_SETTINGS) {
+      this.props.showDialog('DIALOG_CLOUD_PROVIDERS');
+    }
     else if (ctrlId === Controls.SAVE_FILE) {
       this.props.saveCurrentFile();
     }
@@ -185,12 +244,13 @@ export default class Workbench extends Component<Props> {
       //this.toggleSidebarVisible('right');
       this.props.showDialog('DIALOG_SETTINGS');
     }
-    console.log('handleToolbarButtonClick', ctrlId)
   }
 
   handleToolbarValueChange(ctrlId, value) {
     if (ctrlId === Controls.TEST_TARGET) {
-      this.props.setTestTarget(value);
+      if (value !== '-') {
+        this.props.setTestTarget(value);
+      }      
     }
     else if (ctrlId === Controls.TEST_STEP_DELAY) {
       // convert string value to number
@@ -199,15 +259,22 @@ export default class Workbench extends Component<Props> {
         intVal >= 0 && this.props.setStepDelay(intVal);
       }      
     }
+    else if (ctrlId === Controls.TEST_PROVIDER) {
+      this.props.setTestProvider(value);
+    }
   }
 
   getToolbarControlsState() {
     const { test, isRecording, settings, dialog } = this.props;
     const settingsDialogVisible = dialog.DIALOG_SETTINGS.visible;
+    const { test, isRecording, settings, dialog, editorActiveFile } = this.props;
     return {
       [Controls.TEST_RUN]: {
         visible: !test.isRunning,
-        enabled: !isRecording,
+        enabled: !isRecording && 
+                 !!editorActiveFile && 
+                 editorActiveFile.ext && 
+                 editorActiveFile.ext === ".js" 
       },
       [Controls.TEST_STOP]: {
         visible: test.isRunning,
@@ -219,7 +286,10 @@ export default class Workbench extends Component<Props> {
         selected: isRecording,
       },
       [Controls.TEST_SETTINGS]: {
-        selected: settingsDialogVisible,
+        selected: false,
+      },
+      [Controls.CLOUD_PROVIDER_SETTINGS]: {
+        selected: false,
       },
     };
   }
@@ -313,9 +383,40 @@ export default class Workbench extends Component<Props> {
   settingsDialog_onCancel() {
     this.props.hideDialog('DIALOG_SETTINGS');
   }
+  // Cloud Providers
+  providersDialog_onSubmit(providers) {
+    this.props.hideDialog('DIALOG_CLOUD_PROVIDERS');
+    this.props.updateCloudProvidersSettings(providers);    
+  }
+  providersDialog_onCancel() {
+    this.props.hideDialog('DIALOG_CLOUD_PROVIDERS');
+  }
+
+  chromeDrivers_onSubmit = (chromeDriverVersion) => {
+    this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
+    this.props.startDownloadChromeDriver(chromeDriverVersion);
+  }
+
+  chromeDrivers_onCancel = () => {
+    this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
+  }
+
+  chromeDriversSuccess_onClose = () => {
+    this.props.hideDialog('DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS');
+  }
+
+  chromeDriversFailed_onClose = () => {
+    this.props.hideDialog('DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED');
+  }
+  
+  chromeDrivers_onNoChromeDriverSubmit = () => {
+    this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
+    this.props.showDownloadChromeDriverError();
+  }
 
   render() {
-    const { test, settings, dialog, javaError, initialized, changeShowRecorderMessageValue } = this.props;
+    const { test, settings = {}, dialog, javaError, initialized, changeShowRecorderMessageValue } = this.props;
+    const { cloudProviders = {} } = settings;
     const { runtimeSettings } = test;
     // sidebars state
     const leftSidebarSize = settings.sidebars.left.size;
@@ -327,6 +428,18 @@ export default class Workbench extends Component<Props> {
     const loggerVisible = settings.logger.visible;
     const showLanding = settings.showLanding;
     const showRecorderMessage = settings.showRecorderMessage;
+
+    // convert providers dictionary to an array - add only providers marked as 'in use'
+    const providers = [];
+    for (let providerKey of Object.keys(cloudProviders)) {
+      const provider = cloudProviders[providerKey];
+      if (provider.inUse) {
+        providers.push({
+          ...cloudProviders[providerKey],
+          id: providerKey
+        });
+      }      
+    }
     
     if(!initialized){
       return (
@@ -374,6 +487,31 @@ export default class Workbench extends Component<Props> {
               onCancel={ ::this.fileCreateDialog_onCancel } 
             />
           }
+          { dialog.DIALOG_INCORECT_CHROME_DRIVER_VERSION && dialog.DIALOG_INCORECT_CHROME_DRIVER_VERSION.visible &&
+            <ChromeDriverDialog
+              { ...dialog['DIALOG_INCORECT_CHROME_DRIVER_VERSION'] }
+              onSubmit={ this.chromeDrivers_onSubmit }
+              onCancel={ this.chromeDrivers_onCancel }
+              onNoChromeDriverSubmit={ this.chromeDrivers_onNoChromeDriverSubmit }
+            />
+          }
+          { dialog.DIALOG_DOWNLOADING_CHROME_DRIVER && dialog.DIALOG_DOWNLOADING_CHROME_DRIVER.visible &&
+            <ChromeDriverDownloadingDialog
+              { ...dialog['DIALOG_DOWNLOADING_CHROME_DRIVER'] }
+            />
+          }
+          { dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS && dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS.visible &&
+            <ChromeDriverDownloadingSuccessDialog
+              { ...dialog['DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS'] }
+              onClose={ this.chromeDriversSuccess_onClose  }
+            />
+          }
+          { dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED && dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED.visible &&
+            <ChromeDriverDownloadingFailedDialog
+              { ...dialog['DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED'] }
+              onClose={ this.chromeDriversFailed_onClose  }
+            />
+          }
           <FileRenameDialog 
             { ...dialog['DIALOG_FILE_RENAME'] } 
             onSubmit={ ::this.fileRenameDialog_onSubmit }
@@ -390,20 +528,29 @@ export default class Workbench extends Component<Props> {
             onSubmit={ ::this.updateDialog_onSubmit }
             onCancel={ ::this.updateDialog_onCancel }
           />
+          <CloudProvidersDialog
+            { ...dialog['DIALOG_CLOUD_PROVIDERS'] }
+            providers={ cloudProviders }
+            onSubmit={ ::this.providersDialog_onSubmit }
+            onCancel={ ::this.providersDialog_onCancel }
+          />
         </Fragment>
         }
         {updateModals.call(this)}
         <Toolbar
+          testRunning={ test.isRunning }
           canRecord={ this.props.canRecord }
           isChromeExtensionEnabled={ this.props.isChromeExtensionEnabled }
           waitChromeExtension={ this.props.waitChromeExtension }
           stopWaitChromeExtension={ this.props.stopWaitChromeExtension }
           testMode={ runtimeSettings.testMode }
           testTarget={ runtimeSettings.testTarget }
+          testProvider={ runtimeSettings.testProvider }
           stepDelay={ runtimeSettings.stepDelay }
           devices={ test.devices }
           browsers={ test.browsers }
           emulators={ test.emulators }
+          providers={ providers }
           showRecorderMessage={ showRecorderMessage }
           changeShowRecorderMessageValue={ changeShowRecorderMessageValue }
           controlsState={ this.getToolbarControlsState() } 

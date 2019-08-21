@@ -81,7 +81,13 @@ export default class MainIpcService {
         if (!store || !event) {
             return;
         }
-        if (event.type === 'LOG_ENTRY') {
+        if (event && event.event && event.event.type === 'RECORDER_EVENT') {
+            store.dispatch({
+                type: 'RECORDER_SERVICE_ADD_STEP',
+                payload: { ...event },
+            });    
+        }
+        else if (event.type === 'LOG_ENTRY') {
             store.dispatch({
                 type: 'MAIN_SERVICE_LOG',
                 payload: { ...event },

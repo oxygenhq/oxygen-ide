@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +18,31 @@
  *
  * @flow
  */
+
 import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
+
 import Logger from './Logger';
 import MainProcess from './MainProcess';
 import * as Sentry from '@sentry/electron';
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-crashReporter.start({
-  companyName: 'no-company-nc',
-  productName: 'ide',
-  ignoreSystemCrashHandler: true,
-  submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f'
-});
-
-Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
-
+try {
+  if (
+    typeof process !== 'undefined' && 
+    process && 
+    process.env && 
+    process.env.NODE_ENV && 
+    process.env.NODE_ENV === 'development'
+  ) {
+    // dev mode
+    // ignore sentry logging
+  } else {
+    initializeCrashReporterAndSentry();
+  }
+} catch(e){
+  console.warn('Cannot initialize CrashReporter and Sentry', e);
+}
 global.log = new Logger('debug', 'info');
 
 let mainWindow = null;
@@ -42,7 +52,7 @@ try{
   const gotTheLock = app.requestSingleInstanceLock()
   
   if (!gotTheLock) {
-    app.quit()
+    app.exit()
   } else {
     app.on('second-instance', (event, commandLine, workingDirectory) => {
       // Someone tried to run a second instance, we should focus our window.
@@ -64,7 +74,6 @@ if (process.env.NODE_ENV === 'production') {
 
 if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
   require('electron-debug')();
-  const path = require('path');
   const p = path.join(__dirname, 'node_modules');
   require('module').globalPaths.push(p);
 }
@@ -144,8 +153,39 @@ app.on('ready', async () => {
 function disposeMainAndQuit() {
   if (mainProc) {
     // dispose main process and all its services
-    mainProc.dispose().then(() => app.quit());
+    mainProc.dispose().then(() => app.exit());
     // make sure we set mainProc to null to prevent duplicated calls to this function
     mainProc = null;
   }
 }
+
+function initializeCrashReporterAndSentry() {
+  const crashesDirectory = crashReporter.getCrashesDirectory();
+  const completedDirectory = path.join(crashesDirectory, 'completed');
+  const newDirectory = path.join(crashesDirectory, 'new');
+  const pendingDirectory = path.join(crashesDirectory, 'pending');
+  // make sure crashesDirectory and its sub folders exist, otherwise we will get an error while initializing Sentry
+  if (!fs.existsSync(crashesDirectory)){
+    fs.mkdirSync(crashesDirectory);
+  }
+  if (!fs.existsSync(completedDirectory)){
+    fs.mkdirSync(completedDirectory);
+  }
+  if (!fs.existsSync(newDirectory)){
+    fs.mkdirSync(newDirectory);
+  }
+  if (!fs.existsSync(pendingDirectory)){
+    fs.mkdirSync(pendingDirectory);
+  }
+  // start CrashReporter
+  crashReporter.start({
+    companyName: 'no-company-nc',
+    productName: 'ide',
+    ignoreSystemCrashHandler: true,
+    submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f',
+    uploadToServer: true
+  });
+  // initialize Sentry
+  Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
+}
+

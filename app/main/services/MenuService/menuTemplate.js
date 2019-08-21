@@ -56,7 +56,7 @@ export default (cmdHandler, settings) => {
       accelerator: process.platform === 'darwin' ? 'Command+Q' : 'Alt+F4',
       click() {
         try {
-          app.quit();
+          app.exit();
         } catch (e) {
           console.warn(e.message);
         }

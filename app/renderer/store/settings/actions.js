@@ -46,6 +46,7 @@ export const changeCacheUsed = (value) => {
 
 /* Add file */
 export const addFile = (key,name, content=null) => {
+  console.log('!! addFile', key, name);
     return {
       type: types.TMP_ADD_FILE,
       payload: { key,name,content },
@@ -126,3 +127,8 @@ export const setLastSessionRootFolder = value => ({
   type: types.LAST_SESSION_SET_ROOT_FOLDER,
   payload: { value },
 });
+
+export const updateCloudProvidersSettings = providers => ({
+  type: types.UPDATE_CLOUD_PROVIDERS_SETTINGS,
+  payload: { providers }
+})

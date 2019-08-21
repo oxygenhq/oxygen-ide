@@ -10,9 +10,9 @@ export default class Initializing extends PureComponent {
       <div className="initializing-container">
         <div className="initializing-inner">
           <h1 className="initializing-title">
-            Initializing
+            Initializing...
           </h1>
-          <p className="initializing-text">(normaly less then minute)</p>
+          <p className="initializing-text">(Shouldn't take more than a minute)</p>
         </div>
       </div>
     )

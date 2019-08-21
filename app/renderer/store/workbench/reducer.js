@@ -30,7 +30,7 @@ export default (state = defaultState, action, dispatch) => {
     case ActionTypes.WB_SET_JAVA_ERROR:
       return {
         ...state,
-        javaError: error
+        javaError: error || true
       }
     case ActionTypes.WB_CLEAN_JAVA_ERROR:
         let newState = { ...state };

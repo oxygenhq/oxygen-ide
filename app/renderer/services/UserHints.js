@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,13 +53,21 @@ export default class UserHintsService {
                 testMode && testMode === 'mob') {
                 alert('Invalid test mode selected: Mobile.\n\nTo run Web tests please select Web or Responsive mode.');
             }
+        } else if (message.includes('SELENIUM_RUNTIME_ERROR') &&
+            (message.includes('This version of ChromeDriver only supports Chrome version') ||
+                message.includes('Chrome version must be between'))
+        ){
+            store.dispatch({
+                type: 'SELENIUM_RUNTIME_ERROR',
+                payload: {},
+            });
         }
     }
 
     *_handleAppiumServerUnavailable() {
-        if (!confirm(`Appium server is not accessible.\n\nIn order to run mobile test, you need to install and run Appium server manually.\n\nDo you want to read a tutorial on how to install and run Appium server?`)) {
+        if (!confirm(`Appium server is not accessible.\n\nIn order to run mobile tests, you need to install and run Appium server manually.\n\nDo you want to read a tutorial on how to install and run Appium server?`)) {
             return;
         }
-        yield call(services.mainIpc.call, 'ElectronService', 'shellOpenExternal', ['http://docs.oxygenhq.org/guide-mob-intro.html']);
+        yield call(services.mainIpc.call, 'ElectronService', 'shellOpenExternal', ['http://docs.oxygenhq.org/download-mobile.html']);
     }
 }

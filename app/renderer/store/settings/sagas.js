@@ -8,6 +8,7 @@
  */
 import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
 import * as ActionTypes from './types';
+import * as types from '../types';
 import * as tabActions from '../tabs/actions';
 import * as editorActions from '../editor/actions';
 import * as settingsActions from './actions';
@@ -28,8 +29,45 @@ export default function* root() {
       takeLatest(ActionTypes.TMP_REMOVE_FILE, tmpRemoveFile),
       takeLatest(ActionTypes.TMP_UPDATE_FILE_CONTENT, tmpUpdateFileContent),
       takeLatest(ActionTypes.FIRST_OPEN, firstOpen),
-      takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
+      takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),,
+      takeLatest(types.TEST_UPDATE_BREAKPOINTS, testUpdateBreakpoints)
     ]);
+}
+
+
+export function* testUpdateBreakpoints({ payload }){
+        
+    const FONT_SIZE_MIN = 12;
+    const FONT_SIZE_MAX = 36;
+
+    const settings = yield select(state => state.settings);
+    
+    if(
+        settings && 
+        settings.fontSize && 
+        parseInt(settings.fontSize) && 
+        settings.fontSize >= FONT_SIZE_MIN && 
+        settings.fontSize <= FONT_SIZE_MAX
+    ) {
+        // ignore, all good
+    } else {
+        yield put(settingsActions.setZoom(FONT_SIZE_MIN));
+    }
+
+    const test = yield select(state => state.test);
+
+    const { isRunning } = test;
+    const { breakpoints, path } = payload;
+
+    const testBreakpoints = test.breakpoints;
+
+    if(isRunning){
+        // right now run test
+        if(testBreakpoints && testBreakpoints[path]){
+            // the file where breackpoints changed in files, where test runs
+            const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'updateBreakpoints', [ breakpoints, path ]);
+        }
+    }
 }
 
 export function* firstOpen({ payload }){
@@ -51,7 +89,6 @@ export function* tmpAddFile({ payload }) {
         const { key, name, content } = payload;
         try {            
             const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'addFile', [key, name, content]);
-            
             if(newSettings){
                 yield put(settingsActions.mergeSettings(newSettings));
             }
@@ -78,7 +115,7 @@ export function* tmpRemoveFile({ payload }) {
 }
 
 export function* tmpUpdateFileContent({ payload }) {
-    if (payload && payload.path && payload.name && payload.content) {
+    if (payload && payload.path && payload.name && typeof payload.content !== 'undefined') {
         const { path, name, content } = payload;
         try {            
             const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'updateFileContent', [path, name, content]);

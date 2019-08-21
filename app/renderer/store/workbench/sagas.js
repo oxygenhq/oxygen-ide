@@ -41,12 +41,10 @@ import { success, failure, successOrFailure } from '../../helpers/redux';
 
 import ActionTypes from '../types';
 import { MAIN_MENU_EVENT, MAIN_SERVICE_EVENT } from '../../services/MainIpc';
-import { JAVA_ERROR_INFO, JAVA_NOT_FOUND, JAVA_BAD_VERSION } from '../../services/JavaService';
+import { JAVA_NOT_FOUND, JAVA_BAD_VERSION } from '../../services/JavaService';
 
 import ServicesSingleton from '../../services';
 import editorSubjects from '../editor/subjects';
-
-import pathLib from 'path';
 
 const services = ServicesSingleton();
 /**
@@ -86,9 +84,10 @@ export default function* root() {
       takeLatest(ActionTypes.WB_ON_CONTENT_UPDATE, contentUpdate),      
       takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
       takeLatest(success(ActionTypes.FS_DELETE), handleFileDelete),
+      takeLatest(ActionTypes.UPDATE_CLOUD_PROVIDERS_SETTINGS, handleUpdatedCloudProvidersSettings),
+      takeLatest(ActionTypes.TEST_UPDATE_RUN_SETTINGS, handleUpdatedRunSettings),      
       takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
       takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
-      takeLatest(JAVA_ERROR_INFO, handleJavaError),
       takeLatest(JAVA_NOT_FOUND, handleJavaNotFound),
       takeLatest(JAVA_BAD_VERSION, handleJavaBadVersion),
     ]);
@@ -179,47 +178,18 @@ export function* handleServiceEvents({ payload }) {
     }
 }
 
-export function* handleJavaError({ payload }){
-    if(payload.err){
-        yield put(wbActions.setJavaError(payload.err));
-    } else {
-        yield put(wbActions.setJavaError());
-    }
-}
-
 export function* handleJavaNotFound(inner){
-    if(payload.message){
-        yield put(wbActions.setJavaError({
-            reason: 'not-found',
-            message: payload.message
-        }));
-    } else {
-        yield put(wbActions.setJavaError());
-    }
+    yield put(wbActions.setJavaError({
+        reason: 'not-found'
+    }));
 }
 
 export function* handleJavaBadVersion({ payload }){
-
-    const { message, version } = payload;
-
-    if(payload.message){
-        if(version){
-            const versionInt = parseInt(version);
-
-            if(versionInt < 8 || versionInt > 10){
-                yield put(wbActions.setJavaError({
-                    reason: 'bad-version',
-                    message: message
-                }));
-            } else {
-                // ignore, version is correct
-                return;
-            }
-        }
-    } else {
-        yield put(wbActions.setJavaError());
-    }
-    return;
+    const { version } = payload;
+    yield put(wbActions.setJavaError({
+        reason: 'bad-version',
+        version: version
+    }));
 }
 
 function* handleUpdateServiceEvent(event) {
@@ -235,40 +205,27 @@ export function* clearAll() {
 export function* deactivate() {
     // stop Selenium server
     let SeleniumServiceStopResult = yield call(services.mainIpc.call, 'SeleniumService', 'stop');
-    console.log('SeleniumServiceStopResult', SeleniumServiceStopResult);
 }
 
 export function* initialize() {
-
     // start check for update
-    services.mainIpc.call('UpdateService', 'start').then(() => {});
+    services.mainIpc.call('UpdateService', 'start', [false]).then(() => {});
     // start Selenium server
     services.mainIpc.call('SeleniumService', 'start').then(() => {});
     // start Android and iOS device watcher
-    services.mainIpc.call('DeviceDiscoveryService', 'start').then(() => {});
-
-    /* sync variant
-
-    let UpdateServiceStartResult = yield call(services.mainIpc.call, 'UpdateService', 'start');
-    console.log('UpdateServiceStartResult', UpdateServiceStartResult);
-
-    // start Selenium server
-    let SeleniumServiceStartResult = yield call(services.mainIpc.call, 'SeleniumService', 'start');
-    console.log('SeleniumServiceStartResult', SeleniumServiceStartResult);
-
-    // start Android and iOS device watcher
-    let DeviceDiscoveryServiceStartResult = yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'start');
-    console.log('DeviceDiscoveryServiceStartResult', DeviceDiscoveryServiceStartResult);
-
-    */
+    services.mainIpc.call('DeviceDiscoveryService', 'start').then(() => {}).catch((e) => console.error(e.message));
 
     // get app settings from the store
     let appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');
 
-    console.log('appSettings', appSettings);
-
     if(appSettings && appSettings.cache){
-        yield put(wbActions.restoreFromCache(appSettings.cache));
+        const fromCache = yield putAndTake(wbActions.restoreFromCache(appSettings.cache));
+
+        try{
+            yield call(services.javaService.checkJavaVersion);
+        } catch(e){
+            console.log('Failure checking Java', e);
+        }
 
         if(appSettings.cache.settings && appSettings.cache.settings.uuid){
             yield call(services.mainIpc.call, 'AnalyticsService', 'setUser', [appSettings.cache.settings.uuid]);
@@ -349,7 +306,9 @@ export function* openFolder({ payload }) {
     const { path } = payload;
     // check if there are any unsaved files - if so, prompt user and ask whether to proceed.
     const files = yield select(state => state.fs.files);
-    const unsaved = getUnsavedFiles(files);
+    const tabs = yield select(state => state.tabs);
+
+    const unsaved = getUnsavedFiles(files, tabs);
     
     if (unsaved && unsaved.length > 0) {
         let fileNamesStr = '';
@@ -420,24 +379,18 @@ export function* changeTab({ payload }) {
 }
 
 export function* createNewRealFile({ payload }){
-    console.log('createNewRealFile', payload);
-    
     const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, null, [ 
         { name: 'JavaScript file', extensions:['js'] },
         { name: 'All Files', extensions: ['*'] } 
     ]]);
     
-    console.log('saveAsPath', saveAsPath);
-
     if (!saveAsPath) {
         return; // Save As dialog was canceled by user
     }
     
-    // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
-    let folderPath = saveAsPath.split("\\");
+    let folderPath = saveAsPath.split(pathHelper.sep);
     folderPath.pop();
-    folderPath = folderPath.join("\\");
-    console.log('folderPath', folderPath);
+    folderPath = folderPath.join(pathHelper.sep);
 
     let content = '';
     
@@ -467,26 +420,17 @@ export function* createNewRealFile({ payload }){
 
 
         if(payload && payload.fakeFile){
-
             const { path, name } = payload.fakeFile;
-
             const files = yield select(state => state.settings.files);
-
-            console.log('files', files);
-
             const currentFile = files[path+name];
 
-            console.log('currentFile', currentFile);
-
-            if(currentFile){
-                yield closeTmpFile(currentFile);
+            if(currentFile && saveAsFile && saveAsFile.path){
+                yield closeTmpFile(currentFile, saveAsFile.path);
             }
         }
 
         const fs = yield select(state => state.fs);
-        
-        console.log('fs', fs);
-        
+                
         if(fs && typeof typeof fs.rootPath !== 'undefined' && fs.rootPath === null){
             const { error } = yield putAndTake(
                 fsActions.treeOpenFolder(folderPath)
@@ -540,8 +484,6 @@ export function* openFakeFile(){
     let tabs = yield select(state => state.tabs);
     let idenity;
 
-    // console.log('tabs', tabs);
-
     if(tabs && tabs.list && Array.isArray(tabs.list)){
         idenity = tabs.list.filter((tab) => tab.key === "unknown");
         if(!idenity){
@@ -551,21 +493,14 @@ export function* openFakeFile(){
         idenity = [];
     }
 
-    // console.log('idenity', idenity);
-    
-
     const key = "unknown";
     let name = "Untitled-"+(idenity.length+1);
 
     
     const tmpFileExist = tabs.list.some((tab) => tab.key === key && tab.title === name );
 
-    // console.log('tmpFileExist', tmpFileExist);
     if(tmpFileExist){
-        // console.log('in if');
         const index = getMaxIndex(tabs.list);
-        // console.log('tabs.list', tabs.list);
-        // console.log('index', index);
         if(index === 0){
             const timestamp = + new Date();
             name = "Untitled-"+(timestamp);
@@ -854,7 +789,7 @@ export function* closeFile({ payload }) {
     }
 
     if(showDeleteTitle && path){
-        const pathSplit = path.split(pathLib.sep);
+        const pathSplit = path.split(pathHelper.sep);
 
         if(pathSplit && pathSplit.length){
             const newName = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
@@ -912,12 +847,11 @@ export function* showDialog({ payload }) {
         const paths = yield call(services.mainIpc.call, 'ElectronService', 'showOpenFolderDialog', []);
 
         if (paths && Array.isArray(paths) && paths.length > 0) {
-
             const path = paths[0];
             const splitResult = path.split('\\');
 
             if(splitResult && splitResult.length === 2 && !splitResult[1]){
-                alert('Sorry, we don\'t support open full disc, please select some folder');
+                alert('Sorry, we don\'t support opening root disks. Please select a folder.');
             } else {
                 yield openFolder({ payload: { path: paths[0] }});
             }
@@ -928,7 +862,7 @@ export function* showDialog({ payload }) {
         if (paths && Array.isArray(paths) && paths.length > 0) {
             for (let path of paths) {
                 yield put(wbActions.openFile(path));
-            }            
+            }
         }
     }
     else {
@@ -959,12 +893,11 @@ export function* contentUpdate({ payload }) {
     }
 }
 
-export function* closeTmpFile(file){
-    console.log('file', file);
-
+export function* closeTmpFile(file, realFilePath){
     yield put(editorActions.closeFile(file.path, false, file.name));
     yield put(tabActions.removeTab(file.path, file.name));
     yield put(settingsActions.removeFile(file.path, file.name));
+    yield put(testActions.moveBreakpointsFromTmpFileToRealFile(file.path, file.name, realFilePath));
 }
 
 export function* saveCurrentFile({ payload }) {
@@ -973,7 +906,6 @@ export function* saveCurrentFile({ payload }) {
     const recorder = yield select(state => state.recorder);
 
     const { activeFile, activeFileName } = editor;
-
 
     if(activeFile === "unknown"){
         const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, null, [ 
@@ -985,19 +917,9 @@ export function* saveCurrentFile({ payload }) {
             return; // Save As dialog was canceled by user
         }
 
-        let folderPath;
-
-        if (process.platform === 'win32') {
-            // C:\projects\cb-webui\WebAPI\aaz.js => C:\projects\cb-webui\WebAPI\
-            folderPath = saveAsPath.split("\\");
-            folderPath.pop();
-            folderPath = folderPath.join("\\");
-        } else {
-            // /Users/developer/Downloads/f.js => /Users/developer/Downloads
-            folderPath = saveAsPath.split("/");
-            folderPath.pop();
-            folderPath = folderPath.join("/");
-        }
+        let folderPath = saveAsPath.split(pathHelper.sep);
+        folderPath.pop();
+        folderPath = folderPath.join(pathHelper.sep);
 
         const files = yield select(state => state.settings.files);
         
@@ -1013,7 +935,7 @@ export function* saveCurrentFile({ payload }) {
             fsActions.saveFileAs(saveAsPath, saveContent)
         );
         
-        if (!error) {            
+        if (!error) {
             // re-retrieve all files, as Saved As file info has been just added to the File Cache.
             const updatedFiles = yield select(state => state.fs.files);
             // retrieve file info for the newly saved file
@@ -1028,13 +950,11 @@ export function* saveCurrentFile({ payload }) {
             // open newly saved file (as it's not necessary open) - e.g. open it in a new tab
 
             if(currentFile){
-                yield closeTmpFile(currentFile);
+                yield closeTmpFile(currentFile, saveAsPath);
             }
 
             const fs = yield select(state => state.fs);
             
-            // console.log('fs', fs);
-
             if(fs && typeof typeof fs.rootPath !== 'undefined' && fs.rootPath === null){
                 const { error } = yield putAndTake(
                     fsActions.treeOpenFolder(folderPath)
@@ -1064,16 +984,11 @@ export function* saveCurrentFile({ payload }) {
     } else {
         const files = yield select(state => state.fs.files);
 
-        // console.log('files', files);
-    
         if (!activeFile || !files.hasOwnProperty(activeFile)) {
             return;
         }
 
         const currentFile = files[activeFile];
-
-        // console.log('currentFile', currentFile);
-        // console.log('prompt', prompt);
 
         // prompt user with "Save As" dialog before saving the file
         if (prompt) {
@@ -1129,11 +1044,7 @@ export function* saveCurrentFile({ payload }) {
                         yield put(tabActions.setTabTouched(activeFile, false));
                     }
                 }
-                // console.log('tab', tab);
             }
-            
-            // console.log('tabsFiles', tabsFiles);
-
         }
     }
 }
@@ -1413,7 +1324,19 @@ export function* getOrFetchFileInfo(path) {
     return { response, error };
 }
 
-function getUnsavedFiles(files) {
+export function* handleUpdatedCloudProvidersSettings(payload) {
+    const settings = yield select(state => state.settings);
+    // persiste settings in the Electron store
+    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
+}
+
+export function* handleUpdatedRunSettings(payload) {
+    const settings = yield select(state => state.settings);
+    // persiste settings in the Electron store
+    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
+}
+
+function getUnsavedFiles(files, tabs) {
     if (!files) {
         return;
     }
@@ -1421,7 +1344,14 @@ function getUnsavedFiles(files) {
     for (let filePath of Object.keys(files)) {
         const file = files[filePath];
         if (file && file.modified) {
-            unsavedFiles.push(file);
+            if(
+                tabs && 
+                tabs.list && 
+                tabs.list.some && 
+                tabs.list.some(({key}) => key === file.path)
+            ){
+                unsavedFiles.push(file);
+            }
         }
     }
     return unsavedFiles;

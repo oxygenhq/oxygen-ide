@@ -39,6 +39,10 @@
   font-size: 21px;
 }
 
+.appTollbar .control.button.forward {
+  color: #e06331;
+}
+
 .appTollbar .control.selectable {
   display: flex;
   justify-content: center;
@@ -51,6 +55,10 @@
 
 .appTollbar .control.selectable.active {
   background-color: #fff;
+}
+.appTollbar .control.selectable.active.green-bg,
+.tabs-bar-wrapper .tabItemElem.green-bg {
+  background-color: #e8f5e9;
 }
 
 .appTollbar button.control.button {

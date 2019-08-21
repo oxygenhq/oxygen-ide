@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,6 @@ var ElementFinder = function() {
     this.xpathEvaluator.init();
     this._registerAllLocatorFunctions();
 };
-
-ElementFinder.prototype.getCurrentWindow = function() {};
 
 ElementFinder.prototype._registerAllLocatorFunctions = function() {
     // TODO - don't do this in the constructor - only needed once ever
@@ -41,7 +39,8 @@ ElementFinder.prototype._registerAllLocatorFunctions = function() {
     this.findElementBy = function(locatorType, locator, inDocument, inWindow, unique) {
         var locatorFunction = this.locationStrategies[locatorType];
         if (!locatorFunction) {
-            throw new RecorderError("Unrecognised locator type: '" + locatorType + "'");
+            console.error("Unrecognised locator type: '" + locatorType + "'");
+            return null;
         }
         return locatorFunction.call(this, locator, inDocument, inWindow, unique);
     };
@@ -79,22 +78,16 @@ ElementFinder.prototype.findElementRecursive = function(locatorType, locatorStri
 };
 
 /*
-* Finds an element on the current page, using various lookup protocols
+* Finds an element on the specified page, using various lookup protocols
 */
 ElementFinder.prototype.findElement = function(locator, win, unique) {
     var locatorParsed = parseLocator(locator);
-    if (!win) {
-        win = this.getCurrentWindow();
-    }
     var element = this.findElementRecursive(locatorParsed.type, locatorParsed.string, win.document, win, unique);
-    if (element === null) {
-        throw new RecorderError('Element ' + locator + ' not found');
-    }
     return element;
 };
 
 /**
- * Find the element with id - can't rely on getElementById, coz it returns by name as well in IE..
+ * Find the element with id
  */
 ElementFinder.prototype.locateElementById = function(identifier, inDocument, inWindow, unique) {
     var element = inDocument.getElementById(identifier);
@@ -103,23 +96,7 @@ ElementFinder.prototype.locateElementById = function(identifier, inDocument, inW
         var nodes = this.xpathEvaluator.selectNodes('//*[@id="' + identifier + '"]', inDocument,
             inDocument.createNSResolver ?
             inDocument.createNSResolver(inDocument.documentElement) : this._namespaceResolver);
-        return nodes.length === 1 ? element : null;
-    } else if (browserVersion.isIE) {
-        var elements = inDocument.getElementsByTagName('*');
-        
-        for (var i = 0, n = elements.length; i < n; ++i) {
-            element = elements[i];
-            
-            if (element.tagName.toLowerCase() == 'form') {
-                if (element.attributes.id.nodeValue == identifier) {
-                    return element;
-                }
-            } else if (element.getAttribute('id') == identifier) {
-                return element;
-            }
-        }
-        
-        return null;
+        return nodes && nodes.length === 1 ? element : null;
     } else {
         return null;
     }
@@ -173,6 +150,10 @@ ElementFinder.prototype.locateElementByName = function(locator, inDocument, inWi
         elements = this.selectElements(filter, elements, 'value');
     }
 
+    if (!elements) {
+        return null;
+    }
+
     if (unique && elements.length === 1 ||
         !unique && elements.length > 0) {
         return elements[0];
@@ -212,7 +193,7 @@ ElementFinder.prototype._namespaceResolver = function(prefix) {
 ElementFinder.prototype.selectElementsBy = function(filterType, filter, elements) {
     var filterFunction = ElementFinder.filterFunctions[filterType];
     if (!filterFunction) {
-        throw new RecorderError("Unrecognised element-filter type: '" + filterType + "'");
+        return null;
     }
 
     return filterFunction(filter, elements);
@@ -243,10 +224,12 @@ ElementFinder.filterFunctions.value = function(value, elements) {
 ElementFinder.filterFunctions.index = function(index, elements) {
     index = Number(index);
     if (isNaN(index) || index < 0) {
-        throw new RecorderError('Illegal Index: ' + index);
+        console.error('ox: illegal index: ' + index);
+        return null;
     }
     if (elements.length <= index) {
-        throw new RecorderError('Index out of range: ' + index);
+        console.error('ox: index out of range: ' + index);
+        return null;
     }
     return [elements[index]];
 };

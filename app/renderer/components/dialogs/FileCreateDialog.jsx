@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 import React, { PureComponent, Fragment } from 'react';
+import uniq from 'lodash.uniq';
 import { Form, Input, Select, Modal, message, Button } from 'antd';
 import { capitalizeFirst } from '../../helpers/general';
 
@@ -89,7 +90,7 @@ export default class FileCreateDialog extends PureComponent<Props> {
       const illegalCharacters = /(\\)|(\/)|(\:)|(\;)|(\*)|(\?)|(")|(')|(,)|(\.)|(\<)|(\>)|(\|)/gi;
       let result = e.target.value.match( illegalCharacters );
       if(result){
-        result = _.uniq(result);
+        result = uniq(result);
         const srt = `Char${result.length > 1 ? 's': ''} ${result.join(', ')} is not allowed`;
         message.error(srt);
       }

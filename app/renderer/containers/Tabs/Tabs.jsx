@@ -12,7 +12,7 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { Icon, Tooltip, Modal, Button } from 'antd';
-import _ from 'lodash';
+import debounce from 'lodash.debounce';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
 import DraggableTab from './DraggableTab';
 import '../../css/tabs.scss';
@@ -54,7 +54,7 @@ class Tabs extends Component<Props, void> {
       });
     }
 
-    window.addEventListener('resize', _.debounce((e) => {
+    window.addEventListener('resize', debounce((e) => {
       e.preventDefault();
       if (this.ps) {
         this.ps.destroy();
@@ -93,7 +93,7 @@ class Tabs extends Component<Props, void> {
   }
 
   render() {
-    const { active, tabs, activeTitle } = this.props;
+    const { active, tabs, recorder, activeTitle } = this.props;
     let activeTab;
 
     if(active === "unknown"){
@@ -135,8 +135,22 @@ class Tabs extends Component<Props, void> {
 
           {tabs.length > 0 && (
           tabs.map((tab, index) => {
-            const itemClass = activeTab && activeTab.key === tab.key && activeTab.title === tab.title ?
+    
+            let itemClass = activeTab && activeTab.key === tab.key && activeTab.title === tab.title ?
             'tabItemElem activeTabitem' : 'tabItemElem';
+
+            const { isRecording, activeFile, activeFileName } = recorder;
+
+            if(isRecording){
+              if(activeFile === 'unknown'){
+                if(activeFile === tab.key && activeFileName === tab.title){
+                  itemClass += ' green-bg';
+                }
+              } else if(activeFile === tab.key){
+                itemClass += ' green-bg';
+              }
+            }
+
             return (
               <DraggableTab
                 id={tab.key}

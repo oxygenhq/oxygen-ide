@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,7 +11,6 @@ import Mixpanel from 'mixpanel';
 import ServiceBase from "./ServiceBase";
 import moment from 'moment';
 import { version }  from '../../../package.json';
-import parser from 'xml2json';
 import os from 'os';
 import osLocale from 'os-locale';
 import uuidv4 from'uuid/v4';

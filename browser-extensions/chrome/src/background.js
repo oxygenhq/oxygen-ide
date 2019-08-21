@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 const IDE_URL_HTTP = 'http://localhost:7778';
-const IDE_URL_HTTPS = 'https://localhost:8889';
 
 const SETTINGS_DEBUG = 'SETTINGS_DEBUG';
 
@@ -19,11 +18,15 @@ const MENU_ID_ASSERVALUE = 'assertValue';
 const MENU_ID_ASSERTITLE = 'assertTitle';
 
 const PING_INTERVAL = 1000;
+const XHR_TIMEOUT = 2000;
 
 var isIdeRecording = false;
 var isIdeRecordingPrev = false;
 
 var debuggingEnabled = false;
+
+var lastWindow = null;
+var windowGroups = [];
 
 // prevent Content Security Policy by removing CSP response headers
 var filter = {
@@ -150,7 +153,9 @@ function checkIfRecordingIsActive() {
     } finally {
         if (isIdeRecording && !isIdeRecordingPrev) {
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                chrome.tabs.sendMessage(tabs[0].id, { cmd: 'INJECT_RECORDER', settings: { debuggingEnabled: debuggingEnabled } });
+                if (tabs && tabs.length >= 1) {
+                    chrome.tabs.sendMessage(tabs[0].id, { cmd: 'INJECT_RECORDER', settings: { debuggingEnabled: debuggingEnabled } });
+                }
             });
         }
         toggleExtension();
@@ -177,9 +182,62 @@ function toggleExtension() {
     chrome.contextMenus.update(MENU_ID_ASSERTITLE, { enabled: isIdeRecording });
 }
 
+function postToIDEAsync(url, data) {
+    try {
+        var req = new XMLHttpRequest();
+        req.open('POST', url);
+        req.timeout = XHR_TIMEOUT;
+        req.onreadystatechange = function() {
+            if (req.readyState === 4 && req.status != 200) {
+                console.warn('ox: error posting to ' + url + ': ' + req.statusText);
+            }
+        };
+        req.send(data);
+    } catch (e) {
+        console.warn('ox: error posting to ' + url + ': ' + e);
+    }
+}
+
+function lastWindowUpdate(newLastWin) {
+    var tmpLastWin = lastWindow;
+    lastWindow = newLastWin;
+
+    // find top window for the previous window
+    var top;
+    for (var group of windowGroups) {
+        if (group.indexOf(tmpLastWin) >= 0) {
+            top = group.substring(group.length - 20);
+            break;
+        }
+    }
+    // check whether new window has same top as the previous one
+    var sameGroup = false;
+    for (var group of windowGroups) {
+        if (group.indexOf(newLastWin) >= 0 && group.indexOf(top) >= 0) {
+            sameGroup = true;
+        }
+    }
+
+    return {
+        hash: tmpLastWin ? tmpLastWin : '',
+        sameGroup: sameGroup
+    };
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.cmd === 'IS_RECORDING') {
         sendResponse({ result: isIdeRecording, settings: { debuggingEnabled: debuggingEnabled } });
+    } else if (msg.cmd === 'RECORDER_LASTWIN') {
+        if (!lastWindow) {
+            lastWindow = msg.data;
+        }
+    } else if (msg.cmd === 'RECORDER_WINDOW_GROUP_ADD') {
+        windowGroups.push(msg.data);
+    } else if (msg.cmd === 'RECORDER_COMMAND') {
+        postToIDEAsync(IDE_URL_HTTP, msg.data);
+    } else if (msg.cmd === 'RECORDER_LASTWIN_UPDATE') {
+        var lw = lastWindowUpdate(msg.data);
+        sendResponse({ result: lw });
     } else {
         sendResponse({ result: 'error', message: 'invalid cmd' });
     }
@@ -196,9 +254,7 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
         transType === 'auto_bookmark' || 
         transType === 'generated' ||
         transType === 'reload' ||
-        (transType === 'link' && 
-            details.transitionQualifiers.length === 2 && 
-            details.transitionQualifiers[1] === 'from_address_bar')) {
+        (transType === 'link' && details.transitionQualifiers.includes('from_address_bar'))) {
 
         // ignore internal Google Chrome urls
         if (details.url.indexOf('/_/chrome/newtab') > -1 ||
@@ -206,6 +262,13 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
             details.url.startsWith('chrome-search:')) {
             return;
         }
+
+        // FIXME note:
+        // chrome sometimes produces two events when entering URL into address bar and pressing enter:
+        // link and typed
+        // as the result, web.open will be recorded twice
+        // this cannot be reliably fixed in the extension itself
+        // and needs to be looked at the IDE side...
 
         var data = JSON.stringify([{
             module: 'web',
@@ -216,7 +279,7 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
 
         try {
             var req = new XMLHttpRequest();
-            req.open('POST', details.url.startsWith('https:') ? IDE_URL_HTTPS : IDE_URL_HTTP);
+            req.open('POST', IDE_URL_HTTP);
             req.onload = function (e) {
                 if (req.readyState === 4 && req.status != 200) {
                     console.error('ox: error sending open cmd: ' + req.statusText);

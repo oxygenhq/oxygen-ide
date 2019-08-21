@@ -52,7 +52,7 @@ const send = data => {
 const processChange = (eventPath, folderPath, type) => {
     const filePart = eventPath.split(folderPath);
     // FIXME: handle properly case when eventPath === folderPath
-    if (filePart && filePart[1]) {
+    if (Array.isArray(filePart) && filePart.length > 1) {
         // anylize file location
         if (eventPath && !eventPath.endsWith('.DS_Store')) {  
             //  file or folder was deleted or renamed
@@ -75,11 +75,7 @@ const processChange = (eventPath, folderPath, type) => {
                     data: fileInfo
                 });
             }
-        } else {
-            // console.warn(`bad eventPath: ${eventPath}`);
         }
-    } else {
-        console.warn(`Bad split result with eventPath: ${eventPath} and folderPath: ${folderPath}`);
     }
 };
 
@@ -230,6 +226,39 @@ export default class FileService extends ServiceBase {
             parentPath: parentPath,
             type: type,
             ext: path.extname(filePath),
+        };
+    }
+
+    returnFileContent(filePath){
+
+        let response;
+
+        try {
+            if (filePath && fs.existsSync(filePath)) {
+                //file exists
+
+                var data = fs.readFileSync(filePath, 'utf8');
+
+                if(!data){
+                    // sometimes readFileSync return empty data on not emty file :-?
+                    setTimeout(function() { 
+                        var data = fs.readFileSync(filePath, 'utf8');
+                        response = data;
+                    }, 100);
+                } else {
+                    response = data;
+                }
+
+            } else {
+                response = false;
+            }
+        } catch(err) {
+            console.log('Error in returnFileContent method with filePath '+filePath+' :', err);
+        }
+
+        return {
+            filePath: filePath,
+            content: response
         };
     }
 

@@ -91,14 +91,7 @@ Recorder.prototype.attach = function() {
 
     // store initial window handle only for top level windows
     if (window.parent == window) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', Recorder.GetIdeUrl() + '/lastwin_attach');
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status != 200) {
-                console.error('ox: error on lastwin_attach: ' + xhr.statusText);
-            }
-        };
-        xhr.send(window.__hash);
+        window.postMessage(JSON.stringify({cmd: 'RECORDER_LASTWIN', data: window.__hash }), '*');
     }
 
     this.initializeFrameHorrors();
@@ -215,14 +208,7 @@ Recorder.prototype.initializeFrameHorrors = function() {
                     window.parent.postMessage(JSON.stringify({type: WINDOW_GROUP, data: hash}), '*');
                 } else {                        // we have reached the top
                     if (hash.length > 16) { // only if group contains more than one window 
-                        xhr = new XMLHttpRequest();
-                        xhr.open('POST', Recorder.GetIdeUrl()+ '/windowgroup_add' );
-                        xhr.onreadystatechange = function() {
-                            if (xhr.readyState === 4 && xhr.status != 200) {
-                                console.error('ox: error on windowgroup_add: ' + xhr.statusText);
-                            }
-                        };
-                        xhr.send(hash);
+                        window.postMessage(JSON.stringify({cmd: 'RECORDER_WINDOW_GROUP_ADD', data: hash }), '*');
                     }
                 }
             } else if (msg.type === 'CONTEXT_MENU_RECORD') { // not related to frames...
@@ -254,6 +240,8 @@ Recorder.prototype.initializeFrameHorrors = function() {
                 }
             } else if (msg.type === 'SETTINGS_DEBUG') { // not related to frames...
                 window.ox_debug = msg.enable;
+            } else if (msg.type === 'RECORD_COMMAND') { // not related to frames...
+                self.recordSendCommand(msg.lastWindow);
             }
         },
         false
@@ -270,74 +258,93 @@ Recorder.prototype.record = function (command, target, value) {
         return;
     }
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', Recorder.GetIdeUrl() + '/lastwin_update', false);
-    xhr.send(window.__hash);
-    if (xhr.status != 200) {
-        console.error('ox: error on lastwin_update: ' + xhr.statusText);
-    } else {
-        var cmds = [];
-        if (xhr.responseText) {
-            var lastWindow = JSON.parse(xhr.responseText);
-            var isTop = window.parent == window;
-            var isSameOriginFrame = !isTop && window.frameElement != null;
-            ox_log('ox: testing for window transition prev:new ' + lastWindow.hash + ' : ' + window.__hash);
-            if (lastWindow.hash != window.__hash) {
-                if (isTop) {                                    // new top window
-                    ox_log('ox: new window');
-                    var winLocator = window.document.title === '' ? '' : 'title=' + window.document.title;
-                    cmds.push(Recorder.cmdPrepare('selectWindow', winLocator, null));
-                } else if (lastWindow.sameGroup) {              // same window, new frame
-                    ox_log('ox: new frame. same window');
-                    if (window.__frameLocators) {
-                        cmds.push(Recorder.cmdPrepare('selectFrame', window.__frameLocators, null));
-                    }
-                } else {                                        // new window, new frame
-                    ox_log('ox: new frame. new window');
-                    var winLocator = null;
-                    try {
-                        winLocator = window.top.document.title === '' ? '' : 'title=' + window.parent.document.title;
-                    } catch (ignored) {
-                    }
+    if (!this._ox_command) {
+        this._ox_command = [];
+    }
+    this._ox_command.push({
+        command: command,
+        target: target,
+        value: value
+    });
 
-                    if (winLocator) {
-                        cmds.push(Recorder.cmdPrepare('selectWindow', winLocator, null));
-                    } else {
-                        console.error('ox: cannot get window title - frame and top window are of different origins');
-                    }
-                    if (window.__frameLocators) {
-                        cmds.push(Recorder.cmdPrepare('selectFrame', window.__frameLocators, null));
-                    }
+    window.postMessage(JSON.stringify({cmd: 'RECORDER_LASTWIN_UPDATE', data: window.__hash }), '*');
+};
+
+Recorder.prototype.recordSendCommand = function (lastWindow) {
+    var cmds = [];
+    if (lastWindow) {
+        var isTop = window.parent == window;
+        var isSameOriginFrame = !isTop && window.frameElement != null;
+        ox_log('ox: testing for window transition prev:new ' + lastWindow.hash + ' : ' + window.__hash);
+        if (lastWindow.hash != window.__hash) {
+            if (isTop) {                                    // new top window
+                ox_log('ox: new window');
+                var winLocator = window.document.title === '' ? '' : 'title=' + window.document.title;
+                cmds.push(Recorder.cmdPrepare('selectWindow', winLocator, null));
+            } else if (lastWindow.sameGroup) {              // same window, new frame
+                ox_log('ox: new frame. same window');
+                if (window.__frameLocators) {
+                    cmds.push(Recorder.cmdPrepare('selectFrame', window.__frameLocators, null));
+                }
+            } else {                                        // new window, new frame
+                ox_log('ox: new frame. new window');
+                var winLocator = null;
+                try {
+                    winLocator = window.top.document.title === '' ? '' : 'title=' + window.parent.document.title;
+                } catch (ignored) {
+                }
+
+                if (winLocator) {
+                    cmds.push(Recorder.cmdPrepare('selectWindow', winLocator, null));
+                } else {
+                    console.error('ox: cannot get window title - frame and top window are of different origins');
+                }
+                if (window.__frameLocators) {
+                    cmds.push(Recorder.cmdPrepare('selectFrame', window.__frameLocators, null));
                 }
             }
         }
-
-        cmds.push(Recorder.cmdPrepare(command, target, value));
-
-        // ignore any actions on html and body elements 
-        // as 'click' cannot be executed by webdriver on html or body
-        // and assertText/waitForText sometimes erroneously generated for html/body pulling whole page html as text string
-        for (var i = 0; i < cmds.length; i++) {
-            var c = cmds[i];
-            if (c.target === 'css=body' ||
-                c.target === 'css=html' ||
-                c.target === '//body' ||
-                c.target === '//html') {
-                return;
-            }
-        }
-
-        var data = JSON.stringify(cmds, function (k, v) { return (v === null || v === undefined) ? undefined : v; });
-        ox_log('ox: ' + data);
-
-        xhr = new XMLHttpRequest();
-        xhr.open('POST', Recorder.GetIdeUrl(), false);
-        xhr.send(data);
-        if (xhr.status != 200) {
-            console.error('ox: error sending command: ' + xhr.statusText);
-        }
     }
-};
+
+    var validCommands = 0;
+    if (this._ox_command) {
+cmdsLoop:
+        for (var i = 0; i < this._ox_command.length; i++) {
+            var c = this._ox_command[i];
+
+            // ignore any actions on html and body elements 
+            // as 'click' cannot be executed by webdriver on html or body
+            // and assertText/waitForText sometimes erroneously generated for html/body pulling whole page html as text string
+            if (c.target.constructor === Array && c.target.length > 0) {
+                for (var s = 0; s < c.target.length; s++) {
+                    var trg = c.target[s][0];
+                    if (trg === 'css=body' ||
+                        trg === 'css=html' ||
+                        trg === '//body' ||
+                        trg === '//html') {
+                        continue cmdsLoop;
+                    }
+                }
+            } else if (c.target.constructor === Array && c.target.length === 0) {
+                // no locators were found
+                continue;
+            }
+
+            cmds.push(Recorder.cmdPrepare(c.command, c.target, c.value));
+            validCommands++;
+        }
+        delete this._ox_command;
+    }
+
+    if (validCommands === 0) {
+        return;
+    }
+
+    var data = JSON.stringify(cmds, function (k, v) { return (v === null || v === undefined) ? undefined : v; });
+    ox_log('ox: ' + data);
+
+    window.postMessage(JSON.stringify({cmd: 'RECORDER_COMMAND', data: data }), '*');
+}
 
 Recorder.prototype.findLocator = function (element) {
     return this.locatorBuilders.build(element);
@@ -353,10 +360,6 @@ Recorder.addEventHandler = function(eventName, handler, capture) {
 };
 
 Recorder.eventHandlers = {};
-
-Recorder.GetIdeUrl = function() {
-    return location.protocol === 'https:' ? 'https://localhost:8889' : 'http://localhost:7778';
-};
 
 Recorder.guid = function() {
     function s4() {
@@ -418,62 +421,32 @@ Recorder.addEventHandler('change', function (ev) {
     }
 });
 
-if (browserVersion.isIE && browserVersion.ieMode < 11) {
-    // IE 9 Quirks mode. To simulate 'change' event we catch focusin/out and handle those.
-    // TODO: select multiselect
-    Recorder.addEventHandler('focusin', function (ev) {
-        ox_log('ox: focusin ev');
-        var target = ev.target;
 
-        if (target.nodeName.toLowerCase() === 'input' || target.nodeName.toLowerCase() === 'textarea') {
-            this.activeElementValue = target.value;
-        } else if (target.nodeName.toLowerCase() == 'select') {
-            this.activeElementValue = target.options[target.selectedIndex];
-        }
-    });
+Recorder.addEventHandler('focus', function (ev) {
+    ox_log('ox: focus ev');
+    var target = ev.target;
 
-    Recorder.addEventHandler('focusout', function (ev) {
-        ox_log('ox: focusout ev');
-        if (!this.activeElementValue) {
-            return;
-        }
+    if (this.__keysBuf) {
+        this.record('type', this.findLocators(this.__keysBuf.el), this.__keysBuf.keys.join(''));
+        this.__keysBuf = null;
+    }
 
-        var target = ev.target;
-
-        if (target.nodeName.toLowerCase() === 'select' ||
-            target.nodeName.toLowerCase() === 'input') {
-            Recorder.eventHandlers.change.call(this, ev, true);
-        }
-
-        this.activeElementValue = null;
-    });
-} else {
-    Recorder.addEventHandler('focus', function (ev) {
-        ox_log('ox: focus ev');
-        var target = ev.target;
-
-        if (this.__keysBuf) {
-            this.record('type', this.findLocators(this.__keysBuf.el), this.__keysBuf.keys.join(''));
-            this.__keysBuf = null;
-        }
-
-        if (target.nodeName) {
-            var tagName = target.nodeName.toLowerCase();
-            if ('select' == tagName && target.multiple) {
-                ox_log('ox: focus ev remembering selections');
-                var options = target.options;
-                for (var i = 0; i < options.length; i++) {
-                    if (options[i]._wasSelected === null || options[i]._wasSelected === undefined) {
-                        // is the focus was gained by mousedown event, _wasSelected would be already set
-                        options[i]._wasSelected = options[i].selected;
-                    }
+    if (target.nodeName) {
+        var tagName = target.nodeName.toLowerCase();
+        if ('select' == tagName && target.multiple) {
+            ox_log('ox: focus ev remembering selections');
+            var options = target.options;
+            for (var i = 0; i < options.length; i++) {
+                if (options[i]._wasSelected === null || options[i]._wasSelected === undefined) {
+                    // is the focus was gained by mousedown event, _wasSelected would be already set
+                    options[i]._wasSelected = options[i].selected;
                 }
-            } else if (tagName === 'input' || tagName === 'textarea') {
-                this.activeElementValue = target.value;
             }
+        } else if (tagName === 'input' || tagName === 'textarea') {
+            this.activeElementValue = target.value;
         }
-    }, true);
-}
+    }
+}, true);
 
 Recorder.addEventHandler('mousedown', function (ev) {
     ox_log('ox: mousedown ev');
@@ -529,6 +502,8 @@ Recorder.addEventHandler('mouseup', function (ev) {
     this.__mouseDownTarget = null;
 }, true);
 
+Recorder.prototype.meaningfulAttrs = new Set(['href', 'src', 'id', 'name', 'class', 'type', 'alt', 'title', 'value', 'action', 'onclick']);
+
 /*
  * Used to save element's attributes so we can generate proper locators later on on click
  */
@@ -541,7 +516,9 @@ Recorder.addEventHandler('mouseover', function (ev) {
     };
     var attrs = target.attributes;
     for (var i = attrs.length - 1; i >= 0; i--) {
-        this.__originalAttrs.attrs.push({name: attrs[i].name, value: attrs[i].value});
+        if (this.meaningfulAttrs.has(attrs[i].name)) {
+            this.__originalAttrs.attrs.push({name: attrs[i].name, value: attrs[i].value});
+        }
     }
 }, true);
 
@@ -557,12 +534,11 @@ Recorder.addEventHandler('mouseout', function (ev) {
  * 3. Once the id is received, 'content' notifies the page that it can proceed recording. i.e. sends
  *    CONTEXT_MENU_RECORD with with action name.
  */
-if (!browserVersion.isIE) {
-    Recorder.addEventHandler('contextmenu', function(ev){
-        this.__contextmenuEl = ev.target;
-        window.postMessage(JSON.stringify({type: 'CONTEXT_MENU'}), '*');
-    }, true);
-}
+Recorder.addEventHandler('contextmenu', function(ev){
+    this.__contextmenuEl = ev.target;
+    window.postMessage(JSON.stringify({type: 'CONTEXT_MENU'}), '*');
+}, true);
+
 
 // record keystrokes for situations when "change" event is not produced
 // e.g. site handles keyup itself and prevents input's value changes
@@ -626,17 +602,21 @@ Recorder.prototype.recordClick = function (target) {
         var oldAttrs = this.__originalAttrs.attrs;
         var newAttrs = {};
 
+        // restore original attributes
         for (var i = oldAttrs.length - 1; i >= 0; i--) {
             var old = oldAttrs[i];
-            newAttrs[old.name] = target.getAttribute(old.name);
-            target.setAttribute(old.name, old.value);
+            // restore only if the attribute value has changed
+            if (target.getAttribute(old.name) !== old.value) {
+                newAttrs[old.name] = target.getAttribute(old.name);
+                target.setAttribute(old.name, old.value);
+            }
         }
 
         this.record('click', this.findLocators(target), '');
 
         // revert attribute changes
         Object.keys(newAttrs).forEach(function(key) {
-            target.setAttribute(key, newAttrs[key]); ;
+            target.setAttribute(key, newAttrs[key]);
         });
     } else {
         this.record('click', this.findLocators(target), '');

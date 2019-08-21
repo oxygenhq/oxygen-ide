@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,13 +11,34 @@ import * as types from './types';
 
 const FONT_SIZE_MIN = 12;
 const FONT_SIZE_MAX = 36;
+const SAUCELABS_HUB_DEFAULT_URL = 'https://ondemand.saucelabs.com:443/wd/hub';
+const TESTINGBOT_HUB_DEFAULT_URL = 'https://hub.testingbot.com:443/wd/hub';
 
 const defaultAppSettings = {
   cache: null,
   files: {},
+  cloudProviders: {
+    sauceLabs: {
+      title: 'Sauce Labs',
+      url: SAUCELABS_HUB_DEFAULT_URL,
+      username: null,
+      accessKey: null,
+      extendedDebugging: false,
+      capturePerformance: false,
+      inUse: false,
+    },
+    testingBot: {
+      title: 'TestingBot',
+      url: TESTINGBOT_HUB_DEFAULT_URL,
+      key: null,
+      secret: null,
+      extendedDebugging: false,
+      inUse: false,
+    }
+  },
   lastSession: {
     tabs: [],
-    rootFolder: null,
+    rootFolder: null,    
   },
   recentFiles: null,
 };
@@ -51,7 +72,7 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { value, target, settings, zoom, cache, uuid } = payload;
+  const { value, target, settings, zoom, cache, uuid, providers } = payload;
   switch (action.type) {
     
     // // FIRST OPEN
@@ -209,8 +230,8 @@ export default (state = defaultState, action) => {
           }
         },
       };
-      // LOGGER_SET_VISIBLE
-      case types.LOGGER_SET_VISIBLE:
+    // LOGGER_SET_VISIBLE
+    case types.LOGGER_SET_VISIBLE:
       if (typeof value === 'undefined') {
         return state;
       }
@@ -223,12 +244,20 @@ export default (state = defaultState, action) => {
       };
       
     case 'FROM_CACHE': 
-      // console.log('!FROM_CACHE settings', cache.settings);
-
       return {
         ...defaultState,
         ...cache.settings
       }
+
+    case types.UPDATE_CLOUD_PROVIDERS_SETTINGS: 
+      if (!providers || typeof providers !== 'object') {
+        return state;
+      }
+      return {
+        ...state,
+        cloudProviders: providers
+      };
+
     case 'RESET': 
       return defaultState;
     

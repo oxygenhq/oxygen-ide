@@ -4,7 +4,9 @@
 
 import path from 'path';
 import webpack from 'webpack';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import TerserJSPlugin from 'terser-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import merge from 'webpack-merge';
 import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
@@ -31,66 +33,43 @@ export default merge.smart(baseConfig, {
       // Extract all .global.css to style.css as is
       {
         test: /\.global\.css$/,
-        use: ExtractTextPlugin.extract({
-          publicPath: './',
-          use: {
-            loader: 'css-loader',
-            options: {
-              minimize: true,
-            }
-          },
-          fallback: 'style-loader',
-        })
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+        ]
       },
       // Pipe other styles through css modules and append to style.css
       {
         test: /^((?!\.global).)*\.css$/,
-        use: ExtractTextPlugin.extract({
-          use: {
-            loader: 'css-loader',
-            options: {
-              minimize: true,
-              importLoaders: 1,
-            }
-          }
-        }),
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+        ]
       },
       // Add SASS support  - compile all .global.scss files and pipe it to style.css
       {
         test: /\.global\.(scss|sass)$/,
-        use: ExtractTextPlugin.extract({
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                minimize: true,
-                importLoaders: 1,
-              }
-            },
-            {
-              loader: 'postcss-loader'
-            },
-            {
-              loader: 'sass-loader'
-            },
-          ],
-        })
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: { importLoaders: 1 },
+          },
+          'postcss-loader',
+          'sass-loader'
+        ]
       },
       // Add SASS support  - compile all other .scss files and pipe it to style.css
       {
         test: /^((?!\.global).)*\.(scss|sass)$/,
-        use: ExtractTextPlugin.extract({
-          use: [{
-            loader: 'css-loader',
-            options: {
-              minimize: true,
-              importLoaders: 1,
-            }
-          },
+        use: [
+          MiniCssExtractPlugin.loader,
           {
-            loader: 'sass-loader'
-          }]
-        }),
+            loader: 'css-loader',
+            options: { importLoaders: 1 },
+          },
+          'sass-loader'
+        ]
       },
       // Fonts
       {
@@ -107,6 +86,9 @@ export default merge.smart(baseConfig, {
     ]
   },
 
+  optimization: {
+    minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
+  },
   plugins: [
     /**
      * Create global constants which can be configured at compile time.
@@ -126,7 +108,9 @@ export default merge.smart(baseConfig, {
       sourceMap: true
     }),
 
-    new ExtractTextPlugin('style.css'),
+    new MiniCssExtractPlugin({
+      filename: 'style.css'
+    }),
 
     new BundleAnalyzerPlugin({
       analyzerMode: process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',

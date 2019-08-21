@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-chmod');
-    
+    grunt.loadNpmTasks('grunt-stripcomments');
+
     grunt.loadTasks('./tools/grunt-tasks');
 
     var defaultTasks = [];
@@ -37,7 +38,6 @@ module.exports = function(grunt) {
         defaultTasks.push('chmod:geckodriver');
         defaultTasks.push('chmod:oxygendarwin');
     } else if (process.platform === 'win32') {
-        defaultTasks.push('copy:windows');
     }
     defaultTasks.push('rebrand');
 
@@ -46,19 +46,18 @@ module.exports = function(grunt) {
     } else if (process.platform === 'win32') {
         defaultTasks.push('installer-win');
     } else if (process.platform === 'darwin') {
-        defaultTasks.push('appdmg');
+        defaultTasks.push('installer-dmg');
     }
 
     grunt.registerTask('default', defaultTasks);
 
-    grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files']);
+    grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'comments:chrome-ext']);
 
     const OUTDIR = 'dist/temp';
     const RESOURCES = process.platform === 'darwin' ? '/Electron.app/Contents/Resources' : '/resources';
     const CHROME_EXT_SRC = 'browser-extensions/chrome/src/';
     const CHROME_EXT_DIST = 'browser-extensions/chrome/dist/';
     const RECORDER = 'browser-extensions/recorder/';
-    const IE_EXT_DIST = 'browser-extensions/ie/';
 
     // get production dependencies. instead of using '**' we get the actual deps list
     // because ** and tons of ingores (from modclean task) don't play along nicely
@@ -105,7 +104,17 @@ module.exports = function(grunt) {
                     RECORDER + 'locatorBuilders.js',
                     RECORDER + 'recorder.js',
                     RECORDER + 'engineXpath.js'],
-            dest: [CHROME_EXT_DIST + 'recorder.js', IE_EXT_DIST + 'recorder.js' ]
+            dest: [CHROME_EXT_DIST + 'recorder.js']
+        },
+        comments: {
+            'chrome-ext': {
+                options: {
+                    singleline: true,
+                    multiline: true,
+                    keepSpecialComments: false
+                },
+                src: [CHROME_EXT_DIST + 'recorder.js']
+            }
         },
         copy: {
             main: {
@@ -113,14 +122,17 @@ module.exports = function(grunt) {
                     { 
                         expand: true, 
                         cwd: 'app/node_modules', src: prodDeps.concat(['!fibers/src/**',
-                                                                   '!oxygen-cli/dotnet/**',
                                                                    '!oxygen-cli/lib/reporters/pdf/**',
                                                                    '!oxygen-cli/lib/reporters/html/**',
                                                                    '!**/obj/**',
                                                                    '!monaco-editor/dev/**',
                                                                    '!monaco-editor/esm/**',
                                                                    '!codepage/bits/**',
-                                                                   '!moment/src/**']),
+                                                                   '!moment/src/**',
+                                                                   '!node-idevice/apps/TestApp.ipa',
+                                                                   '!appium-ios-driver/instruments-iwd/iwd4/**',
+                                                                   '!appium-ios-driver/instruments-iwd/iwd5/**',
+                                                                   '!appium-ios-driver/instruments-iwd/iwd6/**']),
                         dest: OUTDIR + RESOURCES + '/app/node_modules' 
                     },
                     { 
@@ -128,14 +140,13 @@ module.exports = function(grunt) {
                         cwd: 'app', src: ['dist/**',
                                         'renderer/img/**',
                                         'main/selenium/*.jar',
-                                        'main/services/RecorderService/*.cer',
-                                        'main/services/RecorderService/*.pem',
                                         'main/selenium/' + process.platform + '/**',
                                         'renderer/app.html',
                                         'main/recorder/**',
                                         'renderer/index.js',
                                         'main/main.prod.*',
                                         'main/config.json',
+                                        'main/sentry.js',
                                         'package.json'],
                         dest: OUTDIR + RESOURCES + '/app' 
                     }
@@ -147,11 +158,6 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: 'resources', src: ['app.png'], 
                         dest: OUTDIR + RESOURCES + '/app'
-                    },
-                    { 
-                        expand: true, 
-                        cwd: 'app/main/services/RecorderService', src: ['CARoot.pem'], 
-                        dest: OUTDIR
                     }
                 ]
             },
@@ -161,20 +167,6 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: 'resources', src: ['app.icns'], 
                         dest: OUTDIR + RESOURCES
-                    },
-                    { 
-                        expand: true, 
-                        cwd: 'app/main/services/RecorderService', src: ['CARoot.cer'], 
-                        dest: OUTDIR + '/Electron.app'
-                    }
-                ]
-            },
-            windows: {
-                files: [
-                    { 
-                        expand: true, 
-                        cwd: 'browser-extensions/ie/bin/Release', src: ['IEAddon.dll'], 
-                        dest: OUTDIR
                     }
                 ]
             },
@@ -194,8 +186,8 @@ module.exports = function(grunt) {
             },
             chromedriver: {
                 src: [process.platform === 'linux' ? 
-                        OUTDIR + RESOURCES + '/app/main/selenium/linux/chromedriver' :
-                        OUTDIR + RESOURCES + '/app/main/selenium/darwin/chromedriver']
+                        OUTDIR + RESOURCES + '/app/main/selenium/linux/**/chromedriver' :
+                        OUTDIR + RESOURCES + '/app/main/selenium/darwin/**/chromedriver']
             },
             geckodriver: {
                 src: [process.platform === 'linux' ? 
@@ -221,7 +213,7 @@ module.exports = function(grunt) {
                 ]
             }
         },
-        appdmg: {
+        'installer-dmg': {
             options: {
                 title: 'Oxygen IDE ' + pkg.version,
                 icon: 'resources/app.icns',
@@ -231,15 +223,13 @@ module.exports = function(grunt) {
                     {x: 442, y: 210, type: 'link', path: '/Applications'},
                     {x: 186, y: 210, type: 'file', path: path.join(OUTDIR, 'Oxygen.app')},
                 ],
-                format: 'UDBZ',
-                'code-sign': {
-                    'signing-identity': '62CADA6FF6C358E1BC6023535D6A192B98390B76',
-                    identifier: 'org.oxygen.ide'
-                }
+                format: 'UDBZ'
             },
             target: {
-                dest:  'dist/oxygen-' + pkg.version + '-osx-x64.dmg'
+                dest:  'dist/oxygen-' + pkg.version + '-osx-x64.dmg',
+                'sign-identity': '21E9DBB193EBE7B9422F830962C2604A65233A02'
             }
+            
         },
         'installer-win': {
             version: pkg.version,

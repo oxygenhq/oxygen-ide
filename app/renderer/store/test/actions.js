@@ -43,6 +43,11 @@ export const setTestTarget = (value) => ({
   payload: { value },
 });
 
+export const setTestProvider = (value) => ({
+  type: ActionTypes.TEST_SET_PROVIDER,
+  payload: { value },
+});
+
 export const setTestMode = (value) => ({
   type: ActionTypes.TEST_SET_MODE,
   payload: { value },
@@ -78,14 +83,19 @@ export const removeDevice = (device) => ({
   payload: { device },
 });
 
-export const updateBreakpoints = (filePath, breakpoints) => ({
+export const updateBreakpoints = (filePath, breakpoints, fileName) => ({
   type: ActionTypes.TEST_UPDATE_BREAKPOINTS,
-  payload: { path: filePath, breakpoints },
+  payload: { path: filePath, breakpoints, fileName },
 });
 
 export const removeBreakpoints = (path) => ({
   type: ActionTypes.TEST_REMOVE_BREAKPOINTS,
   payload: { path },
+});
+
+export const moveBreakpointsFromTmpFileToRealFile = (tmpFilePath, tmpfileName, realFilePath) => ({
+  type: ActionTypes.TEST_MOVE_BREAKPOINTS_FROM_TMP_FILE_TO_REAL_FILE,
+  payload: { tmpFilePath, tmpfileName, realFilePath },
 });
 
 export const updateRunSettings = (settings) => ({

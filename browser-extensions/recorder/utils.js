@@ -7,25 +7,6 @@
  * (at your option) any later version.
  */
 
-// on IE8-9 console is undefined unless dev tools are open
-if (typeof(console) === 'undefined') {
-    console = { log: function (msg) { }, error: function (msg) { }};
-}
-
-// not defined in IE11
-if (typeof(String.prototype.startsWith) === 'undefined') {
-    String.prototype.startsWith = function (str) {
-        return this.indexOf(str) === 0;
-    };
-}
-
-// not defined in IE8
-if (typeof(String.prototype.trim) === 'undefined') {
-    String.prototype.trim = function() {
-        return String(this).replace(/^\s+|\s+$/g, '');
-    };
-}
-
 var ox_log = function (msg) {
     if (window.ox_debug) {
         console.log(msg);
@@ -45,28 +26,11 @@ var BrowserVersion = function () {
 };
 var browserVersion = new BrowserVersion();
 
-function RecorderError(message) {
-    var error = new Error(message);
-    if (typeof(arguments.caller) != 'undefined') { // IE, not ECMA
-        var result = '';
-        for (var a = arguments.caller; a !== null; a = a.caller) {
-            result += '> ' + a.callee.toString() + '\n';
-            if (a.caller == a) {
-                result += '*';
-                break;
-            }
-        }
-        error.stack = result;
-    }
-    return error;
-}
-
 /*
  * Returns the text in this element
- */ 
+ */
 function getText(element) {
-    var text = element.textContent ? element.textContent /*all current browsers*/ : element.innerText /*IE<=8*/;
-    text = normalizeNewlines(text);
+    var text = normalizeNewlines(element.textContent);
     text = normalizeSpaces(text);
     text = applyTextTransformation(element, text);
     return text.trim();
@@ -101,11 +65,6 @@ function normalizeNewlines(text) {
  * Replace multiple sequential spaces with a single space, and then convert &nbsp; to space.
  */
 function normalizeSpaces(text) {
-    // IE has already done this conversion, so doing it again will remove multiple nbsp
-    if (browserVersion.isIE) {
-        return text;
-    }
-
     // Replace multiple spaces with a single space
     // TODO - this shouldn't occur inside PRE elements
     text = text.replace(/\ +/g, ' ');

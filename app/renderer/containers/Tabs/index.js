@@ -13,6 +13,7 @@ import * as actions from '../../store/tabs/actions';
 
 const mapStoreToProps = (state) => {
   return {
+    recorder: state.recorder,
     tabs: state.tabs.list,
     active: state.tabs.active,
     activeTitle: state.tabs.activeTitle,

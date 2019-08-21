@@ -18,16 +18,10 @@ LocatorBuilders.order = [];
 LocatorBuilders.builderMap = {};
 
 LocatorBuilders.prototype.finder = function() {
-    var finder = this.window._locator_finder;
-    if (!finder) {
-        finder = new ElementFinder();
-        var self = this;
-        finder.getCurrentWindow = function() {
-            return self.window;
-        };
-        this.window._locator_finder = finder;
+    if (!this.window._locator_finder) {
+        this.window._locator_finder = new ElementFinder();
     }
-    return finder;
+    return this.window._locator_finder;
 };
 
 LocatorBuilders.prototype.buildWith = function(name, e, opt_contextNode) {
@@ -97,7 +91,7 @@ LocatorBuilders.prototype.buildAll = function(el) {
 
 LocatorBuilders.prototype.findElement = function (locator, unique) {
     try {
-        return this.finder().findElement(locator, null, unique);
+        return this.finder().findElement(locator, window, unique);
     } catch (error) {
         return null;
     }
@@ -384,6 +378,10 @@ LocatorBuilders.add('xpath:position', function(e, opt_contextNode) {
         }
 
         current = current.parentNode;
+
+        if (current.nodeType === Node.DOCUMENT_NODE) {
+            break;
+        }
     }
     return null;
 });

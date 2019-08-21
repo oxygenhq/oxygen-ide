@@ -13,7 +13,6 @@ import webpack from 'webpack';
 import chalk from 'chalk';
 import merge from 'webpack-merge';
 import { spawn, execSync } from 'child_process';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
@@ -244,10 +243,6 @@ export default merge.smart(baseConfig, {
 
     new webpack.LoaderOptionsPlugin({
       debug: true
-    }),
-
-    new MiniCssExtractPlugin({
-      filename: '[name].css'
     }),
   ],
 

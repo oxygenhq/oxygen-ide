@@ -93,7 +93,9 @@ const configureStore = (initialState?: counterStateType) => {
       return;
     }
 
-    if(action && action.type.startsWith('LOGGER_')){
+    if(action && action.type === 'LOGGER_SET_VISIBLE'){
+      // add to save cache
+    } else if(action && action.type.startsWith('LOGGER_')){
       return;
     }
 
@@ -108,25 +110,8 @@ const configureStore = (initialState?: counterStateType) => {
     delete state.recorder;
     delete state.wb;
 
-    // console.log('---');
-    // console.log('action', action);
-    // console.log('state', state);
-    // console.log('---');
-
-    // console.log('new state', state);
-    // console.log('new state stringify', JSON.stringify(state));
-
     const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [state] );
 
-    // if(result){
-    //   // console.log('---');
-    //   // console.log('cache in', cache);
-    //   // console.log('action', action);
-    //   // console.log('result', result);
-    //   // console.log('result.cache.tabs.list', result.cache.tabs.list);
-    //   // console.log('JSON.stringify result', JSON.stringify(result));
-    //   // console.log('---');
-    // }
     return state;
   }
 

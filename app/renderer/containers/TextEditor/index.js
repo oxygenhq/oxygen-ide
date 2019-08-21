@@ -12,26 +12,60 @@ import TextEditor from './TextEditor';
 import * as editorActions from '../../store/editor/actions';
 import { zoomIn, zoomOut } from '../../store/settings/actions';
 
+const checkForBreakpoints = (path, breakpoints) => {
+  let result = [];
+
+  if(path && breakpoints && breakpoints[path]){
+    result = breakpoints[path];
+  }
+
+  return result;
+}
 
 const mapStoreToProps = (state) => {
+  let breakpoints;
+
+  if(state && state.test && state.test.breakpoints){
+    breakpoints = state.test.breakpoints;
+  };
+
   // combine file data and editor related metadata
-  const openFiles = Object.keys(state.editor.openFiles).map(path => {
+  let openFiles = Object.keys(state.editor.openFiles).map(path => {
+
+
     if(path.startsWith('unknownUntitled')){
       return {
         ...state.settings.files[path],
-        ...state.editor.openFiles[path],
+        ...state.editor.openFiles[path]
       }
     } else if(path.endsWith('(deleted from disk)')){
-      return {
-        ...state.settings.files['unknown'+path],
-        ...state.editor.openFiles[path],
+
+      let fileData = null;
+
+      if(state.settings.files['unknown'+path]){
+        fileData = { ...state.settings.files['unknown'+path] };
+      } else if(state.settings.files[path]){
+        fileData = { ...state.settings.files[path] };
       }
+
+      if(fileData){
+        return {
+          ...fileData,
+          ...state.editor.openFiles[path],
+        }
+      }
+
     } else {
       return {
         ...state.fs.files[path],
         ...state.editor.openFiles[path],
+        breakpoints: checkForBreakpoints(path, breakpoints)
       }
     }
+  });
+
+  openFiles = openFiles.filter(function (el) {
+    return el != null;
   });
 
   return {
