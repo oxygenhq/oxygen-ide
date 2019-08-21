@@ -9,6 +9,7 @@
 // @flow
 import React, { PureComponent, Fragment } from 'react';
 import styled from '@emotion/styled';
+import { Icon } from 'antd';
 
 import FlexColumn from '../../components/core/FlexColumn';
 import Panel from '../../components/Panel';
@@ -48,6 +49,13 @@ export default class ObjectRepository extends PureComponent<Props> {
         searchResults: searchResults
     })
   }
+
+  closeSelectedObject = () => {
+    const { closeActive } = this.props;
+    if(closeActive){
+      closeActive();
+    }
+  }
   
   render() {
       const { tree, active, name, selectedObject, setActive } = this.props;
@@ -59,6 +67,15 @@ export default class ObjectRepository extends PureComponent<Props> {
       if (selectedObject && selectedObject.name !== '') {
         editorPanelTitle += ` - ${selectedObject.name}`;
       }
+
+      const editorPanelTitleWrap = (
+        <Fragment>
+          {editorPanelTitle} 
+          <div onClick={this.closeSelectedObject} className={`header-control`}>
+            <Icon type="close" />
+          </div>
+        </Fragment>
+      );
       return (
         <ObjectRepository.Container>
             <Panel 
@@ -84,7 +101,7 @@ export default class ObjectRepository extends PureComponent<Props> {
             </Panel>
             { selectedObject &&
               <Panel 
-                header={ editorPanelTitle } 
+                header={ editorPanelTitleWrap } 
                 noBodyPadding={ true } 
               >
                 <ObjectEditor 

@@ -8,4 +8,6 @@
  */
 export const OR_OPEN_FILE = 'OR_OPEN_FILE';
 export const OR_SET_ACTIVE = 'OR_SET_ACTIVE';
+export const OR_CLOSE_ACTIVE = 'OR_CLOSE_ACTIVE';
 export const OR_SET_PARENT = 'OR_SET_PARENT';
+export const OR_CLEAR = 'OR_CLEAR';

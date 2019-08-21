@@ -57,3 +57,13 @@
 .control-wrap-right {
   text-align: right;
 }
+.control-wrap-right-flex {
+  display: flex;
+  position: absolute;
+  right: 5px;
+}
+
+.list .list-item .item-value-wrap .control-wrap-right-flex .control {
+  margin: 3px;
+  min-width: auto;
+}

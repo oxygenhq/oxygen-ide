@@ -606,6 +606,12 @@ export function* openFile({ payload }) {
         yield openObjectRepositoryFile(file);
         yield put(wbActions._openFile_Success(path));
         return;
+    } else {
+        const objrepo = (yield select(state => state.objrepo)) || null;
+       
+        if(objrepo && objrepo.path){
+            yield clearObjectRepositoryFile();
+        }
     }
     // if we are here, it means we are trying to open a regular file (not object repository)
 
@@ -631,6 +637,12 @@ export function* openObjectRepositoryFile(file) {
     yield put(orActions.openFile(file.path));
     yield put(settingsActions.setSidebarComponent('right', 'obj-repo'));
     yield put(settingsActions.setSidebarVisible('right', true));
+}
+
+export function* clearObjectRepositoryFile() {
+    yield put(orActions.clearObjRepo());
+    yield put(settingsActions.setSidebarComponent('right', null));
+    yield put(settingsActions.setSidebarVisible('right', false));
 }
 
 export function* renameFile({ payload }) {
@@ -716,6 +728,8 @@ export function* updateLocator({ payload }) {
     
 
     const result = renameLocatorInRepoRoot(repoRootCopy, path, newName, oldName);
+
+    console.log('result', result);
 
     repoRootCopy = result;
 

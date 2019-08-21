@@ -9,7 +9,7 @@
 // @flow
 
 import React, { PureComponent, Fragment } from 'react';
-import { Input, Button } from 'antd';
+import { Input, Button, Icon } from 'antd';
 import styled from '@emotion/styled';
 
 import FlexColumn from './FlexColumn';
@@ -85,22 +85,26 @@ export default class List extends PureComponent<ListProps> {
         const { 
             data = null,
             editable = false,
+            editing
         } = this.props;
 
         if (!data || !Array.isArray(data) || data.length === 0 || !data[0]) {
             return(
                 <Fragment>
-                    <div className="control-wrap">
-                        <div className="control-wrap-right">
-                            <Button 
-                                onClick={ this.startAdd }
-                                className="control"
-                                type="primary"
-                                shape="circle" 
-                                icon="plus" 
-                            />
+                    {
+                        !editing && 
+                        <div className="control-wrap">
+                            <div className="control-wrap-right">
+                                <Button 
+                                    onClick={ this.startAdd }
+                                    className="control"
+                                    type="primary"
+                                    shape="circle" 
+                                    icon="plus" 
+                                />
+                            </div>
                         </div>
-                    </div>
+                    }
                     <EmptyList />
                 </Fragment>
             );
@@ -111,25 +115,24 @@ export default class List extends PureComponent<ListProps> {
             return (
                 <Fragment>
                     <div className="control-wrap">
-                        <div className="control-wrap-right">
-                            <Button 
-                                onClick={ () => this.deleteSingleLocator(data[0]) }
-                                className="control" 
-                                type="primary" 
-                                shape="circle" 
-                                icon="delete" 
-                            />
-                            <Button 
-                                onClick={ () => this.startEditSingleLocator(data[0]) }
-                                className="control" 
-                                type="primary" 
-                                shape="circle" 
-                                icon="edit" 
-                            />
-                        </div>
                     </div>
                     <List.Container className="list list-auto-height" onKeyPress={(e) => this.handleKeyPress(e)}>
-                        { data.map( (itm, index) => <ListItem key={ `itm_${index}`} data={ itm } editable={ editable } />) }
+                        { data.map( (itm, index) => <ListItem key={ `itm_${index}`} data={ itm } editable={ editable } controls={
+                            <div className="control-wrap-right control-wrap-right-flex">
+                                <div 
+                                    onClick={ () => this.startEditSingleLocator(data[0]) }
+                                    className="control" 
+                                >
+                                    <Icon type="edit" />
+                                </div>
+                                <div 
+                                    onClick={ () => this.deleteSingleLocator(data[0]) }
+                                    className="control" 
+                                >
+                                    <Icon type="delete" />
+                                </div>
+                            </div>
+                        } />) }
                     </List.Container>
                 </Fragment>
             );
@@ -219,6 +222,7 @@ class ListItem extends PureComponent<ListItemProps> {
         const {
             data = '',
             editable = false,
+            controls = null
         } = this.props;
 
         const { editing } = this.state;
@@ -243,6 +247,7 @@ class ListItem extends PureComponent<ListItemProps> {
                         // onClick={ ::this.toggleEdit } 
                     >   
                         { value }
+                        { controls }
                     </div>
                 }
             </ListItem.Container>

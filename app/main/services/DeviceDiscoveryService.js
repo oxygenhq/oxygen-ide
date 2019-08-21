@@ -94,8 +94,8 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 });
             })
             .catch((e) => {
-                console.log('#e getConnectedDevices e', devices);
-                console.debug(e);
+                // console.log('#e getConnectedDevices e', devices);
+                // console.debug(e);
                 if (self.retries-- === 0) {
                     Promise.resolve(e);
                 }

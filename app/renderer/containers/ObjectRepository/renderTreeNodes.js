@@ -11,7 +11,7 @@ import React from 'react';
 
 const checkHighLightChild = (arr, searchResults) => {
   return arr.some(item => {
-    return (searchResults.indexOf(item.name) > -1);
+    return (searchResults.indexOf(item.name) > -1 || item.type === "container" && checkHighLightChild(item.children, searchResults));
   })
 }
 
@@ -46,7 +46,7 @@ function renderTreeNodes(nodes, searchResults) {
       let theTitle = element.name;  
       let highLight = false;
 
-       if (searchResults.indexOf(theTitle) > -1) {
+      if (searchResults.indexOf(theTitle) > -1) {
         highLight = true;
       }
       const highLightStyle = highLight ? { backgroundColor: 'yellow' } :  {};

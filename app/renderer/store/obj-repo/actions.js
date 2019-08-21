@@ -36,3 +36,15 @@ export const setActive = (path) => ({
   type: ActionTypes.OR_SET_ACTIVE,
   payload: { path },
 });
+
+// closeActive
+export const closeActive = () => ({
+  type: ActionTypes.OR_CLOSE_ACTIVE,
+  payload: {},
+});
+
+// clear
+export const clearObjRepo = () => ({
+  type: ActionTypes.OR_CLEAR,
+  payload: {  },
+});

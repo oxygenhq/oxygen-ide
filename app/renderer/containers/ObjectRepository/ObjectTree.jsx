@@ -41,7 +41,7 @@ export default class ObjectTree extends PureComponent<Props> {
     }
   }
 
-  handleSelectNode(selectedKeys, info) {
+  handleSelectNode = (selectedKeys, info) => {
     const { nodeInfo } = info.node.props;
     this.props.onSelect(nodeInfo.path);
   }
@@ -57,7 +57,7 @@ export default class ObjectTree extends PureComponent<Props> {
             defaultExpandedKeys={ ['nonexistingkey'] }
             autoExpandParent
             selectedKeys={ selectedKeys }
-            onSelect={ ::this.handleSelectNode }
+            onSelect={ this.handleSelectNode }
         >
             { renderTreeNodes.apply(this, [tree, searchResults]) }
         </Tree>

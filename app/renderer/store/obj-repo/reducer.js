@@ -52,6 +52,19 @@ export default (state = defaultState, action) => {
         active: path,
       };
 
+    // OR_CLOSE_ACTIVE
+    case ActionTypes.OR_CLOSE_ACTIVE:
+      return {
+        ...state,
+        active: null,
+      };
+    
+
+    // OR_CLEAR
+    case ActionTypes.OR_CLEAR: {
+      return defaultState;
+    }
+
     default:
       return state;
   }

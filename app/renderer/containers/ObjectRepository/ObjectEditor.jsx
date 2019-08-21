@@ -151,6 +151,13 @@ export default class ObjectEditor extends PureComponent<Props> {
     })
   }
 
+  cancelEdit = () => {
+    this.setState({
+      editStr: null,
+      editing: false
+    });
+  }
+
   onChangeUpdate = (name) => {
     this.setState({
       editStr: name
@@ -177,6 +184,7 @@ export default class ObjectEditor extends PureComponent<Props> {
           editStr={ this.state.editStr }
           onChangeUpdate={ this.onChangeUpdate }
           finishEdit={ this.finishEdit }
+          cancelEdit={ this.cancelEdit }
           addLocator={this.addLocator} 
         />
       )
@@ -206,6 +214,8 @@ export default class ObjectEditor extends PureComponent<Props> {
           addLocator={this.addLocator} 
           onChangeUpdate={ this.onChangeUpdate }
           finishEdit={ this.finishEditLocator }
+          cancelEdit={ this.cancelEdit }
+          locator={ true }
         />
       )
     }
@@ -262,6 +272,7 @@ export default class ObjectEditor extends PureComponent<Props> {
           object= { object }
           data={ locators } 
           editable={ true } 
+          editing={ this.state.editing }
         />
       </Fragment>
     );

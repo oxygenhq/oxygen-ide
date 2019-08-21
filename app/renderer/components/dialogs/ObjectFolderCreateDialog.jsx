@@ -26,11 +26,15 @@ type Props = {
 };
 
 export default class ObjectFolderCreateDialog extends PureComponent<Props> {
-  props: Props;
+  constructor(props: Props) {
+    super(props: Props);
 
-  state = {
-    ...DEFAULT_STATE,
-    type: this.props.type ? this.props.type : 'object',
+    this.textInput = null;
+
+    this.state = {
+        ...DEFAULT_STATE,
+        type: this.props.type ? this.props.type : 'object',
+    }
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -53,6 +57,23 @@ export default class ObjectFolderCreateDialog extends PureComponent<Props> {
     // or return null if no changes were made
     return null;
   }
+  
+  componentDidMount(){
+    this.focusTextInput();
+  }
+
+  focusTextInput = () => {
+    if (this.textInput && this.textInput.focus) this.textInput.focus();
+  };
+
+  setTextInputRef = element => {
+    if(element){
+        this.textInput = element;
+        if(this.textInput && this.textInput.focus){
+            this.textInput.focus();
+        }
+    }
+  };
 
   onChangeName(e) {
     this.setState({
@@ -94,6 +115,7 @@ export default class ObjectFolderCreateDialog extends PureComponent<Props> {
         onCancel={onCancel}
       >
         <Input
+          ref={this.setTextInputRef}
           onChange={this.onChangeName.bind(this)}
           style={{ marginBottom: 15 }}
           value={ name }

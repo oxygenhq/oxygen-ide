@@ -57,6 +57,14 @@ export default class LocatorsChanger extends PureComponent<Props> {
     }
   }
 
+  cancelUpdate = () => {
+    const { cancelEdit } = this.props;
+
+    if(cancelEdit){
+      cancelEdit();
+    }
+  }
+
   toggleAdd = () => {
     this.setState({
       addLocator: !this.state.addLocator
@@ -113,7 +121,8 @@ export default class LocatorsChanger extends PureComponent<Props> {
       editStr, 
       selectedLocatorName, 
       selectedLocatorIndex,
-      length 
+      length,
+      locator
     } = this.props;
     const { text, addLocator } = this.state;
     
@@ -121,7 +130,7 @@ export default class LocatorsChanger extends PureComponent<Props> {
 
     if(editing){
       child =  (
-        <div className="locators-changer-container">
+        <div className="locators-update-container">
           <Input 
             ref={this.inputRef} 
             value={ editStr }
@@ -132,7 +141,11 @@ export default class LocatorsChanger extends PureComponent<Props> {
             onClick={ this.update }
             className="add-btn"
             type="primary"
-          >Update</Button>
+          >{ locator ? 'Add' : 'Update' }</Button>
+          <Button 
+            onClick={ this.cancelUpdate }
+            className="add-btn"
+          >Cancel</Button>
         </div>
       )
     }
@@ -155,31 +168,38 @@ export default class LocatorsChanger extends PureComponent<Props> {
       )
     }
 
+    const freezAllBtns = editing || addLocator;
+    const upDisabled = freezAllBtns || !selectedLocatorName || (selectedLocatorIndex === 0);
+    const downDisabled = freezAllBtns || !selectedLocatorName || (selectedLocatorIndex+1 === length);
+
     return (
       <Fragment>
-        <div className="locators-changer-container">
-          <div onClick={this.toggleAdd} className="control">
-            <Icon type={ addLocator ? "minus" : "plus" } />
+        {
+          !locator &&
+          <div className="locators-changer-container">
+            <div onClick={ () => {!freezAllBtns && this.toggleAdd()}} className={`control ${ freezAllBtns ? 'disabled' : '' }`}>
+              <Icon type={ addLocator ? "minus" : "plus" } />
+            </div>
+  
+            <div className="control-group">
+              <div onClick={() => {!upDisabled && this.up()}} className={`control ${ upDisabled ? 'disabled' : '' }`}>
+                <Icon type="up" />
+              </div>
+              <div onClick={() => {!downDisabled && this.down()}} className={`control ${ downDisabled ? 'disabled' : '' }`}>
+                <Icon type="down" />
+              </div>
+            </div>
+  
+            <div className="control-group">
+              <div onClick={this.edit} className={`control ${ !selectedLocatorName ? 'disabled' : '' }`}>
+                <Icon type="edit" />
+              </div>
+              <div onClick={this.remove} className={`control ${ !selectedLocatorName ? 'disabled' : '' }`}>
+                <Icon type="delete" />
+              </div>
+            </div>
           </div>
-
-          <div className="control-group">
-            <div onClick={this.up} className={`control ${ ( !selectedLocatorName || (selectedLocatorIndex === 0) ) ? 'disabled' : '' }`}>
-              <Icon type="up" />
-            </div>
-            <div onClick={this.down} className={`control ${ ( !selectedLocatorName || (selectedLocatorIndex+1 === length) ) ? 'disabled' : '' }`}>
-              <Icon type="down" />
-            </div>
-          </div>
-
-          <div className="control-group">
-            <div onClick={this.edit} className={`control ${ !selectedLocatorName ? 'disabled' : '' }`}>
-              <Icon type="edit" />
-            </div>
-            <div onClick={this.remove} className={`control ${ !selectedLocatorName ? 'disabled' : '' }`}>
-              <Icon type="delete" />
-            </div>
-          </div>
-        </div>
+        }
         {child}
       </Fragment>
     )

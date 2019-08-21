@@ -14,38 +14,61 @@ import '../../css/search-row.scss';
    trees.map(t => {
     const includeInName = check(t, searchQuery);
 
-     let nameMatch = {};
+      let nameMatch = {};
 
-     if(includeInName){
-      const { children, ...data } = t;
-      nameMatch = data;
-    }
-
-     if(t.children){
-      const includeInChildren = t.children.filter(c => {
-        return check(c, searchQuery)
-      });
-
-       let result = [];
-
-       if(nameMatch.name){
-        result = [ nameMatch , ...includeInChildren ];
-      } else {
-        result = includeInChildren;
-      }
-
-       if(result.length){
-        result.forEach(element => {
-          results.push(element.name);
-        });
-      } else {
-        return false;
-      }
-    } else {
       if(includeInName){
-        results.push(nameMatch.name);
+        const { children, ...data } = t;
+        nameMatch = data;
       }
-    }
+
+      if(t.children){
+
+        const containerResults = [];
+
+        const includeInChildren = t.children.filter(c => {
+          
+
+          const checkResult = check(c, searchQuery);
+
+          if(c.type === "container" && c.children && Array.isArray(c.children)){
+            const containerResult = getVisibleTrees(c.children, searchQuery);
+            
+            if(Array.isArray(containerResult) && containerResult.length > 0){
+              containerResult.forEach(element => {
+                containerResults.push(element);
+              });
+            }
+          }
+
+          return checkResult;
+        });
+
+        let result = [];
+
+        if(nameMatch.name){
+          result = [ nameMatch , ...includeInChildren ];
+        } else {
+          result = includeInChildren;
+        }
+
+        if(containerResults.length){
+          containerResults.forEach(element => {
+            result.push(element);
+          })
+        }
+
+        if(result.length){
+          result.forEach(element => {
+            results.push(element.name || element);
+          });
+        } else {
+          return false;
+        }
+      } else {
+        if(includeInName){
+          results.push(nameMatch.name);
+        }
+      }
   })
 
    return results;
@@ -66,11 +89,12 @@ import '../../css/search-row.scss';
    onChange = (e) => {
     const { tree } = this.props;
 
-     const newSearchQuery = e.target.value.trim()
-    const searchResults = getVisibleTrees(tree, newSearchQuery)
+    const newSearchQuery = e.target.value.trim();
 
+    const searchResults = getVisibleTrees(tree, newSearchQuery);
+    
      this.setState({ 
-      searchQuery: newSearchQuery ,
+      searchQuery: newSearchQuery,
       searchResults: searchResults
     }, () => {
       this.props.setSearchResults(searchResults);
@@ -88,7 +112,7 @@ import '../../css/search-row.scss';
     })
   }
 
-   render() {
+  render() {
     const { searchQuery, searchResults } = this.state;
     const { tree } = this.props;
     if(tree){

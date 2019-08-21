@@ -27,3 +27,30 @@
     margin-left: 8px;
   }
 }
+
+.locators-update-container {
+  padding: 8px;
+  
+  .ant-btn {
+    margin: 5px 0px ;
+  }
+
+  .ant-btn-primary {
+    margin-right: 5px;
+  }
+}
+
+.header-control {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+}
+
+
+.header-control:hover {
+  cursor: pointer;
+}
+
+.header-control.disabled:hover {
+  cursor: not-allowed;
+}
