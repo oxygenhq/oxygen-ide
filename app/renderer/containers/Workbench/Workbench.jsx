@@ -15,6 +15,8 @@ import updateModals from '../../components/updateModals';
 import JavaDialog from '../../components/dialogs/JavaDialog';
 import FileRenameDialog from '../../components/dialogs/FileRenameDialog';
 import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
+import ObjectCreateDialog from '../../components/dialogs/ObjectCreateDialog';
+import ObjectFolderCreateDialog from '../../components/dialogs/ObjectFolderCreateDialog';
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
 import SettingsDialog from '../../components/dialogs/SettingsDialog';
 import NeedInstallExtension from '../../components/dialogs/NeedInstallExtension';
@@ -35,6 +37,7 @@ import Sidebar from '../../components/Sidebar';
 import Landing from '../../components/Landing';
 import Initializing from '../../components/Initializing';
 import Settings from '../Settings';
+import ObjectRepository from '../ObjectRepository';
 import * as Controls from '../../components/Toolbar/controls';
 // Styles
 import '../../css/common.scss';
@@ -262,7 +265,7 @@ export default class Workbench extends Component<Props> {
   }
 
   getToolbarControlsState() {
-    const { test, isRecording, settings, dialog, editorActiveFile } = this.props;
+    const { test, isRecording, editorActiveFile } = this.props;
     return {
       [Controls.TEST_RUN]: {
         visible: !test.isRunning,
@@ -336,6 +339,25 @@ export default class Workbench extends Component<Props> {
   fileCreateDialog_onCancel() {
     this.props.hideDialog('DIALOG_FILE_CREATE');
   }
+
+  objectCreateDialog_onSubmit(name, type, parentPath) {
+    this.props.hideDialog('DIALOG_OBJECT_CREATE');
+    this.props.createObject(name, parentPath);
+  }
+
+  objectCreateDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_CREATE');
+  }
+
+  objectFolderCreateDialog_onSubmit(name, type, parentPath) {
+    this.props.hideDialog('DIALOG_OBJECT_FOLDER_CREATE');
+    this.props.createObjectFolder(name, parentPath);
+  }
+
+  objectFolderCreateDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_FOLDER_CREATE');
+  }
+
   // Rename
   fileRenameDialog_onSubmit(path, type, newName) {
     this.props.hideDialog('DIALOG_FILE_RENAME');
@@ -399,6 +421,8 @@ export default class Workbench extends Component<Props> {
     const leftSidebarVisible = settings.sidebars.left.visible;
     const rightSidebarSize = settings.sidebars.right.size;
     const rightSidebarVisible = settings.sidebars.right.visible;
+    const rightSidebarComponent = settings.sidebars.right.component;
+    // logger state
     const loggerVisible = settings.logger.visible;
     const showLanding = settings.showLanding;
     const showRecorderMessage = settings.showRecorderMessage;
@@ -441,6 +465,24 @@ export default class Workbench extends Component<Props> {
           { dialog.DIALOG_NEED_ISTALL_EXTENSION && dialog.DIALOG_NEED_ISTALL_EXTENSION.visible &&
             <NeedInstallExtension
               onClose={ this.needInstallExtensionOnClose }
+            />
+          }
+          <ObjectCreateDialog
+            { ...dialog['DIALOG_OBJECT_CREATE'] }
+            onSubmit={ ::this.objectCreateDialog_onSubmit }
+            onCancel={ ::this.objectCreateDialog_onCancel } 
+          />
+          <ObjectFolderCreateDialog
+            { ...dialog['DIALOG_OBJECT_FOLDER_CREATE'] }
+            onSubmit={ ::this.objectFolderCreateDialog_onSubmit }
+            onCancel={ ::this.objectFolderCreateDialog_onCancel } 
+          />
+
+          { dialog.DIALOG_FILE_CREATE && dialog.DIALOG_FILE_CREATE.visible &&
+            <FileCreateDialog 
+              { ...dialog['DIALOG_FILE_CREATE'] }
+              onSubmit={ ::this.fileCreateDialog_onSubmit }
+              onCancel={ ::this.fileCreateDialog_onCancel } 
             />
           }
           { dialog.DIALOG_INCORECT_CHROME_DRIVER_VERSION && dialog.DIALOG_INCORECT_CHROME_DRIVER_VERSION.visible &&
@@ -534,24 +576,24 @@ export default class Workbench extends Component<Props> {
                   />
                 </Sidebar>
                 <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
-                <Header className="tabs-container">{/*headerBar*/}
-                  <Row>
-                    <Col className="sidebar-trigger">                      
-                      <Icon
-                        title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
-                        className="trigger"
-                        type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
-                        onClick={ () => ::this.toggleSidebarVisible('left') }
-                        style={{ paddingLeft: 15, cursor: 'pointer' }}
-                      />
-                    </Col>
-                    <Col className="tabs-bar-container">
-                      <Tabs 
-                        onChange={ this.handleTabChange } 
-                        onClose={ this.handleTabClose } 
-                      />
-                    </Col>
-                  </Row>
+                  <Header className="tabs-container">{/*headerBar*/}
+                    <Row>
+                      <Col className="sidebar-trigger">                      
+                        <Icon
+                          title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
+                          className="trigger"
+                          type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
+                          onClick={ () => ::this.toggleSidebarVisible('left') }
+                          style={{ paddingLeft: 15, cursor: 'pointer' }}
+                        />
+                      </Col>
+                      <Col className="tabs-bar-container">
+                        <Tabs 
+                          onChange={ this.handleTabChange } 
+                          onClose={ this.handleTabClose } 
+                        />
+                      </Col>
+                    </Row>
                 </Header>
                 <div className="editor-container">
                   <div id="editors-container-wrap">
@@ -565,14 +607,15 @@ export default class Workbench extends Component<Props> {
                     onHide={::this.logger_onHide}
                   />
                 </div>
-              </Layout>
+                </Layout>
                 <Sidebar 
                   align="right"
                   size={ rightSidebarSize } 
                   visible={ rightSidebarVisible } 
                   onResize={ (size) => ::this.handleSidebarResize('right', size) }
                 >
-                  <Settings />
+                  { rightSidebarComponent === 'settings' && <Settings /> } 
+                  { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
                 </Sidebar>
               </Layout>
           </Col>

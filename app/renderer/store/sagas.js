@@ -14,6 +14,7 @@ import editor from './editor/sagas';
 import test from './test/sagas';
 import recorder from './recorder/sagas';
 import settings from './settings/sagas';
+import objrepo from './obj-repo/sagas';
 import dealog from './dialog/sagas';
 
 // services
@@ -31,6 +32,7 @@ export default function* root() {
     fork(test),
     fork(recorder),
     fork(settings),
+    fork(objrepo),
     fork(dealog),
   ];
   // check if any service has saga functions as well

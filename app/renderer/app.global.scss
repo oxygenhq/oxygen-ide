@@ -17,6 +17,14 @@ html, body, #root, #root > div {
   overflow: hidden;
 }
 
+html {
+  box-sizing: border-box;
+}
+
 #root > div > .ant-row {
   height: calc(100vh - 43px);
+}
+
+*, ::after, ::before {
+  box-sizing: border-box;
 }

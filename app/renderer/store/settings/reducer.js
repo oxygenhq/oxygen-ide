@@ -64,6 +64,7 @@ const defaultState = {
     right: {
       visible: false,
       size: 250,
+      component: null,
     },
   },
   ...defaultAppSettings,
@@ -211,6 +212,21 @@ export default (state = defaultState, action) => {
           [target]: {
             ...state.sidebars[target],
             size: value,
+          }
+        },
+      };
+    // SIDEBAR_SET_COMPONENT
+    case types.SIDEBAR_SET_COMPONENT:
+      if (typeof value === 'undefined' || typeof target === 'undefined') {
+        return state;
+      }
+      return {
+        ...state,
+        sidebars: {
+          ...state.sidebars,
+          [target]: {
+            ...state.sidebars[target],
+            component: value,
           }
         },
       };

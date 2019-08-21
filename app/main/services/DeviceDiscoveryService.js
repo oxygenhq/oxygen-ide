@@ -34,7 +34,7 @@ const DEVICE_INFO = {
     }
 };
 
-export default class DeviceDiscoveryService2 extends ServiceBase {
+export default class DeviceDiscoveryService extends ServiceBase {
     devices = {};
     updatingDeviceList = false;
     devListInterval = null;

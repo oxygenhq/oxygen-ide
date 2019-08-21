@@ -1,5 +1,9 @@
 @import 'vars';
 
+.panel-full-height {
+  height: calc(100% - 60px) !important;
+}
+
 .panel-header {
   -webkit-user-select: none;
   cursor: default;
@@ -28,6 +32,9 @@
 .panel-body {
   border-right: solid 1px $panelBorderColor;
   border-left: solid 1px $panelBorderColor;
+  padding-left: $panelBodyPadding;
+  padding-top: $panelBodyPadding;
+  padding-bottom: $panelBodyPadding;
   background-color: $panelBodyBgColor;
   font-family: Helvetica;
   font-size: 12px;
@@ -37,9 +44,22 @@
   line-height: normal;
   letter-spacing: normal;
   color: #333333;
-  height: 100vh;
-  overflow: hidden; 
+  /*height: calc(100vh - 73px);*/
+  height:calc(100% - 30px);
+  height:-moz-calc(100% - 30px);
+  height:-webkit-calc(100% - 30px);
+  overflow: hidden;     
 }
+
+.panel-body.no-padding {
+  padding: 0px !important;
+}
+
+.panel-body.no-borders {
+  border-right: none;
+  border-left: none;
+}
+
 .panel-body:not(> .scroller) {
   padding-right: 8px;
 }

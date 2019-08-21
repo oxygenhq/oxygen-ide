@@ -10,6 +10,17 @@ import uuidv4 from'uuid/v4';
 import { all, put, select, takeLatest, take, call, fork } from 'redux-saga/effects';
 import { putAndTake } from '../../helpers/saga';
 import pathHelper from 'path';
+import { 
+    copyObjectInRepoRoot,
+    createObjectInRepoRoot,
+    createFolderInRepoRoot,
+    deleteLocatorInRepoRoot,
+    updateLocatorValueInRepoRoot,
+    addLocatorInRepoRoot,
+    deleteObjectOrFolder,
+    renameLocatorInRepoRoot,
+    moveLocatorInRepoRoot
+} from '../../helpers/objrepo';
 
 import SupportedExtensions from '../../helpers/file-extensions';
 import * as Const from '../../../const';
@@ -25,6 +36,7 @@ import * as dialogActions from '../dialog/actions';
 import * as recorderActions from '../recorder/actions';
 import * as settingsActions from '../settings/actions';
 import { reportError } from '../sentry/actions';
+import * as orActions from '../obj-repo/actions';
 
 import { success, failure, successOrFailure } from '../../helpers/redux';
 
@@ -54,6 +66,14 @@ export default function* root() {
       takeLatest(ActionTypes.WB_RENAME_FILE, renameFile),
       takeLatest(ActionTypes.WB_SHOW_NEW_FILE_DIALOG, showNewFileDialog),
       takeLatest(ActionTypes.WB_CREATE_FILE, createFile),
+      takeLatest(ActionTypes.WB_CREATE_OBJECT, createObject),
+      takeLatest(ActionTypes.WB_CREATE_OBJECT_FOLDER, createObjectFolder),
+      takeLatest(ActionTypes.WB_ADD_LOCATOR, addLocator),
+      takeLatest(ActionTypes.WB_MOVE_LOCATOR, moveLocator),
+      takeLatest(ActionTypes.WB_DELETE_LOCATOR, deleteLocator),
+      takeLatest(ActionTypes.WB_UPDATE_LOCATOR, updateLocator),
+      takeLatest(ActionTypes.WB_UPDATE_LOCATOR_VALUE, updateLocatorValue),
+      takeLatest(ActionTypes.WB_REMOVE_OBJECT_OR_FOLDER, removeObjectOrFolder),
       takeLatest(ActionTypes.WB_CREATE_FOLDER, createFolder),
       takeLatest(ActionTypes.WB_DELETE_FILE, deleteFile),
       takeLatest(ActionTypes.WB_SAVE_CURRENT_FILE, saveCurrentFile),   
@@ -114,6 +134,15 @@ export function* handleMainMenuEvents({ payload }) {
     }
     else if (cmd === Const.MENU_CMD_OPEN_FILE) {
         yield put(wbActions.showDialog('OPEN_FILE'));
+    }
+    else if (cmd === Const.MENU_CMD_ORE_NEW_OBJECT) {
+        yield showNewObjectDialog({});
+    }
+    else if (cmd === Const.MENU_CMD_ORE_NEW_FOLDER) {
+        yield showNewObjectFolderDialog({});
+    }
+    else if (cmd === Const.MENU_CMD_ORE_COPY_OBJECT) {
+        yield copyObject({});
     }
     else if (cmd === Const.MENU_CMD_NEW_FILE) {
         yield openFakeFile();
@@ -511,6 +540,20 @@ export function* openFile({ payload }) {
         yield put(wbActions._openFile_Failure(path, { message: 'File type is not supported.' }));
         return;
     }
+    // check if this is an object repository file and handle it separately
+    if (file.name.endsWith('.repo.js') || file.name.endsWith('.repo.json')) {
+        yield openObjectRepositoryFile(file);
+        yield put(wbActions._openFile_Success(path));
+        return;
+    } else {
+        const objrepo = (yield select(state => state.objrepo)) || null;
+       
+        if(objrepo && objrepo.path){
+            yield clearObjectRepositoryFile();
+        }
+    }
+    // if we are here, it means we are trying to open a regular file (not object repository)
+
     // add new tab or make the existing one active
     yield put(tabActions.addTab(path, file.name));
     yield put(tabActions.setActiveTab(path));
@@ -527,6 +570,18 @@ export function* openFile({ payload }) {
         yield put(testActions.setMainFile(path));
         yield put(wbActions._openFile_Success(path));
     }
+}
+
+export function* openObjectRepositoryFile(file) {
+    yield put(orActions.openFile(file.path));
+    yield put(settingsActions.setSidebarComponent('right', 'obj-repo'));
+    yield put(settingsActions.setSidebarVisible('right', true));
+}
+
+export function* clearObjectRepositoryFile() {
+    yield put(orActions.clearObjRepo());
+    yield put(settingsActions.setSidebarComponent('right', null));
+    yield put(settingsActions.setSidebarVisible('right', false));
 }
 
 export function* renameFile({ payload }) {
@@ -546,6 +601,158 @@ export function* createFile({ payload }) {
         //yield put(fsActions.treeLoadNodeChildren())
         yield put(wbActions._createFile_Success(path, name));
         yield put(wbActions.openFile(path+pathHelper.sep+name));
+    }
+}
+
+export function* createObjectFolder({ payload }) {
+
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    // name - object name
+    const { path, name } = payload;
+    const { start, end, repoRoot, parent } = objrepo;
+
+    let repoRootCopy = { ...repoRoot };
+   
+    const result = createFolderInRepoRoot(repoRootCopy, path, parent );
+
+    repoRootCopy = result;
+
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ name,  newFileContent, true])
+}
+
+export function* createObject({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    // name - object name
+    const { path, name } = payload;
+    
+    const { start, end, repoRoot, parent } = objrepo;
+    let repoRootCopy = { ...repoRoot };
+   
+    const result = createObjectInRepoRoot(repoRootCopy, path, parent );
+
+    repoRootCopy = result;
+
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ name,  newFileContent, true])
+}
+
+export function* removeObjectOrFolder({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { path, name } = payload;
+    
+    const { start, end, repoRoot, parent } = objrepo;
+    let repoRootCopy = { ...repoRoot };
+
+    const result = deleteObjectOrFolder(repoRootCopy, path, name);
+
+    repoRootCopy = result;
+    
+
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    if(objrepo && objrepo.path){
+        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+    }
+}
+
+export function* updateLocator({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { path, newName, oldName } = payload;
+    
+    const { start, end, repoRoot, parent } = objrepo;
+    let repoRootCopy = { ...repoRoot };
+    
+
+    const result = renameLocatorInRepoRoot(repoRootCopy, path, newName, oldName);
+
+    console.log('result', result);
+
+    repoRootCopy = result;
+
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    if(objrepo && objrepo.path){
+        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+    }
+}
+
+export function* moveLocator({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { path, name, direction, index } = payload;
+    
+    const { start, end, repoRoot, parent } = objrepo;
+    let repoRootCopy = { ...repoRoot };
+
+    const result = moveLocatorInRepoRoot(repoRootCopy, path, name, direction, index);
+
+    repoRootCopy = result;
+
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    if(objrepo && objrepo.path){
+        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+    }
+}
+
+export function* addLocator({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { path, name } = payload;
+    
+    const { start, end, repoRoot, parent } = objrepo;
+    
+    let repoRootCopy = { ...repoRoot };
+    const result = addLocatorInRepoRoot(repoRootCopy, path, name);
+    
+    repoRootCopy = result;
+
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    if(objrepo && objrepo.path){
+        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+    }
+}
+
+export function* deleteLocator({ payload }) {    
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { start, end, repoRoot, parent, path } = objrepo;
+    const { obj } = payload;
+    
+    if (path && obj) {
+
+        let repoRootCopy = { ...repoRoot };
+        const result = deleteLocatorInRepoRoot(repoRootCopy, obj);
+        
+        repoRootCopy = result;
+        const repoRootString = JSON.stringify( repoRootCopy );
+        const newFileContent = start+repoRootString+end;
+        
+        yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true]);
+        
+    } else {
+        console.warn('no path');
+    }
+}
+
+export function* updateLocatorValue({ payload }) {    
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { start, end, repoRoot, parent, path } = objrepo;
+    
+    if (path && payload.path && payload.newValue) {
+
+        let repoRootCopy = { ...repoRoot };
+        const result = updateLocatorValueInRepoRoot(repoRootCopy, payload.path, payload.newValue);
+        
+        repoRootCopy = result;
+        const repoRootString = JSON.stringify( repoRootCopy );
+        const newFileContent = start+repoRootString+end;
+        
+        yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true]);
+        
+    } else {
+        console.warn('no path');
     }
 }
 
@@ -876,6 +1083,77 @@ export function* startRecorderWatcher({ payload }) {
     yield put(recorderActions.startRecorderWatcher());
 }
 
+export function* showNewObjectFolderDialog({ payload }) {
+    const path = (yield select(state => state.objrepo.path)) || null;
+    if (path) {
+        yield put(
+            wbActions.showDialog('DIALOG_OBJECT_FOLDER_CREATE', { type: 'folder', path: path })
+        );
+    }
+}
+
+export function* copyObject({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { start, end, repoRoot, parent, path } = objrepo;
+    
+    if (path) {
+        let safeParent = null
+        if(parent) {
+            safeParent = parent;
+        }
+
+        if(safeParent){
+            let repoRootCopy = { ...repoRoot };
+            const result = copyObjectInRepoRoot(repoRootCopy, safeParent);
+            
+            repoRootCopy = result;
+            const repoRootString = JSON.stringify( repoRootCopy );
+            const newFileContent = start+repoRootString+end;
+            
+            yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true]);
+        }
+        
+    } else {
+        console.warn('no path');
+    }
+}
+
+export function* showNewObjectDialog({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { path, parent } = objrepo;
+    // const activeNode = (yield select(state => state.objrepo.tree.activeNode)) || null;
+    // const path = (yield select(state => state.objrepo.path)) || null;
+    // const files = yield select(state => state.objrepo.files);
+    // const treeActiveFile = activeNode && files.hasOwnProperty(activeNode) ? files[activeNode] : null;
+
+    // if (treeActiveFile) {
+    //     // in case the file is currently selected in the tree, create a new file in the same directory as the selected file
+    //     if (treeActiveFile.type === 'file') {
+    //         yield put(
+    //             wbActions.showDialog('DIALOG_FILE_CREATE', { type: 'file', path: treeActiveFile.parentPath })
+    //         );
+    //     }
+    //     // otherwise if folder is selected, create a new file inside the selected folder
+    //     else {
+    //         yield put(
+    //             wbActions.showDialog('DIALOG_FILE_CREATE', { type: 'file', path: treeActiveFile.path })
+    //         );
+    //     }
+    // }
+    // else 
+    if (path) {
+        let safeParent = null
+        if(parent) {
+            safeParent = parent;
+        }
+        yield put(
+            wbActions.showDialog('DIALOG_OBJECT_CREATE', { type: 'file', path: path, parent: safeParent })
+        );
+    } else {
+        console.warn('no path');
+    }
+}
+
 export function* showNewFileDialog({ payload }) {
     
     const activeNode = (yield select(state => state.fs.tree.activeNode)) || null;
@@ -1012,7 +1290,7 @@ export function* showDeleteFileDialog({ payload }) {
 }
 
 export function* showContextMenu({ payload }) {
-    const { type, event } = payload;
+    const { type, event, node } = payload;
     if (!Menus.hasOwnProperty(type)) {
         console.warn(`Menu type "${type}" not found.`);
         return;
@@ -1025,6 +1303,12 @@ export function* showContextMenu({ payload }) {
         y: clientY,
     };
     yield call(services.mainIpc.call, 'MenuService', 'popup', [menuItems, options]);
+    if(node){
+        yield put(orActions.setParent(node));
+    } else {
+        //clear when previon context was on folder, but next on object
+        yield put(orActions.setParent());
+    }
 }
 
 export function* getOrFetchFileInfo(path) {
