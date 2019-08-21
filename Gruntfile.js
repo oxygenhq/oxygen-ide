@@ -40,6 +40,7 @@ module.exports = function(grunt) {
     } else if (process.platform === 'win32') {
     }
     defaultTasks.push('rebrand');
+    defaultTasks.push('sentry-browser');
 
     if (process.platform === 'linux') {
         defaultTasks.push('compress:linux');
@@ -52,11 +53,14 @@ module.exports = function(grunt) {
     grunt.registerTask('default', defaultTasks);
 
     grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'comments:chrome-ext']);
+    grunt.registerTask('sentry-browser', ['copy:sentry-browser']);
 
     const OUTDIR = 'dist/temp';
     const RESOURCES = process.platform === 'darwin' ? '/Electron.app/Contents/Resources' : '/resources';
     const CHROME_EXT_SRC = 'browser-extensions/chrome/src/';
     const CHROME_EXT_DIST = 'browser-extensions/chrome/dist/';
+    const SENTRY_BROWSER_SRC = 'app/node_modules/@sentry/browser';
+    const SENTRY_BROWSER_DIST = 'dist/temp/resources/app/node_modules/@sentry/browser';
     const RECORDER = 'browser-extensions/recorder/';
 
     // get production dependencies. instead of using '**' we get the actual deps list
@@ -146,7 +150,6 @@ module.exports = function(grunt) {
                                         'renderer/index.js',
                                         'main/main.prod.*',
                                         'main/config.json',
-                                        'main/sentry.js',
                                         'package.json'],
                         dest: OUTDIR + RESOURCES + '/app' 
                     }
@@ -176,6 +179,15 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: CHROME_EXT_SRC, src: ['**'], 
                         dest: CHROME_EXT_DIST
+                    }
+                ]
+            },
+            'sentry-browser': {
+                files: [
+                    { 
+                        expand: true, 
+                        cwd: SENTRY_BROWSER_SRC, src: ['**'], 
+                        dest: SENTRY_BROWSER_DIST
                     }
                 ]
             }

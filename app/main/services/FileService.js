@@ -19,6 +19,7 @@ import ServiceBase from './ServiceBase';
 import fileFolderSorter from '../helpers/fileFolderSorter';
 import isUnixHiddenPath from '../helpers/isUnixHiddenPath';
 import isWinHiddenPath from '../helpers/isWinHiddenPath';
+import * as Sentry from '@sentry/electron';
 
 const FS_ERRORS = {
     EACCES: 'Permission denied',
@@ -196,6 +197,7 @@ export default class FileService extends ServiceBase {
                     stats = fs.lstatSync(filePath);
                 }
                 catch (e) {
+                    Sentry.captureException(e);
                     return result;
                 }
                 if (stats.isSymbolicLink() || junk.is(filePath) 
@@ -252,6 +254,7 @@ export default class FileService extends ServiceBase {
                 response = false;
             }
         } catch(err) {
+            Sentry.captureException(err);
             console.log('Error in returnFileContent method with filePath '+filePath+' :', err);
         }
 

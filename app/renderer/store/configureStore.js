@@ -16,6 +16,7 @@ import rootActionCreator from './actions';
 import rootReducer from './reducers';
 import createActionToSubjectMiddleware from './middleware/createActionToSubjectMiddleware';
 import rootSaga from './sagas';
+import { UNIVERSAL_ERROR } from '../store/sentry/types';
 
 
 import ServicesSingleton from '../services';
@@ -39,7 +40,12 @@ const configureStore = (initialState?: counterStateType) => {
   const enhancers = [];
 
   // Saga Middleware
-  const sagaMiddleware = createSagaMiddleware();
+  const sagaMiddleware = createSagaMiddleware({
+    onError(error) {
+      console.log('saga error', error);
+      sendError(error);
+    }
+  });
   middleware.push(sagaMiddleware);
 
   // Thunk Middleware
@@ -133,9 +139,30 @@ const configureStore = (initialState?: counterStateType) => {
 
     return result;
   }
-  
+
+  async function sendError(error) {
+    try{
+      window.Sentry.captureException(error);
+    } catch(e){
+      console.warn('sendError error', e);
+    }
+  }
+
   middleware.push(cache);
 
+  // UNIVERSAL_ERROR
+  const universalError = store => next => action => {
+    let result = next(action);
+
+    if(action && action.type && action.payload && action.payload.error && action.type === UNIVERSAL_ERROR){
+      sendError(action.payload.error);
+    }
+    
+    return result;
+  }
+  
+  middleware.push(universalError);
+  
   // Apply Middleware & Compose Enhancers
   enhancers.push(applyMiddleware(...middleware));
   const enhancer = composeEnhancers(...enhancers);

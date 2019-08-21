@@ -3,6 +3,7 @@ import { putAndTake } from '../../helpers/saga';
 import * as ActionTypes from './types';
 import * as actions from './actions';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
+import { reportError } from '../sentry/actions';
 
 import { success, failure, successOrFailure } from '../../helpers/redux';
 
@@ -47,6 +48,7 @@ export function* startDownloadChromeDriver({ payload }) {
                 }
             }
         } catch(e){
+            yield put(reportError(e));
             console.warn('startDownloadChromeDriver error in saga', e);
             const path = yield services.mainIpc.call('SeleniumService', 'getDriversRootPath');
             if(path){

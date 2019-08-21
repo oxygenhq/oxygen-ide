@@ -52,7 +52,12 @@ export default class MainIpcService {
                     args: args || [],
                 });
             }
-            catch (e) { reject(e); }
+            catch (e) { 
+                if(window && window.Sentry && window.Sentry.captureException){
+                  window.Sentry.captureException(e);
+                }
+                reject(e); 
+            }
 
             _this.requests[id] = { resolve, reject };
         });

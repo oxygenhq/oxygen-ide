@@ -12,6 +12,7 @@ import ActionTypes from '../types';
 import * as fsActions from './actions';
 import * as settingsActions from './../settings/actions';
 import * as workbenchActions from './../workbench/actions';
+import { reportError } from '../sentry/actions';
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import { putAndTake } from '../../helpers/saga';
 import fileSubjects from '../../store/fs/subjects';
@@ -354,6 +355,7 @@ export function* initializeSuccess() {
                             })
                         }
                     } catch(e){
+                        yield put(reportError(e));
                         console.log('Error when try create deleted from disk file', e);
                     }
 
@@ -458,8 +460,7 @@ export function* saveFileContent({ payload }) {
         yield put(fsActions._saveFile_Success(path));
     }
     catch (err) {
-        /* istanbul ignore next */
-        
+        yield put(reportError(err));
         yield call(services.mainIpc.call, 'ElectronService', 'showErrorBox', ['Save File Failed', err.code]);
         yield put(fsActions._saveFile_Failure(path, err));
     }
@@ -477,7 +478,7 @@ export function* saveFileContentAs({ payload }) {
         yield put(fsActions._saveFileAs_Success(path, content, response));
     }
     catch (err) {
-        /* istanbul ignore next */
+        yield put(reportError(err));
         yield put(fsActions._saveFileAs_Failure(path, err));
     }
 }
@@ -508,7 +509,7 @@ export function* renameFileOrFolder({ payload }) {
         yield put(fsActions._rename_Success(path, fileInfo));
     }
     catch (err) {
-        /* istanbul ignore next */
+        yield put(reportError(err));
         yield put(fsActions._rename_Failure(path, err));
     }
 }
@@ -524,7 +525,7 @@ export function* deleteFileOrFolder({ payload }) {
         yield put(fsActions._delete_Success(path));
     }
     catch (err) {
-        /* istanbul ignore next */
+        yield put(reportError(err));
         yield put(fsActions._delete_Failure(path, err));
     }
 }
@@ -544,7 +545,7 @@ export function* createFolder({ payload }) {
         yield put(fsActions._createFolder_Success(path, name, newPath));
     }
     catch (err) {
-        /* istanbul ignore next */
+        yield put(reportError(err));
         yield put(fsActions._createFolder_Failure(path, name, err));
     }
 }
@@ -564,7 +565,7 @@ export function* createFile({ payload }) {
         yield put(fsActions._createFile_Success(path, name, newPath));
     }
     catch (err) {
-        /* istanbul ignore next */
+        yield put(reportError(err));
         yield put(fsActions._createFile_Failure(path, name, err));
     }
 }

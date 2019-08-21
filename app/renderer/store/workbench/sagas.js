@@ -24,6 +24,7 @@ import * as testActions from '../test/actions';
 import * as dialogActions from '../dialog/actions';
 import * as recorderActions from '../recorder/actions';
 import * as settingsActions from '../settings/actions';
+import { reportError } from '../sentry/actions';
 
 import { success, failure, successOrFailure } from '../../helpers/redux';
 
@@ -194,8 +195,11 @@ export function* initialize() {
 
         try{
             yield call(services.javaService.checkJavaVersion);
-        } catch(e){
-            console.log('Failure checking Java', e);
+        } catch(error){
+            console.log('Failure checking Java', error);
+            
+            yield put(reportError(error));
+            
         }
 
         if(appSettings.cache.settings && appSettings.cache.settings.uuid){

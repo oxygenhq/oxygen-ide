@@ -90,6 +90,9 @@ export default merge.smart(baseConfig, {
     minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.type': '"renderer"'
+    }),
     /**
      * Create global constants which can be configured at compile time.
      *
