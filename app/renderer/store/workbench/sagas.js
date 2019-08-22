@@ -166,6 +166,8 @@ export function* handleMainMenuEvents({ payload }) {
     }
     else if (cmd === Const.MENU_CMD_VIEW_SETTINGS) {
         yield put(wbActions.showDialog('DIALOG_SETTINGS'));
+    } else if (cmd === Const.MENU_CMD_OPEN_OR_FILE) {
+        yield openOrFile({});
     }
 }
 
@@ -522,7 +524,7 @@ export function* openFakeFile(){
 }
 
 export function* openFile({ payload }) {
-    const { path } = payload;
+    const { path, force } = payload;
     let file = yield select(state => state.fs.files[path]);
     if (!file) {
         const { error } = yield putAndTake(
@@ -540,19 +542,16 @@ export function* openFile({ payload }) {
         yield put(wbActions._openFile_Failure(path, { message: 'File type is not supported.' }));
         return;
     }
-    // check if this is an object repository file and handle it separately
-    if (file.name.endsWith('.repo.js') || file.name.endsWith('.repo.json')) {
-        yield openObjectRepositoryFile(file);
-        yield put(wbActions._openFile_Success(path));
-        return;
-    } else {
-        const objrepo = (yield select(state => state.objrepo)) || null;
-       
-        if(objrepo && objrepo.path){
-            yield clearObjectRepositoryFile();
+
+    if(!force){
+        // check if this is an object repository file and handle it separately
+        if (file.name.endsWith('.repo.js') || file.name.endsWith('.repo.json')) {
+            yield openObjectRepositoryFile(file);
+            yield put(wbActions._openFile_Success(path));
+            return;
         }
+        // if we are here, it means we are trying to open a regular file (not object repository)
     }
-    // if we are here, it means we are trying to open a regular file (not object repository)
 
     // add new tab or make the existing one active
     yield put(tabActions.addTab(path, file.name));
@@ -578,11 +577,6 @@ export function* openObjectRepositoryFile(file) {
     yield put(settingsActions.setSidebarVisible('right', true));
 }
 
-export function* clearObjectRepositoryFile() {
-    yield put(orActions.clearObjRepo());
-    yield put(settingsActions.setSidebarComponent('right', null));
-    yield put(settingsActions.setSidebarVisible('right', false));
-}
 
 export function* renameFile({ payload }) {
     const { path, newName } = payload;
@@ -929,7 +923,7 @@ export function* saveCurrentFile({ payload }) {
         
         const currentFile = files[activeFile+activeFileName];
 
-        let saveContent = currentFile.content;
+        let saveContent = currentFile && currentFile.content;
 
         if(!saveContent){
             saveContent = '';
@@ -1001,7 +995,7 @@ export function* saveCurrentFile({ payload }) {
                 return; // Save As dialog was canceled by user
             }
 
-            let saveContent = currentFile.content;
+            let saveContent = currentFile && currentFile.content;
 
             if(!saveContent){
                 saveContent = '';
@@ -1232,6 +1226,15 @@ export function* showRenameFolderDialog({ payload }) {
         alert(error.message);
         yield put(fsActions.deleteFile(activeNodePath));
     }
+}
+
+export function* openOrFile({ payload }) {
+    const activeNodePath = (yield select(state => state.fs.tree.activeNode)) || null;
+    if (!activeNodePath) {
+        return;
+    }
+
+    yield openFile({payload: {path:activeNodePath, force: true}})
 }
 
 export function* showRenameFileDialog({ payload }) {   

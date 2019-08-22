@@ -20,6 +20,7 @@ import ActionTypes from '../types';
 /* Action Creators */
 import * as fsActions from '../fs/actions';
 import * as repoActions from './actions';
+import * as settingsActions from '../settings/actions';
 
 /* Services */
 import ServicesSingleton from '../../services';
@@ -31,7 +32,14 @@ const services = ServicesSingleton();
 export default function* root() {
     yield all([
       takeLatest(ActionTypes.OR_OPEN_FILE, openFile),
+      takeLatest(ActionTypes.OR_OBJECT_REPOSITORY_FILE, clearObjectRepositoryFile)
     ]);
+}
+
+export function* clearObjectRepositoryFile() {
+    yield put(repoActions.clearObjRepo());
+    yield put(settingsActions.setSidebarComponent('right', null));
+    yield put(settingsActions.setSidebarVisible('right', false));
 }
 
 export function* openFile({ payload }) {
