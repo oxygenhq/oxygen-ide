@@ -21,6 +21,7 @@ import {
     renameLocatorInRepoRoot,
     moveLocatorInRepoRoot
 } from '../../helpers/objrepo';
+import { notification } from 'antd';
 
 import SupportedExtensions from '../../helpers/file-extensions';
 import * as Const from '../../../const';
@@ -1086,29 +1087,66 @@ export function* showNewObjectFolderDialog({ payload }) {
     }
 }
 
-export function* copyObject({ payload }) {
-    const objrepo = (yield select(state => state.objrepo)) || null;
-    const { start, end, repoRoot, parent, path } = objrepo;
-    
-    if (path) {
-        let safeParent = null
-        if(parent) {
-            safeParent = parent;
-        }
+export function* copyStringToClipboard(str) {
+    let result = false;
+    try {
+        // Create new element
+        const el = document.createElement('textarea');
+        // Set value (string to be copied)
+        el.value = str;
+        // Set non-editable to avoid focus and move outside of view
+        el.setAttribute('readonly', '');
+        el.style = {position: 'absolute', left: '-9999px'};
+        document.body.appendChild(el);
+        // Select text inside element
+        el.select();
+        // Copy text to clipboard
+        document.execCommand('copy');
+        // Remove temporary element
+        document.body.removeChild(el);
 
-        if(safeParent){
-            let repoRootCopy = { ...repoRoot };
-            const result = copyObjectInRepoRoot(repoRootCopy, safeParent);
-            
-            repoRootCopy = result;
-            const repoRootString = JSON.stringify( repoRootCopy );
-            const newFileContent = start+repoRootString+end;
-            
-            yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true]);
+        result = true;
+    } catch(error){
+        console.warn('copyStringToClipboard error', error);
+        yield put(reportError(error));
+        result = false;
+    }
+    return result;
+}
+
+const openCopyNotificationWithIcon = type => {
+    notification[type]({
+      message: 'Copy object',
+      description: type,
+    });
+};
+
+export function* copyObject({ payload }) {
+    try{    
+        const objrepo = (yield select(state => state.objrepo)) || null;
+    
+        if(objrepo){    
+            const { parent } = objrepo;
+
+            if(parent && parent.path) {
+                const copyResult = yield copyStringToClipboard(parent.path);
+
+                if(copyResult){
+                    openCopyNotificationWithIcon('success');
+                } else {
+                    openCopyNotificationWithIcon('error');
+                }
+            } else {
+                openCopyNotificationWithIcon('error');
+            }
+
+        } else {
+            openCopyNotificationWithIcon('error');
         }
-        
-    } else {
-        console.warn('no path');
+    } catch(error){
+        console.warn('copyObject error', error);
+        openCopyNotificationWithIcon('error');
+        yield put(reportError(error));
     }
 }
 
