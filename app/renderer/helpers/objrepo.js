@@ -120,6 +120,58 @@ export function addLocatorInRepoRoot(repo, parentPath, locatorName){
     return newRoot;
 }
 
+export function addArrayObjectLocatorInRepoRoot(repo, parentPath, locatorName){
+    if (!repo && !parentPath && !locatorName) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(parentPath)){
+        pathToObject = parentPath.join(".");
+    } else if(typeof parentPath === "object"){
+        const { path } = parentPath;
+        pathToObject = path;
+    } else if (typeof parentPath === "string") {
+        pathToObject = parentPath;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = addArrayObjectLocatorInRepoRoot(value, serchStringLast, locatorName);
+                newRoot[key] = newChildValue;
+            } else {
+                let newValue;
+
+                if(value && Array.isArray(value)){
+                    newValue = [...value, locatorName];
+                } else {
+                    newValue = [locatorName];
+                }
+                newRoot[key] = newValue;
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
 
 export function deleteObjectOrFolder(repo, parentPath, name){
     if (!repo && !parentPath && !name) {
@@ -161,6 +213,68 @@ export function deleteObjectOrFolder(repo, parentPath, name){
                 let tmpValue = value;
                 delete tmpValue[name];
                 newRoot[key] = tmpValue;
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
+
+
+export function deleteArrayObjectLocator(repo, parentPath, idx){
+
+    if (!repo && !parentPath && typeof idx === 'undefined') {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(parentPath)){
+        pathToObject = parentPath.join(".");
+    } else if(typeof parentPath === "object"){
+        const { path } = parentPath;
+        pathToObject = path;
+    } else if (typeof parentPath === "string") {
+        pathToObject = parentPath;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = deleteArrayObjectLocator(value, serchStringLast, idx);
+                newRoot[key] = newChildValue;
+            } else {
+                let newValue;
+
+                if(value && Array.isArray(value)){
+                    newValue = [...value];
+                } else {
+                    newValue = [];
+                }
+
+                if(newValue[idx]){
+                    newValue.splice(idx, 1);
+                } else {
+                    console.warn('in newValue no element with idx', newValue, idx);
+                }
+
+                newRoot[key] = newValue;
             }
         } else {
             newRoot[key] = value;
@@ -352,6 +466,81 @@ export function moveLocatorInRepoRoot(repo, parentPath, name, direction, index){
     return newRoot;
 }
 
+function array_move(arr, old_index, new_index) {
+    if (new_index >= arr.length) {
+        var k = new_index - arr.length + 1;
+        while (k--) {
+            arr.push(undefined);
+        }
+    }
+    arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+    return arr; // for testing
+};
+
+export function moveArrayObjectLocatorInRepoRoot(repo, parentPath, index, direction){
+    if (!repo && !parentPath && !name && !direction) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(parentPath)){
+        pathToObject = parentPath.join(".");
+    } else if(typeof parentPath === "object"){
+        const { path } = parentPath;
+        pathToObject = path;
+    } else if (typeof parentPath === "string") {
+        pathToObject = parentPath;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+    
+    for (let [key, value] of Object.entries(repo)) {
+
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = moveArrayObjectLocatorInRepoRoot(value, serchStringLast, name, direction, index);
+                newRoot[key] = newChildValue;
+            } else {
+
+                const keys = Object.keys(value);
+                
+                // value = ['a', 'b', 'c', 'd']
+                // keys = ['1', '2', '3', '4']
+
+                if(direction === 'up'){
+                    const newIndex = index - 1;
+                    const newValue = array_move(value, index, newIndex);
+                    newRoot[key] = newValue;
+                }
+
+                if(direction === 'down'){
+                    const newIndex = index + 1;
+                    const newValue = array_move(value, index, newIndex);
+                    newRoot[key] = newValue;
+                }
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+
+    return newRoot;
+}
+
 export function updateLocatorValueInRepoRoot(repo, locatorPath, locatorNewValue){
     if (!repo && !locatorPath && !locatorNewValue) {
         return null;
@@ -390,6 +579,67 @@ export function updateLocatorValueInRepoRoot(repo, locatorPath, locatorNewValue)
                 newRoot[key] = newChildValue;
             } else {
                 newRoot[key] = locatorNewValue;
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    return newRoot;
+}
+
+export function updateArrayObjecLocatorValueInRepoRoot(repo, parentPath, locatorNewValue, idx){
+
+    if (!repo && !parentPath && typeof idx === 'undefined') {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+    
+    if(Array.isArray(parentPath)){
+        pathToObject = parentPath.join(".");
+    } else if(typeof parentPath === "object"){
+        const { path } = parentPath;
+        pathToObject = path;
+    } else if (typeof parentPath === "string") {
+        pathToObject = parentPath;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.')
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = deleteArrayObjectLocator(value, serchStringLast,locatorNewValue, idx);
+                newRoot[key] = newChildValue;
+            } else {
+                let newValue;
+
+                if(value && Array.isArray(value)){
+                    newValue = [...value];
+                } else {
+                    newValue = [];
+                }
+
+                if(newValue[idx]){
+                    newValue[idx] = locatorNewValue;
+                } else {
+                    console.warn('in newValue no element with idx', newValue, idx);
+                }
+
+                newRoot[key] = newValue;
             }
         } else {
             newRoot[key] = value;

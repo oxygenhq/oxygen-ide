@@ -124,11 +124,15 @@ export default class ObjectRepository extends PureComponent<Props> {
                 <ObjectEditor 
                   refreshScroll={ this.props.refreshScroll }
                   addLocator = {this.props.addLocator}
+                  addArrayObjectLocator = {this.props.addArrayObjectLocator}
                   moveLocator = {this.props.moveLocator}
+                  moveArrayObjectLocator = {this.props.moveArrayObjectLocator}
                   deleteLocator = {this.props.deleteLocator}
                   updateLocator = {this.props.updateLocator}
                   updateLocatorValue = {this.props.updateLocatorValue}
+                  updateArrayObjecLocatorValue = {this.props.updateArrayObjecLocatorValue}
                   removeObjectOrFolder = {this.props.removeObjectOrFolder}
+                  removeArrayObjectLocator = {this.props.removeArrayObjectLocator}
                   object={ selectedObject } 
                 />
               </Panel>

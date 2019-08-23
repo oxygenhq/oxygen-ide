@@ -198,10 +198,24 @@ export const addLocator = (path, name) => {
   };
 };
 
+export const addArrayObjectLocator = (path, name) => {
+  return {
+    type: ActionTypes.WB_ADD_ARRAY_OBJECT_LOCATOR,
+    payload: { path, name },
+  };
+};
+
 export const moveLocator = (path, name, direction, index) => {
   return {
     type: ActionTypes.WB_MOVE_LOCATOR,
     payload: { path, name, direction, index },
+  };
+};
+
+export const moveArrayObjectLocator = (path, index, direction) => {
+  return {
+    type: ActionTypes.WB_MOVE_ARRAY_OBJECT_LOCATOR,
+    payload: { path, index:index, direction },
   };
 };
 
@@ -219,6 +233,13 @@ export const updateLocatorValue = (path, newValue) => {
   };
 };
 
+export const updateArrayObjecLocatorValue = (path, newValue, idx) => {
+  return {
+    type: ActionTypes.WB_UPDATE_ARRAY_OBJECT_LOCATOR_VALUE,
+    payload: { path, newValue, idx:idx },
+  };
+};
+
 export const updateLocator = (path, newName, oldName) => {
   return {
     type: ActionTypes.WB_UPDATE_LOCATOR,
@@ -230,6 +251,13 @@ export const removeObjectOrFolder = (path, name) => {
   return {
     type: ActionTypes.WB_REMOVE_OBJECT_OR_FOLDER,
     payload: { path, name },
+  };
+};
+
+export const removeArrayObjectLocator = (path, idx) => {
+  return {
+    type: ActionTypes.WB_REMOVE_ARRAY_OBJECT_LOCATOR,
+    payload: { path, idx:idx },
   };
 };
 

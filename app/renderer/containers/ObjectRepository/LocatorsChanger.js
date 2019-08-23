@@ -32,7 +32,7 @@ export default class LocatorsChanger extends PureComponent<Props> {
   add = () => {
     const { text } = this.state;
     if (!text || text.length == 0) {
-      message.error(`Locator name cannot be blank!`);
+      console.error(`Locator name cannot be blank!`);
       return;
     }
     if(this.props.addLocator){
@@ -160,6 +160,7 @@ export default class LocatorsChanger extends PureComponent<Props> {
             placeholder="Locator" 
           />
           <Button 
+            disabled={ !text }
             onClick={ this.add }
             className="add-btn"
             type="primary"
@@ -169,15 +170,18 @@ export default class LocatorsChanger extends PureComponent<Props> {
     }
 
     const freezAllBtns = editing || addLocator;
-    const upDisabled = freezAllBtns || !selectedLocatorName || (selectedLocatorIndex === 0);
-    const downDisabled = freezAllBtns || !selectedLocatorName || (selectedLocatorIndex+1 === length);
 
+    const locatorNameCondition = ['number','string'].includes(typeof selectedLocatorName);
+
+    const upDisabled = freezAllBtns || !locatorNameCondition || (selectedLocatorIndex === 0);
+    const downDisabled = freezAllBtns || !locatorNameCondition || (selectedLocatorIndex+1 === length);
+    
     return (
       <Fragment>
         {
           !locator &&
           <div className="locators-changer-container">
-            <div onClick={ () => {!freezAllBtns && this.toggleAdd()}} className={`control ${ freezAllBtns ? 'disabled' : '' }`}>
+            <div onClick={ () => {!(!addLocator && freezAllBtns) && this.toggleAdd()}} className={`control ${ (!addLocator && freezAllBtns) ? 'disabled' : '' }`}>
               <Icon type={ addLocator ? "minus" : "plus" } />
             </div>
   
@@ -191,10 +195,10 @@ export default class LocatorsChanger extends PureComponent<Props> {
             </div>
   
             <div className="control-group">
-              <div onClick={this.edit} className={`control ${ !selectedLocatorName ? 'disabled' : '' }`}>
+              <div onClick={() => { locatorNameCondition && this.edit() }} className={`control ${ !locatorNameCondition ? 'disabled' : '' }`}>
                 <Icon type="edit" />
               </div>
-              <div onClick={this.remove} className={`control ${ !selectedLocatorName ? 'disabled' : '' }`}>
+              <div onClick={() => { locatorNameCondition && this.remove() }} className={`control ${ !locatorNameCondition ? 'disabled' : '' }`}>
                 <Icon type="delete" />
               </div>
             </div>

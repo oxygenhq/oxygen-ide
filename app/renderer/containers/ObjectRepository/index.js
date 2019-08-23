@@ -14,11 +14,15 @@ import { findObject } from '../../helpers/objrepo';
 import { 
   showContextMenu, 
   addLocator, 
+  addArrayObjectLocator,
   moveLocator,
+  moveArrayObjectLocator,
   deleteLocator, 
   updateLocator, 
   removeObjectOrFolder, 
-  updateLocatorValue 
+  removeArrayObjectLocator,
+  updateLocatorValue,
+  updateArrayObjecLocatorValue 
 } from '../../store/workbench/actions';
 
 const mapStoreToProps = (state) => {
@@ -35,11 +39,15 @@ const mapDispatchToProps = (dispatch) => (
     ...orActions, 
     showContextMenu, 
     addLocator, 
+    addArrayObjectLocator,
     moveLocator,
+    moveArrayObjectLocator,
     deleteLocator, 
     updateLocator, 
     removeObjectOrFolder, 
-    updateLocatorValue 
+    removeArrayObjectLocator,
+    updateLocatorValue,
+    updateArrayObjecLocatorValue
   } , dispatch)
 );
 

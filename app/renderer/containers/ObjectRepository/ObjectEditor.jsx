@@ -32,9 +32,15 @@ export default class ObjectEditor extends PureComponent<Props> {
   state = {
     selectedLocatorName: null,
     selectedLocatorIndex: null,
+    selectedArrayObjectLocatorName: null,
+    selectedArrayObjectLocatorIndex: null,
     object: null,
     editStr: null,
-    editing: false
+    editing: false,
+    arrayObjectEditStr: null,
+    arrayObjectOriginStr: null,
+    arrayObjectOriginIndex: null,
+    arrayObjectEditing: false
   }
 
   componentWillReceiveProps(nextProps) {
@@ -61,6 +67,15 @@ export default class ObjectEditor extends PureComponent<Props> {
     }
   }
 
+  addArrayObjectLocator = (name) => {
+    const { object } = this.props;
+    const { path } = object;
+
+    if(this.props.addArrayObjectLocator){
+      this.props.addArrayObjectLocator(path, name);
+    }
+  }
+
   select = (selectedName, index) => {
     const { selectedLocatorName } = this.state;
     const { object } = this.props;
@@ -82,6 +97,28 @@ export default class ObjectEditor extends PureComponent<Props> {
     })
   }
 
+  selectArrayObject = (name, index) => {
+    const { selectedArrayObjectLocatorIndex } = this.state;
+    const { object } = this.props;
+
+    let newSelectedArrayObjectLocatorIndex;
+    let newSelectedArrayObjectLocatorName;
+
+    if(index === selectedArrayObjectLocatorIndex){
+      newSelectedArrayObjectLocatorIndex = null;
+      newSelectedArrayObjectLocatorName = null;
+    } else {
+      newSelectedArrayObjectLocatorIndex = index;
+      newSelectedArrayObjectLocatorName = name;
+    }
+
+    this.setState({
+      selectedArrayObjectLocatorName: newSelectedArrayObjectLocatorName,
+      selectedArrayObjectLocatorIndex: newSelectedArrayObjectLocatorIndex
+    })
+  }
+
+
   remove = (name) => {
     const { object } = this.props;
     const { path } = object;
@@ -96,6 +133,21 @@ export default class ObjectEditor extends PureComponent<Props> {
     }
   }
 
+  removeArrayObjectLocator = (id) => {
+
+    const { object } = this.props;
+    const { path } = object;
+
+    if(this.props.removeArrayObjectLocator){
+      this.props.removeArrayObjectLocator(path, id);
+      
+      this.setState({
+        selectedArrayObjectLocatorName: null,
+        selectedArrayObjectLocatorIndex: null
+      });      
+    }
+  }
+
   startEdit = (name, path = null) => {
     this.setState({
       editStr: name,
@@ -103,6 +155,24 @@ export default class ObjectEditor extends PureComponent<Props> {
       originPath: path,
       editing: true
     })
+  }
+
+  startEditArrayObject = (index) => {
+    try {
+      const { object } = this.props;
+  
+      const name = object.locator[index];
+  
+      this.setState({
+        arrayObjectEditStr: name,
+        arrayObjectOriginStr: name,
+        arrayObjectOriginIndex: index,
+        arrayObjectEditing: true
+      });
+
+    } catch(error) {
+      console.warn('startEditArrayObject error', error);
+    }
   }
 
   finishEdit = (name) => {
@@ -137,6 +207,21 @@ export default class ObjectEditor extends PureComponent<Props> {
     });    
   }
 
+  moveArrayObjectLocator = (index, direction) => {
+    const { object } = this.props;
+    const { path } = object;
+    
+    this.setState({
+      selectedArrayObjectLocatorName: null,
+      selectedArrayObjectLocatorIndex: null
+    },
+    () => {
+      if(this.props.moveArrayObjectLocator){
+        this.props.moveArrayObjectLocator(path, index, direction);
+      }
+    });    
+  }
+
   finishEditLocator = (name) => {
     const { originPath } = this.state;
 
@@ -151,10 +236,37 @@ export default class ObjectEditor extends PureComponent<Props> {
     })
   }
 
+  finishArrayObjecEditLocator = (name) => {
+    const { object } = this.props;
+    const { path } = object;
+    const { arrayObjectOriginIndex } = this.state;
+
+    if(this.props.updateArrayObjecLocatorValue){
+      this.props.updateArrayObjecLocatorValue(path, name, arrayObjectOriginIndex);
+    }
+
+    this.setState({
+      arrayObjectEditStr: null,
+      arrayObjectOriginStr: null,
+      arrayObjectOriginIndex: null,
+      arrayObjectEditing: false
+    });
+
+  }
+
   cancelEdit = () => {
     this.setState({
       editStr: null,
       editing: false
+    });
+  }
+
+  cancelArrayObjectEdit = () => {
+    this.setState({
+      arrayObjectEditStr: null,
+      arrayObjectOriginStr: null,
+      arrayObjectOriginIndex: null,
+      arrayObjectEditing: false
     });
   }
 
@@ -164,11 +276,19 @@ export default class ObjectEditor extends PureComponent<Props> {
     })
   }
 
+  onChangeArrayObjectUpdate= (name) => {
+    this.setState({
+      arrayObjectEditStr: name
+    })
+  }
+
   renderLocatorChanger() {
     const { object } = this.props;
     const { 
       selectedLocatorName,
-      selectedLocatorIndex
+      selectedLocatorIndex,
+      selectedArrayObjectLocatorName,   
+      selectedArrayObjectLocatorIndex
     } = this.state;
 
     if(object && object.children && object.children.length) {
@@ -220,12 +340,41 @@ export default class ObjectEditor extends PureComponent<Props> {
       )
     }
 
+    if (object && object.hasOwnProperty('locator') && Array.isArray(object.locator)){
+      
+      let length = 0;
+      if(object && object.locator && object.locator.length){
+        length = object.locator.length;
+      }
+
+      return(
+        <LocatorsChanger
+          selectedLocatorName = {selectedArrayObjectLocatorIndex}
+          selectedLocatorIndex = {selectedArrayObjectLocatorIndex}
+          length={ length }
+          moveLocator={this.moveArrayObjectLocator}
+          addLocator={this.addArrayObjectLocator} 
+          remove={ this.removeArrayObjectLocator }
+          startEdit={ this.startEditArrayObject }
+          editing={ this.state.arrayObjectEditing }
+          editStr={ this.state.arrayObjectEditStr } 
+          cancelEdit={ this.cancelArrayObjectEdit }
+          onChangeUpdate={ this.onChangeArrayObjectUpdate }
+          finishEdit={ this.finishArrayObjecEditLocator }
+        />
+      );
+    }
+
+
     return null;
   }
 
   renderInner() {
     const { object } = this.props;
-    const { selectedLocatorName } = this.state;
+    const { 
+      selectedLocatorName,
+      selectedArrayObjectLocatorIndex
+    } = this.state;
     
     if(object && object.children && object.children.length) {
       return (
@@ -261,21 +410,47 @@ export default class ObjectEditor extends PureComponent<Props> {
     if (!object && !object.hasOwnProperty('locator')) {
       return null;
     }
-    // make sure to wrap the locator property in array if it's a string
-    const locators = Array.isArray(object.locator) ? object.locator : [object.locator];
 
-    return (
-      <Fragment>
-        <List 
-          startEdit={ this.startEdit }
-          deleteLocator={ this.props.deleteLocator }
-          object= { object }
-          data={ locators } 
-          editable={ true } 
-          editing={ this.state.editing }
-        />
-      </Fragment>
-    );
+    if(Array.isArray(object.locator)){
+      return (
+        <Fragment>
+          <div className="list list-auto-height">
+              { object.locator.map( (itm, index) => 
+                <div 
+                  className="list-item" 
+                  key={index}
+                >
+                  <div 
+                    className={`item-value-wrap ${index === selectedArrayObjectLocatorIndex ? 'selected' : ''}`}
+                    onClick={ () => { this.selectArrayObject(itm, index) } }
+                    onDoubleClick={ () => { this.startEditArrayObject(index) } }
+                  >
+                    <p className="control">
+                      {itm}
+                    </p>
+                  </div>
+                </div>
+              ) }
+          </div>
+        </Fragment>
+      );
+    }
+
+    if(typeof object.locator === 'string'){
+      const locators = [object.locator];
+      return (
+        <Fragment>
+          <List 
+            startEdit={ this.startEdit }
+            deleteLocator={ this.props.deleteLocator }
+            object= { object }
+            data={ locators } 
+            editable={ true } 
+            editing={ this.state.editing }
+          />
+        </Fragment>
+      );
+    }
   }
 
   render() {

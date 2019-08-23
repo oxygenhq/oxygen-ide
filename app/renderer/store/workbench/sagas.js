@@ -16,10 +16,14 @@ import {
     createFolderInRepoRoot,
     deleteLocatorInRepoRoot,
     updateLocatorValueInRepoRoot,
+    updateArrayObjecLocatorValueInRepoRoot,
     addLocatorInRepoRoot,
+    addArrayObjectLocatorInRepoRoot,
     deleteObjectOrFolder,
+    deleteArrayObjectLocator,
     renameLocatorInRepoRoot,
-    moveLocatorInRepoRoot
+    moveLocatorInRepoRoot,
+    moveArrayObjectLocatorInRepoRoot
 } from '../../helpers/objrepo';
 import { notification } from 'antd';
 
@@ -70,11 +74,15 @@ export default function* root() {
       takeLatest(ActionTypes.WB_CREATE_OBJECT, createObject),
       takeLatest(ActionTypes.WB_CREATE_OBJECT_FOLDER, createObjectFolder),
       takeLatest(ActionTypes.WB_ADD_LOCATOR, addLocator),
+      takeLatest(ActionTypes.WB_ADD_ARRAY_OBJECT_LOCATOR, addArrayObjectLocator),
       takeLatest(ActionTypes.WB_MOVE_LOCATOR, moveLocator),
+      takeLatest(ActionTypes.WB_MOVE_ARRAY_OBJECT_LOCATOR, moveArrayObjectLocator),
       takeLatest(ActionTypes.WB_DELETE_LOCATOR, deleteLocator),
       takeLatest(ActionTypes.WB_UPDATE_LOCATOR, updateLocator),
       takeLatest(ActionTypes.WB_UPDATE_LOCATOR_VALUE, updateLocatorValue),
+      takeLatest(ActionTypes.WB_UPDATE_ARRAY_OBJECT_LOCATOR_VALUE, updateArrayObjecLocatorValue),
       takeLatest(ActionTypes.WB_REMOVE_OBJECT_OR_FOLDER, removeObjectOrFolder),
+      takeLatest(ActionTypes.WB_REMOVE_ARRAY_OBJECT_LOCATOR, removeArrayObjectLocator),
       takeLatest(ActionTypes.WB_CREATE_FOLDER, createFolder),
       takeLatest(ActionTypes.WB_DELETE_FILE, deleteFile),
       takeLatest(ActionTypes.WB_SAVE_CURRENT_FILE, saveCurrentFile),   
@@ -653,6 +661,23 @@ export function* removeObjectOrFolder({ payload }) {
     }
 }
 
+export function* removeArrayObjectLocator({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { path, idx } = payload;
+
+    const { start, end, repoRoot, parent } = objrepo;
+    let repoRootCopy = { ...repoRoot };
+
+    const result = deleteArrayObjectLocator(repoRootCopy, path, idx);
+
+    repoRootCopy = result;
+
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    if(objrepo && objrepo.path){
+        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+    }
+}
 export function* updateLocator({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { path, newName, oldName } = payload;
@@ -662,8 +687,6 @@ export function* updateLocator({ payload }) {
     
 
     const result = renameLocatorInRepoRoot(repoRootCopy, path, newName, oldName);
-
-    console.log('result', result);
 
     repoRootCopy = result;
 
@@ -692,6 +715,23 @@ export function* moveLocator({ payload }) {
     }
 }
 
+export function* moveArrayObjectLocator({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { path, index, direction } = payload;
+    const { start, end, repoRoot, parent } = objrepo;
+    let repoRootCopy = { ...repoRoot };
+
+    const result = moveArrayObjectLocatorInRepoRoot(repoRootCopy, path, index, direction);
+
+    repoRootCopy = result;
+    
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    if(objrepo && objrepo.path){
+        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+    }
+}
+
 export function* addLocator({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { path, name } = payload;
@@ -709,6 +749,25 @@ export function* addLocator({ payload }) {
         const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
+
+export function* addArrayObjectLocator({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { path, name } = payload;
+    
+    const { start, end, repoRoot, parent } = objrepo;
+    
+    let repoRootCopy = { ...repoRoot };
+    const result = addArrayObjectLocatorInRepoRoot(repoRootCopy, path, name);
+    
+    repoRootCopy = result;
+
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    if(objrepo && objrepo.path){
+        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+    }
+}
+
 
 export function* deleteLocator({ payload }) {    
     const objrepo = (yield select(state => state.objrepo)) || null;
@@ -741,6 +800,27 @@ export function* updateLocatorValue({ payload }) {
         const result = updateLocatorValueInRepoRoot(repoRootCopy, payload.path, payload.newValue);
         
         repoRootCopy = result;
+        const repoRootString = JSON.stringify( repoRootCopy );
+        const newFileContent = start+repoRootString+end;
+        
+        yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true]);
+        
+    } else {
+        console.warn('no path');
+    }
+}
+
+export function* updateArrayObjecLocatorValue ({ payload }) {    
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { start, end, repoRoot, parent, path } = objrepo;
+    
+    if (path && payload.path && payload.newValue) {
+
+        let repoRootCopy = { ...repoRoot };
+        const result = updateArrayObjecLocatorValueInRepoRoot(repoRootCopy, payload.path, payload.newValue, payload.idx);
+        
+        repoRootCopy = result;
+
         const repoRootString = JSON.stringify( repoRootCopy );
         const newFileContent = start+repoRootString+end;
         
