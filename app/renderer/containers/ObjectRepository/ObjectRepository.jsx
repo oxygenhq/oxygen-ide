@@ -17,6 +17,7 @@ import ScrollContainer from '../../components/ScrollContainer';
 import ObjectTree from './ObjectTree';
 import SearchRow from './SearchRow';
 import ObjectEditor from './ObjectEditor';
+import AddToRootRow from './AddToRootRow';
 
 type Props = {
   tree: null | object,
@@ -98,10 +99,15 @@ export default class ObjectRepository extends PureComponent<Props> {
             <Panel 
                 header={ repoPanelTitleWrap }
                 afterHeader = {
-                  <SearchRow
-                    setSearchResults={ this.setSearchResults }
-                    tree={ tree }
-                  />
+                  <Fragment>
+                    <SearchRow
+                      setSearchResults={ this.setSearchResults }
+                      tree={ tree }
+                    />
+                    <AddToRootRow
+                      orAddToRoot={this.props.orAddToRoot}
+                    />
+                  </Fragment>
                 }
                 scroller
                 scrollWrapperClass="tree-wrapper tree-wrapper-half"

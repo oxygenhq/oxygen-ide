@@ -13,6 +13,7 @@ import { putAndTake } from '../../helpers/saga';
 import { convertToObjectTree, getRepositoryNameFromFileName } from '../../helpers/objrepo';
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import orgRequire from '../../helpers/require';
+import { notification } from 'antd';
 
 /* Types */
 import ActionTypes from '../types';
@@ -77,6 +78,12 @@ export function* openFile({ payload }) {
                 repoRoot = repoRootCopy;
             } else {
                 repoRoot = orgRequire(file.path);
+                if(Object.keys(repoRoot).length === 0){
+                    notification['error']({
+                        message: 'Not valid repo file:'+file.path,
+                        description: 'module.exports = po; is required',
+                    });
+                }
             }
             const content = yield getFileContent(path);
             start = content.split('{')[0];
@@ -112,12 +119,16 @@ function* getFileContent(path) {
     if (!path) {
         return null;
     }
+    /*
     // check if file content has been previously retrieved
     const fileCache = yield select(state => state.fs.files);
+
+
     const file = fileCache[path];
     if (file && file.hasOwnProperty('content') && file.content != null) {
         return file.content;
     }
+    */
     // if file is not cached, let's fetch its content and add it to the editor
     const { response, error } = yield putAndTake(
         fsActions.fetchFileContent(path)

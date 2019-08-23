@@ -13,6 +13,7 @@ import List from '../../components/core/List';
 import Panel from '../../components/Panel';
 import LocatorsChanger from './LocatorsChanger';
 import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
+import difference from 'lodash.difference';
 
 type Props = {
   object: null | object,
@@ -26,36 +27,47 @@ const EmptyList = () => {
   );
 }
 
+const DEFAULT_STATE = {
+  selectedLocatorName: null,
+  selectedLocatorIndex: null,
+  selectedArrayObjectLocatorName: null,
+  selectedArrayObjectLocatorIndex: null,
+  object: null,
+  editStr: null,
+  originStr: null,
+  editing: false,
+  arrayObjectEditStr: null,
+  arrayObjectOriginStr: null,
+  arrayObjectOriginIndex: null,
+  arrayObjectEditing: false
+};
+
 export default class ObjectEditor extends PureComponent<Props> {
   props: Props;
 
-  state = {
-    selectedLocatorName: null,
-    selectedLocatorIndex: null,
-    selectedArrayObjectLocatorName: null,
-    selectedArrayObjectLocatorIndex: null,
-    object: null,
-    editStr: null,
-    editing: false,
-    arrayObjectEditStr: null,
-    arrayObjectOriginStr: null,
-    arrayObjectOriginIndex: null,
-    arrayObjectEditing: false
-  }
+  state = DEFAULT_STATE;
 
   componentWillReceiveProps(nextProps) {
+    let newState = {};
+
+    const n = nextProps.object;
+    const t = this.props.object;
+
+    const same = n.name === t.name && n.path === t.path && n.type === t.type;
+    
+    if(!same){
+      newState = {...DEFAULT_STATE}
+    }
+
     if (this.props.active !== nextProps.active) {
       if (!nextProps.object) {
-        this.setState({
-          object: null,
-        });
+        newState.object = null;
       }
       else {
-        this.setState({
-          object: nextProps.object,
-        });
+        newState.object = nextProps.object;
       }
     }
+    this.setState({...newState});
   }
 
   addLocator = (name) => {
@@ -182,7 +194,10 @@ export default class ObjectEditor extends PureComponent<Props> {
 
     this.setState({
       editStr: null,
-      editing: false
+      editing: false,
+      originStr: null,
+      selectedLocatorIndex: null,
+      selectedLocatorName: null
     },
     () => {
       if(this.props.updateLocator){
@@ -227,7 +242,9 @@ export default class ObjectEditor extends PureComponent<Props> {
 
     this.setState({
       editStr: null,
-      editing: false
+      editing: false,
+      originStr: null,
+      originPath: null
     },
     () => {
       if(this.props.updateLocatorValue){
@@ -249,7 +266,9 @@ export default class ObjectEditor extends PureComponent<Props> {
       arrayObjectEditStr: null,
       arrayObjectOriginStr: null,
       arrayObjectOriginIndex: null,
-      arrayObjectEditing: false
+      arrayObjectEditing: false,
+      selectedArrayObjectLocatorName: null,
+      selectedArrayObjectLocatorIndex: null,
     });
 
   }
@@ -411,7 +430,7 @@ export default class ObjectEditor extends PureComponent<Props> {
       return null;
     }
 
-    if(Array.isArray(object.locator)){
+    if(Array.isArray(object.locator) && object.locator.length){
       return (
         <Fragment>
           <div className="list list-auto-height">
@@ -433,6 +452,14 @@ export default class ObjectEditor extends PureComponent<Props> {
               ) }
           </div>
         </Fragment>
+      );
+    }
+    
+    if(Array.isArray(object.locator) && object.locator.length === 0) {
+      return (
+        <div className="list list-auto-height">
+          <EmptyList />
+        </div>
       );
     }
 

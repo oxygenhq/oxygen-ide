@@ -100,6 +100,7 @@ export default function* root() {
       takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
       takeLatest(JAVA_NOT_FOUND, handleJavaNotFound),
       takeLatest(JAVA_BAD_VERSION, handleJavaBadVersion),
+      takeLatest(ActionTypes.WB_OR_ADD_TO_ROOT, orAddToRoot)
     ]);
 }
 
@@ -1480,4 +1481,86 @@ function getUnsavedFiles(files, tabs) {
         }
     }
     return unsavedFiles;
+}
+
+const getValueByKey = key => {
+    let result = false;
+
+    try {
+        switch(key){
+            case 'container':
+                result = {};
+                break;
+            case 'array_object':
+                result = [];
+                break;
+            case 'string_object':
+                result = '';
+                break;
+            default:
+                result = false;
+        }
+    } catch(e) {
+        console.warn('e', e);
+    }
+
+    return result;
+}
+export function* orAddToRoot({payload}){    
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    const { start, end, repoRoot, parent, path } = objrepo;
+    
+    let safeStart;
+    let safeEnd;
+
+    if(!start){
+        safeStart = 'const po = ';
+    } else {
+        safeStart = start;
+    }
+    
+    if(!end){
+        safeEnd = `;module.exports = po;`;
+    } else {
+        safeEnd = end;
+    }
+
+    if (path && payload.name && payload.key) {
+
+        const { name, key } = payload;
+
+        let repoRootCopy;
+        
+        if(repoRoot){
+            repoRootCopy = { ...repoRoot };
+        } else {
+            repoRootCopy = {};
+        }
+        
+        if(repoRootCopy[name]){
+            notification['error']({
+                message: 'Tree item with this name already exist',
+                description: name,
+            });
+        } else {
+            const value = getValueByKey(key);
+            
+            if(false === value){
+                notification['error']({
+                    message: 'Bad key',
+                    description: key,
+                });
+            } else {
+                repoRootCopy[name] = value;
+                
+                const repoRootString = JSON.stringify( repoRootCopy );
+                const newFileContent = safeStart+repoRootString+safeEnd;
+
+                yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true]);
+            }
+        }
+    } else {
+        console.warn('no path');
+    }
+
 }

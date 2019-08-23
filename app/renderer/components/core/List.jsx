@@ -246,7 +246,7 @@ class ListItem extends PureComponent<ListItemProps> {
                         className="item-value-wrap"
                         // onClick={ ::this.toggleEdit } 
                     >   
-                        { value }
+                        { value || 'empty string' }
                         { controls }
                     </div>
                 }

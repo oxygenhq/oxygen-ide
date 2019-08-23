@@ -22,7 +22,8 @@ import {
   removeObjectOrFolder, 
   removeArrayObjectLocator,
   updateLocatorValue,
-  updateArrayObjecLocatorValue 
+  updateArrayObjecLocatorValue,
+  orAddToRoot
 } from '../../store/workbench/actions';
 
 const mapStoreToProps = (state) => {
@@ -47,7 +48,8 @@ const mapDispatchToProps = (dispatch) => (
     removeObjectOrFolder, 
     removeArrayObjectLocator,
     updateLocatorValue,
-    updateArrayObjecLocatorValue
+    updateArrayObjecLocatorValue,
+    orAddToRoot
   } , dispatch)
 );
 

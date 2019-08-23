@@ -16,7 +16,7 @@
   }
 }
 
- .search-row-contols {
+.search-row-contols {
   height: 30px;
   line-height: 30px;
 
@@ -32,3 +32,9 @@
     min-width: 32px;
   }
 } 
+
+.add-to-root-row {
+  padding: 5px;
+  background: #f2f2f2;
+  border-left: solid 1px $panelBorderColor;
+}

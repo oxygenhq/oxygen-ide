@@ -354,3 +354,8 @@ export const showContextMenu = (type, event = null, node = null) => ({
   type: ActionTypes.WB_SHOW_CONTEXT_MENU,
   payload: { type, event, node },
 })
+
+export const orAddToRoot = (name, key) => ({
+  type: ActionTypes.WB_OR_ADD_TO_ROOT,
+  payload: { name, key },
+})
