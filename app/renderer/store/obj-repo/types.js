@@ -11,3 +11,4 @@ export const OR_SET_ACTIVE = 'OR_SET_ACTIVE';
 export const OR_CLOSE_ACTIVE = 'OR_CLOSE_ACTIVE';
 export const OR_SET_PARENT = 'OR_SET_PARENT';
 export const OR_CLEAR = 'OR_CLEAR';
+export const OR_OBJECT_REPOSITORY_FILE = 'OR_OBJECT_REPOSITORY_FILE';

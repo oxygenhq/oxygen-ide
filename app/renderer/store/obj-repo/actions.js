@@ -48,3 +48,9 @@ export const clearObjRepo = () => ({
   type: ActionTypes.OR_CLEAR,
   payload: {  },
 });
+
+// clearObjectRepositoryFile
+export const clearObjectRepositoryFile = () => ({
+  type: ActionTypes.OR_OBJECT_REPOSITORY_FILE,
+  payload: {},
+});

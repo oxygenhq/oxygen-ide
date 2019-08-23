@@ -56,6 +56,13 @@ export default class ObjectRepository extends PureComponent<Props> {
       closeActive();
     }
   }
+
+  closeObjectRepository= () => {
+    const { clearObjectRepositoryFile } = this.props;
+    if(clearObjectRepositoryFile){
+      clearObjectRepositoryFile();
+    }
+  }
   
   render() {
       const { tree, active, name, selectedObject, setActive } = this.props;
@@ -76,10 +83,20 @@ export default class ObjectRepository extends PureComponent<Props> {
           </div>
         </Fragment>
       );
+
+      const repoPanelTitleWrap = (
+        <Fragment>
+          {repoPanelTitle} 
+          <div onClick={this.closeObjectRepository} className={`header-control`}>
+            <Icon type="close" />
+          </div>
+        </Fragment>
+      );
+
       return (
         <ObjectRepository.Container>
             <Panel 
-                header={ repoPanelTitle }
+                header={ repoPanelTitleWrap }
                 afterHeader = {
                   <SearchRow
                     setSearchResults={ this.setSearchResults }
