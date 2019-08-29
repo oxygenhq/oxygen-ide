@@ -18,6 +18,7 @@ import { type LogEntry } from '../types/LogEntry';
 import ScrollContainer from './ScrollContainer';
 import { AutoSizer, Grid } from 'react-virtualized';
 import 'react-virtualized/styles.css';
+import os from 'os';
 
 type Props = {
     logs: Array<LogEntry>,
@@ -153,20 +154,19 @@ export default class LogViewer extends PureComponent<Props> {
     }
   }
 
-
-  getCopyValue = () => {
-    let result = '';
-
-    if(this.loggerRef && this.loggerRef.current && this.loggerRef.current.innerText){
-      result = this.loggerRef.current.innerText
-    }
-
-    return result;
-  }
-
   copyClicked = () => {
+
+    const { lines } = this.state;
+
     if (!this.state.copyValue) {
-      const copyValue = this.getCopyValue();
+      let copyValue = '';
+
+      if(lines && lines.length && lines.length > 0){
+        lines.map((line) => {
+          copyValue+=line.message+os.EOL;
+        })
+      }
+      
       if(copyValue){
         this.setState({
           keyKeys: ['Meta', 'c'],
@@ -201,7 +201,7 @@ export default class LogViewer extends PureComponent<Props> {
       return (
         <div 
           className="auto-sizer-wrapper-row" 
-          style={{...style, paddingTop: rowIndex ? '0px': '5px'}} 
+          style={{...style, paddingTop: rowIndex ? '0px': '5px'}}
           key={key}
         >
           {line.message}
