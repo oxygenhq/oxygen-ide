@@ -120,6 +120,15 @@ export default class Logger {
             const detail = err.toString()
                           + '\n\nFull log is available at: ' + this.logFilePath;
 
+                
+            if(Sentry && Sentry.captureException){                
+                const error = new Error(msg);
+
+                Sentry.captureException(error);
+            } else {
+                console.log('bad Sentry', Sentry);
+            }
+
             if (app.isReady()) {
                 dialog.showMessageBox({
                     type: type,
