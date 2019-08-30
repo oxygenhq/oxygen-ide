@@ -98,7 +98,6 @@ export const setZoom = (zoom) => ({
   payload: { zoom }
 });
 
-
 export const setSidebarVisible= (sidebar, visible) => ({
   type: types.SIDEBAR_SET_VISIBLE,
   payload: { target: sidebar, value: visible },
@@ -107,6 +106,11 @@ export const setSidebarVisible= (sidebar, visible) => ({
 export const setSidebarSize = (sidebar, size) => ({
   type: types.SIDEBAR_SET_SIZE,
   payload: { target: sidebar, value: size },
+});
+
+export const setSidebarComponent = (sidebar, component) => ({
+  type: types.SIDEBAR_SET_COMPONENT,
+  payload: { target: sidebar, value: component },
 });
 
 export const setLoggerVisible= (visible) => ({

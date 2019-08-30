@@ -15,9 +15,17 @@ import updateModals from '../../components/updateModals';
 import JavaDialog from '../../components/dialogs/JavaDialog';
 import FileRenameDialog from '../../components/dialogs/FileRenameDialog';
 import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
+import ObjectCreateDialog from '../../components/dialogs/ObjectCreateDialog';
+import ObjectFolderCreateDialog from '../../components/dialogs/ObjectFolderCreateDialog';
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
 import SettingsDialog from '../../components/dialogs/SettingsDialog';
 import NeedInstallExtension from '../../components/dialogs/NeedInstallExtension';
+import CloudProvidersDialog from '../../components/dialogs/CloudProvidersDialog';
+import ChromeDriverDialog from '../../components/dialogs/ChromeDriverDialog';
+import ChromeDriverDownloadingDialog from '../../components/dialogs/ChromeDriverDownloadingDialog';
+import ChromeDriverDownloadingSuccessDialog from '../../components/dialogs/ChromeDriverDownloadingSuccessDialog';
+import ChromeDriverDownloadingFailedDialog from '../../components/dialogs/ChromeDriverDownloadingFailedDialog';
+
 // Other components
 import TextEditor from '../TextEditor';
 import Tabs from '../Tabs';
@@ -29,11 +37,11 @@ import Sidebar from '../../components/Sidebar';
 import Landing from '../../components/Landing';
 import Initializing from '../../components/Initializing';
 import Settings from '../Settings';
+import ObjectRepository from '../ObjectRepository';
 import * as Controls from '../../components/Toolbar/controls';
 // Styles
 import '../../css/common.scss';
 import '../../css/workbench.scss';
-import CloudProvidersDialog from '../../components/dialogs/CloudProvidersDialog';
 
 const { Header } = Layout;
 
@@ -65,6 +73,8 @@ export default class Workbench extends Component<Props> {
   constructor(props) {
     super(props);
 
+    this.on = false;
+
     this.handleTabChange = this.handleTabChange.bind(this);
     this.handleTabClose = this.handleTabClose.bind(this);
   }
@@ -90,6 +100,57 @@ export default class Workbench extends Component<Props> {
         alert('no stopRecorder');
       }  
     }
+    
+    if(this.elem && this.elem.removeEventListener){
+      this.elem.removeEventListener("keydown", this.keydownCallback);
+      this.elem.removeEventListener("keyup", this.keyupCallback);
+    }
+  }
+
+  componentDidUpdate(){
+    if(!this.elem){
+      this.elem = document.getElementById('editors-container-wrap');
+
+      if(this.elem && this.elem.addEventListener){
+        this.elem.addEventListener("keydown", this.keydownCallback);
+        this.elem.addEventListener("keyup", this.keyupCallback);
+      }
+    }
+  }
+
+  keydownCallback = (e) => {
+    if(e.key === 'Control'){
+      if(!this.on){
+        e.stopPropagation()
+        this.elem.addEventListener('wheel', this.wheelCallback , true);
+        this.on = true;
+      }
+    }
+  }
+  
+  keyupCallback = (e) => {
+    if(e.key === 'Control'){
+      e.stopPropagation()
+      this.elem.removeEventListener('wheel',  this.wheelCallback , true)
+      this.on = false;
+    }
+  }
+
+  wheelCallback = (e) => {
+    e.stopPropagation();
+    
+    if(e && e.deltaY && e.deltaY < 0){
+      //up
+      if(this.props.zoomIn){
+        this.props.zoomIn();
+      }
+    }
+    if(e && e.deltaY && e.deltaY > 0){
+      //down
+      if(this.props.zoomOut){
+        this.props.zoomOut();
+      }
+    }
   }
 
   handleTabChange(key, name = null) {
@@ -104,8 +165,8 @@ export default class Workbench extends Component<Props> {
     this.props.onContentUpdate(path, content, name);
   }
 
-  handleBreakpointsUpdate(filePath, breakpoints) {
-    this.props.updateBreakpoints(filePath, breakpoints);
+  handleBreakpointsUpdate(filePath, breakpoints, name) {
+    this.props.updateBreakpoints(filePath, breakpoints, name);
   }
 
   handleSidebarResize(sidebar, newSize) {
@@ -207,7 +268,7 @@ export default class Workbench extends Component<Props> {
   }
 
   getToolbarControlsState() {
-    const { test, isRecording, settings, dialog, editorActiveFile } = this.props;
+    const { test, isRecording, editorActiveFile } = this.props;
     return {
       [Controls.TEST_RUN]: {
         visible: !test.isRunning,
@@ -281,6 +342,25 @@ export default class Workbench extends Component<Props> {
   fileCreateDialog_onCancel() {
     this.props.hideDialog('DIALOG_FILE_CREATE');
   }
+
+  objectCreateDialog_onSubmit(name, type, parentPath) {
+    this.props.hideDialog('DIALOG_OBJECT_CREATE');
+    this.props.createObject(name, parentPath);
+  }
+
+  objectCreateDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_CREATE');
+  }
+
+  objectFolderCreateDialog_onSubmit(name, type, parentPath) {
+    this.props.hideDialog('DIALOG_OBJECT_FOLDER_CREATE');
+    this.props.createObjectFolder(name, parentPath);
+  }
+
+  objectFolderCreateDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_FOLDER_CREATE');
+  }
+
   // Rename
   fileRenameDialog_onSubmit(path, type, newName) {
     this.props.hideDialog('DIALOG_FILE_RENAME');
@@ -313,6 +393,28 @@ export default class Workbench extends Component<Props> {
     this.props.hideDialog('DIALOG_CLOUD_PROVIDERS');
   }
 
+  chromeDrivers_onSubmit = (chromeDriverVersion) => {
+    this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
+    this.props.startDownloadChromeDriver(chromeDriverVersion);
+  }
+
+  chromeDrivers_onCancel = () => {
+    this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
+  }
+
+  chromeDriversSuccess_onClose = () => {
+    this.props.hideDialog('DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS');
+  }
+
+  chromeDriversFailed_onClose = () => {
+    this.props.hideDialog('DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED');
+  }
+  
+  chromeDrivers_onNoChromeDriverSubmit = () => {
+    this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
+    this.props.showDownloadChromeDriverError();
+  }
+
   render() {
     const { test, settings = {}, dialog, javaError, initialized, changeShowRecorderMessageValue } = this.props;
     const { cloudProviders = {} } = settings;
@@ -322,6 +424,8 @@ export default class Workbench extends Component<Props> {
     const leftSidebarVisible = settings.sidebars.left.visible;
     const rightSidebarSize = settings.sidebars.right.size;
     const rightSidebarVisible = settings.sidebars.right.visible;
+    const rightSidebarComponent = settings.sidebars.right.component;
+    // logger state
     const loggerVisible = settings.logger.visible;
     const showLanding = settings.showLanding;
     const showRecorderMessage = settings.showRecorderMessage;
@@ -364,6 +468,49 @@ export default class Workbench extends Component<Props> {
           { dialog.DIALOG_NEED_ISTALL_EXTENSION && dialog.DIALOG_NEED_ISTALL_EXTENSION.visible &&
             <NeedInstallExtension
               onClose={ this.needInstallExtensionOnClose }
+            />
+          }
+          <ObjectCreateDialog
+            { ...dialog['DIALOG_OBJECT_CREATE'] }
+            onSubmit={ ::this.objectCreateDialog_onSubmit }
+            onCancel={ ::this.objectCreateDialog_onCancel } 
+          />
+          <ObjectFolderCreateDialog
+            { ...dialog['DIALOG_OBJECT_FOLDER_CREATE'] }
+            onSubmit={ ::this.objectFolderCreateDialog_onSubmit }
+            onCancel={ ::this.objectFolderCreateDialog_onCancel } 
+          />
+
+          { dialog.DIALOG_FILE_CREATE && dialog.DIALOG_FILE_CREATE.visible &&
+            <FileCreateDialog 
+              { ...dialog['DIALOG_FILE_CREATE'] }
+              onSubmit={ ::this.fileCreateDialog_onSubmit }
+              onCancel={ ::this.fileCreateDialog_onCancel } 
+            />
+          }
+          { dialog.DIALOG_INCORECT_CHROME_DRIVER_VERSION && dialog.DIALOG_INCORECT_CHROME_DRIVER_VERSION.visible &&
+            <ChromeDriverDialog
+              { ...dialog['DIALOG_INCORECT_CHROME_DRIVER_VERSION'] }
+              onSubmit={ this.chromeDrivers_onSubmit }
+              onCancel={ this.chromeDrivers_onCancel }
+              onNoChromeDriverSubmit={ this.chromeDrivers_onNoChromeDriverSubmit }
+            />
+          }
+          { dialog.DIALOG_DOWNLOADING_CHROME_DRIVER && dialog.DIALOG_DOWNLOADING_CHROME_DRIVER.visible &&
+            <ChromeDriverDownloadingDialog
+              { ...dialog['DIALOG_DOWNLOADING_CHROME_DRIVER'] }
+            />
+          }
+          { dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS && dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS.visible &&
+            <ChromeDriverDownloadingSuccessDialog
+              { ...dialog['DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS'] }
+              onClose={ this.chromeDriversSuccess_onClose  }
+            />
+          }
+          { dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED && dialog.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED.visible &&
+            <ChromeDriverDownloadingFailedDialog
+              { ...dialog['DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED'] }
+              onClose={ this.chromeDriversFailed_onClose  }
             />
           }
           <FileRenameDialog 
@@ -432,24 +579,24 @@ export default class Workbench extends Component<Props> {
                   />
                 </Sidebar>
                 <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
-                <Header className="tabs-container">{/*headerBar*/}
-                  <Row>
-                    <Col className="sidebar-trigger">                      
-                      <Icon
-                        title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
-                        className="trigger"
-                        type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
-                        onClick={ () => ::this.toggleSidebarVisible('left') }
-                        style={{ paddingLeft: 15, cursor: 'pointer' }}
-                      />
-                    </Col>
-                    <Col className="tabs-bar-container">
-                      <Tabs 
-                        onChange={ this.handleTabChange } 
-                        onClose={ this.handleTabClose } 
-                      />
-                    </Col>
-                  </Row>
+                  <Header className="tabs-container">{/*headerBar*/}
+                    <Row>
+                      <Col className="sidebar-trigger">                      
+                        <Icon
+                          title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
+                          className="trigger"
+                          type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
+                          onClick={ () => ::this.toggleSidebarVisible('left') }
+                          style={{ paddingLeft: 15, cursor: 'pointer' }}
+                        />
+                      </Col>
+                      <Col className="tabs-bar-container">
+                        <Tabs 
+                          onChange={ this.handleTabChange } 
+                          onClose={ this.handleTabClose } 
+                        />
+                      </Col>
+                    </Row>
                 </Header>
                 <div className="editor-container">
                   <div id="editors-container-wrap">
@@ -463,14 +610,15 @@ export default class Workbench extends Component<Props> {
                     onHide={::this.logger_onHide}
                   />
                 </div>
-              </Layout>
+                </Layout>
                 <Sidebar 
                   align="right"
                   size={ rightSidebarSize } 
                   visible={ rightSidebarVisible } 
                   onResize={ (size) => ::this.handleSidebarResize('right', size) }
                 >
-                  <Settings />
+                  { rightSidebarComponent === 'settings' && <Settings /> } 
+                  { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
                 </Sidebar>
               </Layout>
           </Col>

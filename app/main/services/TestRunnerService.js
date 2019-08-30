@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,10 +9,9 @@
 import { util, Runner } from 'oxygen-cli';
 import path from 'path';
 import moment from 'moment';
-import cfg from '../config.json';
+import detectPort from 'detect-port';
 import ServiceBase from "./ServiceBase";
 
-const { selenium } = cfg;
 const oxutil = util;
 
 // Events
@@ -34,7 +33,7 @@ export default class TestRunnerService extends ServiceBase {
     mainFilePath = null;
 
     constructor() {
-        super();        
+        super();
     }
     /**
      * @param  {String} scriptFilename | path to script file
@@ -55,9 +54,8 @@ export default class TestRunnerService extends ServiceBase {
         const filename = path.basename(this.mainFilePath, '.js');
         const testConfig = {
             testName: filename,
-            seleniumPort: selenium.port,    // this is default selenium port, found in config file
-            dbgPort: TestRunnerService._getRandomPort(),
-            ...runtimeSettings,             // selenium port can also come from runtime setttings (over)
+            dbgPort: await detectPort(10205),
+            ...runtimeSettings,
         };
         const {
             paramFilePath, 
@@ -65,7 +63,7 @@ export default class TestRunnerService extends ServiceBase {
             iterations,
             reopenSession,
             dbgPort,
-            testMode,            
+            testMode,
             testTarget,
             testProvider,
             seleniumPort,
@@ -76,10 +74,13 @@ export default class TestRunnerService extends ServiceBase {
         let testsuite = null;
 
         try {
-            testsuite = await oxutil.generateTestSuiteFromJSFile(mainFilePath, paramFilePath, paramMode);
-        }
-        catch (e) {
-            this._emitLogEvent(SEVERITY_ERROR, `Cannot generate test suite from JS file: ${e.message}`);
+            testsuite = await oxutil.generateTestSuiteFromJSFile(mainFilePath, paramFilePath, paramMode, true);
+        } catch (e) {
+            // could get exception only if param file loading fails
+            this._emitLogEvent(SEVERITY_ERROR, `Test Failed! Unable to load parameters file: ${e.message}`);
+            this._emitTestEnded(null, e);
+            this.isRunning = false; // oxygen crashed - nothing to oxRunner.dispose(), so just unset local vars
+            this.oxRunner = null;
             return;
         }
         // set iterations count
@@ -87,7 +88,6 @@ export default class TestRunnerService extends ServiceBase {
         // prepare launch options and capabilities
         const caps = {};
         const options = {};
-        options.debugPort = dbgPort;
         options.debugPortIde = dbgPort;
         options.require = {
             allow: true,
@@ -105,6 +105,12 @@ export default class TestRunnerService extends ServiceBase {
                     caps.accessKey = testProvider.accessKey;
                     caps.extendedDebugging = testProvider.extendedDebugging || false;
                     caps.capturePerformance = testProvider.capturePerformance || false;
+                case 'testingBot':
+                    options.seleniumUrl = testProvider.url;
+                    caps.name = testName || null;
+                    caps.key = testProvider.key;
+                    caps.secret = testProvider.secret;
+                    caps.extendedDebugging = testProvider.extendedDebugging || false;
             }
         }
                 
@@ -184,7 +190,7 @@ export default class TestRunnerService extends ServiceBase {
             } else {
                 this._emitLogEvent(SEVERITY_ERROR, `ERROR: ${e.message}. ${e.stack || ''}`);
             }
-            this._emitLogEvent(SEVERITY_FATAL, 'Test Failed!');
+            this._emitLogEvent(SEVERITY_ERROR, 'Test Failed!');
             this._emitTestEnded(null, e);
             try {
                 await this.dispose();
@@ -246,12 +252,6 @@ export default class TestRunnerService extends ServiceBase {
         }
     }
 
-    static _getRandomPort() {
-        const portMin = 1024;
-        const portMax = 65535;
-        return Math.floor(Math.random() * (portMax - portMin)) + portMin;
-    }
-
     _emitTestStarted() {
         this.notify({
             type: EVENT_TEST_STARTED,
@@ -275,30 +275,21 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _hookToOxygenEvents() {
-        this.oxRunner.on('line-update', (line, stack, time) => {
-            // send LINE_UPDATE event for each file in the stack
-            if (stack && Array.isArray(stack)) {
-                const primaryFile  = stack.length > 0 ? stack[0].file : null;
-                for (const call of stack) {
-                    this.notify({
-                        type: EVENT_LINE_UPDATE,
-                        time: time,
-                        file: call.file,
-                        line: call.line,
-                        // determine if this stack call is the top (primary) one in the stack (so we can open the relevant tab)
-                        primary: primaryFile === call.file, 
-                    });
-                }
-            }
-            else {
+        this.oxRunner.on('line-update', (stack, time) => {
+            // first entry in the stack is the current file
+            // (which can be the primary file or a file loaded via `require`)
+            // last entry is the primary file.
+            if (Array.isArray(stack) && stack.length > 0) {
+                const primaryFile = stack[stack.length - 1].file;
                 this.notify({
                     type: EVENT_LINE_UPDATE,
                     time: time,
-                    file: this.mainFilePath,
-                    line: line,
-                    primary: true,
+                    file: stack[0].file,
+                    line: stack[0].line,
+                    // determine if this the primary file or not (so we can open the relevant tab)
+                    primary: primaryFile === stack[0].file
                 });
-            }            
+            }
         });
 
         // @params breakpoint, testcase
@@ -308,8 +299,9 @@ export default class TestRunnerService extends ServiceBase {
             // if no fileName is received from the debugger (not suppose to happen), assume we are in the main script file
             const editorFile = fileName ? fileName : this.mainFilePath;
             // if we are in the main script file, adjust line number according to script boilerplate offset
-            let editorLine = editorFile !== this.mainFilePath ? lineNumber : lineNumber - getScriptContentLineOffset;
-            // set event time
+            // if we are in the secondary file (loaded via `require`) add 1 since BP indices are 0-based.
+            let editorLine = editorFile !== this.mainFilePath ? lineNumber + 1 : lineNumber - getScriptContentLineOffset;
+            
             const time = moment.utc().valueOf();
             // make sure to mark breakpoint line with current line mark
             this.notify({

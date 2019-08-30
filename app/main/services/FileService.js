@@ -10,6 +10,7 @@
 /* eslint-disable class-methods-use-this */
 import fs from 'fs';
 import fsExtra from 'fs-extra';
+import beautify from 'js-beautify';
 import path from 'path';
 import rimraf from 'rimraf';
 import junk from 'junk';
@@ -19,6 +20,7 @@ import ServiceBase from './ServiceBase';
 import fileFolderSorter from '../helpers/fileFolderSorter';
 import isUnixHiddenPath from '../helpers/isUnixHiddenPath';
 import isWinHiddenPath from '../helpers/isWinHiddenPath';
+import * as Sentry from '@sentry/electron';
 
 const FS_ERRORS = {
     EACCES: 'Permission denied',
@@ -196,6 +198,7 @@ export default class FileService extends ServiceBase {
                     stats = fs.lstatSync(filePath);
                 }
                 catch (e) {
+                    Sentry.captureException(e);
                     return result;
                 }
                 if (stats.isSymbolicLink() || junk.is(filePath) 
@@ -225,6 +228,40 @@ export default class FileService extends ServiceBase {
             parentPath: parentPath,
             type: type,
             ext: path.extname(filePath),
+        };
+    }
+
+    returnFileContent(filePath){
+
+        let response;
+
+        try {
+            if (filePath && fs.existsSync(filePath)) {
+                //file exists
+
+                var data = fs.readFileSync(filePath, 'utf8');
+
+                if(!data){
+                    // sometimes readFileSync return empty data on not emty file :-?
+                    setTimeout(function() { 
+                        var data = fs.readFileSync(filePath, 'utf8');
+                        response = data;
+                    }, 100);
+                } else {
+                    response = data;
+                }
+
+            } else {
+                response = false;
+            }
+        } catch(err) {
+            Sentry.captureException(err);
+            console.log('Error in returnFileContent method with filePath '+filePath+' :', err);
+        }
+
+        return {
+            filePath: filePath,
+            content: response
         };
     }
 
@@ -339,9 +376,22 @@ export default class FileService extends ServiceBase {
         return this.saveFileContent(newFilePath, '', 'utf-8', 'wx');
     }
 
-    saveFileContent(filePath, content, encoding = 'utf8', flag = 'w') {
+    saveFileContent(filePath, content, beautifyContent = false, encoding = 'utf8', flag = 'w') {
         return new Promise((resolve, reject) => {
-            fs.writeFile(filePath, content, { encoding, flag }, (error) => {
+            let fileContent;
+            if (beautifyContent) {
+                send({
+                    service: 'FileService',
+                    event: 'ObjectRepoWatcher',
+                    path: filePath,
+                    content: content
+                });
+
+                fileContent = beautify(content, { indent_size: 2, space_in_empty_paren: true });
+            } else {
+                fileContent = content;
+            }
+            fs.writeFile(filePath, fileContent, { encoding, flag }, (error) => {
                 if (error) {
                     reject(this._humanizeErrorCode(error));
                 }

@@ -9,15 +9,19 @@
 // @flow
 import React, { Component } from 'react';
 import type { Element } from 'react';
+import styled from '@emotion/styled';
+
+import FlexColumn from './core/FlexColumn';
 import ScrollContainer from './ScrollContainer';
 import '../css/panel.scss';
 
 type Props = {
-  header: string|React.Node,
+  header: any,
   scroller?: boolean,
   scrollWrapperClass?: string,
   scrollRefresh?: boolean,
   scrollVerticalOnly?: boolean,
+  noBodyPadding?: boolean,
   children?: Element,
 };
 
@@ -25,39 +29,49 @@ type Props = {
 export default class Panel extends Component<Props> {
     props: Props;
 
+    static Container = styled(FlexColumn)(props => ({
+        flex: 1,
+    }));
+
     render() {
         const { 
             header,
+            afterHeader = null,
             scroller = false,
             scrollWrapperClass = null,
             scrollRefresh = false,
             scrollVerticalOnly = false,
-            refreshScrollBottom = false,
-            wrapRef
+            noBodyPadding = false,
+            noBodyBorders = false,
+            className = null
         } = this.props;
 
         let children = this.props.children;
         if (scroller) {
-            children = renderChildrenWithScroller(this.props.children, scrollWrapperClass, scrollVerticalOnly, scrollRefresh, refreshScrollBottom);
+            children = renderChildrenWithScroller(this.props.children, scrollWrapperClass, scrollVerticalOnly, scrollRefresh);
         }
 
+        const panelBodyClassNames = 'panel-body' + 
+            (noBodyPadding ? ' no-padding' : '') +
+            (noBodyBorders ? ' no-borders' : '');
+
         return (
-            <div 
-                ref={wrapRef ? wrapRef : undefined}
-                className="panel"
-            >
-                <div className="panel-header">
-                    <span>{ header }</span>
-                </div>
-                <div className="panel-body">
+            <Panel.Container className={`panel1 ${className}`}>
+                { header && 
+                    <div className="panel-header">
+                        <span>{ header }</span>
+                    </div>
+                }
+                { afterHeader }
+                <div className={ panelBodyClassNames }>
                     { children }
                 </div>
-            </div>
+            </Panel.Container>
         );
     }
 }
 
-function renderChildrenWithScroller(children, wrapperClass = null, scrollVerticalOnly = false, refreshScroll = false, refreshScrollBottom = false) {
+function renderChildrenWithScroller(children, wrapperClass = null, scrollVerticalOnly = false, refreshScroll = false) {
     let classes = 'scroller';
     if (wrapperClass) {
         classes += ' ' + wrapperClass;
@@ -65,7 +79,6 @@ function renderChildrenWithScroller(children, wrapperClass = null, scrollVertica
     return (
         <ScrollContainer
           refreshScroll={ refreshScroll }
-          refreshScrollBottom={ refreshScrollBottom }
           disableHorizontal={ scrollVerticalOnly }
           classes={ classes }
         >

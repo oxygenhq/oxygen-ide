@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,18 +12,27 @@ import * as types from './types';
 const FONT_SIZE_MIN = 12;
 const FONT_SIZE_MAX = 36;
 const SAUCELABS_HUB_DEFAULT_URL = 'https://ondemand.saucelabs.com:443/wd/hub';
+const TESTINGBOT_HUB_DEFAULT_URL = 'https://hub.testingbot.com:443/wd/hub';
 
 const defaultAppSettings = {
   cache: null,
   files: {},
   cloudProviders: {
     sauceLabs: {
-      title: 'SauceLabs',
+      title: 'Sauce Labs',
       url: SAUCELABS_HUB_DEFAULT_URL,
       username: null,
       accessKey: null,
       extendedDebugging: false,
       capturePerformance: false,
+      inUse: false,
+    },
+    testingBot: {
+      title: 'TestingBot',
+      url: TESTINGBOT_HUB_DEFAULT_URL,
+      key: null,
+      secret: null,
+      extendedDebugging: false,
       inUse: false,
     }
   },
@@ -55,6 +64,7 @@ const defaultState = {
     right: {
       visible: false,
       size: 250,
+      component: null,
     },
   },
   ...defaultAppSettings,
@@ -202,6 +212,21 @@ export default (state = defaultState, action) => {
           [target]: {
             ...state.sidebars[target],
             size: value,
+          }
+        },
+      };
+    // SIDEBAR_SET_COMPONENT
+    case types.SIDEBAR_SET_COMPONENT:
+      if (typeof value === 'undefined' || typeof target === 'undefined') {
+        return state;
+      }
+      return {
+        ...state,
+        sidebars: {
+          ...state.sidebars,
+          [target]: {
+            ...state.sidebars[target],
+            component: value,
           }
         },
       };

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ try {
   ) {
     // dev mode
     // ignore sentry logging
+    initializeCrashReporterAndSentry();
   } else {
     initializeCrashReporterAndSentry();
   }
@@ -52,7 +53,7 @@ try{
   const gotTheLock = app.requestSingleInstanceLock()
   
   if (!gotTheLock) {
-    app.quit()
+    app.exit()
   } else {
     app.on('second-instance', (event, commandLine, workingDirectory) => {
       // Someone tried to run a second instance, we should focus our window.
@@ -65,6 +66,10 @@ try{
 } catch(e){
   alert('Please, open later (2 sec)');
   console.log(e);
+
+  if(Sentry && Sentry.captureException){
+    Sentry.captureException(e);
+  }
 }
 
 if (process.env.NODE_ENV === 'production') {
@@ -74,7 +79,6 @@ if (process.env.NODE_ENV === 'production') {
 
 if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
   require('electron-debug')();
-  const path = require('path');
   const p = path.join(__dirname, 'node_modules');
   require('module').globalPaths.push(p);
 }
@@ -118,8 +122,7 @@ app.on('ready', async () => {
     width: 1024,
     height: 728,
     webPreferences: {
-      webSecurity: false,
-      preload: path.join(__dirname, 'sentry.js')
+      webSecurity: false
     },
   });
 
@@ -147,6 +150,11 @@ app.on('ready', async () => {
   try{
     mainProc = new MainProcess(mainWindow);
   } catch(e){
+    
+    if(Sentry && Sentry.captureException){
+      Sentry.captureException(e);
+    }
+    
     console.log('e', e);
   }
 });
@@ -154,7 +162,7 @@ app.on('ready', async () => {
 function disposeMainAndQuit() {
   if (mainProc) {
     // dispose main process and all its services
-    mainProc.dispose().then(() => app.quit());
+    mainProc.dispose().then(() => app.exit());
     // make sure we set mainProc to null to prevent duplicated calls to this function
     mainProc = null;
   }
@@ -186,7 +194,7 @@ function initializeCrashReporterAndSentry() {
     submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f',
     uploadToServer: true
   });
-  // initialize Sentry
-  Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
+   // initialize Sentry
+   Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
 }
 

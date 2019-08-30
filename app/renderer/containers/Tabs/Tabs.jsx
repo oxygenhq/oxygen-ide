@@ -12,7 +12,7 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { Icon, Tooltip, Modal, Button } from 'antd';
-import _ from 'lodash';
+import debounce from 'lodash.debounce';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
 import DraggableTab from './DraggableTab';
 import '../../css/tabs.scss';
@@ -54,7 +54,7 @@ class Tabs extends Component<Props, void> {
       });
     }
 
-    window.addEventListener('resize', _.debounce((e) => {
+    window.addEventListener('resize', debounce((e) => {
       e.preventDefault();
       if (this.ps) {
         this.ps.destroy();

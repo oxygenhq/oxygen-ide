@@ -17,3 +17,18 @@ export const hideDialog = (dialog) => ({
   type: types.DIALOG,
   payload: { dialog, visible: false },
 });
+
+export const setParamstoDialog = (dialog, params) => ({
+  type: types.DIALOG,
+  payload: { dialog, visible: false, ...params },
+});
+
+export const startDownloadChromeDriver = (chromeDriverVersion) => ({
+  type: types.DIALOG_START_DOWNLOAD_CHROME_DRIVER,
+  payload: { chromeDriverVersion },
+});
+
+export const showDownloadChromeDriverError = () => ({
+  type: types.DIALOG_SHOW_DOWNLOADING_CHROME_DRIVER_FAILED,
+  payload: {  },
+});

@@ -1,0 +1,69 @@
+@import 'vars';
+
+.list {
+  .list-item {
+    border-bottom: 1px #dcdcdc solid;
+    background-color: white;
+
+    .item-value-wrap {
+      padding: 5px 5px;
+      display: flex;
+      align-items: center;
+
+      .control {
+        margin: 2px;
+        min-width: 32px;
+      }
+    }
+
+    .item-value-wrap:hover {
+      cursor: pointer;
+    }
+
+    .item-value-wrap.selected {
+      background: #DAD8D0;
+    }
+    
+    input.item-value-editing {
+      padding: 3px 4px;
+      width: 100%;
+      color: darkblue;
+      /*.ant-input:focus {
+        border-color: #40a9ff;
+        outline: 0;*/
+    }
+  }
+}
+
+.list-auto-height {
+  height: auto!important;
+}
+
+.no-data {
+  text-align: center;
+  margin: 1em;
+}
+
+
+.control-wrap {
+  padding: 1em;
+
+  .control {
+    margin: 2px;
+    min-width: 32px;
+  }
+}
+
+.control-wrap-right {
+  text-align: right;
+}
+.control-wrap-right-flex {
+  display: flex;
+  position: absolute;
+  right: 5px;
+}
+
+.list .list-item .item-value-wrap .control-wrap-right-flex .control {
+  margin: 3px;
+  min-width: auto;
+}

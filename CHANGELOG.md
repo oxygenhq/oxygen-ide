@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## v1.9.0 (2019-08-19)
+* Added TestingBot as cloud provider [on behalf of jochen].
+* Prevent crash when relaunching the IDE while it's already running in the background.
+* Fixed not being able to remove breakpoints from empty lines.
+* Bundle ChromeDriver v77.
+* Other minor fixes.
+
+## v1.8.0 (2019-08-07)
+* Added mechanism for ChromeDriver version management.
+* Allow setting/removing breakpoint after the test has been already started.
+* Allow setting breakpoints in unsaved files.
+* Scroll log window when new content is added.
+* Do not allow starting recording while test is running.
+* Fixed breakpoints to work with nested files.
+* Fixed number of issues related to file synchronization.
+* Fixed switching between local and Sauce Labs mode.
+* Fixed crash when running certain nested tests.
+* Fixed mouse scroll wheel occasionally performing zoom-in/out instead of scrolling.
+* Fixed Java check during startup.
+* Fixed handling of invalid parameters files.
+* Fixed rare crash when executing tests due to debugger port being unavailable.
+* Fixed crash when executing unsaved file on OS X under certain conditions.
+* Notarize OS X builds. Prevents security warnings on OS X 10.14.4 and later.
+* Bump Oxygen 0.47.2
+
 ## v1.7.0 (2019-07-14)
 * [BREAKING] Oxygen IDE requires now Chrome Oxygen Extension v0.64.0 or later.
 * Fixed an issue with Run button being disabled when recording stopped abruptly.

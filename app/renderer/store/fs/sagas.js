@@ -11,7 +11,9 @@ import { default as pathNode } from 'path';
 import ActionTypes from '../types';
 import * as fsActions from './actions';
 import * as settingsActions from './../settings/actions';
+import * as objRepActions from '../obj-repo/actions';
 import * as workbenchActions from './../workbench/actions';
+import { reportError } from '../sentry/actions';
 import { success, failure, successOrFailure } from '../../helpers/redux';
 import { putAndTake } from '../../helpers/saga';
 import fileSubjects from '../../store/fs/subjects';
@@ -153,6 +155,26 @@ export function* handleServiceEvents({ payload }) {
             console.warn('on getFileContent no path');
         }
     }
+
+    if (service === 'FileService' && event === 'ObjectRepoWatcher' ) {
+        if(path && content){
+            const [qwe, ...cont] = content.split('{');
+            const conte = "{"+cont.join("{");
+    
+            const conten = conte.split('};')[0] + "}";
+    
+            const repoRoot = JSON.parse(conten);
+
+            const activeNode = yield select(state => state.objrepo.path);
+            
+            if (activeNode && path && activeNode === path) {
+                yield put(objRepActions.openFile(path, true, repoRoot))
+            } else {
+                console.warn(`${activeNode} === ${path}`);
+            }
+        }
+    }
+
 }
 
 function* addFileOrFolder(fileOrFolder) {
@@ -255,6 +277,7 @@ export function* initializeSuccess() {
             fs.files[path]
         ) {
             const folder = fs.files[path];
+            const rootPath = fs.rootPath;
 
             if(folder && folder.children){
                 yield put(fsActions._treeOpenFolder_Success(path, folder.children));
@@ -263,37 +286,100 @@ export function* initializeSuccess() {
 
                 const editorState = yield select(state => state.editor);
                 
-                if(editorState && editorState.openFiles){
+                if(editorState && editorState.openFiles && rootPath){
+                    
+                    const fileContentArray = [];
 
-                    let allResults = yield all(Object.keys(editorState.openFiles).map(openFilePath =>{
+                    let allResults = yield all(Object.keys(editorState.openFiles).map(openFilePath => {
 
-                        const result = allFiles.some(file => {
-                            return file.path === openFilePath;
-                        })
+                        if(!openFilePath.startsWith('unknown') && openFilePath.startsWith(rootPath) && openFilePath.split(rootPath) && openFilePath.split(rootPath)[1]){
 
-                        if(!result && !openFilePath.startsWith('unknown')){
-                            // file removed from folder, but content in cache;
-
-                            if(fs && fs.files && fs.files[openFilePath] && fs.files[openFilePath]['content']){
-                                let unlinkedFileContent = fs.files[openFilePath]['content']|| '';
-                                
-                                const pathSplit = openFilePath.split(pathLib.sep);
-                                
-                                const name = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
-                                
-                                const key = 'unknown';
-
-                                const pRes = all([
-                                    put(tabActions.renameTab(openFilePath, key, name)),
-                                    put(editorActions.renameFile(openFilePath, name, true)),
-                                    put(settingsActions.addFile(key, name, unlinkedFileContent))
-                                ]);
-
-                                return pRes;
-                            }
+                            const innerPath = openFilePath.split(rootPath)[1];
+                            const innerPathArray = innerPath.split('\\');
+                            innerPathArray.shift();
                             
+                            let result = true;
+
+                            if(innerPathArray && innerPathArray.length === 1){
+                                // in root folder
+
+                                result = allFiles.some(file => {
+                                    return file.path === openFilePath;
+                                })
+
+                            } else {
+                                // not in root folder
+                                
+                                const resp = call(
+                                    services.mainIpc.call,
+                                    'FileService',
+                                    'returnFileContent',
+                                    [openFilePath]
+                                );
+
+                                fileContentArray.push(resp);
+                                
+                            }
+    
+                            if(!result){
+                                // file removed from folder, but content in cache;
+    
+                                if(fs && fs.files && fs.files[openFilePath]){
+                                    let unlinkedFileContent = fs.files[openFilePath]['content'] || '';
+                                    
+                                    const pathSplit = openFilePath.split(pathLib.sep);
+                                    
+                                    const name = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
+                                    
+                                    const key = 'unknown';
+    
+                                    const pRes = all([
+                                        put(tabActions.renameTab(openFilePath, key, name)),
+                                        put(editorActions.renameFile(openFilePath, name, true)),
+                                        put(settingsActions.addFile(key, name, unlinkedFileContent))
+                                    ]);
+    
+                                    return pRes;
+                                }
+                                
+                            }
                         }
                     }))
+
+                    try{
+                        if(fileContentArray && Array.isArray(fileContentArray) && fileContentArray.length > 0){
+                            const filesResults = yield all(fileContentArray);
+    
+                            filesResults.map(file => {
+                                if(
+                                    file && 
+                                    file.filePath && 
+                                    typeof file.content === 'string'
+                                ){
+                                    // file exist
+                                } else {
+                                    let unlinkedFileContent = fs.files[file.filePath]['content']|| '';
+                                    const pathSplit = file.filePath.split(pathLib.sep);
+                                    
+                                    const name = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
+                                    
+                                    const key = 'unknown';
+    
+                                    const pRes = all([
+                                        put(tabActions.renameTab(file.filePath, key, name)),
+                                        put(editorActions.renameFile(file.filePath, name, true)),
+                                        put(settingsActions.addFile(key, name, unlinkedFileContent))
+                                    ]);
+    
+                                    allResults.push(pRes);
+                                }
+                            })
+                        }
+                    } catch(e){
+                        yield put(reportError(e));
+                        console.log('Error when try create deleted from disk file', e);
+                    }
+
 
                     allResults = allResults.filter(function (el) {
                         return el != null;
@@ -395,8 +481,7 @@ export function* saveFileContent({ payload }) {
         yield put(fsActions._saveFile_Success(path));
     }
     catch (err) {
-        /* istanbul ignore next */
-        
+        yield put(reportError(err));
         yield call(services.mainIpc.call, 'ElectronService', 'showErrorBox', ['Save File Failed', err.code]);
         yield put(fsActions._saveFile_Failure(path, err));
     }
@@ -414,7 +499,7 @@ export function* saveFileContentAs({ payload }) {
         yield put(fsActions._saveFileAs_Success(path, content, response));
     }
     catch (err) {
-        /* istanbul ignore next */
+        yield put(reportError(err));
         yield put(fsActions._saveFileAs_Failure(path, err));
     }
 }
@@ -445,7 +530,7 @@ export function* renameFileOrFolder({ payload }) {
         yield put(fsActions._rename_Success(path, fileInfo));
     }
     catch (err) {
-        /* istanbul ignore next */
+        yield put(reportError(err));
         yield put(fsActions._rename_Failure(path, err));
     }
 }
@@ -461,7 +546,7 @@ export function* deleteFileOrFolder({ payload }) {
         yield put(fsActions._delete_Success(path));
     }
     catch (err) {
-        /* istanbul ignore next */
+        yield put(reportError(err));
         yield put(fsActions._delete_Failure(path, err));
     }
 }
@@ -481,7 +566,7 @@ export function* createFolder({ payload }) {
         yield put(fsActions._createFolder_Success(path, name, newPath));
     }
     catch (err) {
-        /* istanbul ignore next */
+        yield put(reportError(err));
         yield put(fsActions._createFolder_Failure(path, name, err));
     }
 }
@@ -501,7 +586,7 @@ export function* createFile({ payload }) {
         yield put(fsActions._createFile_Success(path, name, newPath));
     }
     catch (err) {
-        /* istanbul ignore next */
+        yield put(reportError(err));
         yield put(fsActions._createFile_Failure(path, name, err));
     }
 }

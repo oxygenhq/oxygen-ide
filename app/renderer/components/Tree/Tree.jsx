@@ -12,7 +12,7 @@ import classNames from 'classnames';
 import warning from 'warning';
 import toArray from 'rc-util/lib/Children/toArray';
 import { polyfill } from 'react-lifecycles-compat';
-import _ from 'lodash';
+import debounce from 'lodash.debounce';
 
 import { treeContextTypes } from './contextTypes';
 import {
@@ -122,7 +122,7 @@ class Tree extends React.Component {
       treeNode: [],
     };
 
-    this.delayedCallback = _.debounce(this.debounceOnDrag, 150);
+    this.delayedCallback = debounce(this.debounceOnDrag, 150);
   }
 
   getChildContext() {
@@ -789,7 +789,11 @@ class Tree extends React.Component {
       domProps.onKeyDown = this.onKeyDown;
     }
 
-    const dragOver = dragOverNodeKey === rootPath;
+    let dragOver;
+
+    if(dragOverNodeKey && rootPath){
+      dragOver = dragOverNodeKey === rootPath;
+    }
 
     return (
       <ul

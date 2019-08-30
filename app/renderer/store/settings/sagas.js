@@ -13,6 +13,7 @@ import * as tabActions from '../tabs/actions';
 import * as editorActions from '../editor/actions';
 import * as settingsActions from './actions';
 import * as wbActions from '../workbench/actions';
+import { reportError } from '../sentry/actions';
 import * as Const from '../../../const';
 import { MAIN_MENU_EVENT } from '../../services/MainIpc';
 
@@ -93,6 +94,7 @@ export function* tmpAddFile({ payload }) {
                 yield put(settingsActions.mergeSettings(newSettings));
             }
         } catch (err) {
+            yield put(reportError(err));
             console.warn('err', err);
         }
     }
@@ -109,6 +111,7 @@ export function* tmpRemoveFile({ payload }) {
                 yield put(settingsActions.mergeSettings(newSettings));
             }
         } catch (err) {
+            yield put(reportError(err));
             console.warn('err', err);
         }
     }
@@ -117,13 +120,14 @@ export function* tmpRemoveFile({ payload }) {
 export function* tmpUpdateFileContent({ payload }) {
     if (payload && payload.path && payload.name && typeof payload.content !== 'undefined') {
         const { path, name, content } = payload;
-        try {            
+        try {
             const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'updateFileContent', [path, name, content]);
             
             if(newSettings){
                 yield put(settingsActions.mergeSettings(newSettings));
             }
         } catch (err) {
+            yield put(reportError(err));
             console.warn('err', err);
         }
     }

@@ -14,6 +14,7 @@
     flex-flow: row nowrap;
     width: auto;
     max-width: 100%;
+    background: #f2f2f2;
 
   .tabs-container {
       background-color: $panelHeaderBgColor;
@@ -56,4 +57,26 @@
 .ant-layout-content {
   padding-top: 0;
   background-color: $layoutBg;
+}
+
+.ant-modal.hide-x-button {
+  .ant-modal-close {
+    display: none!important;
+  }
+}
+
+.ant-modal.scroll-y {
+  .ant-modal-body {
+    overflow-y: scroll!important;
+  }
+}
+
+.cloud-providers-form-wrap {
+  border: 1px solid #e9e9e9;
+  border-radius: 2px;
+  padding-top: 15px;
+}
+
+.cloud-providers-form-wrap-margin-bottom {
+  margin-bottom: 15px;
 }

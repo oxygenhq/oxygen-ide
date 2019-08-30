@@ -64,25 +64,7 @@ function* handleTestRunnerServiceEvent(event) {
         }
     }
     else if (event.type === 'LINE_UPDATE') {
-        const editor = yield select(state => state.editor);
-
-        try {
-            if( editor && 
-                editor.openFiles &&
-                event &&
-                event.file &&
-                editor.openFiles[event.file] && 
-                editor.openFiles[event.file].activeLine &&
-                event.line === editor.openFiles[event.file].activeLine
-            ) {
-                // wait before solve problem with stepOver
-                // yield call(services.mainIpc.call, 'TestRunnerService', 'continue');
-            } else {
-                yield put(testActions.onLineUpdate(event.time, event.file, event.line, event.primary));
-            }
-        } catch(e){
-            console.log('e', e);
-        }
+        yield put(testActions.onLineUpdate(event.time, event.file, event.line, event.primary));
     }
     else if (event.type === 'BREAKPOINT') {
         yield put(testActions.onBreakpoint(event.file, event.line));

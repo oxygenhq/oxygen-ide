@@ -60,7 +60,7 @@ if (process.platform === 'darwin') {
 
 export default (state = defaultState, action) => {
   const payload = action.payload || {};
-  const { value, settings, device, breakpoints, path, error, cache } = payload;
+  const { value, settings, device, breakpoints, path, error, cache, fileName } = payload;
   let _newDevices = [];
   let _newBreakpoints = {};
 
@@ -159,6 +159,9 @@ export default (state = defaultState, action) => {
       if (state.runtimeSettings.testMode === value) {
         return state;
       }
+
+      let newTestProvider = state.runtimeSettings.testProvider;
+
       // determine new testTarget value, depending on the selected test mode
       let newTestTarget = null;
       if (value === 'web') {
@@ -168,6 +171,7 @@ export default (state = defaultState, action) => {
         newTestTarget = state.devices.length > 0 ? state.devices[0].id : null;
       }
       else if (value === 'resp') {
+        newTestProvider = "";
         newTestTarget = state.emulators.length > 0 ? state.emulators[0] : null;
       }
       return {
@@ -176,6 +180,7 @@ export default (state = defaultState, action) => {
           ...state.runtimeSettings,
           testMode: value,
           testTarget: newTestTarget,
+          testProvider: newTestProvider
         },
       };
 
@@ -241,14 +246,42 @@ export default (state = defaultState, action) => {
 
     // TEST_UPDATE_BREAKPOINTS
     case ActionTypes.TEST_UPDATE_BREAKPOINTS:
-      return {
-        ...state,
-        breakpoints: {
-          ...state.breakpoints,
-          [path]: breakpoints,
-        },
-      };
+      if(path === "unknown"){
+        return {
+          ...state,
+          breakpoints: {
+            ...state.breakpoints,
+            [path+fileName]: breakpoints,
+          },
+        };
+      } else {
+        return {
+          ...state,
+          breakpoints: {
+            ...state.breakpoints,
+            [path]: breakpoints,
+          },
+        };
+      }
     
+    // TEST_MOVE_BREAKPOINTS_FROM_TMP_FILE_TO_REAL_FILE
+    case ActionTypes.TEST_MOVE_BREAKPOINTS_FROM_TMP_FILE_TO_REAL_FILE:{
+      const { tmpFilePath, tmpfileName, realFilePath } = payload;
+      const newState = { ...state };
+
+      if(
+        tmpFilePath && 
+        tmpfileName && 
+        realFilePath &&
+        newState.breakpoints[tmpFilePath+tmpfileName]
+      ){
+        newState.breakpoints[realFilePath] = newState.breakpoints[tmpFilePath+tmpfileName];
+        delete newState.breakpoints[tmpFilePath+tmpfileName];
+      }
+
+      return newState;
+    }
+
     // TEST_REMOVE_BREAKPOINTS
     case ActionTypes.TEST_REMOVE_BREAKPOINTS:
       // make sure the file with breakpoints is on the list

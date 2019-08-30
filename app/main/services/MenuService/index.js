@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,9 +7,7 @@
  * (at your option) any later version.
  */
 import electron, { BrowserWindow } from 'electron';
-const os = require('os');
-const path = require('path');
-import ServiceBase from "../ServiceBase";
+import ServiceBase from '../ServiceBase';
 import menuTemplate from './menuTemplate';
 import menuTemplateFromArray from './menuTemplateFromArray';
 import * as Const from '../../../const';
@@ -25,116 +23,6 @@ const DEFAULT_MENU_STATE = {
         selected: true,
     },
 };
-
-const chromeVersion = () => {
-    return new Promise(function(resolve, reject) {
-      if (os.platform() === 'win32') {
-        try {
-          const process = require('child_process');   
-          const spawn = process.spawn(path.resolve(__dirname, 'get_chrome_versions.bat'));
-          spawn.on('error', function(err){
-            console.log('error', err);
-            reject(err);
-          });
-
-          let infoArray;
-
-          spawn.stdout.on('data', function (data) {
-            try {
-              let cmdOut = data.toString().split('\n');
-              if(Array.isArray(cmdOut) && cmdOut.length > 2){
-                infoArray = cmdOut.filter(function (el) {
-                    if(el && el.length){
-                        return el.length > 1;
-                    }
-                });
-              }
-            } catch(e){
-              console.log('e', e);
-              reject(e);
-            }
-          });
-          spawn.on('close', function (code) {
-              try{
-                if (code == 0){
-                    console.log('code 0');
-                }
-                else {
-                    if(
-                        infoArray &&
-                        Array.isArray(infoArray) &&
-                        infoArray.length
-                    ){
-                        const lineWithVersion = infoArray[infoArray.length - 1];
-        
-                        if(
-                            lineWithVersion && 
-                            Array.isArray(infoArray) &&
-                            lineWithVersion.split
-                        ){
-                            const lineWithVersionSplit = lineWithVersion.split(' ');
-            
-                            if(
-                                lineWithVersionSplit &&
-                                Array.isArray(lineWithVersionSplit) && 
-                                lineWithVersionSplit.length
-                            ){
-                                resolve(lineWithVersionSplit[lineWithVersionSplit.length - 1]);
-                                spawn.kill();
-                            } else {
-                                resolve('not found');
-                            }
-                        } else {
-                            resolve('not found');
-                        }
-                    } else {
-                        resolve('not found');
-                    }
-                }
-              } catch(e){
-                  console.log('e', e);
-                  reject(e);
-              }
-          });
-        } catch(e){
-          console.log('e', e);
-          reject(e);
-        }
-      } else if(os.platform() === 'darwin') {
-        try {
-          const spawn = require('child_process').spawn('/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome', ['--version']);
-          spawn.on('error', function(err){
-            console.log('error', err);
-            reject(err);
-          });
-    
-          spawn.stdout.on('data', function (data) {
-            try{
-              let cmdOut = data.toString().split('\n');
-      
-              if(cmdOut && cmdOut[0]){
-                const ArrFromStrWithChromeVersion = cmdOut[0].trim().split(' ');
-                if(Array.isArray(ArrFromStrWithChromeVersion) && ArrFromStrWithChromeVersion.length && ArrFromStrWithChromeVersion.length === 3){
-                    resolve(ArrFromStrWithChromeVersion[2]);
-                } else {
-                    resolve('not found');
-                }
-              } else {
-                resolve('not found');
-              }
-            } catch(e){
-              console.log('e', e);
-              reject(e);
-            }
-          });
-        } catch(e){
-          console.log('e', e);
-          reject(e);
-        }
-      }
-    });
-
-  }
 
 export default class MenuService extends ServiceBase {
     constructor(mainWindow) {
@@ -237,18 +125,6 @@ export default class MenuService extends ServiceBase {
             notify = false;
         }
         else if (cmd === Const.MENU_CMD_HELP_SHOW_ABOUT) {
-
-            // var chromeVer = 'not found';
-            // try {
-            //     const result = await chromeVersion();
-                
-            //     if(result){
-            //         chromeVer = result;
-            //     }
-            // } catch(e){
-            //     console.log('e',e);
-            // }
-
             var oxVersion = pkgNativeInfo.dependencies['oxygen-cli'];
             var details = 'Oxygen: ' + (oxVersion.startsWith('git') ? oxVersion.substring(oxVersion.length - 40) : oxVersion) + '\n' +
                     'Electron: ' + process.versions.electron + '\n' +

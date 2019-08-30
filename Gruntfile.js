@@ -40,23 +40,27 @@ module.exports = function(grunt) {
     } else if (process.platform === 'win32') {
     }
     defaultTasks.push('rebrand');
+    defaultTasks.push('sentry-browser');
 
     if (process.platform === 'linux') {
         defaultTasks.push('compress:linux');
     } else if (process.platform === 'win32') {
         defaultTasks.push('installer-win');
     } else if (process.platform === 'darwin') {
-        defaultTasks.push('appdmg');
+        defaultTasks.push('installer-dmg');
     }
 
     grunt.registerTask('default', defaultTasks);
 
     grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'comments:chrome-ext']);
+    grunt.registerTask('sentry-browser', ['copy:sentry-browser']);
 
     const OUTDIR = 'dist/temp';
     const RESOURCES = process.platform === 'darwin' ? '/Electron.app/Contents/Resources' : '/resources';
     const CHROME_EXT_SRC = 'browser-extensions/chrome/src/';
     const CHROME_EXT_DIST = 'browser-extensions/chrome/dist/';
+    const SENTRY_BROWSER_SRC = 'app/node_modules/@sentry/browser';
+    const SENTRY_BROWSER_DIST = 'dist/temp/resources/app/node_modules/@sentry/browser';
     const RECORDER = 'browser-extensions/recorder/';
 
     // get production dependencies. instead of using '**' we get the actual deps list
@@ -128,7 +132,11 @@ module.exports = function(grunt) {
                                                                    '!monaco-editor/dev/**',
                                                                    '!monaco-editor/esm/**',
                                                                    '!codepage/bits/**',
-                                                                   '!moment/src/**']),
+                                                                   '!moment/src/**',
+                                                                   '!node-idevice/apps/TestApp.ipa',
+                                                                   '!appium-ios-driver/instruments-iwd/iwd4/**',
+                                                                   '!appium-ios-driver/instruments-iwd/iwd5/**',
+                                                                   '!appium-ios-driver/instruments-iwd/iwd6/**']),
                         dest: OUTDIR + RESOURCES + '/app/node_modules' 
                     },
                     { 
@@ -173,6 +181,15 @@ module.exports = function(grunt) {
                         dest: CHROME_EXT_DIST
                     }
                 ]
+            },
+            'sentry-browser': {
+                files: [
+                    { 
+                        expand: true, 
+                        cwd: SENTRY_BROWSER_SRC, src: ['**'], 
+                        dest: SENTRY_BROWSER_DIST
+                    }
+                ]
             }
         },
         chmod: {
@@ -181,8 +198,8 @@ module.exports = function(grunt) {
             },
             chromedriver: {
                 src: [process.platform === 'linux' ? 
-                        OUTDIR + RESOURCES + '/app/main/selenium/linux/chromedriver' :
-                        OUTDIR + RESOURCES + '/app/main/selenium/darwin/chromedriver']
+                        OUTDIR + RESOURCES + '/app/main/selenium/linux/**/chromedriver' :
+                        OUTDIR + RESOURCES + '/app/main/selenium/darwin/**/chromedriver']
             },
             geckodriver: {
                 src: [process.platform === 'linux' ? 
@@ -208,7 +225,7 @@ module.exports = function(grunt) {
                 ]
             }
         },
-        appdmg: {
+        'installer-dmg': {
             options: {
                 title: 'Oxygen IDE ' + pkg.version,
                 icon: 'resources/app.icns',
@@ -221,8 +238,10 @@ module.exports = function(grunt) {
                 format: 'UDBZ'
             },
             target: {
-                dest:  'dist/oxygen-' + pkg.version + '-osx-x64.dmg'
+                dest:  'dist/oxygen-' + pkg.version + '-osx-x64.dmg',
+                'sign-identity': '21E9DBB193EBE7B9422F830962C2604A65233A02'
             }
+            
         },
         'installer-win': {
             version: pkg.version,

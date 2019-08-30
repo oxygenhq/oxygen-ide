@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,10 +11,10 @@ import Mixpanel from 'mixpanel';
 import ServiceBase from "./ServiceBase";
 import moment from 'moment';
 import { version }  from '../../../package.json';
-import parser from 'xml2json';
 import os from 'os';
 import osLocale from 'os-locale';
 import uuidv4 from'uuid/v4';
+import * as Sentry from '@sentry/electron';
 
 export default class AnalyticsService extends ServiceBase {
     constructor() {
@@ -25,6 +25,7 @@ export default class AnalyticsService extends ServiceBase {
             this.mixpanel = Mixpanel.init('e80db0ad2789b5718fa1b84b6661f008');
         } catch(e){
             console.warn('mixpanel e', e);
+            Sentry.captureException(e);
         }
     }
 
@@ -101,10 +102,12 @@ export default class AnalyticsService extends ServiceBase {
                                     });
                                 } catch(e){
                                     console.warn('mixpanel e', e);
+                                    Sentry.captureException(e);
                                 }
                             }
                         } catch(e){
                             console.warn('e',e);
+                            Sentry.captureException(e);
                         }
                     })
                 response.on('end', () => {
@@ -114,6 +117,7 @@ export default class AnalyticsService extends ServiceBase {
             request.end();
         } catch(e){
             console.warn('e', e);
+            Sentry.captureException(e);
         }
 
         
@@ -129,6 +133,7 @@ export default class AnalyticsService extends ServiceBase {
             }); 
         } catch(e){
             console.warn('mixpanel e', e);
+            Sentry.captureException(e);
         }
         this.ideOpen();
     }
@@ -142,6 +147,7 @@ export default class AnalyticsService extends ServiceBase {
             }); 
         } catch(e){
             console.warn('mixpanel e', e);
+            Sentry.captureException(e);
         }
     }
 
@@ -157,6 +163,7 @@ export default class AnalyticsService extends ServiceBase {
                 });
             } catch(e){
                 console.warn('mixpanel e', e);
+                Sentry.captureException(e);
             }
             setTimeout(() => {
                 resolve("result");
@@ -174,6 +181,7 @@ export default class AnalyticsService extends ServiceBase {
             });
         } catch(e){
             console.warn('mixpanel e', e);
+            Sentry.captureException(e);
         }
     }
 
@@ -190,6 +198,7 @@ export default class AnalyticsService extends ServiceBase {
             });
         } catch(e){
             console.warn('mixpanel e', e);
+            Sentry.captureException(e);
         }
         this.recStartMoment = null;
     }
@@ -204,6 +213,7 @@ export default class AnalyticsService extends ServiceBase {
             });
         } catch(e){
             console.warn('mixpanel e', e);
+            Sentry.captureException(e);
         }
     }
 
@@ -221,6 +231,7 @@ export default class AnalyticsService extends ServiceBase {
             });
         } catch(e){
             console.log('mixpanel e', e);
+            Sentry.captureException(e);
         }
 
         this.playStartMoment = null;

@@ -1,81 +1,60 @@
-import { ipcRenderer } from 'electron';
-
-export const JAVA_ERROR_INFO = 'JAVA_ERROR_INFO';
 export const JAVA_NOT_FOUND = 'JAVA_NOT_FOUND';
 export const JAVA_BAD_VERSION = 'JAVA_BAD_VERSION';
 
 const javaversion = (callback) => {
   try {
-    const spawn = require('child_process').spawn('java', ['-version']);
-    spawn.on('error', function(err){
-        return callback(err, null);
+    var output = '';
+    const cp = require('child_process').spawn('java', ['-version']);
+    cp.on('error', (err) => {
+      console.error('java -version child process error. ', err);
+      return callback(null);
     })
-    spawn.stderr.on('data', function(data) {
-        if (process.platform === 'win32') {
-          data = data.toString().split('\n')[0];
-          var javaVersion = new RegExp('java version').test(data) ? data.split(' ')[2].replace(/"/g, '') : false;
-          if (javaVersion != false) {
-              return callback(null, javaVersion);
-          } else {
-            return callback(null, false);
-          }
-        } else {
-          data = data.toString().split('\n')[0];
-          var javaVersion = new RegExp('openjdk version').test(data) ? data.split(' ')[2].replace(/"/g, '') : false;
-          console.log('javaVersion', javaVersion);
-          if (javaVersion != false) {
-            return callback(null, javaVersion);
-          } else {
-            return callback(null, false);
-          }
-        }
+    cp.stdout.on('data', (data) => {
+      output += data.toString();
+    });
+    cp.stderr.on('data', (data) => {
+      output += data.toString();
+    });
+    cp.on('close', (code) => {
+      // Java 8 or lower: 1.6.0_23, 1.7.0, 1.7.0_80, 1.8.0_211
+      // Java 9 or higher: 9.0.1, 11.0.4, 12, 12.0.1
+      var matches = output.match(/"(\d+\.?\d+)[\._\-\d+]*"/)
+      let javaVersion = matches ? matches[1] : null;
+      if (!javaVersion) {
+        console.error('java -version mismatch error:\n' + output);
+      }
+      return callback(javaVersion);
     });
   } catch(e){
-    callback('catch', e);
+
+    if(window && window.Sentry && window.Sentry.captureException){
+      window.Sentry.captureException(e);
+    }
+
+    console.error('java -version spawn error. ', e);
   }
 }
 
 export default class JavaService {
-
   constructor(store) {
-    // console.log('~JavaService elive');
   }
-
-
 
   checkJavaVersion() {
     if(window && window.dispatch){
-      javaversion(function(err,version){
-        if(version && typeof version === 'string' && version.startsWith('1.8')){
-          // do nothing, java version is correct;
-        } else if(version && typeof version === 'string' && !version.startsWith('1.8')){
-          const message = `Java 8 is required to run test, but currently installed version is ${version}.
-          Please install the JDK v1.8 : `;        
-          window.dispatch({
-            type: JAVA_BAD_VERSION,
-            payload: {
-              version: version,
-              message: message
-            }
-          });
-          // do nothing, java version is correct;
-        } else if(version && typeof version === 'boolean' && !version ){
-          const message = `“Java installation was either not found.
-          Please install the JDK v1.8 : `;
-          window.dispatch({
-              type: JAVA_NOT_FOUND,
-              message: message
-          });
-        } else if(err){    
-          window.dispatch({
-              type: JAVA_ERROR_INFO,
-              payload: { err: err },
-          });
-          
+      javaversion((version) => {
+        if (version) {
+          var ver = version.split('.');
+          if (ver[0] == 1 && ver[1] != 8 /*lower than 1.8*/ || ver[0] > 10 /*higher than 10*/) {
+            window.dispatch({
+              type: JAVA_BAD_VERSION,
+              payload: {
+                version: version
+              }
+            });
+          }
         } else {
           window.dispatch({
-              type: JAVA_ERROR_INFO,
-              payload: { err: err },
+            type: JAVA_NOT_FOUND
           });
         }
       })

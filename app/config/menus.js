@@ -41,3 +41,36 @@ export const CONTEXT_MENU_FILE_EXPLORER_FILE = [
 		cmd: Const.MENU_CMD_DELETE_FILE,
 	},
 ];
+
+export const CONTEXT_MENU_OBJECT_REPOSITORY_FILE_EXPLORER_FILE = [
+	{
+		label: 'Open',
+		cmd: Const.MENU_CMD_OPEN_OR_FILE,
+	},
+	{
+		label: 'Rename',
+		cmd: Const.MENU_CMD_RENAME_FILE,
+	},
+	{
+		label: 'Delete',
+		cmd: Const.MENU_CMD_DELETE_FILE,
+	},
+];
+
+export const CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_OBJECT = [
+	{
+		label: 'Copy Object',
+		cmd: Const.MENU_CMD_ORE_COPY_OBJECT,
+	},
+];
+
+export const CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_FOLDER = [
+	{
+		label: 'New Object',
+		cmd: Const.MENU_CMD_ORE_NEW_OBJECT,
+	},
+	{
+		label: 'New Folder',
+		cmd: Const.MENU_CMD_ORE_NEW_FOLDER,
+	}
+];

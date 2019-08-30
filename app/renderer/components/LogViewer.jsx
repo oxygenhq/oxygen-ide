@@ -13,11 +13,12 @@
 import React, { PureComponent, Fragment } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { message } from 'antd';
-import _ from 'lodash';
+import difference from 'lodash.difference';
 import { type LogEntry } from '../types/LogEntry';
 import ScrollContainer from './ScrollContainer';
 import { AutoSizer, Grid } from 'react-virtualized';
 import 'react-virtualized/styles.css';
+import os from 'os';
 
 type Props = {
     logs: Array<LogEntry>,
@@ -47,7 +48,7 @@ export default class LogViewer extends PureComponent<Props> {
   }
 
   componentWillReceiveProps(nextProps) {
-    const diff = _.difference(nextProps.logs, this.props.logs);   
+    const diff = difference(nextProps.logs, this.props.logs);   
     let newState = {};
     let maxWidth = 1;
 
@@ -153,20 +154,19 @@ export default class LogViewer extends PureComponent<Props> {
     }
   }
 
-
-  getCopyValue = () => {
-    let result = '';
-
-    if(this.loggerRef && this.loggerRef.current && this.loggerRef.current.innerText){
-      result = this.loggerRef.current.innerText
-    }
-
-    return result;
-  }
-
   copyClicked = () => {
+
+    const { lines } = this.state;
+
     if (!this.state.copyValue) {
-      const copyValue = this.getCopyValue();
+      let copyValue = '';
+
+      if(lines && lines.length && lines.length > 0){
+        lines.map((line) => {
+          copyValue+=line.message+os.EOL;
+        })
+      }
+      
       if(copyValue){
         this.setState({
           keyKeys: ['Meta', 'c'],
@@ -199,7 +199,11 @@ export default class LogViewer extends PureComponent<Props> {
       const line = lines[rowIndex];
       
       return (
-        <div className="auto-sizer-wrapper-row" style={{...style, paddingTop: rowIndex ? '0px': '5px'}} key={`log-${category}-line-${line.timestamp}`}>
+        <div 
+          className="auto-sizer-wrapper-row" 
+          style={{...style, paddingTop: rowIndex ? '0px': '5px'}}
+          key={key}
+        >
           {line.message}
         </div>
       );
@@ -242,6 +246,8 @@ export default class LogViewer extends PureComponent<Props> {
                       columnCount={1}
                       columnWidth={columnWidth}
                       width={width}
+                      scrollToRow={lines.length-1}
+                      scrollToIndex={lines.length-1}
                     />
                   )}
                 </AutoSizer>

@@ -8,6 +8,7 @@
  */
 import * as Const from '../../../const';
 import { app } from 'electron';
+import * as Sentry from '@sentry/electron';
 /**
  * @param  {Function} cmdHandler - function that will handle menu command
  * @param  {Object} settings - a set of settings for selected menu items
@@ -56,9 +57,10 @@ export default (cmdHandler, settings) => {
       accelerator: process.platform === 'darwin' ? 'Command+Q' : 'Alt+F4',
       click() {
         try {
-          app.quit();
+          app.exit();
         } catch (e) {
           console.warn(e.message);
+          Sentry.captureException(e);
         }
       }
     },

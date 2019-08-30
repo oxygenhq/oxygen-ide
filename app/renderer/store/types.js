@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@ import * as TEST_TYPES from './test/types';
 import * as LOG_TYPES from './logger/types';
 import * as DIALOG_TYPES from './dialog/types';
 import * as RECORDER_TYPES from './recorder/types';
+import * as OR_TYPES from './obj-repo/types';
 import * as SETTINGS_TYPES from './settings/types';
 
 export default {
@@ -28,6 +29,7 @@ export default {
     ...LOG_TYPES,
     ...DIALOG_TYPES,
     ...RECORDER_TYPES,
+    ...OR_TYPES,
     ...SETTINGS_TYPES,
 };
 

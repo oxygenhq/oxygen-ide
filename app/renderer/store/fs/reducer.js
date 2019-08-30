@@ -15,7 +15,6 @@ import * as treeHelpers from '../../helpers/tree';
 import * as fsHelpers from '../../helpers/fs';
 import { success, failure } from '../../helpers/redux';
 import fileFolderSorter from '../../../main/helpers/fileFolderSorter';
-import _ from 'lodash';
 
 const defaultState = {
   isLoading: false,
