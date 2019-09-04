@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,13 +74,12 @@ export const CHROME_EMULATED_DEVICES = [
     'Nexus 6P',
     'Nexus 7',
 	'Pixel 2',
-	'Pixel 2 XL',    
+	'Pixel 2 XL',
 	'Galaxy S III',
 	'Galaxy S5',
 	'Galaxy Note 3',
     'Galaxy Note II',
-    'Amazon Kindle Fire HDX',
 	'Laptop with touch',
-	'Laptop with HiDPI screen',
-    'Laptop with MDPI screen',
+	'Laptop with HiDPI',
+    'Laptop with MDPI',
 ];
