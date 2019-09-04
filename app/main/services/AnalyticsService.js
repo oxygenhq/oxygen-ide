@@ -33,6 +33,15 @@ export default class AnalyticsService extends ServiceBase {
         await this.ideClose();
     }
 
+    getUserId(){
+        if(this.uuid){
+            return this.uuid;
+        } else {
+            this.uuid = uuidv4();
+            return this.uuid;
+        }
+    }
+
     setUser(uuid){
         if(uuid){
             this.uuid = uuid;
@@ -145,6 +154,13 @@ export default class AnalyticsService extends ServiceBase {
             this.mixpanel.track('IDE_OPEN', {
                 distinct_id: this.uuid
             }); 
+
+            if(Sentry && Sentry.configureScope){
+                Sentry.configureScope((scope) => {
+                    scope.setUser({"userId": this.uuid});
+                });
+            }
+
         } catch(e){
             console.warn('mixpanel e', e);
             Sentry.captureException(e);

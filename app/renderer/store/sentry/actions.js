@@ -5,3 +5,7 @@ export const reportError = (error) => ({
     payload: { error: error },
 });
   
+export const setUserIdToSentry = (userId) => ({
+    type: ActionTypes.SET_USER_ID_TO_SENTRY,
+    payload: { userId: userId },
+});

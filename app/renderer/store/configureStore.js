@@ -16,7 +16,7 @@ import rootActionCreator from './actions';
 import rootReducer from './reducers';
 import createActionToSubjectMiddleware from './middleware/createActionToSubjectMiddleware';
 import rootSaga from './sagas';
-import { UNIVERSAL_ERROR } from '../store/sentry/types';
+import { UNIVERSAL_ERROR, SET_USER_ID_TO_SENTRY } from '../store/sentry/types';
 
 
 import ServicesSingleton from '../services';
@@ -43,7 +43,10 @@ const configureStore = (initialState?: counterStateType) => {
   const sagaMiddleware = createSagaMiddleware({
     onError(error) {
       console.log('saga error', error);
-      sendError(error);
+
+      const err = new Error(error.message || error);
+
+      sendError(err);
     }
   });
   middleware.push(sagaMiddleware);
@@ -148,6 +151,23 @@ const configureStore = (initialState?: counterStateType) => {
     }
   }
 
+  async function setUserIdToSentry(userId) {
+    try{
+
+      if(userId && window && window.Sentry && window.Sentry.configureScope){
+        window.Sentry.configureScope((scope) => {
+          scope.setUser({"userId": userId});
+        });
+      } else {
+        console.log('maybe bad userId', userId);
+        console.log('or window.Sentry', window.Sentry);
+      }
+
+    } catch(e){
+      console.warn('setUserIdToSentry error', e);
+    }
+  }
+
   middleware.push(cache);
 
   // UNIVERSAL_ERROR
@@ -156,6 +176,10 @@ const configureStore = (initialState?: counterStateType) => {
 
     if(action && action.type && action.payload && action.payload.error && action.type === UNIVERSAL_ERROR){
       sendError(action.payload.error);
+    }
+    
+    if(action && action.type && action.payload && action.payload.userId && action.type === SET_USER_ID_TO_SENTRY){
+      setUserIdToSentry(action.payload.userId);
     }
     
     return result;

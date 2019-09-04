@@ -40,7 +40,7 @@ import * as testActions from '../test/actions';
 import * as dialogActions from '../dialog/actions';
 import * as recorderActions from '../recorder/actions';
 import * as settingsActions from '../settings/actions';
-import { reportError } from '../sentry/actions';
+import { reportError, setUserIdToSentry } from '../sentry/actions';
 import * as orActions from '../obj-repo/actions';
 
 import { success, failure, successOrFailure } from '../../helpers/redux';
@@ -244,11 +244,14 @@ export function* initialize() {
         }
 
         if(appSettings.cache.settings && appSettings.cache.settings.uuid){
-            yield call(services.mainIpc.call, 'AnalyticsService', 'setUser', [appSettings.cache.settings.uuid]);
+            yield call(services.mainIpc.call, 'AnalyticsService', 'setUser', [appSettings.cache.settings.uuid]); 
+            yield put(setUserIdToSentry(appSettings.cache.settings.uuid));
+            
         } else {
             const uuid = uuidv4();
             yield call(services.mainIpc.call, 'AnalyticsService', 'createUser', [uuid]);
             yield put(settingsActions.createUser(uuid));
+            yield put(setUserIdToSentry(uuid));
         }
 
     } else {
@@ -259,6 +262,8 @@ export function* initialize() {
         yield call(services.mainIpc.call, 'AnalyticsService', 'createUser', [uuid]);
         yield put(settingsActions.createUser(uuid));
         yield put(settingsActions.firstOpen());
+        yield put(setUserIdToSentry(uuid));
+
         if(appSettings){
             appSettings.cacheUsed = true;
         }
