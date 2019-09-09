@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2019 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,15 +11,14 @@ var modclean = require('modclean');
 var fs = require('fs');
 
 module.exports = function(grunt) {
-    grunt.registerTask('module-cleanup', 'Removes unneeded files from node_module', function() {
+    grunt.registerTask('module-cleanup', 'Removes unneeded files from node_modules', function() {
         var done = this.async();
 
         var mc = new modclean.ModClean({
             cwd: path.join(process.cwd(), 'app', 'node_modules'),
             patterns: ['default:safe'],
-            additionalPatterns: ['doc', 'docs', 'documentation', 
-                                'coverage', 
-                                'browser', 
+            additionalPatterns: ['doc', 'docs', 'documentation',
+                                'coverage',
                                 '*.txt',
                                 'gruntfile.js',
                                 'quick-test.js',
