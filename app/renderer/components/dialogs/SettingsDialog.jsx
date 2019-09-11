@@ -75,8 +75,8 @@ class SettingsDialog extends PureComponent<Props> {
 
   async onBrowseFile() {
     const paths = await services.mainIpc.call('ElectronService', 'showOpenFileDialog', [[
-      {name: 'Excel Files', extensions: ['xlsx']},
-      {name: 'Text Files', extensions: ['csv', 'txt']},
+      {name: 'Excel & CSV Files', extensions: ['xlsx', 'csv']},
+      {name: 'Text Files', extensions: ['txt']},
       {name: 'All Files', extensions: ['*']}
     ]]);
     if (Array.isArray(paths) && paths.length > 0) {
