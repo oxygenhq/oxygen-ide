@@ -81,3 +81,50 @@ window.addEventListener(
 function enableLogging(debuggingEnabled) {
     window.ox_debug = debuggingEnabled;
 }
+
+(function() {
+    var s = document.createElement('script');
+    s.innerHTML = `
+        this.windowMethods = {
+            alert: window.alert,
+            confirm: window.confirm,
+            prompt: window.prompt,
+        };
+        var self = this;
+        window.alert = function(alert) {
+            self.windowMethods.alert.call(self.window, alert);
+            var cmdData = [{
+                module: 'web',
+                cmd: 'assertAlert',
+                target: alert,
+                timestamp: (new Date()).getTime()
+            }];
+            var data = JSON.stringify(cmdData, function (k, v) { return (v === null || v === undefined) ? undefined : v; });
+            window.postMessage(JSON.stringify({ type: 'RECORD_ALERT', data: data }), '*');
+        };
+        window.confirm = function(message) {
+            var result = self.windowMethods.confirm.call(self.window, message);
+            var cmdData = [{
+                module: 'web',
+                cmd: result ? 'acceptAlert' : 'dismissAlert',
+                target: alert,
+                timestamp: (new Date()).getTime()
+            }];
+            var data = JSON.stringify(cmdData, function (k, v) { return (v === null || v === undefined) ? undefined : v; });
+            window.postMessage(JSON.stringify({ type: 'RECORD_ALERT', data: data }), '*');
+            return result;
+        };
+        window.prompt = function(message) {
+            var result = self.windowMethods.prompt.call(self.window, message);
+               var cmdData = [{
+                module: 'web',
+                cmd: 'acceptAlert',
+                target: alert,
+                timestamp: (new Date()).getTime()
+            }];
+            var data = JSON.stringify(cmdData, function (k, v) { return (v === null || v === undefined) ? undefined : v; });
+            window.postMessage(JSON.stringify({ type: 'RECORD_ALERT', data: data }), '*');
+            return result;
+        };`;
+    document.body.appendChild(s);
+})();

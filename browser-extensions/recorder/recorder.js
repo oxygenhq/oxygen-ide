@@ -72,7 +72,6 @@ Recorder.prototype.attach = function() {
     ox_log('ox: attaching to ' + window.__hash);
 
     this.locatorBuilders = new LocatorBuilders(window);
-    this.attachWindowMethods();
     var self = this;
     for (var eventKey in Recorder.eventHandlers) {
         var eventInfo = this.parseEventKey(eventKey);
@@ -108,32 +107,6 @@ Recorder.prototype.attach = function() {
       ArrowRight: '\\uE014',
       ArrowDown: '\\uE015',
       Delete: '\\uE017'
-    };
-};
-
-Recorder.prototype.attachWindowMethods = function() {
-    this.windowMethods = {};
-    ['alert', 'confirm', 'prompt', 'open'].forEach(function(method) {
-            this.windowMethods[method] = window[method];
-        }, this);
-    var self = this;
-    window.alert = function(alert) {
-        self.windowMethods.alert.call(self.window, alert);
-        self.record('assertAlert', alert);
-    };
-    window.confirm = function(message) {
-        var result = self.windowMethods.confirm.call(self.window, message);
-        if (!result) {
-            self.record('chooseCancelOnNextConfirmation', null, null, true);
-        }
-        self.record('assertConfirmation', message);
-        return result;
-    };
-    window.prompt = function(message) {
-        var result = self.windowMethods.prompt.call(self.window, message);
-        self.record('answerOnNextPrompt', result, null, true);
-        self.record('assertPrompt', message);
-        return result;
     };
 };
 
@@ -242,6 +215,8 @@ Recorder.prototype.initializeFrameHorrors = function() {
                 window.ox_debug = msg.enable;
             } else if (msg.type === 'RECORD_COMMAND') { // not related to frames...
                 self.recordSendCommand(msg.lastWindow);
+            } else if (msg.type === 'RECORD_ALERT') {
+                window.postMessage(JSON.stringify({cmd: 'RECORDER_COMMAND', data: msg.data }), '*');
             }
         },
         false
