@@ -41,8 +41,8 @@ Recorder.cmdPrepare = function(command, target, value) {
     // if primary locator is potentially a dynamic one - try to find another one
     // locator potentially dynamic if it has 3+ digit number in it.
     var regex = /[0-9]{3,}/;
-    if (regex.test(trg) === true) {
-        for (var i = 0; i < target.length; i++) {!regex.test(target[i][0])
+    if (trgLocs && regex.test(trg) === true) {
+        for (var i = 0; i < target.length; i++) {
             if (!regex.test(target[i][0])) {
                 trg = target[i][0];
                 break;
