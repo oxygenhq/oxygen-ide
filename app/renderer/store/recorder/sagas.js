@@ -23,6 +23,7 @@ const services = ServicesSingleton();
 
 let canRecord = false;
 let waitChromeExtension = true;
+const EXTENSION_CHECK_TIMEOUT = 4500;
 
 /**
  * Recorder Sagas
