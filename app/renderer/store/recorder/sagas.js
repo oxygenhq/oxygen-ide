@@ -23,6 +23,7 @@ const services = ServicesSingleton();
 
 let canRecord = false;
 let waitChromeExtension = true;
+const EXTENSION_CHECK_TIMEOUT = 4500;
 
 /**
  * Recorder Sagas
@@ -177,7 +178,8 @@ function* handleRequest(payload) {
             if (!prevContent.endsWith('\n') && prevContent !== '') {
                 prevContent += '\n';
             }
-            // prepend web.init if it doesn't exist in the script
+            // prepend web.
+          if it doesn't exist in the script
             if (prevContent.indexOf('web.init') === -1) {
                 prevContent += 'web.init();\n';
             }
