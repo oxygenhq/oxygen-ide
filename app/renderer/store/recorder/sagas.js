@@ -179,7 +179,7 @@ function* handleRequest(payload) {
                 prevContent += '\n';
             }
             // prepend web.
-          if it doesn't exist in the script
+            // if it doesn't exist in the script
             if (prevContent.indexOf('web.init') === -1) {
                 prevContent += 'web.init();\n';
             }
