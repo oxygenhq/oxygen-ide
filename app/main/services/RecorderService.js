@@ -14,12 +14,17 @@ import ServiceBase from './ServiceBase';
 const PORT_HTTP = 7778;
 
 const RECORDER_EVENT = 'RECORDER_EVENT';
+const RECORDER_NEW_CAN_RECORD = 'RECORDER_NEW_CAN_RECORD';
 const CHROME_EXTENSION_ENABLED = 'CHROME_EXTENSION_ENABLED';
+const EXTENSION_CHECK_TIMEOUT = 4500;
 
 export default class RecorderService extends ServiceBase {
     constructor(mainWindow) {
         super(mainWindow);
         this.windowGroups = [];
+        
+        this.lastExtensionTime = 0;
+        this.intervalId = setInterval(this.timer, EXTENSION_CHECK_TIMEOUT);
     }
 
     watch() {
@@ -80,6 +85,8 @@ export default class RecorderService extends ServiceBase {
                 });
                 response.statusCode = 200;
                 response.statusMessage = 'OK';
+                
+                this.lastExtensionTime = Date.now();
             } else {
                 response.statusCode = 404;
                 response.statusMessage = 'Not found';
@@ -92,8 +99,19 @@ export default class RecorderService extends ServiceBase {
             });
 
             request.on('end', function () {
-                self._emit(JSON.parse(body));
                 response.end();
+                setTimeout(function() {
+                    self._emit(JSON.parse(body));
+
+                    // For stress test
+                    // for(var i = 1; i < 500; i++){
+                    //     setTimeout(function(i) {
+                    //         return function() { 
+                    //             self._emit(JSON.parse(body));
+                    //         }
+                    //     }(i), 100);
+                    // }
+                }, 100);
             });
         } else if (request.method === 'OPTIONS') {
             response.statusCode = 200;
@@ -107,16 +125,43 @@ export default class RecorderService extends ServiceBase {
     }
 
     _emit = (steps) => {
-        let stepsArray = []
-        for (var step of steps) {
-            stepsArray.push({
-                ...step,
-                module: step.module || 'web',   // use default module (Web) if module name is not returned by recorder extension
+        setTimeout(() => {
+    
+            let stepsArray = []
+            for (var step of steps) {
+                const stp = {
+                    ...step,
+                    module: step.module || 'web',   // use default module (Web) if module name is not returned by recorder extension
+                }
+                stepsArray.push(stp);
+            }
+    
+            const notifyResult = this.notify({
+                type: RECORDER_EVENT,
+                stepsArray
             });
-       }
-       this.notify({
-            type: RECORDER_EVENT,
-            stepsArray
-       });
+            
+        }, 0);
+    }
+
+    timer = () => {
+        if(this.lastExtensionTime){
+            let newCanRecord = false;
+            const now = Date.now();
+            const diff = now - this.lastExtensionTime;
+    
+    
+            if(diff && diff > EXTENSION_CHECK_TIMEOUT ){
+                newCanRecord = false;
+            } else {
+                newCanRecord = true;
+            }
+
+
+            this.notify({
+                type: RECORDER_NEW_CAN_RECORD,
+                newCanRecord: newCanRecord
+            });
+        }
     }
 }
