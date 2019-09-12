@@ -25,6 +25,7 @@ let lastExtensionTime = 0;
 let canRecord = false;
 let stopWaitChromeExtension = false;
 let waitChromeExtension = true;
+const EXTENSION_CHECK_TIMEOUT = 4500;
 
 const timer = () => {
     if(lastExtensionTime){
@@ -32,7 +33,7 @@ const timer = () => {
         const now = Date.now();
         const diff = now - lastExtensionTime;
 
-        if(diff && diff > 2000){
+        if(diff && diff > EXTENSION_CHECK_TIMEOUT){
             newCanRecord = false;
         } else {
             newCanRecord = true;
@@ -59,7 +60,7 @@ const timer = () => {
     }
 }
 
-window.intervalId = setInterval(timer, 2000);
+window.intervalId = setInterval(timer, EXTENSION_CHECK_TIMEOUT);
 
 /**
  * Recorder Sagas
@@ -71,7 +72,7 @@ export default function* root() {
       takeLatest(ActionTypes.RECORDER_START_WATCHER, startRecorderWatcher),
       takeLatest(success(ActionTypes.WB_CLOSE_FILE), wbCloseFileSuccess),
       takeLatest('MAIN_SERVICE_EVENT', handleServiceEvents),
-      takeLatest('RECORDER_SERVICE_ADD_STEP', recorderAddStep),
+      takeLatest('RECORDER_START_SUCCESS', recorderAddStepChannelInnit),
       takeLatest('RESET', initialize)
     ]);
 }
@@ -87,7 +88,7 @@ export function* initialize() {
         clearTimeout(window.intervalId);
     }
     
-    window.intervalId = setInterval(timer, 2000);
+    window.intervalId = setInterval(timer, EXTENSION_CHECK_TIMEOUT);
 
     return;
 }
@@ -130,12 +131,15 @@ export function* wbCloseFileSuccess({ payload }) {
 }
 
 
-export function* recorderAddStep({ payload }) {
+export function* recorderAddStepChannelInnit({ payload }) {
     const channel = yield actionChannel("RECORDER_SERVICE_ADD_STEP");
 
     while(true) {
         const { payload } = yield take(channel);
-        const resp = yield call(handleRequest, payload)
+
+        if(payload){
+            const resp = yield call(handleRequest, payload);
+        }
     }
 
 }
