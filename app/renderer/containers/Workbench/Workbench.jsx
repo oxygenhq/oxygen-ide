@@ -118,9 +118,25 @@ export default class Workbench extends Component<Props> {
   keydownCallback = (e) => {
     if(e.key === 'Control'){
       if(!this.on){
-        e.stopPropagation()
+        e.stopPropagation();
         this.elem.addEventListener('wheel', this.wheelCallback , true);
         this.on = true;
+      }
+    }
+
+    if(e.ctrlKey || e.metaKey){
+      if(e.key === '+'){
+        e.stopPropagation();
+        if(this.props.zoomIn){
+          this.props.zoomIn();
+        }
+      }
+      
+      if(e.key === '-'){
+        e.stopPropagation();
+        if(this.props.zoomOut){
+          this.props.zoomOut();
+        }
       }
     }
   }
