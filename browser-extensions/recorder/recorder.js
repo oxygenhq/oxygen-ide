@@ -30,7 +30,7 @@ Recorder.cmdPrepare = function(command, target, value) {
     // target is an array containing all available locators or a string for commands which doesn't
     // use locator in the target parameter
     var trg, trgLocs;
-    if (target.constructor === Array) {
+    if (target && target.constructor === Array) {
         trg = target[0][0];
         trgLocs = target;
     } else {
@@ -216,7 +216,8 @@ Recorder.prototype.initializeFrameHorrors = function() {
             } else if (msg.type === 'RECORD_COMMAND') { // not related to frames...
                 self.recordSendCommand(msg.lastWindow);
             } else if (msg.type === 'RECORD_ALERT') {
-                window.postMessage(JSON.stringify({cmd: 'RECORDER_COMMAND', data: msg.data }), '*');
+                self.recordNoLocators(msg.cmd, msg.val);
+                self.recordSendCommand();
             }
         },
         false
@@ -240,6 +241,18 @@ Recorder.prototype.record = function (command, target, value) {
         command: command,
         target: target,
         value: value
+    });
+
+    window.postMessage(JSON.stringify({cmd: 'RECORDER_LASTWIN_UPDATE', data: window.__hash }), '*');
+};
+
+Recorder.prototype.recordNoLocators = function (command, target) {
+    if (!this._ox_command) {
+        this._ox_command = [];
+    }
+    this._ox_command.push({
+        command: command,
+        target: target
     });
 
     window.postMessage(JSON.stringify({cmd: 'RECORDER_LASTWIN_UPDATE', data: window.__hash }), '*');
@@ -290,7 +303,7 @@ cmdsLoop:
             // ignore any actions on html and body elements 
             // as 'click' cannot be executed by webdriver on html or body
             // and assertText/waitForText sometimes erroneously generated for html/body pulling whole page html as text string
-            if (c.target.constructor === Array && c.target.length > 0) {
+            if (c.target && c.target.constructor === Array && c.target.length > 0) {
                 for (var s = 0; s < c.target.length; s++) {
                     var trg = c.target[s][0];
                     if (trg === 'css=body' ||
@@ -300,7 +313,7 @@ cmdsLoop:
                         continue cmdsLoop;
                     }
                 }
-            } else if (c.target.constructor === Array && c.target.length === 0) {
+            } else if (c.target && c.target.constructor === Array && c.target.length === 0) {
                 // no locators were found
                 continue;
             }
