@@ -59,7 +59,6 @@ export function* recorderNewCanRecord({ payload }){
             yield put(recorderActions.stopRecorder());
         }
     }
-
     if(waitChromeExtension){
         yield put(recorderActions.stopWaitChromeExtension());
         waitChromeExtension = false;
