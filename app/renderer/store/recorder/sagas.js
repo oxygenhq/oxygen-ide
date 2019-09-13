@@ -22,45 +22,9 @@ import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
 
-let lastExtensionTime = 0;
 let canRecord = false;
 let waitChromeExtension = true;
 const EXTENSION_CHECK_TIMEOUT = 4500;
-
-const timer = () => {
-    if(lastExtensionTime){
-        let newCanRecord = false;
-        const now = Date.now();
-        const diff = now - lastExtensionTime;
-
-        if(diff && diff > EXTENSION_CHECK_TIMEOUT){
-            newCanRecord = false;
-        } else {
-            newCanRecord = true;
-        }
-
-        if(newCanRecord !== canRecord){
-            canRecord = newCanRecord;
-            if(window && window.dispatch){
-                window.dispatch(recorderActions.changeCanRecord(newCanRecord));
-
-                if(!newCanRecord){
-                    window.dispatch(recorderActions.stopRecorder());
-                }
-            }
-        }
-    }
-
-    if(waitChromeExtension){
-      // extension not finded
-      if(window && window.dispatch){
-        window.dispatch(recorderActions.stopWaitChromeExtension());
-        waitChromeExtension = false;
-      }
-    }
-}
-
-window.intervalId = setInterval(timer, EXTENSION_CHECK_TIMEOUT);
 
 /**
  * Recorder Sagas
@@ -73,23 +37,33 @@ export default function* root() {
       takeLatest(success(ActionTypes.WB_CLOSE_FILE), wbCloseFileSuccess),
       takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
       takeLatest('RECORDER_START_SUCCESS', recorderAddStepChannelInnit),
-      takeLatest('RESET', initialize)
+      takeLatest('RECORDER_NEW_CAN_RECORD', recorderNewCanRecord),
+      takeLatest('RESET', reset)
     ]);
 }
 
-
-export function* initialize() {
-    lastExtensionTime = 0;
+export function* reset(){
     canRecord = false;
     waitChromeExtension = true;
+}
 
-    if(window.intervalId){
-        clearTimeout(window.intervalId);
+export function* recorderNewCanRecord({ payload }){
+    const { event } = payload;
+    const { newCanRecord } = event;
+
+    if(newCanRecord !== canRecord){
+        canRecord = newCanRecord;
+
+        yield put(recorderActions.changeCanRecord(newCanRecord));
+
+        if(!newCanRecord){
+            yield put(recorderActions.stopRecorder());
+        }
     }
-    
-    window.intervalId = setInterval(timer, EXTENSION_CHECK_TIMEOUT);
-
-    return;
+    if(waitChromeExtension){
+        yield put(recorderActions.stopWaitChromeExtension());
+        waitChromeExtension = false;
+    }
 }
 
 export function* stopRecorderAfterFileClose(){
@@ -241,6 +215,7 @@ function* handleRequest(payload) {
                 prevContent += 'web.init();\n';
             }
             const newContent = `${prevContent}${generatedCode}`;
+            
             // append newly recorded content
             yield all([
                 put(wbActions.onContentUpdate(activeFile, newContent)),
@@ -259,12 +234,6 @@ export function* handleServiceEvents({ payload }) {
 
     if (!event) {
         return;
-    }
-    if (service === 'RecorderService' && event.type === 'CHROME_EXTENSION_ENABLED') {
-        const recorder = yield select(state => state.recorder);
-
-        waitChromeExtension = recorder.waitChromeExtension;
-        lastExtensionTime = Date.now();
     }
 }
 
