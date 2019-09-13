@@ -989,11 +989,17 @@ export function* saveCurrentFile({ payload }) {
     const { prompt } = payload || {};
     const editor = yield select(state => state.editor);
     const recorder = yield select(state => state.recorder);
+    const fsRootPath = yield select(state => state.fs.rootPath);
+    let rootPath = null;
+
+    if(fsRootPath){
+        rootPath = fsRootPath;
+    }
 
     const { activeFile, activeFileName } = editor;
 
     if(activeFile === "unknown"){
-        const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, null, [ 
+        const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, rootPath, [ 
             { name: 'JavaScript file', extensions:['js'] },
             { name: 'All Files', extensions: ['*'] } 
         ] ]);
