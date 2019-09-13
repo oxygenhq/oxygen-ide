@@ -35,11 +35,7 @@ export default class TestRunnerService extends ServiceBase {
     constructor() {
         super();
     }
-    /**
-     * @param  {String} scriptFilename | path to script file
-     * @param  {Object} toolbarState | toolbar buttons params
-     * @param  {Object} mainWindow | renderer window
-     */
+    
     async start(mainFilePath, breakpoints, runtimeSettings) {
         if (this.oxRunner) {
             throw Error('Previous test is still running. Stop the previous test before calling "start" method.');
@@ -114,18 +110,16 @@ export default class TestRunnerService extends ServiceBase {
             }
         }
                 
-        // prepare module parameters        
+        // prepare module parameters
         if (testMode === 'resp') {
             options.mode = 'web';
             caps.browserName = 'chrome';
-            caps.version = '*';
             caps['goog:chromeOptions'] = {
                 mobileEmulation: {
                     deviceName: testTarget
                 }
             };
-        }
-        else if (testMode === 'mob') {
+        } else if (testMode === 'mob') {
             options.mode = 'mob';
             let deviceName = null;
             let platformName = 'Android';
@@ -142,8 +136,7 @@ export default class TestRunnerService extends ServiceBase {
             caps.deviceName = deviceName;
             caps.platformName = platformName;
             caps.platformVersion = platformVersion;
-        }
-        else if (testMode === 'web') {
+        } else if (testMode === 'web') {
             options.mode = 'web';
             if (!options.seleniumUrl) {
                 options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
