@@ -177,6 +177,10 @@ export function* stopTest({ payload }) {
     try {
         // call TestRunner service to stop the test
         yield call(services.mainIpc.call, 'TestRunnerService', 'stop');
+        
+        // reset active line cursor in all editors
+        yield put(editorActions.resetActiveLines());
+        
         yield put({
             type: success(ActionTypes.TEST_STOP),
             payload: null,
