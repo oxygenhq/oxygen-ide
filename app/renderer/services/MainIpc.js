@@ -87,6 +87,13 @@ export default class MainIpcService {
                 payload: { ...event },
             });    
         }
+        else if (event && event.event && event.event.type === 'RECORDER_NEW_CAN_RECORD') {
+            store.dispatch({
+                type: 'RECORDER_NEW_CAN_RECORD',
+                payload: { ...event },
+            });    
+        }
+        
         else if (event.type === 'LOG_ENTRY') {
             store.dispatch({
                 type: 'MAIN_SERVICE_LOG',

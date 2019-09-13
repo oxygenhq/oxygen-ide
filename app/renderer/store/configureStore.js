@@ -53,8 +53,13 @@ const configureStore = (initialState?: counterStateType) => {
   if (process.env.NODE_ENV === 'development') {
     const { createLogger } = require('redux-logger');
     middleware.push(createLogger({ 
-      collapsed: true,
-      predicate: (getState, action) => !( (action.type === 'MAIN_SERVICE_EVENT' && action.payload && action.payload.event && action.payload.event.type && action.payload.event.type === "CHROME_EXTENSION_ENABLED"))
+      collapsed: true,      
+      predicate: (getState, action) => !((
+        action.payload && 
+        action.payload.event && 
+        action.payload.event.type && 
+        ["CHROME_EXTENSION_ENABLED", "RECORDER_NEW_CAN_RECORD"].includes(action.payload.event.type)
+      ))
     }));
   }
 
