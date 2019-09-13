@@ -7,7 +7,6 @@
   "chrome": {
       "binary": ""
   },
-  "useFiber": false,
   "logger": {
     "file": {
       "level": "error",
