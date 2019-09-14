@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,9 +29,10 @@ module.exports = function(grunt) {
                                       '--set-icon', 'resources/app.ico',
                                       '--set-file-version', cfg.version,
                                       '--set-product-version', cfg.version,
-                                      '--set-version-string', 'LegalCopyright', 'Copyright (C) 2015-2017 CloudBeat Ltd.',
+                                      '--set-version-string', 'LegalCopyright', 'Copyright (C) 2015-2019 CloudBeat Ltd.',
                                       '--set-version-string', 'ProductName', 'Oxygen IDE',
-                                      '--set-version-string', 'FileDescription', 'Oxygen IDE']);
+                                      '--set-version-string', 'FileDescription', 'Oxygen IDE',
+                                      '--set-version-string', 'CompanyName', 'CloudBeat Ltd.']);
             if (child.error) {
                 grunt.fail.fatal(child.error);
             }
