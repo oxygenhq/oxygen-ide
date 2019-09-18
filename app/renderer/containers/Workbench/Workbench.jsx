@@ -128,14 +128,14 @@ export default class Workbench extends Component<Props> {
     }
 
     if(e.ctrlKey || e.metaKey){
-      if(e.key === '+'){
+      if(e.key === '+' || e.key === '=' || e.code === "NumpadAdd" || e.code  === "Equal"){
         e.stopPropagation();
         if(this.props.zoomIn){
           this.props.zoomIn();
         }
       }
       
-      if(e.key === '-'){
+      if(e.key === '-' || e.code === "Minus" || e.code === "NumpadSubtract"){
         e.stopPropagation();
         if(this.props.zoomOut){
           this.props.zoomOut();
