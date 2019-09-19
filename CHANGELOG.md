@@ -1,5 +1,51 @@
 # CHANGELOG
 
+## v1.10.0 (2019-09-19)
+
+#### :tada: New Feature
+* New web commands: `web.isSelected`
+* New mob commands: `mob.closeApp`, `mob.installApp`, `mob.removeApp`, `mob.launchApp`, `mob.resetApp`, `mob.getCurrentAcitivity`, `mob.getCurrentPackage`
+* New pdf commands: `pdf.count`
+* Optional `pageNum` argument for `pdf.assert` and `pdf.assertNot`.
+* Optional `timeout` argument for all `mob` and `web` commands. Can be used to set timeouts per command.
+* Optional `clickParent` argument for `web.clickHidden`.
+
+#### :boom: Breaking Change
+* `mob.verifyTitle`, `mob.verifyTitle`, `mob.verifyValue` removed since those command worked exactly like their `assert*` counterparts.
+* `mob.swipe` has been split into two separate commands: `mob.swipe` and `mob.swipeScreen`.
+* `mob.hideKeyboard` accepts different arguments and supports more strategies.
+* `mob.scrollToElement` accepts different arguments.
+* `mob.setAutoWait` and `web.setAutoWait` removed.
+* Optional `message` argument has been removed from relevant `mob` commands.
+
+#### :beetle: Bug Fix
+* Recorder turning off sporadically.
+* Not all commands being recorded sometimes.
+* CSVs produced by Excel on OS X couldn't be used.
+* `web.makeVisible` will keep the original element dimensions if non 0.
+* Copying log to clipboard wasn't preserving the line breaks.
+* Duplicate line indicator appearing under certain conditions.
+
+#### :nail_care: Polish
+* Error handling has been significantly improved.
+* Show both XLSX and CSV file types in parameters file browser by default.
+* Display currently opened folder path in save dialog.
+* Remove deprecated Amazon Kindle Fire HDX from responsive mode targets list.
+
+#### :book: Documentation
+* Various documentation fixes.
+
+#### :house: Internal
+* WebDriverIO v5.
+* Bump dependencies.
+* Update bundled ChromeDriver v76 and v77.
+* Update IEDriverServer 3.150.0.
+* Update GeckoDriver 0.25.0.
+
+#### :studio_microphone: Chrome Extension (v0.69.0)
+* Fixed invalid selectWindow title being recorded in certain situations.
+* Fixed recording of alerts, confirmation, and prompt dialogs.
+
 ## v1.9.0 (2019-08-19)
 * Added TestingBot as cloud provider [on behalf of jochen].
 * Prevent crash when relaunching the IDE while it's already running in the background.
