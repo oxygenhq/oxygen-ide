@@ -14,6 +14,32 @@ const FONT_SIZE_MAX = 36;
 const SAUCELABS_HUB_DEFAULT_URL = 'https://ondemand.saucelabs.com:443/wd/hub';
 const TESTINGBOT_HUB_DEFAULT_URL = 'https://hub.testingbot.com:443/wd/hub';
 
+const saveCloudProvidersDestruction = (fieldName, object) => {
+  let result = {};
+
+  try{
+    if(fieldName && object){
+      if(
+        object && 
+        typeof object === 'object' &&
+        Object.keys(object).length > 0
+      ) {
+
+        if(object['cloudProviders'] && object['cloudProviders'][fieldName]){
+          result = object['cloudProviders'][fieldName];
+        }
+      }
+    }
+  } catch(e){
+    console.warn('e', e);
+    if(window && window.Sentry && window.Sentry.captureException){
+      window.Sentry.captureException(e);
+    }
+  }
+
+  return result;
+}
+
 const defaultAppSettings = {
   cache: null,
   files: {},
@@ -244,11 +270,25 @@ export default (state = defaultState, action) => {
       };
       
     case 'FROM_CACHE': 
-      return {
+    return {
         ...defaultState,
-        ...cache.settings
+        ...cache.settings,
+        cloudProviders: {
+          sauceLabs: {
+            ...saveCloudProvidersDestruction('sauceLabs', defaultState),
+            ...saveCloudProvidersDestruction('sauceLabs', cache.settings),
+          },
+          testingBot: {
+            ...saveCloudProvidersDestruction('testingBot', defaultState),
+            ...saveCloudProvidersDestruction('testingBot', cache.settings),
+          },
+          lambdaTest: {
+            ...saveCloudProvidersDestruction('lambdaTest', defaultState),
+            ...saveCloudProvidersDestruction('lambdaTest', cache.settings),
+          }
+        }
       }
-
+      
     case types.UPDATE_CLOUD_PROVIDERS_SETTINGS: 
       if (!providers || typeof providers !== 'object') {
         return state;
