@@ -269,19 +269,6 @@ export function* initialize() {
         }
     }
 
-    if (appSettings) {
-
-        if(appSettings.showRecorderMessage === null ){
-            // set showRecorderMessage from cache
-            if(appSettings.cache && appSettings.cache.settings && typeof appSettings.cache.settings.showRecorderMessage === "boolean"){
-                appSettings.showRecorderMessage = appSettings.cache.settings.showRecorderMessage
-            }
-        }
-
-        // make sure we push Electron store settings to our Redux Store
-        yield put(settingsActions.mergeSettings(appSettings));
-    }
-
     if(appSettings && appSettings.lastSession && appSettings.lastSession.rootFolder){
         yield put(settingsActions.hildeLanding());
     } else {
