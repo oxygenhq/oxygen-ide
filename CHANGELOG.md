@@ -1,8 +1,9 @@
 # CHANGELOG
 
-## v1.10.0 (2019-09-19)
+## v1.10.0 (2019-09-21)
 
 #### :tada: New Feature
+* Added support for LambdaTest cloud provider.
 * New web commands: `web.isSelected`
 * New mob commands: `mob.closeApp`, `mob.installApp`, `mob.removeApp`, `mob.launchApp`, `mob.resetApp`, `mob.getCurrentAcitivity`, `mob.getCurrentPackage`
 * New pdf commands: `pdf.count`
