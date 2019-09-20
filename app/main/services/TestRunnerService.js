@@ -110,8 +110,8 @@ export default class TestRunnerService extends ServiceBase {
                 case 'lambdaTest':
                     options.seleniumUrl = testProvider.url;
                     options.wdioOpts = {
-                        user: testProvider.username,
-                        key: testProvider.accessToken
+                        user: testProvider.user,
+                        key: testProvider.key
                     };
             }
         }
