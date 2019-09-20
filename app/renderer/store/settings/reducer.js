@@ -13,7 +13,7 @@ const FONT_SIZE_MIN = 12;
 const FONT_SIZE_MAX = 36;
 const SAUCELABS_HUB_DEFAULT_URL = 'https://ondemand.saucelabs.com:443/wd/hub';
 const TESTINGBOT_HUB_DEFAULT_URL = 'https://hub.testingbot.com:443/wd/hub';
-const LAMBDATEST_HUB_DEFAULT_URL = 'https://hub.lambdatest.com/wd/hub';
+const LAMBDATEST_HUB_DEFAULT_URL = 'https://hub.lambdatest.com:443/wd/hub';
 
 const saveCloudProvidersDestruction = (fieldName, object) => {
   let result = {};
@@ -65,8 +65,8 @@ const defaultAppSettings = {
     lambdaTest: {
       title: 'LambdaTest',
       url: LAMBDATEST_HUB_DEFAULT_URL,
-      username: null,
-      accessToken: null,
+      user: null,
+      key: null,
       inUse: false,
     }
   },
