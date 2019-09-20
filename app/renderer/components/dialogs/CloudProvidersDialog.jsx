@@ -215,7 +215,7 @@ class CloudProvidersDialog extends PureComponent<Props> {
         ...this.state.providers,
         lambdaTest: {
           ...this.state.providers.lambdaTest,
-          username: value,
+          user: value,
         }
       }
     });
@@ -229,7 +229,7 @@ class CloudProvidersDialog extends PureComponent<Props> {
         ...this.state.providers,
         lambdaTest: {
           ...this.state.providers.lambdaTest,
-          accessToken: value,
+          key: value,
         }
       }
     });
@@ -370,13 +370,13 @@ class CloudProvidersDialog extends PureComponent<Props> {
                 </Form.Item>
                 <Form.Item label="Username" {...formItemLayout} >
                   <Input
-                    value={ lambdaTest.username }
+                    value={ lambdaTest.user }
                     onChange={ (e) => ::this.onChangeLambdaTestUsername(e.target.value) }
                   />
                 </Form.Item>
                 <Form.Item label="AccessToken" {...formItemLayout} >
                   <Input
-                    value={ lambdaTest.accessToken }
+                    value={ lambdaTest.key }
                     onChange={ (e) => ::this.onChangeLambdaTestAccessToken(e.target.value) }
                   />
                 </Form.Item>

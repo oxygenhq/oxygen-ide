@@ -109,8 +109,10 @@ export default class TestRunnerService extends ServiceBase {
                     caps.extendedDebugging = testProvider.extendedDebugging || false;
                 case 'lambdaTest':
                     options.seleniumUrl = testProvider.url;
-                    caps.username = testProvider.username;
-                    caps.accessToken = testProvider.accessToken;
+                    options.wdioOpts = {
+                        user: testProvider.username,
+                        key: testProvider.accessToken
+                    };
             }
         }
                 
