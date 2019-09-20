@@ -192,6 +192,62 @@ class CloudProvidersDialog extends PureComponent<Props> {
       }
     });
   }
+
+  onChangeLambdaTestUrl(value) {
+    const { providers = {} } = this.state || {};
+    const { lambdaTest = {} } = providers;
+    this.setState({
+      providers: {
+        ...this.state.providers,
+        lambdaTest: {
+          ...this.state.providers.lambdaTest,
+          url: value,
+        }
+      }
+    });
+  }
+
+  onChangeLambdaTestUsername (value) {
+    const { providers = {} } = this.state || {};
+    const { lambdaTest = {} } = providers;
+    this.setState({
+      providers: {
+        ...this.state.providers,
+        lambdaTest: {
+          ...this.state.providers.lambdaTest,
+          username: value,
+        }
+      }
+    });
+  }
+
+  onChangeLambdaTestAccessToken (value) {
+    const { providers = {} } = this.state || {};
+    const { lambdaTest = {} } = providers;
+    this.setState({
+      providers: {
+        ...this.state.providers,
+        lambdaTest: {
+          ...this.state.providers.lambdaTest,
+          accessToken: value,
+        }
+      }
+    });
+  }
+
+  onUseLambdaTestChange(value) {
+    const { providers = {} } = this.state || {};
+    const { lambdaTest = {} } = providers;
+    this.setState({
+      providers: {
+        ...this.state.providers,
+        lambdaTest: {
+          ...this.state.providers.lambdaTest,
+          inUse: value,
+        }
+      }
+    });
+  }
   
   handleOk() {
     const { providers } = this.state;
@@ -214,7 +270,8 @@ class CloudProvidersDialog extends PureComponent<Props> {
     } = this.state;
     const {
       sauceLabs = {},
-      testingBot = {}
+      testingBot = {},
+      lambdaTest = {}
     } = providers;
     // form layout settings
     const formItemLayout = {
@@ -240,6 +297,9 @@ class CloudProvidersDialog extends PureComponent<Props> {
             </Form.Item>
             <Form.Item label="TestingBot" {...formItemLayout} extra="Use TestingBot to run your tests in cloud." >
               <Switch onChange={ ::this.onUseTestingBotChange } checked={ testingBot.inUse } />
+            </Form.Item>
+            <Form.Item label="LambdaTest" {...formItemLayout} extra="Use LambdaTest to run your tests in cloud." >
+              <Switch onChange={ ::this.onUseLambdaTestChange } checked={ lambdaTest.inUse } />
             </Form.Item>
             { sauceLabs && sauceLabs.inUse &&
               <div className="cloud-providers-form-wrap cloud-providers-form-wrap-margin-bottom">
@@ -295,6 +355,29 @@ class CloudProvidersDialog extends PureComponent<Props> {
                   <Checkbox
                     checked={ testingBot.extendedDebugging || false }
                     onChange={ (e) => ::this.onChangeTestingBotExtendedDebugging(e.target.checked) }
+                  />
+                </Form.Item>
+              </div>
+            }
+            { lambdaTest && lambdaTest.inUse &&
+              <div className="cloud-providers-form-wrap">
+                <Form.Item label="LambdaTest settings" {...formItemLayout}/>
+                <Form.Item label="Cloud URL" {...formItemLayout} >
+                  <Input
+                    value={ lambdaTest.url }
+                    onChange={ (e) => ::this.onChangeLambdaTestUrl(e.target.value) }
+                  />
+                </Form.Item>
+                <Form.Item label="Username" {...formItemLayout} >
+                  <Input
+                    value={ lambdaTest.username }
+                    onChange={ (e) => ::this.onChangeLambdaTestUsername(e.target.value) }
+                  />
+                </Form.Item>
+                <Form.Item label="AccessToken" {...formItemLayout} >
+                  <Input
+                    value={ lambdaTest.accessToken }
+                    onChange={ (e) => ::this.onChangeLambdaTestAccessToken(e.target.value) }
                   />
                 </Form.Item>
               </div>
