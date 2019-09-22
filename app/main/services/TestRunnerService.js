@@ -106,13 +106,17 @@ export default class TestRunnerService extends ServiceBase {
                     caps.name = testName || null;
                     caps.key = testProvider.key;
                     caps.secret = testProvider.secret;
-                    caps.extendedDebugging = testProvider.extendedDebugging || false;
                 case 'lambdaTest':
                     options.seleniumUrl = testProvider.url;
                     options.wdioOpts = {
                         user: testProvider.user,
                         key: testProvider.key
                     };
+                    caps.name = testName || null;
+                    caps.console = testProvider.captureConsole || false;
+                    caps.network = testProvider.captureNetwork || false;
+                    caps.visual = testProvider.takeScreenshots || false;
+                    caps.video = testProvider.videoRecording || false;
             }
         }
                 

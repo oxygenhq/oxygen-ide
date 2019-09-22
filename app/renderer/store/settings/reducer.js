@@ -67,6 +67,10 @@ const defaultAppSettings = {
       url: LAMBDATEST_HUB_DEFAULT_URL,
       user: null,
       key: null,
+      captureNetwork: false,
+      captureConsole: false,
+      takeScreenshots: false,
+      videoRecording: false,
       inUse: false,
     }
   },
