@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.10.0 (2019-09-21)
+## v1.10.0 (2019-09-26)
 
 #### :tada: New Feature
 * Added support for LambdaTest cloud provider.
