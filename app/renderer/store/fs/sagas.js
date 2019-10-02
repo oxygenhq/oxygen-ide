@@ -428,7 +428,9 @@ export function* _fetchFolderContent(path) {
 export function* fetchFolderContent({ payload }) {
     const { path } = payload;
     try {
-        yield _fetchFolderContent(path);
+        if(path){
+            yield _fetchFolderContent(path);
+        }
     } catch (err) {
         console.warn('Problem when fetching folder content whith payload:', payload);
     }
@@ -472,16 +474,28 @@ export function* fetchFileInfo({ payload }) {
 export function* saveFileContent({ payload }) {
     const { path } = payload;
     try {
-        const file = yield select(state => state.fs.files[path]);
-        if (!file) {
-            return;
+        if(path){
+            const file = yield select(state => state.fs.files[path]);
+            if (!file) {
+                return;
+            }
+            let content = '';
+            if(file && file.content){
+                content = file.content;
+            }
+            yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  content]);
+            yield put(fsActions._saveFile_Success(path));
         }
-        const content = file.content;
-        yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  content]);
-        yield put(fsActions._saveFile_Success(path));
     }
     catch (err) {
         yield put(reportError(err));
+
+        let saveCode = 'Unknown code';
+
+        if(err && err.code){
+            saveCode = err.code;
+        }
+
         yield call(services.mainIpc.call, 'ElectronService', 'showErrorBox', ['Save File Failed', err.code]);
         yield put(fsActions._saveFile_Failure(path, err));
     }
