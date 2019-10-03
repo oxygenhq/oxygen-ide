@@ -16,11 +16,15 @@
     </script>
     <script src="../node_modules/@sentry/browser/build/bundle.min.js"></script>
     <script>
-      try{
-        Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
-        window.Sentry = Sentry;
-      } catch(e){
-        console.warn('Sentry Error', e);
+      if (process.env.NODE_ENV === 'development') {
+        // ignore
+      } else {
+        try{
+          Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
+          window.Sentry = Sentry;
+        } catch(e){
+          console.warn('Sentry Error', e);
+        }
       }
     </script>
   </head>
