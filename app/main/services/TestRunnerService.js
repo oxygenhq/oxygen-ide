@@ -181,11 +181,14 @@ export default class TestRunnerService extends ServiceBase {
         testsuite.testcases[0].breakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
         // run the test
         try {
-            const result = await this.oxRunner.run(testsuite, null, caps);
+            if(this.oxRunner && this.oxRunner.run){
+                const result = await this.oxRunner.run(testsuite, null, caps);
+                
+                // eslint-disable-line
+                this._emitTestEnded(result);    
+            }    
             // dispose Oxygen Runner and mark the state as not running, before updating the UI
-            await this.dispose();
-            // eslint-disable-line
-            this._emitTestEnded(result);            
+            await this.dispose();    
         }
         catch (e) {
             if (e.line) {
