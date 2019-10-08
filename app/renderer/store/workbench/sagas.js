@@ -1298,7 +1298,7 @@ export function* showNewFolderDialog({ payload }) {
     const rootPath = (yield select(state => state.fs.rootPath)) || null;
     const files = yield select(state => state.fs.files);
     const treeActiveFile = activeNode && files.hasOwnProperty(activeNode) ? files[activeNode] : null;
-
+    
     if (treeActiveFile) {
         // in case the file is currently selected in the tree, create a new file in the same directory as the selected file
         if (treeActiveFile.type === 'file') {
@@ -1312,6 +1312,11 @@ export function* showNewFolderDialog({ payload }) {
                 wbActions.showDialog('DIALOG_FILE_CREATE', { type: 'folder', path: treeActiveFile.path })
             );
         }
+    }
+    else if(activeNode){
+        yield put(
+            wbActions.showDialog('DIALOG_FILE_CREATE', { type: 'folder', path: activeNode })
+        );
     }
     else if (rootPath) {
         yield put(
