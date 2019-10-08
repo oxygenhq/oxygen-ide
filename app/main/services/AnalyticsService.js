@@ -20,9 +20,12 @@ export default class AnalyticsService extends ServiceBase {
     constructor() {
         super();
         this.uuid = null;
+        this.mixpanel = null;
         
         try{
-            this.mixpanel = Mixpanel.init('e80db0ad2789b5718fa1b84b6661f008');
+            if (process.env.NODE_ENV === 'production') {
+                this.mixpanel = Mixpanel.init('e80db0ad2789b5718fa1b84b6661f008');
+            }
         } catch(e){
             console.warn('mixpanel e', e);
             Sentry.captureException(e);
@@ -101,14 +104,16 @@ export default class AnalyticsService extends ServiceBase {
                                 }
 
                                 try{
-                                    this.mixpanel.people.set(uuid, {
-                                        $region: region,
-                                        $country_code: country_code,
-                                        'Сountry Name': country_name,
-                                        'City': city,
-                                        'Continent Name': continent_name,
-                                        'Continent Code': continent_code
-                                    });
+                                    if(this.mixpanel && this.mixpanel.people && this.mixpanel.people.set){
+                                        this.mixpanel.people.set(uuid, {
+                                            $region: region,
+                                            $country_code: country_code,
+                                            'Сountry Name': country_name,
+                                            'City': city,
+                                            'Continent Name': continent_name,
+                                            'Continent Code': continent_code
+                                        });
+                                    }
                                 } catch(e){
                                     console.warn('mixpanel e', e);
                                     Sentry.captureException(e);
@@ -131,15 +136,17 @@ export default class AnalyticsService extends ServiceBase {
 
         
         try{
-            this.mixpanel.people.set(uuid, {
-                $created: (new Date()).toISOString(),
-                $timezone: ''+moment().format('Z'),
-                'IDE Version': version,
-                'OS Name': process.platform,
-                'OS Version': os.release(),
-                'Language': language,
-                'Dev': process.env.NODE_ENV === 'development'
-            }); 
+            if(this.mixpanel && this.mixpanel.people && this.mixpanel.people.set){
+                this.mixpanel.people.set(uuid, {
+                    $created: (new Date()).toISOString(),
+                    $timezone: ''+moment().format('Z'),
+                    'IDE Version': version,
+                    'OS Name': process.platform,
+                    'OS Version': os.release(),
+                    'Language': language,
+                    'Dev': process.env.NODE_ENV === 'development'
+                }); 
+            }
         } catch(e){
             console.warn('mixpanel e', e);
             Sentry.captureException(e);
@@ -151,9 +158,11 @@ export default class AnalyticsService extends ServiceBase {
         this.openMoment = moment();
         
         try{
-            this.mixpanel.track('IDE_OPEN', {
-                distinct_id: this.uuid
-            }); 
+            if(this.mixpanel && this.mixpanel.track){
+                this.mixpanel.track('IDE_OPEN', {
+                    distinct_id: this.uuid
+                }); 
+            }
 
             if(Sentry && Sentry.configureScope){
                 Sentry.configureScope((scope) => {
@@ -173,10 +182,12 @@ export default class AnalyticsService extends ServiceBase {
             const duration = closeMoment.diff(this.openMoment, 'seconds');
             
             try{
-                this.mixpanel.track('IDE_CLOSE', {
-                    distinct_id: this.uuid,
-                    'Duration': duration
-                });
+                if(this.mixpanel && this.mixpanel.track){
+                    this.mixpanel.track('IDE_CLOSE', {
+                        distinct_id: this.uuid,
+                        'Duration': duration
+                    });
+                }
             } catch(e){
                 console.warn('mixpanel e', e);
                 Sentry.captureException(e);
@@ -191,10 +202,13 @@ export default class AnalyticsService extends ServiceBase {
         this.recStartMoment = moment();
 
         try{
-            this.mixpanel.track('IDE_FEATURE_REC_START', {
-                distinct_id: this.uuid,
-                'Recorder type': 'web'
-            });
+            
+            if(this.mixpanel && this.mixpanel.track){
+                this.mixpanel.track('IDE_FEATURE_REC_START', {
+                    distinct_id: this.uuid,
+                    'Recorder type': 'web'
+                });
+            }
         } catch(e){
             console.warn('mixpanel e', e);
             Sentry.captureException(e);
@@ -206,12 +220,14 @@ export default class AnalyticsService extends ServiceBase {
         const duration = recStopMoment.diff(this.recStartMoment, 'seconds');
         
         try{
-            this.mixpanel.track('IDE_FEATURE_REC_END', {
-                distinct_id: this.uuid,
-                'Recorder type': 'web',
-                'Duration': duration,
-                'Recorded items count': recorded_items_count || 0
-            });
+            if(this.mixpanel && this.mixpanel.track){
+                this.mixpanel.track('IDE_FEATURE_REC_END', {
+                    distinct_id: this.uuid,
+                    'Recorder type': 'web',
+                    'Duration': duration,
+                    'Recorded items count': recorded_items_count || 0
+                });
+            }
         } catch(e){
             console.warn('mixpanel e', e);
             Sentry.captureException(e);
@@ -223,10 +239,12 @@ export default class AnalyticsService extends ServiceBase {
         this.playStartMoment = moment();
 
         try{
-            this.mixpanel.track('IDE_FEATURE_PLAY_START', {
-                distinct_id: this.uuid,
-                'Playback type': 'web'
-            });
+            if(this.mixpanel && this.mixpanel.track){
+                this.mixpanel.track('IDE_FEATURE_PLAY_START', {
+                    distinct_id: this.uuid,
+                    'Playback type': 'web'
+                });
+            }
         } catch(e){
             console.warn('mixpanel e', e);
             Sentry.captureException(e);
@@ -238,13 +256,15 @@ export default class AnalyticsService extends ServiceBase {
         const duration = playStopMoment.diff(this.playStartMoment, 'seconds');
 
         try{
-            this.mixpanel.track('IDE_FEATURE_PLAY_END', {
-                distinct_id: this.uuid,
-                'Playback type': 'web',
-                'Duration': duration,
-                'Test duration': summary && summary._duration,
-                'Playback outcome': summary && summary._status
-            });
+            if(this.mixpanel && this.mixpanel.track){
+                this.mixpanel.track('IDE_FEATURE_PLAY_END', {
+                    distinct_id: this.uuid,
+                    'Playback type': 'web',
+                    'Duration': duration,
+                    'Test duration': summary && summary._duration,
+                    'Playback outcome': summary && summary._status
+                });
+            }
         } catch(e){
             console.log('mixpanel e', e);
             Sentry.captureException(e);

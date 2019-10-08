@@ -27,10 +27,16 @@ const defaultState = {
   [types.DIALOG_NEED_ISTALL_EXTENSION]: {
     visible: false,
   },
-  [types.DIALOG_OBJECT_CREATE]: {
+  [types.DIALOG_OBJECT_ELEMENT_CREATE]: {
     visible: false,
   },
-  [types.DIALOG_OBJECT_FOLDER_CREATE]: {
+  [types.DIALOG_OBJECT_ELEMENT_OR_CONTAINER_RENAME]: {
+    visible: false,
+  },
+  [types.DIALOG_OBJECT_ELEMENT_OR_CONTAINER_REMOVE]: {
+    visible: false,
+  },
+  [types.DIALOG_OBJECT_CONTAINER_CREATE]: {
     visible: false,
   },
   [types.DIALOG_CLOUD_PROVIDERS]: {

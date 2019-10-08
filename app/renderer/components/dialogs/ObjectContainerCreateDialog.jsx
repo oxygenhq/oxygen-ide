@@ -25,7 +25,7 @@ type Props = {
   onCancel: () => void,
 };
 
-export default class ObjectFolderCreateDialog extends PureComponent<Props> {
+export default class ObjectContainerCreateDialog extends PureComponent<Props> {
   constructor(props: Props) {
     super(props: Props);
 
@@ -33,7 +33,7 @@ export default class ObjectFolderCreateDialog extends PureComponent<Props> {
 
     this.state = {
         ...DEFAULT_STATE,
-        type: this.props.type ? this.props.type : 'object',
+        type: this.props.type ? this.props.type : 'container',
     }
   }
 
@@ -84,7 +84,7 @@ export default class ObjectFolderCreateDialog extends PureComponent<Props> {
   handleOk() {
     const { name } = this.state;
     if (!name || name.length == 0) {
-      message.error(`Folder name cannot be blank!`);
+      message.error(`Container name cannot be blank!`);
       return;
     }
     this.props.onSubmit(name, this.props.type, this.props.path);
@@ -107,7 +107,7 @@ export default class ObjectFolderCreateDialog extends PureComponent<Props> {
 
     return (
       <Modal
-        title={`Create New Folder`}
+        title={`Create New Container`}
         okText="Create"
         width={700}
         visible={visible}
@@ -119,7 +119,7 @@ export default class ObjectFolderCreateDialog extends PureComponent<Props> {
           onChange={this.onChangeName.bind(this)}
           style={{ marginBottom: 15 }}
           value={ name }
-          placeholder={`Enter new Folder name...`}
+          placeholder={`Enter new Container name...`}
         />
       </Modal>
     );

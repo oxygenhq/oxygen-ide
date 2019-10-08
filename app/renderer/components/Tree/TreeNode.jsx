@@ -400,7 +400,13 @@ class TreeNode extends React.Component {
   // Icon + Title
   renderSelector = () => {
     const { dragNodeHighlight } = this.state;
-    const { title, selected, icon, loading } = this.props;
+    const { 
+      title,
+      selected,
+      icon,
+      loading,
+      onContextMenuHendler
+    } = this.props;
     const { rcTree: { prefixCls, showIcon, icon: treeIcon, draggable, loadData } } = this.context;
     const disabled = this.isDisabled();
 
@@ -451,6 +457,7 @@ class TreeNode extends React.Component {
         onDoubleClick={this.onSelectorDoubleClick}
         onDragStart={draggable ? this.onDragStart : undefined}
         onDrag={ this.onDrag }
+        onContextMenu={onContextMenuHendler || null}
       >
         {$icon}{$title}
       </span>

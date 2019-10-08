@@ -57,20 +57,35 @@ export const CONTEXT_MENU_OBJECT_REPOSITORY_FILE_EXPLORER_FILE = [
 	},
 ];
 
-export const CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_OBJECT = [
+export const CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_ELEMENT = [
 	{
-		label: 'Copy Object',
-		cmd: Const.MENU_CMD_ORE_COPY_OBJECT,
+		label: 'Rename',
+		cmd: Const.MENU_CMD_ORE_RENAME_ELEMENT,
 	},
+	{
+		label: 'Delete',
+		cmd: Const.MENU_CMD_ORE_DELETE_ELEMENT,
+	}
 ];
 
-export const CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_FOLDER = [
+export const CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_CONTAINER = [
 	{
-		label: 'New Object',
-		cmd: Const.MENU_CMD_ORE_NEW_OBJECT,
+		label: 'New Container',
+		cmd: Const.MENU_CMD_ORE_NEW_CONTAINER,
 	},
 	{
-		label: 'New Folder',
-		cmd: Const.MENU_CMD_ORE_NEW_FOLDER,
+		label: 'New Element',
+		cmd: Const.MENU_CMD_ORE_NEW_ELEMENT,
+	},
+	{
+		type: 'separator',
+	},
+	{
+		label: 'Rename',
+		cmd: Const.MENU_CMD_ORE_RENAME_CONTAINER,
+	},
+	{
+		label: 'Delete',
+		cmd: Const.MENU_CMD_ORE_DELETE_CONTAINER,
 	}
 ];

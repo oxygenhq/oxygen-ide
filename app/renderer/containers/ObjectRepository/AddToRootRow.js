@@ -1,7 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Button, Menu, Dropdown, Icon, Modal, Input } from 'antd';
 
-
 export default class AddToRootRow extends PureComponent {
     constructor(props) {
         super(props);
@@ -95,9 +94,7 @@ export default class AddToRootRow extends PureComponent {
             if(key === 'container'){
                 title = 'Container';
             } else if(key === 'array_object'){
-                title = 'Array Object';
-            } else if(key === 'string_object'){
-                title = 'String Object';
+                title = 'Element';
             }
         }
 
@@ -106,8 +103,7 @@ export default class AddToRootRow extends PureComponent {
                 <Dropdown overlay={
                     <Menu onClick={this.handleMenuClick}>
                         <Menu.Item key="container">Container</Menu.Item>
-                        <Menu.Item key="array_object">Array Object</Menu.Item>
-                        <Menu.Item key="string_object">String Object</Menu.Item>
+                        <Menu.Item key="array_object">Element</Menu.Item>
                     </Menu>
                 }>
                     <Button>

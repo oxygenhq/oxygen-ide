@@ -57,7 +57,6 @@ function renderTreeNodes(nodes, searchResults) {
             className="nodeText"
             title={ element.name } 
             style={{ userSelect: 'none', ...highLightStyle }} 
-            onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_OBJECT') }
           >{element.name}</span>
         );
       }
@@ -67,7 +66,6 @@ function renderTreeNodes(nodes, searchResults) {
             className="nodeText"
             title={ element.name } 
             style={{ userSelect: 'none', ...highLightStyle }} 
-            onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_FOLDER') }
           >{element.name}</span>
         );
       }
@@ -91,6 +89,7 @@ function renderTreeNodes(nodes, searchResults) {
             style={{ userSelect: 'none' }}
             isLeaf={false}
             highLightChild={highLightChild}
+            onContextMenuHendler={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_CONTAINER') }
           >
             {element.children ? renderTreeNodes.apply(this, [element.children, searchResults]) : []}
           </Tree.TreeNode>
@@ -106,6 +105,7 @@ function renderTreeNodes(nodes, searchResults) {
           dataRef={element}
           style={{ userSelect: 'none' }}
           isLeaf={true}
+          onContextMenuHendler={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_ELEMENT') }
         />
       );
     });

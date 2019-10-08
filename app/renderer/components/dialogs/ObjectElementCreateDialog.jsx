@@ -25,7 +25,7 @@ type Props = {
   onCancel: () => void,
 };
 
-export default class ObjectCreateDialog extends PureComponent<Props> {
+export default class ObjectElementCreateDialog extends PureComponent<Props> {
   constructor(props: Props) {
     super(props: Props);
 
@@ -33,7 +33,7 @@ export default class ObjectCreateDialog extends PureComponent<Props> {
 
     this.state = {
         ...DEFAULT_STATE,
-        type: this.props.type ? this.props.type : 'object',
+        type: this.props.type ? this.props.type : 'element',
     }
   }
 
@@ -84,7 +84,7 @@ export default class ObjectCreateDialog extends PureComponent<Props> {
   handleOk() {
     const { name } = this.state;
     if (!name || name.length == 0) {
-      message.error(`Object name cannot be blank!`);
+      message.error(`Element name cannot be blank!`);
       return;
     }
     this.props.onSubmit(name, this.props.type, this.props.path);
@@ -120,7 +120,7 @@ export default class ObjectCreateDialog extends PureComponent<Props> {
 
     return (
       <Modal
-        title={`Create New Object ${parentName}`}
+        title={`Create New Element ${parentName}`}
         okText="Create"
         width={700}
         visible={visible}
@@ -132,7 +132,7 @@ export default class ObjectCreateDialog extends PureComponent<Props> {
           onChange={this.onChangeName.bind(this)}
           style={{ marginBottom: 15 }}
           value={ name }
-          placeholder={`Enter new Object name...`}
+          placeholder={`Enter new Element name...`}
         />
       </Modal>
     );

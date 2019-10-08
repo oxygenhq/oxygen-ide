@@ -15,8 +15,10 @@ import updateModals from '../../components/updateModals';
 import JavaDialog from '../../components/dialogs/JavaDialog';
 import FileRenameDialog from '../../components/dialogs/FileRenameDialog';
 import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
-import ObjectCreateDialog from '../../components/dialogs/ObjectCreateDialog';
-import ObjectFolderCreateDialog from '../../components/dialogs/ObjectFolderCreateDialog';
+import ObjectElementCreateDialog from '../../components/dialogs/ObjectElementCreateDialog';
+import ObjectElementOrContainerRenameDialog from '../../components/dialogs/ObjectElementOrContainerRenameDialog';
+import ObjectElementOrContainerRemoveDialog from '../../components/dialogs/ObjectElementOrContainerRemoveDialog';
+import ObjectContainerCreateDialog from '../../components/dialogs/ObjectContainerCreateDialog';
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
 import SettingsDialog from '../../components/dialogs/SettingsDialog';
 import NeedInstallExtension from '../../components/dialogs/NeedInstallExtension';
@@ -38,6 +40,7 @@ import Landing from '../../components/Landing';
 import Initializing from '../../components/Initializing';
 import Settings from '../Settings';
 import ObjectRepository from '../ObjectRepository';
+import ObjectRepositoryNotValid from '../ObjectRepository/ObjectRepositoryNotValid';
 import * as Controls from '../../components/Toolbar/controls';
 // Styles
 import '../../css/common.scss';
@@ -356,22 +359,40 @@ export default class Workbench extends Component<Props> {
     this.props.hideDialog('DIALOG_FILE_CREATE');
   }
 
-  objectCreateDialog_onSubmit(name, type, parentPath) {
-    this.props.hideDialog('DIALOG_OBJECT_CREATE');
-    this.props.createObject(name, parentPath);
+  objectElementCreateDialog_onSubmit(name, type, parentPath) {
+    this.props.hideDialog('DIALOG_OBJECT_ELEMENT_CREATE');
+    this.props.createObjectElement(name, parentPath);
   }
 
-  objectCreateDialog_onCancel() {
-    this.props.hideDialog('DIALOG_OBJECT_CREATE');
+  objectElementCreateDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_ELEMENT_CREATE');
+  }
+  
+  objectElementRenameDialog_onSubmit(name, type, parentPath) {
+    this.props.hideDialog('DIALOG_OBJECT_ELEMENT_OR_CONTAINER_RENAME');
+    this.props.renameObjectElementOrContainer(name, type, parentPath);
   }
 
-  objectFolderCreateDialog_onSubmit(name, type, parentPath) {
-    this.props.hideDialog('DIALOG_OBJECT_FOLDER_CREATE');
-    this.props.createObjectFolder(name, parentPath);
+  objectElementRenameDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_ELEMENT_OR_CONTAINER_RENAME');
+  }
+  
+  objectElementRemoveDialog_onSubmit(name, type, parentPath) {
+        this.props.hideDialog('DIALOG_OBJECT_ELEMENT_OR_CONTAINER_REMOVE');
+    this.props.removeObjectElementOrContainer(name, type, parentPath);
   }
 
-  objectFolderCreateDialog_onCancel() {
-    this.props.hideDialog('DIALOG_OBJECT_FOLDER_CREATE');
+  objectElementRemoveDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_ELEMENT_OR_CONTAINER_REMOVE');
+  }
+  
+  objectContainerCreateDialog_onSubmit(name, type, parentPath) {
+    this.props.hideDialog('DIALOG_OBJECT_CONTAINER_CREATE');
+    this.props.createObjectContainer(name, parentPath);
+  }
+
+  objectContainerCreateDialog_onCancel() {
+    this.props.hideDialog('DIALOG_OBJECT_CONTAINER_CREATE');
   }
 
   // Rename
@@ -438,6 +459,7 @@ export default class Workbench extends Component<Props> {
     const rightSidebarSize = settings.sidebars.right.size;
     const rightSidebarVisible = settings.sidebars.right.visible;
     const rightSidebarComponent = settings.sidebars.right.component;
+
     // logger state
     const loggerVisible = settings.logger.visible;
     const showLanding = settings.showLanding;
@@ -483,17 +505,30 @@ export default class Workbench extends Component<Props> {
               onClose={ this.needInstallExtensionOnClose }
             />
           }
-          <ObjectCreateDialog
-            { ...dialog['DIALOG_OBJECT_CREATE'] }
-            onSubmit={ ::this.objectCreateDialog_onSubmit }
-            onCancel={ ::this.objectCreateDialog_onCancel } 
+          <ObjectElementCreateDialog
+            { ...dialog['DIALOG_OBJECT_ELEMENT_CREATE'] }
+            onSubmit={ ::this.objectElementCreateDialog_onSubmit }
+            onCancel={ ::this.objectElementCreateDialog_onCancel } 
           />
-          <ObjectFolderCreateDialog
-            { ...dialog['DIALOG_OBJECT_FOLDER_CREATE'] }
-            onSubmit={ ::this.objectFolderCreateDialog_onSubmit }
-            onCancel={ ::this.objectFolderCreateDialog_onCancel } 
+          <ObjectContainerCreateDialog
+            { ...dialog['DIALOG_OBJECT_CONTAINER_CREATE'] }
+            onSubmit={ ::this.objectContainerCreateDialog_onSubmit }
+            onCancel={ ::this.objectContainerCreateDialog_onCancel } 
           />
-
+          { dialog.DIALOG_OBJECT_ELEMENT_OR_CONTAINER_RENAME && dialog.DIALOG_OBJECT_ELEMENT_OR_CONTAINER_RENAME.visible &&
+            <ObjectElementOrContainerRenameDialog
+              { ...dialog['DIALOG_OBJECT_ELEMENT_OR_CONTAINER_RENAME'] }
+              onSubmit={ ::this.objectElementRenameDialog_onSubmit }
+              onCancel={ ::this.objectElementRenameDialog_onCancel }
+            />
+          }
+          { dialog.DIALOG_OBJECT_ELEMENT_OR_CONTAINER_REMOVE && dialog.DIALOG_OBJECT_ELEMENT_OR_CONTAINER_REMOVE.visible &&
+            <ObjectElementOrContainerRemoveDialog
+              { ...dialog['DIALOG_OBJECT_ELEMENT_OR_CONTAINER_REMOVE'] }
+              onSubmit={ ::this.objectElementRemoveDialog_onSubmit }
+              onCancel={ ::this.objectElementRemoveDialog_onCancel }
+            />
+          }
           { dialog.DIALOG_FILE_CREATE && dialog.DIALOG_FILE_CREATE.visible &&
             <FileCreateDialog 
               { ...dialog['DIALOG_FILE_CREATE'] }
@@ -632,6 +667,7 @@ export default class Workbench extends Component<Props> {
                 >
                   { rightSidebarComponent === 'settings' && <Settings /> } 
                   { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
+                  { rightSidebarComponent === 'obj-repo-not-valid' && <ObjectRepositoryNotValid /> } 
                 </Sidebar>
               </Layout>
           </Col>

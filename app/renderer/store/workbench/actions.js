@@ -177,16 +177,31 @@ export const createFile = (path, name) => {
   };
 };
 
-export const createObject = (path, name) => {
+export const createObjectElement = (path, name) => {
   return {
-    type: ActionTypes.WB_CREATE_OBJECT,
+    type: ActionTypes.WB_CREATE_OBJECT_ELEMENT,
     payload: { path, name },
   };
 };
 
-export const createObjectFolder = (path, name) => {
+export const renameObjectElementOrContainer = (newName, type, path) => {
   return {
-    type: ActionTypes.WB_CREATE_OBJECT_FOLDER,
+    type: ActionTypes.WB_RENAME_OBJECT_ELEMENT_OR_CONTAINER,
+    payload: { path, type, newName },
+  };
+};
+
+export const removeObjectElementOrContainer = (type, path) => {
+  return {
+    type: ActionTypes.WB_REMOVE_OBJECT_ELEMENT_OR_CONTAINER,
+    payload: { path, type },
+  };
+};
+
+
+export const createObjectContainer = (path, name) => {
+  return {
+    type: ActionTypes.WB_CREATE_OBJECT_CONTAINER,
     payload: { path, name },
   };
 };
