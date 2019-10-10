@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## v1.11.0 (2019-10-xx)
+
+#### :tada: New Feature
+* Add `build` property to LambdaTest provider settings.
+
+#### :beetle: Bug Fix
+* Unable to create nested folders.
+* Issue with Firefox tests not working on Windows machines which don't have MSVC installed.
+* Various other fixes.
+
+#### :nail_care: Polish
+* Various Object Repository UI improvements.
+
+#### :house: Internal
+* Bump Chokidar (should reduce memory consumption and improve responsiveness)
+* Bump oxygen-cli to v0.50.1. See [Oxygen ChhangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+
 ## v1.10.0 (2019-09-26)
 
 #### :tada: New Feature
