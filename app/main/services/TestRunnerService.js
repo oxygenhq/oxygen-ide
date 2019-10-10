@@ -113,6 +113,7 @@ export default class TestRunnerService extends ServiceBase {
                         key: testProvider.key
                     };
                     caps.name = testName || null;
+                    caps.build = testProvider.build || null;
                     caps.console = testProvider.captureConsole || false;
                     caps.network = testProvider.captureNetwork || false;
                     caps.visual = testProvider.takeScreenshots || false;

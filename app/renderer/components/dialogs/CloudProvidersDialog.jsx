@@ -235,6 +235,20 @@ class CloudProvidersDialog extends PureComponent<Props> {
     });
   }
 
+  onChangeLambdaBuildName (value) {
+    const { providers = {} } = this.state || {};
+    const { lambdaTest = {} } = providers;
+    this.setState({
+      providers: {
+        ...this.state.providers,
+        lambdaTest: {
+          ...this.state.providers.lambdaTest,
+          build: value,
+        }
+      }
+    });
+  }
+
   onChangeLambdaTestAccessToken (value) {
     const { providers = {} } = this.state || {};
     const { lambdaTest = {} } = providers;
@@ -424,6 +438,12 @@ class CloudProvidersDialog extends PureComponent<Props> {
                   <Input.Password
                     value={ lambdaTest.key }
                     onChange={ (e) => ::this.onChangeLambdaTestAccessToken(e.target.value) }
+                  />
+                </Form.Item>
+                <Form.Item label="Build Name" {...formItemLayout} >
+                  <Input
+                    value={ lambdaTest.build }
+                    onChange={ (e) => ::this.onChangeLambdaBuildName(e.target.value) }
                   />
                 </Form.Item>
                 <Form.Item label="Capture Browser Console" {...formItemLayout} >
