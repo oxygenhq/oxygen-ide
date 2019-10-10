@@ -61,6 +61,18 @@ export const cleanJavaError = () => {
   }
 }
 
+export const setXCodeError = () => {
+  return {
+    type: ActionTypes.WB_SET_XCODE_ERROR
+  }
+}
+
+export const cleanXCodeError = () => {
+  return {
+    type: ActionTypes.WB_CLEAN_XCODE_ERROR
+  }
+}
+
 /* createNewRealFile */
 
 export const createNewRealFile = (fakeFile=null) => {

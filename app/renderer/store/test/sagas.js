@@ -92,6 +92,8 @@ function* handleDeviceDiscoveryServiceEvent(event) {
     }
     else if (event.type === 'DEVICE_DISCONNECTED') {
         yield put(testActions.removeDevice(event.device));
+    } else if(event.type === 'XCODE_ERROR'){
+        yield put(wbActions.setXCodeError());
     }
 }
 

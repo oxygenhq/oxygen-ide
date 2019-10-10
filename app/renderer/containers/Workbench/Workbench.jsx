@@ -13,6 +13,7 @@ import { Modal, Layout, Icon, Row, Col, Tooltip, message, notification } from 'a
 import updateModals from '../../components/updateModals';
 // Dialogs
 import JavaDialog from '../../components/dialogs/JavaDialog';
+import XCodeDialog from '../../components/dialogs/XCodeDialog';
 import FileRenameDialog from '../../components/dialogs/FileRenameDialog';
 import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
 import ObjectElementCreateDialog from '../../components/dialogs/ObjectElementCreateDialog';
@@ -450,7 +451,7 @@ export default class Workbench extends Component<Props> {
   }
 
   render() {
-    const { test, settings = {}, dialog, javaError, initialized, changeShowRecorderMessageValue } = this.props;
+    const { test, settings = {}, dialog, javaError, xCodeError, initialized, changeShowRecorderMessageValue, cleanJavaError, cleanXCodeError } = this.props;
     const { cloudProviders = {} } = settings;
     const { runtimeSettings } = test;
     // sidebars state
@@ -487,9 +488,15 @@ export default class Workbench extends Component<Props> {
       <div>
         { javaError && 
           <JavaDialog 
-            clean={this.props.cleanJavaError}
+            clean={cleanJavaError}
             javaError={javaError}
           />  
+        }
+        { xCodeError && 
+          <XCodeDialog 
+            clean={cleanXCodeError}
+            xCodeError={xCodeError}
+          />
         }
         { dialog && 
         <Fragment>

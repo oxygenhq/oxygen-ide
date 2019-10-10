@@ -14,6 +14,7 @@ import * as Sentry from '@sentry/electron';
 
 const DEVICE_CONNECTED = 'DEVICE_CONNECTED';
 const DEVICE_DISCONNECTED = 'DEVICE_DISCONNECTED';
+const XCODE_ERROR = 'XCODE_ERROR';
 const DEVICE_MONITOR_INTERVAL = 10000;
 
 let isError = function(e){
@@ -39,6 +40,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
     updatingDeviceList = false;
     devListInterval = null;
     adbPresent = true;
+    xCodeNotified = false;
 
     constructor() {
         super();
@@ -208,8 +210,18 @@ export default class DeviceDiscoveryService extends ServiceBase {
             }
         }
         catch (e) {
-            console.warn('Unable to retrieve iOS device list.', e);
-            Sentry.captureException(e);
+            if(e && e.message && e.message === "Could not find the instruments binary. Please ensure `xcrun -find instruments` can locate it."){
+                if(this.xCodeNotified){
+                    // ignore
+                } else {
+                    this.xCodeNotified = true;
+                    this.notify({
+                        type: XCODE_ERROR,
+                    });
+                }
+            } else {
+                Sentry.captureException(e);
+            }
         }
     };
     
