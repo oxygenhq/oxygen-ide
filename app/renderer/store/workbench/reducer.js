@@ -32,10 +32,22 @@ export default (state = defaultState, action, dispatch) => {
         ...state,
         javaError: error || true
       }
-    case ActionTypes.WB_CLEAN_JAVA_ERROR:
+    case ActionTypes.WB_CLEAN_JAVA_ERROR: {
         let newState = { ...state };
         delete newState.javaError;
         return newState;
+    }
+
+    case ActionTypes.WB_SET_XCODE_ERROR:
+        return {
+          ...state,
+          xCodeError: true
+        }
+    case ActionTypes.WB_CLEAN_XCODE_ERROR: {
+        let newState = { ...state };
+        delete newState.xCodeError;
+        return newState;
+    }
 
     // WB_OPEN_FILE
     case ActionTypes.WB_OPEN_FILE:
