@@ -110,9 +110,27 @@ export function* openFile({ payload }) {
     // retrieve file name without extension
     const name = getRepositoryNameFromFileName(file.name);
     // convert original object repository structure to tree based structure
-    const treeRoot = convertToObjectTree(repoRoot);
-    // report success
-    yield put(repoActions._openFile_Success(path, name, treeRoot, start, end, repoRoot));
+
+    let treeRoot = null;
+
+    try{
+        treeRoot = convertToObjectTree(repoRoot);
+    } catch(e){
+        console.warn('e', e);
+        
+        yield put(settingsActions.setSidebarComponent('right', 'obj-repo-not-valid'));
+        yield put(settingsActions.setSidebarVisible('right', true));
+        // report failure
+        yield put(repoActions._openFile_Failure(path, e));
+    }
+    
+
+    if(treeRoot){
+        yield put(settingsActions.setSidebarComponent('right', 'obj-repo'));
+        yield put(settingsActions.setSidebarVisible('right', true));
+        // report success
+        yield put(repoActions._openFile_Success(path, name, treeRoot, start, end, repoRoot));
+    }
 }
 
 function* getFileContent(path) {

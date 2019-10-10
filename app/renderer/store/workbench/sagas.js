@@ -12,8 +12,10 @@ import { putAndTake } from '../../helpers/saga';
 import pathHelper from 'path';
 import { 
     copyObjectInRepoRoot,
-    createObjectInRepoRoot,
-    createFolderInRepoRoot,
+    createElementInRepoRoot,
+    createContainerInRepoRoot,
+    renameElementOrContaimerInRepoRoot,
+    removeElementOrContaimerInRepoRoot,
     deleteLocatorInRepoRoot,
     updateLocatorValueInRepoRoot,
     updateArrayObjecLocatorValueInRepoRoot,
@@ -71,8 +73,10 @@ export default function* root() {
       takeLatest(ActionTypes.WB_RENAME_FILE, renameFile),
       takeLatest(ActionTypes.WB_SHOW_NEW_FILE_DIALOG, showNewFileDialog),
       takeLatest(ActionTypes.WB_CREATE_FILE, createFile),
-      takeLatest(ActionTypes.WB_CREATE_OBJECT, createObject),
-      takeLatest(ActionTypes.WB_CREATE_OBJECT_FOLDER, createObjectFolder),
+      takeLatest(ActionTypes.WB_CREATE_OBJECT_ELEMENT, createObjectElement),
+      takeLatest(ActionTypes.WB_CREATE_OBJECT_CONTAINER, createObjectContainer),
+      takeLatest(ActionTypes.WB_RENAME_OBJECT_ELEMENT_OR_CONTAINER, renameObjectElementOrContainer),
+      takeLatest(ActionTypes.WB_REMOVE_OBJECT_ELEMENT_OR_CONTAINER, removeObjectElementOrContainer),
       takeLatest(ActionTypes.WB_ADD_LOCATOR, addLocator),
       takeLatest(ActionTypes.WB_ADD_ARRAY_OBJECT_LOCATOR, addArrayObjectLocator),
       takeLatest(ActionTypes.WB_MOVE_LOCATOR, moveLocator),
@@ -145,11 +149,23 @@ export function* handleMainMenuEvents({ payload }) {
     else if (cmd === Const.MENU_CMD_OPEN_FILE) {
         yield put(wbActions.showDialog('OPEN_FILE'));
     }
-    else if (cmd === Const.MENU_CMD_ORE_NEW_OBJECT) {
-        yield showNewObjectDialog({});
+    else if (cmd === Const.MENU_CMD_ORE_NEW_ELEMENT) {
+        yield showNewObjectElementDialog({});
     }
-    else if (cmd === Const.MENU_CMD_ORE_NEW_FOLDER) {
-        yield showNewObjectFolderDialog({});
+    else if (cmd === Const.MENU_CMD_ORE_RENAME_ELEMENT){
+        yield showRenameObjectElementOrContainerDialog({ type : 'element' });
+    }
+    else if (cmd === Const.MENU_CMD_ORE_RENAME_CONTAINER){
+        yield showRenameObjectElementOrContainerDialog({ type : 'container' });
+    }
+    else if (cmd === Const.MENU_CMD_ORE_DELETE_ELEMENT){
+        yield showRemoveObjectElementOrContainerDialog({ type : 'element' });
+    }
+    else if (cmd === Const.MENU_CMD_ORE_DELETE_CONTAINER){
+        yield showRemoveObjectElementOrContainerDialog({ type : 'container' });
+    }
+    else if (cmd === Const.MENU_CMD_ORE_NEW_CONTAINER) {
+        yield showNewObjectContainerDialog({});
     }
     else if (cmd === Const.MENU_CMD_ORE_COPY_OBJECT) {
         yield copyObject({});
@@ -237,7 +253,7 @@ export function* initialize() {
         try{
             yield call(services.javaService.checkJavaVersion);
         } catch(error){
-            console.log('Failure checking Java', error);
+            console.warn('Failure checking Java', error);
             
             yield put(reportError(error));
             
@@ -293,7 +309,7 @@ export function* initialize() {
     //         );
     //         // if any error occurs during openning tab's file content (e.g. file doesn't not exist), remove this tab
     //         if (error) {
-    //             console.log('error', error);
+    //             console.warn('error', error);
     //             if(tab && tab.key){
     //                 yield put(tabActions.removeTab(tab.key));
     //             }
@@ -361,9 +377,6 @@ export function* openFolder({ payload }) {
 export function* changeTab({ payload }) {
     const { key, name } = payload;
 
-    // console.log('key', key);
-    // console.log('name', name);
-
     if(key === "unknown"){
         yield put(tabActions.setActiveTab(key, name));
         yield put(testActions.setMainFile(key, name));
@@ -374,7 +387,7 @@ export function* changeTab({ payload }) {
         );
         // if any error occurs during openning tab's file content (e.g. file doesn't not exist), remove this tab
         if (error) {
-            console.log('error', error);
+            console.warn('error', error);
             if(key){
                 yield put(tabActions.removeTab(key));
             }
@@ -445,7 +458,7 @@ export function* createNewRealFile({ payload }){
             );
 
             if (error) {
-                console.log('error')
+                console.warn('error')
 
                 yield put(wbActions._openFile_Failure(folderPath, error));
                 return;
@@ -453,8 +466,6 @@ export function* createNewRealFile({ payload }){
 
             // report success
             yield put(wbActions._openFile_Success(folderPath));
-        } else {
-            console.log('rootPath is good');
         }
 
         // refresh File Explorer tree in case save file's parent folder is currently open in the tree
@@ -575,8 +586,6 @@ export function* openFile({ payload }) {
 
 export function* openObjectRepositoryFile(file) {
     yield put(orActions.openFile(file.path));
-    yield put(settingsActions.setSidebarComponent('right', 'obj-repo'));
-    yield put(settingsActions.setSidebarVisible('right', true));
 }
 
 
@@ -600,7 +609,7 @@ export function* createFile({ payload }) {
     }
 }
 
-export function* createObjectFolder({ payload }) {
+export function* createObjectContainer({ payload }) {
 
     const objrepo = (yield select(state => state.objrepo)) || null;
     // name - object name
@@ -609,7 +618,7 @@ export function* createObjectFolder({ payload }) {
 
     let repoRootCopy = { ...repoRoot };
    
-    const result = createFolderInRepoRoot(repoRootCopy, path, parent );
+    const result = createContainerInRepoRoot(repoRootCopy, path, parent );
 
     repoRootCopy = result;
 
@@ -618,7 +627,7 @@ export function* createObjectFolder({ payload }) {
     yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ name,  newFileContent, true])
 }
 
-export function* createObject({ payload }) {
+export function* createObjectElement({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     // name - object name
     const { path, name } = payload;
@@ -626,13 +635,49 @@ export function* createObject({ payload }) {
     const { start, end, repoRoot, parent } = objrepo;
     let repoRootCopy = { ...repoRoot };
    
-    const result = createObjectInRepoRoot(repoRootCopy, path, parent );
+    const result = createElementInRepoRoot(repoRootCopy, path, parent );
 
     repoRootCopy = result;
 
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
     yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ name,  newFileContent, true])
+}
+
+export function* renameObjectElementOrContainer({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    
+    const { path, type, newName } = payload;
+    
+    const { start, end, repoRoot, parent } = objrepo;
+    let repoRootCopy = { ...repoRoot };
+   
+    const result = renameElementOrContaimerInRepoRoot(repoRootCopy, parent, type, newName);
+
+    repoRootCopy = result;
+
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    
+    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true])
+}
+
+export function* removeObjectElementOrContainer({ payload }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+    
+    const { path, type } = payload;
+    
+    const { start, end, repoRoot, parent } = objrepo;
+    let repoRootCopy = { ...repoRoot };
+   
+    const result = removeElementOrContaimerInRepoRoot(repoRootCopy, parent, type);
+
+    repoRootCopy = result;
+
+    const repoRootString = JSON.stringify( repoRootCopy );
+    const newFileContent = start+repoRootString+end;
+    
+    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true])
 }
 
 export function* removeObjectOrFolder({ payload }) {
@@ -1039,16 +1084,12 @@ export function* saveCurrentFile({ payload }) {
                 );
     
                 if (error) {
-                    console.log('error')
-    
                     yield put(wbActions._openFile_Failure(folderPath, error));
                     return;
                 }   
     
                 // report success
                 yield put(wbActions._openFile_Success(folderPath));
-            } else {
-                console.log('rootPath is good');
             }
 
             yield openFile({ payload: { path: saveAsPath } });
@@ -1157,11 +1198,11 @@ export function* startRecorderWatcher({ payload }) {
     yield put(recorderActions.startRecorderWatcher());
 }
 
-export function* showNewObjectFolderDialog({ payload }) {
+export function* showNewObjectContainerDialog({ payload }) {
     const path = (yield select(state => state.objrepo.path)) || null;
     if (path) {
         yield put(
-            wbActions.showDialog('DIALOG_OBJECT_FOLDER_CREATE', { type: 'folder', path: path })
+            wbActions.showDialog('DIALOG_OBJECT_CONTAINER_CREATE', { type: 'container', path: path })
         );
     }
 }
@@ -1229,36 +1270,51 @@ export function* copyObject({ payload }) {
     }
 }
 
-export function* showNewObjectDialog({ payload }) {
+export function* showNewObjectElementDialog({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { path, parent } = objrepo;
-    // const activeNode = (yield select(state => state.objrepo.tree.activeNode)) || null;
-    // const path = (yield select(state => state.objrepo.path)) || null;
-    // const files = yield select(state => state.objrepo.files);
-    // const treeActiveFile = activeNode && files.hasOwnProperty(activeNode) ? files[activeNode] : null;
-
-    // if (treeActiveFile) {
-    //     // in case the file is currently selected in the tree, create a new file in the same directory as the selected file
-    //     if (treeActiveFile.type === 'file') {
-    //         yield put(
-    //             wbActions.showDialog('DIALOG_FILE_CREATE', { type: 'file', path: treeActiveFile.parentPath })
-    //         );
-    //     }
-    //     // otherwise if folder is selected, create a new file inside the selected folder
-    //     else {
-    //         yield put(
-    //             wbActions.showDialog('DIALOG_FILE_CREATE', { type: 'file', path: treeActiveFile.path })
-    //         );
-    //     }
-    // }
-    // else 
     if (path) {
         let safeParent = null
         if(parent) {
             safeParent = parent;
         }
         yield put(
-            wbActions.showDialog('DIALOG_OBJECT_CREATE', { type: 'file', path: path, parent: safeParent })
+            wbActions.showDialog('DIALOG_OBJECT_ELEMENT_CREATE', { type: 'element', path: path, parent: safeParent })
+        );
+    } else {
+        console.warn('no path');
+    }
+}
+
+export function* showRenameObjectElementOrContainerDialog({ type }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+
+    const { path, parent } = objrepo;
+    if (path) {
+        let safeParent = null
+        if(parent) {
+            safeParent = parent;
+        }
+        yield put(
+            wbActions.showDialog('DIALOG_OBJECT_ELEMENT_OR_CONTAINER_RENAME', { type: type, path: path, parent: safeParent })
+        );
+    } else {
+        console.warn('no path');
+    }
+}
+
+
+export function* showRemoveObjectElementOrContainerDialog({ type }) {
+    const objrepo = (yield select(state => state.objrepo)) || null;
+
+    const { path, parent } = objrepo;
+    if (path) {
+        let safeParent = null
+        if(parent) {
+            safeParent = parent;
+        }
+        yield put(
+            wbActions.showDialog('DIALOG_OBJECT_ELEMENT_OR_CONTAINER_REMOVE', { type: type, path: path, parent: safeParent })
         );
     } else {
         console.warn('no path');
@@ -1496,9 +1552,6 @@ const getValueByKey = key => {
                 break;
             case 'array_object':
                 result = [];
-                break;
-            case 'string_object':
-                result = '';
                 break;
             default:
                 result = false;

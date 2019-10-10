@@ -44,6 +44,15 @@ export default (state = defaultState, action) => {
         end: end,
         repoRoot: repoRoot
       };
+    
+    // OPEN_FILE_FAILURE
+    case failure(ActionTypes.OR_OPEN_FILE):
+
+      console.log('payload', payload);
+
+      return {
+        ...state,
+      };
 
     // OPEN_FILE_SUCCESS
     case ActionTypes.OR_SET_ACTIVE:

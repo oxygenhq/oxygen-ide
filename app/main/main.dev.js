@@ -186,15 +186,20 @@ function initializeCrashReporterAndSentry() {
   if (!fs.existsSync(pendingDirectory)){
     fs.mkdirSync(pendingDirectory);
   }
-  // start CrashReporter
-  crashReporter.start({
-    companyName: 'no-company-nc',
-    productName: 'ide',
-    ignoreSystemCrashHandler: true,
-    submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f',
-    uploadToServer: true
-  });
-   // initialize Sentry
-   Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
+  
+  if (process.env.NODE_ENV === 'development') {
+    // ignore
+  } else {
+    // start CrashReporter
+    crashReporter.start({
+      companyName: 'no-company-nc',
+      productName: 'ide',
+      ignoreSystemCrashHandler: true,
+      submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f',
+      uploadToServer: true
+    });
+    // initialize Sentry
+    Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
+  }
 }
 

@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+import { notification } from 'antd';
+
 export function findObject(repo, path) {
     if (!path) {
         return null;
@@ -37,7 +39,8 @@ export function convertToObjectTree(repo, rootPath = '') {
     for (let key of keys) {
         const elm = repo[key];
         const path = rootPath ? `${rootPath}.${key}` : `${key}`;
-        if (typeof elm === 'string' || Array.isArray(elm)) {
+
+        if (Array.isArray(elm)) {
             root.push({
                 name: key,
                 path: path,
@@ -52,7 +55,9 @@ export function convertToObjectTree(repo, rootPath = '') {
                 type: 'container',
                 children: convertToObjectTree(elm, path),
             });
-        }        
+        } else {
+            throw new Error('Object Repository is not valid');
+        }
     }
     return root;
 }
@@ -71,7 +76,6 @@ export function getRepositoryNameFromFileName(fileName) {
     // if no standard suffix of repository file was found, return repository name AS IS
     return fileName;    
 }
-
 
 export function addLocatorInRepoRoot(repo, parentPath, locatorName){
     if (!repo && !parentPath && !locatorName) {
@@ -649,7 +653,7 @@ export function updateArrayObjecLocatorValueInRepoRoot(repo, parentPath, locator
 }
 
 // obj - parentNode
-export function createFolderInRepoRoot(repo, newObjName, obj){
+export function createContainerInRepoRoot(repo, newObjName, obj){
     if (!repo && !newObjName && !parentNode) {
         return null;
     }
@@ -683,11 +687,20 @@ export function createFolderInRepoRoot(repo, newObjName, obj){
     for (let [key, value] of Object.entries(repo)) {
         if(serchString === key){
             if(serchStringLast){
-                const newChildValue = createFolderInRepoRoot(value, newObjName, serchStringLast);
+                const newChildValue = createContainerInRepoRoot(value, newObjName, serchStringLast);
                 newRoot[key] = newChildValue;
             } else {
+
                 newRoot[key] = value;
-                newRoot[key][newObjName] = {};
+                
+                if(newRoot && key && newRoot[key] && newRoot[key][newObjName]){
+                    notification['error']({
+                        message: 'Tree item with this name already exist',
+                        description: newObjName,
+                    });
+                } else {
+                    newRoot[key][newObjName] = {};
+                }
             }
         } else {
             newRoot[key] = value;
@@ -697,7 +710,7 @@ export function createFolderInRepoRoot(repo, newObjName, obj){
 }
 
 // obj - parentNode
-export function createObjectInRepoRoot(repo, newObjName, obj){
+export function createElementInRepoRoot(repo, newObjName, obj){
     if (!repo && !newObjName && !parentNode) {
         return null;
     }
@@ -731,16 +744,146 @@ export function createObjectInRepoRoot(repo, newObjName, obj){
     for (let [key, value] of Object.entries(repo)) {
         if(serchString === key){
             if(serchStringLast){
-                const newChildValue = createObjectInRepoRoot(value, newObjName, serchStringLast);
+                const newChildValue = createElementInRepoRoot(value, newObjName, serchStringLast);
                 newRoot[key] = newChildValue;
             } else {
+
                 newRoot[key] = value;
-                newRoot[key][newObjName] = "";
+
+                if(newRoot && key && newRoot[key] && newRoot[key][newObjName]){
+                    notification['error']({
+                        message: 'Tree item with this name already exist',
+                        description: newObjName,
+                    });
+                } else {
+                    newRoot[key][newObjName] = [];
+                }
             }
         } else {
             newRoot[key] = value;
         }
     }
+    return newRoot;
+}
+
+const renameProp = (
+    oldProp,
+    newProp,
+{ [oldProp]: old, ...others }
+) => ({
+    [newProp]: old,
+    ...others
+})
+
+export function renameElementOrContaimerInRepoRoot(repo, parentPath, type, newName){
+
+    if (!repo && !type && !parentPath && !newName) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+
+    
+
+    if(Array.isArray(parentPath)){
+        pathToObject = parentPath.join(".");
+    } else if(typeof parentPath === "object"){
+        const { path } = parentPath;
+        pathToObject = path;
+    } else if (typeof parentPath === "string") {
+        pathToObject = parentPath;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.');
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = renameElementOrContaimerInRepoRoot(value, serchStringLast, type, newName);
+                newRoot[key] = newChildValue;
+            } else {
+                if(repo && repo[newName]){
+                    notification['error']({
+                        message: 'Tree item with this name already exist',
+                        description: newName,
+                    });
+                    
+                    newRoot[key] = value;
+                } else {
+                    const renameResult = renameProp(key, newName, repo);
+                    newRoot = renameResult;
+                }
+
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+
+    
+    return newRoot;
+}
+
+export function removeElementOrContaimerInRepoRoot(repo, parentPath, type){
+
+    if (!repo && !type && !parentPath) {
+        return null;
+    }
+
+    let newRoot = {};
+    let pathToObject;
+
+    
+
+    if(Array.isArray(parentPath)){
+        pathToObject = parentPath.join(".");
+    } else if(typeof parentPath === "object"){
+        const { path } = parentPath;
+        pathToObject = path;
+    } else if (typeof parentPath === "string") {
+        pathToObject = parentPath;
+    } else {
+        console.warn('unespected typeof');
+    }
+    
+    let serchString = '';
+    let serchStringLast = '';
+    
+    if(pathToObject.includes('.')){
+        const [ first, ...last ] = pathToObject.split('.');
+        serchString = first;
+        serchStringLast = last.join('.');
+
+    } else {
+        serchString = pathToObject;
+    }
+
+    for (let [key, value] of Object.entries(repo)) {
+        if(serchString === key){
+            if(serchStringLast){
+                const newChildValue = removeElementOrContaimerInRepoRoot(value, serchStringLast, type);
+                newRoot[key] = newChildValue;
+            } else {
+                // just ignore
+            }
+        } else {
+            newRoot[key] = value;
+        }
+    }
+    
     return newRoot;
 }
 
