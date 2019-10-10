@@ -162,6 +162,10 @@ export default (state = defaultState, action) => {
       }
       else if (value === 'mob') {
         newTestTarget = state.devices.length > 0 ? state.devices[0].id : null;
+
+        if(newTestTarget === null){
+          message.error('You don’t seem to have any devices connected or emulators setup.');
+        }
       }
       else if (value === 'resp') {
         newTestProvider = "";
