@@ -342,6 +342,15 @@ export function* initializeSuccess() {
                                     return pRes;
                                 }
                                 
+                            } else {
+                                const resp = call(
+                                    services.mainIpc.call,
+                                    'FileService',
+                                    'returnFileContent',
+                                    [openFilePath]
+                                );
+
+                                fileContentArray.push(resp);
                             }
                         }
                     }))
@@ -357,6 +366,12 @@ export function* initializeSuccess() {
                                     typeof file.content === 'string'
                                 ){
                                     // file exist
+                                    
+                                    const pRes = all([
+                                        put(fsActions._fetchFileContent_Success(file.filePath, file.content))
+                                    ]);
+
+                                    allResults.push(pRes);
                                 } else {
                                     let unlinkedFileContent = fs.files[file.filePath]['content']|| '';
                                     const pathSplit = file.filePath.split(pathLib.sep);
