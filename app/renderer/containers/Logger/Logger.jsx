@@ -10,6 +10,7 @@
 import React, { PureComponent } from 'react';
 import { Icon, Tabs } from 'antd';
 import LogViewer from '../../components/LogViewer';
+import VariablesViewer from '../../components/VariablesViewer';
 import { type LogEntry } from '../../types/LogEntry';
 import '../../css/logger.scss';
 
@@ -77,7 +78,7 @@ export default class Logger extends PureComponent<Props> {
 
   render() {
     const { panelHeight } = this.state;
-    const { visible = true, logs, active } = this.props;
+    const { visible = true, logs, active, category, variables } = this.props;
     const activeLogs = active ? logs[active] : null;
 
     return (
@@ -102,6 +103,7 @@ export default class Logger extends PureComponent<Props> {
           >
             <TabPane tab="General" key="general" />
             <TabPane tab="Selenium" key="selenium" />
+            { variables && <TabPane tab="Variables" key="variables" /> }
           </Tabs>
           <Icon
             type="close"
@@ -109,7 +111,12 @@ export default class Logger extends PureComponent<Props> {
             onClick={ () => this.props.onHide() }
           />
         </div>
-        <LogViewer logs={ activeLogs } category={ active } height={ panelHeight } />
+        { active !== 'variables' && 
+          <LogViewer logs={ activeLogs } category={ active } height={ panelHeight } />
+        }
+        { active === 'variables' && 
+          <VariablesViewer variables={variables} height={ panelHeight } />
+        }
       </div>
     );
   }

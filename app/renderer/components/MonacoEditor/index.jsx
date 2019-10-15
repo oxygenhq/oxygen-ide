@@ -53,6 +53,8 @@ const MONACO_DEFAULT_OPTIONS = {
   theme: 'oxygen-theme'
 };
 
+const variables = ['a', 'b'];
+
 export default class MonacoEditor extends React.Component {
   state = {
     // editorClass holds an optional class name which will be added to editor's container DIV 
@@ -264,6 +266,33 @@ export default class MonacoEditor extends React.Component {
     if (this.editorContainer) {
       // Before initializing monaco editor
       this.editorWillMount();
+
+      // monaco.languages.registerHoverProvider('javascript', {
+      //   provideHover: function (model, position) {
+
+      //     const wordAtPosition = model.getWordAtPosition(position);
+
+      //     if(wordAtPosition && wordAtPosition.word){
+            
+      //       const lineCount = model.getLineCount();
+
+      //       console.log('lineCount', lineCount);
+
+      //       console.log('position', position);
+            
+      //       console.log('word', wordAtPosition.word);
+
+      //       if(variables.includes(wordAtPosition.word)){
+      //         return {
+      //           range: new monaco.Range(1, 1, lineCount, model.getLineMaxColumn(lineCount)),
+      //           contents: [
+      //             { value: '\n'+wordAtPosition.word+'\n' }
+      //           ]
+      //         };
+      //       }
+      //     }
+      //   }
+      // });
 
       // workaround for not being able to override or extend existing tokenziers
       // https://github.com/Microsoft/monaco-editor/issues/252

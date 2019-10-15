@@ -405,16 +405,17 @@ class TreeNode extends React.Component {
       selected,
       icon,
       loading,
-      onContextMenuHendler
+      onContextMenuHendler,
+      showIcon
     } = this.props;
-    const { rcTree: { prefixCls, showIcon, icon: treeIcon, draggable, loadData } } = this.context;
+    const { rcTree: { prefixCls, icon: treeIcon, draggable, loadData } } = this.context;
     const disabled = this.isDisabled();
 
     const wrapClass = `${prefixCls}-node-content-wrapper`;
 
     // Icon - Still show loading icon when loading without showIcon
     let $icon;
-
+    
     if (showIcon) {
       const currentIcon = icon || treeIcon;
 

@@ -13,8 +13,9 @@ import * as logActions from '../../store/logger/actions';
 
 const mapStoreToProps = (state) => {
   return {
-    logs: state.logger.logs,
+    logs: state.logger.logs || [],
     active: state.logger.active,
+    variables: state.test.variables
   };
 };
   

@@ -66,7 +66,16 @@ function* handleTestRunnerServiceEvent(event) {
         yield put(testActions.onLineUpdate(event.time, event.file, event.line, event.primary));
     }
     else if (event.type === 'BREAKPOINT') {
-        yield put(testActions.onBreakpoint(event.file, event.line));
+
+        console.log('event', event);
+
+        let variables = null;
+
+        if(event && event.variables){
+            variables = event.variables;
+        }
+
+        yield put(testActions.onBreakpoint(event.file, event.line, variables));
     }
 }
 
