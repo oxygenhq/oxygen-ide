@@ -11,7 +11,7 @@ import { success, failure } from '../../helpers/redux';
 
 const defaultState = {
   path: null,
-  name: 'name',
+  name: null,
   tree: null,
   active: null,
   start: null,

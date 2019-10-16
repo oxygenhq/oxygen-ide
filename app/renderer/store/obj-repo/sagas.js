@@ -38,8 +38,8 @@ export default function* root() {
 }
 
 export function* clearObjectRepositoryFile() {
-    yield put(repoActions.clearObjRepo());
-    yield put(settingsActions.setSidebarComponent('right', null));
+    // yield put(repoActions.clearObjRepo());
+    // yield put(settingsActions.setSidebarComponent('right', null));
     yield put(settingsActions.setSidebarVisible('right', false));
 }
 
@@ -50,14 +50,16 @@ export function* openFile({ payload }) {
     }
 
     const currentRepoPath = yield select(state => state.objrepo.path);
+    
 
     if(force){
         // info from file watcher that file changed
     } else {
+        
         // check if the repo we are trying to open is the same as the one currently open
-        if (path === currentRepoPath) {
-            return;     // ignore open file call 
-        }    
+        // if (path === currentRepoPath) {
+        //     return;     // ignore open file call 
+        // }    
     }
     // get file info from the cache
     let file = yield select(state => state.fs.files[path]);
@@ -71,24 +73,34 @@ export function* openFile({ payload }) {
     let repoRoot;
     let start;
     let end;
+    
     // if this is a .js file, then use 'require' to parse the file
     if (file.ext === '.js') {
         try {
             if(force && repoRootCopy){
                 repoRoot = repoRootCopy;
+
             } else {
-                repoRoot = orgRequire(file.path);
-                if(Object.keys(repoRoot).length === 0){
-                    notification['error']({
-                        message: 'Not valid repo file:'+file.path,
-                        description: 'module.exports = po; is required',
-                    });
-                }
+                repoRoot = yield call(services.mainIpc.call, 'ElectronService', 'orgRequire', [file.path]);
+
             }
-            const content = yield getFileContent(path);
-            start = content.split('{')[0];
+
+            const fetchFileContent = yield call(
+                services.mainIpc.call,
+                'FileService',
+                'returnFileContent',
+                [path]
+            );
+
+            let content = '';
+
+            if(fetchFileContent && fetchFileContent.content){
+                content = fetchFileContent.content;
+            }
+            
+            start = content.split('{')[0] || 'const po = ';
             const endArray = content.split('}');
-            end = endArray[endArray.length-1];
+            end = endArray[endArray.length-1] || `;module.exports = po;`;
         }
         catch (e) {
             yield put(repoActions._openFile_Failure(path, e));
@@ -148,9 +160,11 @@ function* getFileContent(path) {
     }
     */
     // if file is not cached, let's fetch its content and add it to the editor
+
     const { response, error } = yield putAndTake(
         fsActions.fetchFileContent(path)
     );
+
     if (error) {
         throw new Error(error.message || null);
     }

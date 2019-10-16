@@ -115,7 +115,7 @@ export function addLocatorInRepoRoot(repo, parentPath, locatorName){
                 newRoot[key] = newChildValue;
             } else {
                 newRoot[key] = value;
-                newRoot[key][locatorName] = "";
+                newRoot[key][locatorName] = [];
             }
         } else {
             newRoot[key] = value;
@@ -325,7 +325,7 @@ export function deleteLocatorInRepoRoot(repo, obj){
                 const newChildValue = deleteLocatorInRepoRoot(value, serchStringLast);
                 newRoot[key] = newChildValue;
             } else {
-                newRoot[key] = "";
+                newRoot[key] = [];
             }
         } else {
             newRoot[key] = value;
@@ -626,7 +626,7 @@ export function updateArrayObjecLocatorValueInRepoRoot(repo, parentPath, locator
     for (let [key, value] of Object.entries(repo)) {
         if(serchString === key){
             if(serchStringLast){
-                const newChildValue = deleteArrayObjectLocator(value, serchStringLast,locatorNewValue, idx);
+                const newChildValue = updateArrayObjecLocatorValueInRepoRoot(value, serchStringLast,locatorNewValue, idx);
                 newRoot[key] = newChildValue;
             } else {
                 let newValue;

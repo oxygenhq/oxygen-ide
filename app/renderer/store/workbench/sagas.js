@@ -538,7 +538,10 @@ export function* openFakeFile(){
 
 export function* openFile({ payload }) {
     const { path, force } = payload;
+
+    let files = yield select(state => state.fs.files);
     let file = yield select(state => state.fs.files[path]);
+    
     if (!file) {
         const { error } = yield putAndTake(
             fsActions.fetchFileInfo(path)
@@ -549,6 +552,7 @@ export function* openFile({ payload }) {
         }
         file = yield select(state => state.fs.files[path]);
     }
+    
     // check if we support file's extension
     if (!SupportedExtensions[file.ext]) {
         // show error
@@ -557,12 +561,26 @@ export function* openFile({ payload }) {
     }
 
     if(!force){
-        // check if this is an object repository file and handle it separately
-        if (file.name.endsWith('.repo.js') || file.name.endsWith('.repo.json')) {
-            yield openObjectRepositoryFile(file);
-            yield put(wbActions._openFile_Success(path));
-            return;
+        if(file && file.name && file.parentPath && file.name.endsWith('.js') && !file.name.endsWith('.repo.js')){
+            const splitResult = file.name.split('.js');
+            
+            splitResult.pop();
+            splitResult.push('.repo.js');
+            const repoFileName = file.parentPath+pathHelper.sep+splitResult.join('');
+
+            
+            const fetchFileInfo = yield putAndTake(
+                fsActions.fetchFileInfo(repoFileName)
+            );
+
+            // check if this is an object repository file and handle it separately
+            if (fetchFileInfo && fetchFileInfo.response) {
+                yield openObjectRepositoryFile(fetchFileInfo.response);
+            } else {
+                yield put(settingsActions.setSidebarVisible('right', false));
+            }
         }
+
         // if we are here, it means we are trying to open a regular file (not object repository)
     }
 
@@ -1180,6 +1198,23 @@ export function* handleFileRename({ payload }) {
 
 export function* handleFileDelete({ payload }) {
     const { path, showDeleteTitle } = payload;
+
+    const files = yield select(state => state.fs.files);
+    const objrepoPath = yield select(state => state.objrepo.path);
+    
+
+    if(path && !path.endsWith('.repo.js')){
+        const splitResult = path.split('.js');
+        splitResult.pop();
+        splitResult.push('.repo.js');
+        const repoFilePath = splitResult.join('')
+        const repoFile = files[repoFilePath];
+    
+        if(repoFile && objrepoPath && repoFilePath === objrepoPath){
+            yield put(orActions.clearObjectRepositoryFile());
+        }
+    }
+
     yield closeFile({ payload: {...payload, force: true} });
 }
 
