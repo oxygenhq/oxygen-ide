@@ -52,11 +52,13 @@ export function* openFile({ payload }) {
         return;
     }
     const fileCache = yield select(state => state.fs.files);
-    const file = fileCache[path];
-    if (!file || !file.hasOwnProperty('content')) {
-        yield put(editorActions._openFile_Failure(path, { message: 'File not found in the file cache or content is missing.'} ));
-        return;
-    }
+    
+    // const file = fileCache[path];
+    // if (!file || !file.hasOwnProperty('content')) {
+    //     yield put(editorActions._openFile_Failure(path, { message: 'File not found in the file cache or content is missing.'} ));
+    //     return;
+    // }
+
     yield put(editorActions.addFile(path));
     yield put(editorActions.setActiveFile(path));
     yield put(editorActions._openFile_Success(path));

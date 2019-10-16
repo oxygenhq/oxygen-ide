@@ -451,7 +451,22 @@ export default class Workbench extends Component<Props> {
   }
 
   render() {
-    const { test, settings = {}, dialog, javaError, xCodeError, initialized, changeShowRecorderMessageValue, cleanJavaError, cleanXCodeError } = this.props;
+    const { 
+      test, 
+      settings = {}, 
+      dialog, 
+      javaError, 
+      xCodeError, 
+      initialized, 
+      changeShowRecorderMessageValue, 
+      cleanJavaError, 
+      cleanXCodeError,
+      objrepoPath,
+      editorActiveFile,
+      editorActiveFilePossibleRepoPath,
+      objrepoName
+    } = this.props;
+
     const { cloudProviders = {} } = settings;
     const { runtimeSettings } = test;
     // sidebars state
@@ -651,6 +666,18 @@ export default class Workbench extends Component<Props> {
                           onClose={ this.handleTabClose } 
                         />
                       </Col>
+                      {
+                        objrepoPath && editorActiveFile && editorActiveFilePossibleRepoPath && objrepoPath === editorActiveFilePossibleRepoPath &&
+                        <Col className="sidebar-trigger">                      
+                          <Icon
+                            title={!rightSidebarVisible ? 'Show Object Repository' : 'Hide Object Repository'}
+                            className="trigger"
+                            type={!rightSidebarVisible ? 'menu-unfold' : 'menu-fold'}
+                            onClick={ () => ::this.toggleSidebarVisible('right') }
+                            style={{ paddingLeft: 15, cursor: 'pointer', transform: 'rotate(180deg)' }}
+                          />
+                        </Col>
+                      }
                     </Row>
                 </Header>
                 <div className="editor-container">
@@ -666,16 +693,27 @@ export default class Workbench extends Component<Props> {
                   />
                 </div>
                 </Layout>
-                <Sidebar 
-                  align="right"
-                  size={ rightSidebarSize } 
-                  visible={ rightSidebarVisible } 
-                  onResize={ (size) => ::this.handleSidebarResize('right', size) }
-                >
-                  { rightSidebarComponent === 'settings' && <Settings /> } 
-                  { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
-                  { rightSidebarComponent === 'obj-repo-not-valid' && <ObjectRepositoryNotValid /> } 
-                </Sidebar>
+                { rightSidebarComponent === 'settings' && 
+                  <Sidebar 
+                    align="right"
+                    size={ rightSidebarSize } 
+                    visible={ rightSidebarVisible } 
+                    onResize={ (size) => ::this.handleSidebarResize('right', size) }
+                  >
+                    <Settings />
+                  </Sidebar>
+                }
+                { objrepoName &&
+                  <Sidebar 
+                    align="right"
+                    size={ rightSidebarSize } 
+                    visible={ rightSidebarVisible } 
+                    onResize={ (size) => ::this.handleSidebarResize('right', size) }
+                  >
+                    { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
+                    { rightSidebarComponent === 'obj-repo-not-valid' && <ObjectRepositoryNotValid /> } 
+                  </Sidebar>
+                }
               </Layout>
           </Col>
         </Row>

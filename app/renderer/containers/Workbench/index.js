@@ -24,6 +24,7 @@ const mapStoreToProps = (state) => {
   const { activeFile, activeFileName } = state.editor;
 
   let fullEditorActiveFile = null;
+  let editorActiveFilePossibleRepoPath = null;
  
   if(activeFile){
     if(activeFile === 'unknown'){
@@ -31,6 +32,14 @@ const mapStoreToProps = (state) => {
       fullEditorActiveFile = state.settings.files.hasOwnProperty(key) ? state.settings.files[key] : null;
     } else {
       fullEditorActiveFile = state.fs.files.hasOwnProperty(activeFile) ? state.fs.files[activeFile] : null;
+
+      if(fullEditorActiveFile && fullEditorActiveFile.path && !fullEditorActiveFile.path.endsWith('.repo.js')){
+        
+        const splitResult = fullEditorActiveFile.path.split('.js');
+        splitResult.pop();
+        splitResult.push('.repo.js');
+        editorActiveFilePossibleRepoPath = splitResult.join('');
+      }
     }
   }
 
@@ -47,7 +56,10 @@ const mapStoreToProps = (state) => {
     dialog: state.dialog,
     treeActiveFile: activeNode && state.fs.files.hasOwnProperty(activeNode) ? state.fs.files[activeNode] : null,
     editorActiveFile: fullEditorActiveFile,
-    rootPath: rootPath
+    rootPath: rootPath,
+    objrepoPath : state.objrepo.path,
+    objrepoName : state.objrepo.name,
+    editorActiveFilePossibleRepoPath: editorActiveFilePossibleRepoPath
   };
 };
   

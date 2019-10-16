@@ -67,9 +67,6 @@ export default class ObjectRepositoryNotValidView extends PureComponent<Props> {
   
   render() {
       const { tree, active, name, selectedObject, setActive } = this.props;
-
-      console.log('name', name);
-
       let repoPanelTitle = 'Repository';
       let editorPanelTitle = 'Object';
       if (name && name !== '') {

@@ -10,12 +10,18 @@ import electron, { app } from 'electron';
 import appSettings from 'electron-settings';
 
 import ServiceBase from "./ServiceBase";
+var decache = require('decache');
 
 const { dialog } = electron;
 
 export default class ElectronService extends ServiceBase {
     constructor(mainWindow) {
         super(mainWindow);
+    }
+
+    orgRequire(moduleName) {
+        decache(moduleName);
+        return require(moduleName);
     }
 
     addFile(key, name, content = ''){
