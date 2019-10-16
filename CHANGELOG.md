@@ -7,15 +7,17 @@
 
 #### :beetle: Bug Fix
 * Unable to create nested folders.
+* Opened file content not being restored properly if the file was modified outside the IDE.
 * Issue with Firefox tests not working on Windows machines which don't have MSVC installed.
 * Various other fixes.
 
 #### :nail_care: Polish
 * Various Object Repository UI improvements.
+* Warn if iOS device discovery fails due to `xcrun -find instruments` failure.
 
 #### :house: Internal
 * Bump Chokidar (should reduce memory consumption and improve responsiveness)
-* Bump oxygen-cli to v0.50.1. See [Oxygen ChhangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bump oxygen-cli to v0.50.2. See [Oxygen ChhangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 
 ## v1.10.0 (2019-09-26)
 
