@@ -20,8 +20,13 @@ export default class ElectronService extends ServiceBase {
     }
 
     orgRequire(moduleName) {
-        decache(moduleName);
-        return require(moduleName);
+        try{
+            console.log('moduleName', moduleName);
+            decache(moduleName);
+            return require(moduleName);
+        } catch(e){
+            console.log('orgRequire e', e);
+        }
     }
 
     addFile(key, name, content = ''){

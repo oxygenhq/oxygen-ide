@@ -77,13 +77,18 @@ export function* openFile({ payload }) {
     // if this is a .js file, then use 'require' to parse the file
     if (file.ext === '.js') {
         try {
+
+            console.log('force', force);
+            console.log('repoRootCopy', repoRootCopy);
+            console.log('file.path', file.path);
+            
             if(force && repoRootCopy){
                 repoRoot = repoRootCopy;
-
             } else {
                 repoRoot = yield call(services.mainIpc.call, 'ElectronService', 'orgRequire', [file.path]);
-
             }
+
+            console.log('repoRoot', repoRoot);
 
             const fetchFileContent = yield call(
                 services.mainIpc.call,
@@ -91,6 +96,8 @@ export function* openFile({ payload }) {
                 'returnFileContent',
                 [path]
             );
+            
+            console.log('fetchFileContent', fetchFileContent);
 
             let content = '';
 
@@ -103,6 +110,8 @@ export function* openFile({ payload }) {
             end = endArray[endArray.length-1] || `;module.exports = po;`;
         }
         catch (e) {
+            console.log('#106 openFile_Failure path', path);
+            console.log('#106 openFile_Failure', e);
             yield put(repoActions._openFile_Failure(path, e));
             return;
         }
@@ -115,6 +124,8 @@ export function* openFile({ payload }) {
         }
         catch (e) {
             console.error(e);
+            console.log('#119 openFile_Failure path', path);
+            console.log('#119 openFile_Failure', e);
             yield put(repoActions._openFile_Failure(path, e));
             return;
         }    
@@ -133,6 +144,9 @@ export function* openFile({ payload }) {
         yield put(settingsActions.setSidebarComponent('right', 'obj-repo-not-valid'));
         yield put(settingsActions.setSidebarVisible('right', true));
         // report failure
+        
+        console.log('#141 openFile_Failure path', path);
+        console.log('#141 openFile_Failure', e);
         yield put(repoActions._openFile_Failure(path, e));
     }
     
