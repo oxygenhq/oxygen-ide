@@ -17,7 +17,7 @@
 
 #### :house: Internal
 * Bump Chokidar (should reduce memory consumption and improve responsiveness)
-* Bump oxygen-cli to v0.50.2. See [Oxygen ChhangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bump oxygen-cli from v0.48.5 to v0.50.2. See [Oxygen ChhangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 
 ## v1.10.0 (2019-09-26)
 
