@@ -242,6 +242,9 @@ export default class Workbench extends Component<Props> {
     else if (ctrlId === Controls.SAVE_FILE) {
       this.props.saveCurrentFile();
     }
+    else if (ctrlId === Controls.NEW_FOLDER) {
+      this.props.showNewFileDialog();
+    }
     else if (ctrlId === Controls.NEW_FILE) {
       const { settings } = this.props;
 

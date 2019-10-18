@@ -179,6 +179,17 @@ export default class Toolbar extends Component<Props> {
           />
         )}
 
+        { this._isVisible(Controls.NEW_FOLDER) && (
+          <Icon
+            className="control button"
+            style={ getOpacity(this._isEnabled(Controls.NEW_FOLDER)) }
+            onClick={ () => ::this.handleClickEvent(Controls.NEW_FOLDER) }
+            type="folder-add"
+            title="New Folder"
+            style={ {'fontSize': '25px'} }
+          />
+        )}
+
         <Icon
           className="control button"
           onClick={ () => ::this.handleClickEvent(Controls.OPEN_FOLDER) }
