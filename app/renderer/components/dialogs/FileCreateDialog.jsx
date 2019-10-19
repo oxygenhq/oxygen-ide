@@ -35,7 +35,7 @@ export default class FileCreateDialog extends PureComponent<Props> {
 
         this.state = {
             ...DEFAULT_STATE,
-            type: this.props.type ? this.props.type : 'file',
+            type: this.props.type ? this.props.type : 'folder',
         }
     }
 
@@ -49,7 +49,7 @@ export default class FileCreateDialog extends PureComponent<Props> {
     }
     if (nextProps.type !== prevState.type) {
         newState.type = nextProps.type;
-        if (nextProps.type === 'file') {
+        if (nextProps.type === 'folder') {
             newState.ext = DEFAULT_EXT;
         }
     }
