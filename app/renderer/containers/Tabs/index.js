@@ -12,16 +12,16 @@ import Tabs from './Tabs';
 import * as actions from '../../store/tabs/actions';
 
 const mapStoreToProps = (state) => {
-  return {
-    recorder: state.recorder,
-    tabs: state.tabs.list,
-    active: state.tabs.active,
-    activeTitle: state.tabs.activeTitle,
-  };
+    return {
+        recorder: state.recorder,
+        tabs: state.tabs.list,
+        active: state.tabs.active,
+        activeTitle: state.tabs.activeTitle,
+    };
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...actions } , dispatch)
+    bindActionCreators({ ...actions } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Tabs);

@@ -15,5 +15,5 @@ import styled from '@emotion/styled';
  * A container dispalying its children in a column
  */
 export default styled(FlexBox)({
-  flexDirection: 'column',
+    flexDirection: 'column',
 });

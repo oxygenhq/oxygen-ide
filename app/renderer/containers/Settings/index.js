@@ -12,13 +12,13 @@ import Settings from './Settings';
 import * as actions from '../../store/test/actions';
 
 const mapStoreToProps = (state) => {
-  return {
-    runtimeSettings: state.test.runtimeSettings,
-  };
+    return {
+        runtimeSettings: state.test.runtimeSettings,
+    };
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...actions } , dispatch)
+    bindActionCreators({ ...actions } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Settings);

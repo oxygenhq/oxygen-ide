@@ -46,7 +46,7 @@ export function updateFilesAfterRename(files, oldPath, renamedFile) {
                 ...file,
                 parentPath: replacePath(file.parentPath, oldPath, newPath),
                 children: file.children ? replaceChildrenPath(file.children, file.path, newPath) : null,
-            }
+            };
         }
         // in case current file/folder is not impacted by path chance (rename)
         else {
@@ -62,11 +62,11 @@ export function replaceChildrenPath(children, oldPath, newPath) {
     }
     let newChildren = [];
     for (let child of children) {
-    newChildren.push({
-        ...child,
-        parentPath: replacePath(child.parentPath, oldPath, newPath),
-        path: replacePath(child.path, oldPath, newPath),
-    });
+        newChildren.push({
+            ...child,
+            parentPath: replacePath(child.parentPath, oldPath, newPath),
+            path: replacePath(child.path, oldPath, newPath),
+        });
     }
     return newChildren;
 }

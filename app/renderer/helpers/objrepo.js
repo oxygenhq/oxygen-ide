@@ -86,11 +86,11 @@ export function addLocatorInRepoRoot(repo, parentPath, locatorName){
     let pathToObject;
     
     if(Array.isArray(parentPath)){
-        pathToObject = parentPath.join(".");
-    } else if(typeof parentPath === "object"){
+        pathToObject = parentPath.join('.');
+    } else if(typeof parentPath === 'object'){
         const { path } = parentPath;
         pathToObject = path;
-    } else if (typeof parentPath === "string") {
+    } else if (typeof parentPath === 'string') {
         pathToObject = parentPath;
     } else {
         console.warn('unespected typeof');
@@ -100,7 +100,7 @@ export function addLocatorInRepoRoot(repo, parentPath, locatorName){
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -133,11 +133,11 @@ export function addArrayObjectLocatorInRepoRoot(repo, parentPath, locatorName){
     let pathToObject;
     
     if(Array.isArray(parentPath)){
-        pathToObject = parentPath.join(".");
-    } else if(typeof parentPath === "object"){
+        pathToObject = parentPath.join('.');
+    } else if(typeof parentPath === 'object'){
         const { path } = parentPath;
         pathToObject = path;
-    } else if (typeof parentPath === "string") {
+    } else if (typeof parentPath === 'string') {
         pathToObject = parentPath;
     } else {
         console.warn('unespected typeof');
@@ -147,7 +147,7 @@ export function addArrayObjectLocatorInRepoRoot(repo, parentPath, locatorName){
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -186,11 +186,11 @@ export function deleteObjectOrFolder(repo, parentPath, name){
     let pathToObject;
     
     if(Array.isArray(parentPath)){
-        pathToObject = obj.join(".");
-    } else if(typeof parentPath === "object"){
+        pathToObject = obj.join('.');
+    } else if(typeof parentPath === 'object'){
         const { path } = parentPath;
         pathToObject = parentPath;
-    } else if (typeof parentPath === "string") {
+    } else if (typeof parentPath === 'string') {
         pathToObject = parentPath;
     } else {
         console.warn('unespected typeof');
@@ -200,7 +200,7 @@ export function deleteObjectOrFolder(repo, parentPath, name){
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -236,11 +236,11 @@ export function deleteArrayObjectLocator(repo, parentPath, idx){
     let pathToObject;
     
     if(Array.isArray(parentPath)){
-        pathToObject = parentPath.join(".");
-    } else if(typeof parentPath === "object"){
+        pathToObject = parentPath.join('.');
+    } else if(typeof parentPath === 'object'){
         const { path } = parentPath;
         pathToObject = path;
-    } else if (typeof parentPath === "string") {
+    } else if (typeof parentPath === 'string') {
         pathToObject = parentPath;
     } else {
         console.warn('unespected typeof');
@@ -250,7 +250,7 @@ export function deleteArrayObjectLocator(repo, parentPath, idx){
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -297,11 +297,11 @@ export function deleteLocatorInRepoRoot(repo, obj){
     let pathToObject;
     
     if(Array.isArray(obj)){
-        pathToObject = obj.join(".");
-    } else if(typeof obj === "object"){
+        pathToObject = obj.join('.');
+    } else if(typeof obj === 'object'){
         const { path } = obj;
         pathToObject = path;
-    } else if (typeof obj === "string") {
+    } else if (typeof obj === 'string') {
         pathToObject = obj;
     } else {
         console.warn('unespected typeof');
@@ -311,7 +311,7 @@ export function deleteLocatorInRepoRoot(repo, obj){
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -343,11 +343,11 @@ export function renameLocatorInRepoRoot(repo, parentPath, newName, originName){
     let pathToObject;
     
     if(Array.isArray(parentPath)){
-        pathToObject = parentPath.join(".");
-    } else if(typeof parentPath === "object"){
+        pathToObject = parentPath.join('.');
+    } else if(typeof parentPath === 'object'){
         const { path } = parentPath;
         pathToObject = path;
-    } else if (typeof parentPath === "string") {
+    } else if (typeof parentPath === 'string') {
         pathToObject = parentPath;
     } else {
         console.warn('unespected typeof');
@@ -357,7 +357,7 @@ export function renameLocatorInRepoRoot(repo, parentPath, newName, originName){
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -392,12 +392,12 @@ function arrayMove(arr, fromIndex, toIndex) {
 }
 
 function orderKey(obj, keyOrder) {
-    const result = {}
+    const result = {};
     keyOrder.forEach((k) => {
-      result[k] = obj[k]
-    })
+        result[k] = obj[k];
+    });
     return result;
-  }
+}
 
 export function moveLocatorInRepoRoot(repo, parentPath, name, direction, index){
     if (!repo && !parentPath && !name && !direction) {
@@ -408,11 +408,11 @@ export function moveLocatorInRepoRoot(repo, parentPath, name, direction, index){
     let pathToObject;
     
     if(Array.isArray(parentPath)){
-        pathToObject = parentPath.join(".");
-    } else if(typeof parentPath === "object"){
+        pathToObject = parentPath.join('.');
+    } else if(typeof parentPath === 'object'){
         const { path } = parentPath;
         pathToObject = path;
-    } else if (typeof parentPath === "string") {
+    } else if (typeof parentPath === 'string') {
         pathToObject = parentPath;
     } else {
         console.warn('unespected typeof');
@@ -422,7 +422,7 @@ export function moveLocatorInRepoRoot(repo, parentPath, name, direction, index){
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -490,11 +490,11 @@ export function moveArrayObjectLocatorInRepoRoot(repo, parentPath, index, direct
     let pathToObject;
     
     if(Array.isArray(parentPath)){
-        pathToObject = parentPath.join(".");
-    } else if(typeof parentPath === "object"){
+        pathToObject = parentPath.join('.');
+    } else if(typeof parentPath === 'object'){
         const { path } = parentPath;
         pathToObject = path;
-    } else if (typeof parentPath === "string") {
+    } else if (typeof parentPath === 'string') {
         pathToObject = parentPath;
     } else {
         console.warn('unespected typeof');
@@ -504,7 +504,7 @@ export function moveArrayObjectLocatorInRepoRoot(repo, parentPath, index, direct
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -554,11 +554,11 @@ export function updateLocatorValueInRepoRoot(repo, locatorPath, locatorNewValue)
     let pathToObject;
     
     if(Array.isArray(locatorPath)){
-        pathToObject = locatorPath.join(".");
-    } else if(typeof locatorPath === "object"){
+        pathToObject = locatorPath.join('.');
+    } else if(typeof locatorPath === 'object'){
         const { path } = locatorPath;
         pathToObject = path;
-    } else if (typeof locatorPath === "string") {
+    } else if (typeof locatorPath === 'string') {
         pathToObject = locatorPath;
     } else {
         console.warn('unespected typeof');
@@ -568,7 +568,7 @@ export function updateLocatorValueInRepoRoot(repo, locatorPath, locatorNewValue)
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -601,11 +601,11 @@ export function updateArrayObjecLocatorValueInRepoRoot(repo, parentPath, locator
     let pathToObject;
     
     if(Array.isArray(parentPath)){
-        pathToObject = parentPath.join(".");
-    } else if(typeof parentPath === "object"){
+        pathToObject = parentPath.join('.');
+    } else if(typeof parentPath === 'object'){
         const { path } = parentPath;
         pathToObject = path;
-    } else if (typeof parentPath === "string") {
+    } else if (typeof parentPath === 'string') {
         pathToObject = parentPath;
     } else {
         console.warn('unespected typeof');
@@ -615,7 +615,7 @@ export function updateArrayObjecLocatorValueInRepoRoot(repo, parentPath, locator
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -662,11 +662,11 @@ export function createContainerInRepoRoot(repo, newObjName, obj){
     let pathToObject;
     
     if(Array.isArray(obj)){
-        pathToObject = obj.join(".");
-    } else if(typeof obj === "object"){
+        pathToObject = obj.join('.');
+    } else if(typeof obj === 'object'){
         const { path } = obj;
         pathToObject = path;
-    } else if (typeof obj === "string") {
+    } else if (typeof obj === 'string') {
         pathToObject = obj;
     } else {
         console.warn('unespected typeof');
@@ -676,7 +676,7 @@ export function createContainerInRepoRoot(repo, newObjName, obj){
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -719,11 +719,11 @@ export function createElementInRepoRoot(repo, newObjName, obj){
     let pathToObject;
     
     if(Array.isArray(obj)){
-        pathToObject = obj.join(".");
-    } else if(typeof obj === "object"){
+        pathToObject = obj.join('.');
+    } else if(typeof obj === 'object'){
         const { path } = obj;
         pathToObject = path;
-    } else if (typeof obj === "string") {
+    } else if (typeof obj === 'string') {
         pathToObject = obj;
     } else {
         console.warn('unespected typeof');
@@ -733,7 +733,7 @@ export function createElementInRepoRoot(repo, newObjName, obj){
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 
@@ -769,11 +769,11 @@ export function createElementInRepoRoot(repo, newObjName, obj){
 const renameProp = (
     oldProp,
     newProp,
-{ [oldProp]: old, ...others }
+    { [oldProp]: old, ...others }
 ) => ({
     [newProp]: old,
     ...others
-})
+});
 
 export function renameElementOrContaimerInRepoRoot(repo, parentPath, type, newName){
 
@@ -787,11 +787,11 @@ export function renameElementOrContaimerInRepoRoot(repo, parentPath, type, newNa
     
 
     if(Array.isArray(parentPath)){
-        pathToObject = parentPath.join(".");
-    } else if(typeof parentPath === "object"){
+        pathToObject = parentPath.join('.');
+    } else if(typeof parentPath === 'object'){
         const { path } = parentPath;
         pathToObject = path;
-    } else if (typeof parentPath === "string") {
+    } else if (typeof parentPath === 'string') {
         pathToObject = parentPath;
     } else {
         console.warn('unespected typeof');
@@ -849,11 +849,11 @@ export function removeElementOrContaimerInRepoRoot(repo, parentPath, type){
     
 
     if(Array.isArray(parentPath)){
-        pathToObject = parentPath.join(".");
-    } else if(typeof parentPath === "object"){
+        pathToObject = parentPath.join('.');
+    } else if(typeof parentPath === 'object'){
         const { path } = parentPath;
         pathToObject = path;
-    } else if (typeof parentPath === "string") {
+    } else if (typeof parentPath === 'string') {
         pathToObject = parentPath;
     } else {
         console.warn('unespected typeof');
@@ -896,11 +896,11 @@ export function copyObjectInRepoRoot(repo, obj){
     let pathToObject;
     
     if(Array.isArray(obj)){
-        pathToObject = obj.join(".");
-    } else if(typeof obj === "object"){
+        pathToObject = obj.join('.');
+    } else if(typeof obj === 'object'){
         const { path } = obj;
         pathToObject = path;
-    } else if (typeof obj === "string") {
+    } else if (typeof obj === 'string') {
         pathToObject = obj;
     } else {
         console.warn('unespected typeof');
@@ -910,7 +910,7 @@ export function copyObjectInRepoRoot(repo, obj){
     let serchStringLast = '';
     
     if(pathToObject.includes('.')){
-        const [ first, ...last ] = pathToObject.split('.')
+        const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
 

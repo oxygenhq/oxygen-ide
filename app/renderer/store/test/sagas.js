@@ -22,11 +22,11 @@ import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
  */
 export default function* root() {
     yield all([
-      takeLatest(ActionTypes.TEST_START, startTest),
-      takeLatest(ActionTypes.TEST_STOP, stopTest),
-      takeLatest(ActionTypes.TEST_CONTINUE, continueTest),
-      takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
-      takeLatest(ActionTypes.TEST_EVENT_LINE_UPDATE, handleOnLineUpdate)
+        takeLatest(ActionTypes.TEST_START, startTest),
+        takeLatest(ActionTypes.TEST_STOP, stopTest),
+        takeLatest(ActionTypes.TEST_CONTINUE, continueTest),
+        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
+        takeLatest(ActionTypes.TEST_EVENT_LINE_UPDATE, handleOnLineUpdate)
     ]);
 }
 
@@ -55,7 +55,7 @@ function* handleTestRunnerServiceEvent(event) {
 
         if(event && event.result && event.result.summary){
             const { summary } = event.result;
-            if(summary && summary._status && summary._status ==="passed"){
+            if(summary && summary._status && summary._status ==='passed'){
                 yield put(editorActions.resetActiveLines());
             }
             

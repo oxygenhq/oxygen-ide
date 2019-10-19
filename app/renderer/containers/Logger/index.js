@@ -12,14 +12,14 @@ import Logger from './Logger';
 import * as logActions from '../../store/logger/actions';
 
 const mapStoreToProps = (state) => {
-  return {
-    logs: state.logger.logs,
-    active: state.logger.active,
-  };
+    return {
+        logs: state.logger.logs,
+        active: state.logger.active,
+    };
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...logActions } , dispatch)
+    bindActionCreators({ ...logActions } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Logger);

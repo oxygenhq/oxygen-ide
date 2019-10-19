@@ -22,19 +22,19 @@ import recorder from './recorder/reducer';
 import objrepo from './obj-repo/reducer';
 
 const rootReducer = combineReducers({
-  router,
-  tree,
-  settings,
-  editor,
-  fs,
-  tabs,
-  test,
-  logger,
-  dialog,
-  wb,
-  recorder,
-  objrepo,
-  recorder
+    router,
+    tree,
+    settings,
+    editor,
+    fs,
+    tabs,
+    test,
+    logger,
+    dialog,
+    wb,
+    recorder,
+    objrepo,
+    recorder
 });
 
 export default rootReducer;

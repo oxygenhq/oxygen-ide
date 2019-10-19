@@ -103,7 +103,7 @@ export default class Logger {
     _overrideConsole() {
         const formatArgs = (args) => {
             return [util.format.apply(util.format, Array.prototype.slice.call(args))];
-        }
+        };
         console.log = (...args) => log.info.apply(log, formatArgs(args));
         console.info = (...args) => log.info.apply(log, formatArgs(args));
         console.warn = (...args) => log.info.apply(log, formatArgs(args));
@@ -161,21 +161,21 @@ export default class Logger {
         this.info = (...args) => {
             prepError(args);
             return _log.info.apply(this, args);
-        }
+        };
         this.debug = (...args) => {
             prepError(args);
             return _log.debug.apply(this, args);
-        }
+        };
         this.error = (...args) => {
             prepError(args);
             const ret = _log.error.apply(this, args);
-             // do not show errors to the user about deprecated Buffer()
+            // do not show errors to the user about deprecated Buffer()
             if (args[0] && args[0].includes('DeprecationWarning: Buffer() is deprecated')) {
                 return ret;
             }
             showDialog(args[0], args.length === 2 ? args[1] : '', 'error');
             return ret;
-        }
+        };
         this.warn = (...args) => {
             prepError(args);
             const ret = _log.warn.apply(this, args);
@@ -183,7 +183,7 @@ export default class Logger {
                 showDialog(args[0], args.length === 2 ? args[1] : '', 'warning');
             }
             return ret;
-        }
+        };
     }
 
     _catchTheUncaught() {

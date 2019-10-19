@@ -10,8 +10,8 @@ import React, { PureComponent } from 'react';
 import { Modal } from 'antd';
 
 const DEFAULT_STATE = {
-  name: '',
-  type: null,
+    name: '',
+    type: null,
 };
 
 type Props = {
@@ -36,7 +36,7 @@ export default class ObjectElementOrContainerRemoveDialog extends PureComponent<
         this.state = {
             name: name,
             type: this.props.type ? this.props.type : 'element',
-        }
+        };
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -101,13 +101,13 @@ export default class ObjectElementOrContainerRemoveDialog extends PureComponent<
 
         return (
             <Modal
-              title="Confirm your actions"
-              okText="Delete"
-              visible={visible}
-              onOk={this.handleOk.bind(this)}
-              onCancel={onCancel}
+                title="Confirm your actions"
+                okText="Delete"
+                visible={visible}
+                onOk={this.handleOk.bind(this)}
+                onCancel={onCancel}
             >
-              <p>Are you sure, you want to delete '{parentName}' {typeString}?</p>
+                <p>Are you sure, you want to delete '{parentName}' {typeString}?</p>
             </Modal>
         );
     }

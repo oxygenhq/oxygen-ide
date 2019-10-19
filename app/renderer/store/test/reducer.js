@@ -13,316 +13,316 @@ import * as Const from '../../../const';
 import { success, failure } from '../../helpers/redux';
 
 const defaultState = {
-  isRunning: false,         // indicates if a test is currently running
-  isPaused: false,          // indicates if the current test is paused
-  isSeleniumReady: false,   // indicates if built-in Selenium server has been successfully started
-  isAppiumReady: false,     // indicates if built-in Appium server has been successfully started
-  breakpoints: {},          // holds all user-defined breakpoints per file, shall include file name and line number
-  mainFile: null,           // main test (script) file to be executed 
-  runtimeSettings: {
-    testMode: 'web',
-    testTarget: 'chrome',
-    testProvider: null,
-    stepDelay: 0,
-    reopenSession: false,   // indicates if Selenium session must be re-opened for each iteration
-    seleniumPort: null,     // holds Selenium server port number
-    iterations: 1,
-    paramFilePath: null,
-    paramMode: 'sequential',
-  },
-  browsers: [
-    {
-      name: 'Chrome',
-      id: 'chrome',
+    isRunning: false,         // indicates if a test is currently running
+    isPaused: false,          // indicates if the current test is paused
+    isSeleniumReady: false,   // indicates if built-in Selenium server has been successfully started
+    isAppiumReady: false,     // indicates if built-in Appium server has been successfully started
+    breakpoints: {},          // holds all user-defined breakpoints per file, shall include file name and line number
+    mainFile: null,           // main test (script) file to be executed 
+    runtimeSettings: {
+        testMode: 'web',
+        testTarget: 'chrome',
+        testProvider: null,
+        stepDelay: 0,
+        reopenSession: false,   // indicates if Selenium session must be re-opened for each iteration
+        seleniumPort: null,     // holds Selenium server port number
+        iterations: 1,
+        paramFilePath: null,
+        paramMode: 'sequential',
     },
-    {
-      name: 'Firefox',
-      id: 'firefox',
-    },
-  ],
-  devices: [],
-  emulators: Const.CHROME_EMULATED_DEVICES,
+    browsers: [
+        {
+            name: 'Chrome',
+            id: 'chrome',
+        },
+        {
+            name: 'Firefox',
+            id: 'firefox',
+        },
+    ],
+    devices: [],
+    emulators: Const.CHROME_EMULATED_DEVICES,
 };
 
 if (process.platform === 'win32') {
-  defaultState.browsers.push({
-    name: 'Internet Explorer',
-    id: 'ie',
-  });
+    defaultState.browsers.push({
+        name: 'Internet Explorer',
+        id: 'ie',
+    });
 }
 
 if (process.platform === 'darwin') {
-  defaultState.browsers.push({
-    name: 'Safari',
-    id: 'safari',
-  });
+    defaultState.browsers.push({
+        name: 'Safari',
+        id: 'safari',
+    });
 }
 
 export default (state = defaultState, action) => {
-  const payload = action.payload || {};
-  const { value, settings, device, breakpoints, path, error, cache, fileName } = payload;
-  let _newDevices = [];
-  let _newBreakpoints = {};
+    const payload = action.payload || {};
+    const { value, settings, device, breakpoints, path, error, cache, fileName } = payload;
+    let _newDevices = [];
+    let _newBreakpoints = {};
 
-  switch (action.type) {
+    switch (action.type) {
     // TEST_START
     case ActionTypes.TEST_START:
-      return {
-        ...state,
-        isRunning: true,
-        isPaused: false,
-      };
+        return {
+            ...state,
+            isRunning: true,
+            isPaused: false,
+        };
 
     // TEST_START_FAILURE
     case failure(ActionTypes.TEST_START):
-      if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SAVED) {
-        message.warning('The current file has been modified. Please save the file before running the test.')
-      } else if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SELECTED) {
-        message.error('Please open a script file before you could run the test.')
-      } else if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_IS_EMPTY) {
-        message.error('Test with empty script file cannot be started.')
-      }
-      return {
-        ...state,
-        isRunning: false,
-        isPaused: false,
-      };
+        if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SAVED) {
+            message.warning('The current file has been modified. Please save the file before running the test.');
+        } else if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SELECTED) {
+            message.error('Please open a script file before you could run the test.');
+        } else if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_IS_EMPTY) {
+            message.error('Test with empty script file cannot be started.');
+        }
+        return {
+            ...state,
+            isRunning: false,
+            isPaused: false,
+        };
 
     // TEST_STOP
     case ActionTypes.TEST_STOP:
-      return {
-        ...state,
-        isRunning: false,
-        isPaused: false,
-      };
+        return {
+            ...state,
+            isRunning: false,
+            isPaused: false,
+        };
     // TEST_CONTINUE
     case ActionTypes.TEST_CONTINUE:
-      return {
-        ...state,
-        isRunning: true,
-        isPaused: false,
-      };
+        return {
+            ...state,
+            isRunning: true,
+            isPaused: false,
+        };
     // TEST_EVENT_ENDED
     case ActionTypes.TEST_EVENT_ENDED:
-      return {
-        ...state,
-        isRunning: false,
-        isPaused: false,
-      };
+        return {
+            ...state,
+            isRunning: false,
+            isPaused: false,
+        };
     // TEST_EVENT_BREAKPOINT
     case ActionTypes.TEST_EVENT_BREAKPOINT:
-      return {
-        ...state,
-        isRunning: true,
-        isPaused: true,
-      };
+        return {
+            ...state,
+            isRunning: true,
+            isPaused: true,
+        };
     // TEST_STOP
     case ActionTypes.TEST_STOP:
-      return {
-        ...state,
-        isRunning: false,
-        isPaused: false,
-      };
+        return {
+            ...state,
+            isRunning: false,
+            isPaused: false,
+        };
     // TEST_SET_MAIN
     case ActionTypes.TEST_SET_MAIN:
-      return {
-        ...state,
-        mainFile: value,
-      };
+        return {
+            ...state,
+            mainFile: value,
+        };
     // TEST_SET_TARGET
     case ActionTypes.TEST_SET_TARGET:
-      return {
-        ...state,
-        runtimeSettings: {
-          ...state.runtimeSettings,
-          testTarget: value,
-        },
-      };
+        return {
+            ...state,
+            runtimeSettings: {
+                ...state.runtimeSettings,
+                testTarget: value,
+            },
+        };
     // TEST_SET_STEP_DELAY
     case ActionTypes.TEST_SET_STEP_DELAY:
-      return {
-        ...state,
-        runtimeSettings: {
-          ...state.runtimeSettings,
-          stepDelay: value,
-        },
-      };
+        return {
+            ...state,
+            runtimeSettings: {
+                ...state.runtimeSettings,
+                stepDelay: value,
+            },
+        };
     // TEST_SET_MODE
     case ActionTypes.TEST_SET_MODE:
-      if (state.runtimeSettings.testMode === value) {
-        return state;
-      }
-
-      let newTestProvider = state.runtimeSettings.testProvider;
-
-      // determine new testTarget value, depending on the selected test mode
-      let newTestTarget = null;
-      if (value === 'web') {
-        newTestTarget = state.browsers.length > 0 ? state.browsers[0].id : null;
-      }
-      else if (value === 'mob') {
-        newTestTarget = state.devices.length > 0 ? state.devices[0].id : null;
-
-        if(newTestTarget === null){
-          message.error('No connected devices or emulators found. Mobile device needs to be connected to the computer in order to run mobile tests.');
+        if (state.runtimeSettings.testMode === value) {
+            return state;
         }
-      }
-      else if (value === 'resp') {
-        newTestProvider = "";
-        newTestTarget = state.emulators.length > 0 ? state.emulators[0] : null;
-      }
-      return {
-        ...state,
-        runtimeSettings: {
-          ...state.runtimeSettings,
-          testMode: value,
-          testTarget: newTestTarget,
-          testProvider: newTestProvider
-        },
-      };
+
+        let newTestProvider = state.runtimeSettings.testProvider;
+
+        // determine new testTarget value, depending on the selected test mode
+        let newTestTarget = null;
+        if (value === 'web') {
+            newTestTarget = state.browsers.length > 0 ? state.browsers[0].id : null;
+        }
+        else if (value === 'mob') {
+            newTestTarget = state.devices.length > 0 ? state.devices[0].id : null;
+
+            if(newTestTarget === null){
+                message.error('No connected devices or emulators found. Mobile device needs to be connected to the computer in order to run mobile tests.');
+            }
+        }
+        else if (value === 'resp') {
+            newTestProvider = '';
+            newTestTarget = state.emulators.length > 0 ? state.emulators[0] : null;
+        }
+        return {
+            ...state,
+            runtimeSettings: {
+                ...state.runtimeSettings,
+                testMode: value,
+                testTarget: newTestTarget,
+                testProvider: newTestProvider
+            },
+        };
 
     // TEST_SET_SELENIUM_READY
     case ActionTypes.TEST_SET_SELENIUM_READY:
-      return {
-        ...state,
-        isSeleniumReady: value,
-      };
+        return {
+            ...state,
+            isSeleniumReady: value,
+        };
 
     // TEST_SET_SELENIUM_PORT
     case ActionTypes.TEST_SET_SELENIUM_PORT:
-      return {
-        ...state,
-        runtimeSettings: {
-          ...state.runtimeSettings,
-          seleniumPort: value,
-        },
-      };
+        return {
+            ...state,
+            runtimeSettings: {
+                ...state.runtimeSettings,
+                seleniumPort: value,
+            },
+        };
 
     // TEST_ADD_DEVICE
     case ActionTypes.TEST_ADD_DEVICE:
-      if (!device || !device.id || state.devices.some(x => x.id === device.id)) {
-        return state; // ignore any device which do not have UUID assigned or the device is already in the list
-      }
-      // if we are in Mobile mode, and no device is selected, then pre-select the new device
-      const setTestTarget = state.runtimeSettings.testMode === 'mob' && !state.runtimeSettings.testTarget;
-      return {
-        ...state,
-        devices: [
-          ...state.devices,
-          {
-            id: device.id,
-            name: device.name || device.info.name || device.id,
-            osName: device.info.os.name,
-            osVersion: device.info.os.version,
-          },
-        ],
-        runtimeSettings: !setTestTarget ? state.runtimeSettings : {
-          ...state.runtimeSettings,
-          testTarget: device.id,
-        },
-      };
+        if (!device || !device.id || state.devices.some(x => x.id === device.id)) {
+            return state; // ignore any device which do not have UUID assigned or the device is already in the list
+        }
+        // if we are in Mobile mode, and no device is selected, then pre-select the new device
+        const setTestTarget = state.runtimeSettings.testMode === 'mob' && !state.runtimeSettings.testTarget;
+        return {
+            ...state,
+            devices: [
+                ...state.devices,
+                {
+                    id: device.id,
+                    name: device.name || device.info.name || device.id,
+                    osName: device.info.os.name,
+                    osVersion: device.info.os.version,
+                },
+            ],
+            runtimeSettings: !setTestTarget ? state.runtimeSettings : {
+                ...state.runtimeSettings,
+                testTarget: device.id,
+            },
+        };
 
     // TEST_REMOVE_DEVICE
     case ActionTypes.TEST_REMOVE_DEVICE:
-      _newDevices = [];
-      for (var i = state.devices.length; i--;) {
-          if (state.devices[i].id !== device.id){
-            _newDevices.push(state.devices[i]);
-          }
-      }
-      const updateTestTarget = state.runtimeSettings.testMode === 'mob' && state.runtimeSettings.testTarget === device.id;
+        _newDevices = [];
+        for (var i = state.devices.length; i--;) {
+            if (state.devices[i].id !== device.id){
+                _newDevices.push(state.devices[i]);
+            }
+        }
+        const updateTestTarget = state.runtimeSettings.testMode === 'mob' && state.runtimeSettings.testTarget === device.id;
 
-      return {
-        ...state,
-        runtimeSettings: !updateTestTarget ? state.runtimeSettings : {
-          ...state.runtimeSettings,
-          testTarget: null,
-        },
-        devices: _newDevices,
-      };
+        return {
+            ...state,
+            runtimeSettings: !updateTestTarget ? state.runtimeSettings : {
+                ...state.runtimeSettings,
+                testTarget: null,
+            },
+            devices: _newDevices,
+        };
 
     // TEST_UPDATE_BREAKPOINTS
     case ActionTypes.TEST_UPDATE_BREAKPOINTS:
-      if(path === "unknown"){
-        return {
-          ...state,
-          breakpoints: {
-            ...state.breakpoints,
-            [path+fileName]: breakpoints,
-          },
-        };
-      } else {
-        return {
-          ...state,
-          breakpoints: {
-            ...state.breakpoints,
-            [path]: breakpoints,
-          },
-        };
-      }
+        if(path === 'unknown'){
+            return {
+                ...state,
+                breakpoints: {
+                    ...state.breakpoints,
+                    [path+fileName]: breakpoints,
+                },
+            };
+        } else {
+            return {
+                ...state,
+                breakpoints: {
+                    ...state.breakpoints,
+                    [path]: breakpoints,
+                },
+            };
+        }
     
     // TEST_MOVE_BREAKPOINTS_FROM_TMP_FILE_TO_REAL_FILE
     case ActionTypes.TEST_MOVE_BREAKPOINTS_FROM_TMP_FILE_TO_REAL_FILE:{
-      const { tmpFilePath, tmpfileName, realFilePath } = payload;
-      const newState = { ...state };
+        const { tmpFilePath, tmpfileName, realFilePath } = payload;
+        const newState = { ...state };
 
-      if(
-        tmpFilePath && 
+        if(
+            tmpFilePath && 
         tmpfileName && 
         realFilePath &&
         newState.breakpoints[tmpFilePath+tmpfileName]
-      ){
-        newState.breakpoints[realFilePath] = newState.breakpoints[tmpFilePath+tmpfileName];
-        delete newState.breakpoints[tmpFilePath+tmpfileName];
-      }
+        ){
+            newState.breakpoints[realFilePath] = newState.breakpoints[tmpFilePath+tmpfileName];
+            delete newState.breakpoints[tmpFilePath+tmpfileName];
+        }
 
-      return newState;
+        return newState;
     }
 
     // TEST_REMOVE_BREAKPOINTS
     case ActionTypes.TEST_REMOVE_BREAKPOINTS:
-      // make sure the file with breakpoints is on the list
-      if (!state.breakpoints || !state.breakpoints.hasOwnProperty(path)) {
-        return state;
-      }
-      // clone all breakpoints except the one that needs to be removed (refered by path)
-      _newBreakpoints = Object.keys(state.breakpoints).reduce((acc, cur) => cur === path ? acc : {...acc, [cur]: state.breakpoints[cur]}, {});
-      return {
-        ...state,
-        breakpoints: _newBreakpoints,
-      };
+        // make sure the file with breakpoints is on the list
+        if (!state.breakpoints || !state.breakpoints.hasOwnProperty(path)) {
+            return state;
+        }
+        // clone all breakpoints except the one that needs to be removed (refered by path)
+        _newBreakpoints = Object.keys(state.breakpoints).reduce((acc, cur) => cur === path ? acc : {...acc, [cur]: state.breakpoints[cur]}, {});
+        return {
+            ...state,
+            breakpoints: _newBreakpoints,
+        };
 
     // TEST_UPDATE_RUN_SETTINGS
     case ActionTypes.TEST_UPDATE_RUN_SETTINGS:
-      return {
-        ...state,
-        runtimeSettings: {
-          ...state.runtimeSettings,
-          ...settings
-        },
-      };
+        return {
+            ...state,
+            runtimeSettings: {
+                ...state.runtimeSettings,
+                ...settings
+            },
+        };
 
     // TEST_SET_PROVIDER
     case ActionTypes.TEST_SET_PROVIDER:
-      return {
-        ...state,
-        runtimeSettings: {
-          ...state.runtimeSettings,
-          testProvider: value
-        },
-      };
+        return {
+            ...state,
+            runtimeSettings: {
+                ...state.runtimeSettings,
+                testProvider: value
+            },
+        };
 
     case 'FROM_CACHE': 
-      return {
-        ...defaultState,
-        ...cache.test
-      }
+        return {
+            ...defaultState,
+            ...cache.test
+        };
 
     case 'RESET': {
-      return defaultState;
+        return defaultState;
     }
 
     default:
-      return state;
-  }
+        return state;
+    }
 };

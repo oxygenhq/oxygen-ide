@@ -11,10 +11,10 @@
  * The method checks if file or folder is already open and either opens a new file or folder, or make the existing tab active.
  */ 
 export default function (selectedKeys, info) {
-  const { nodeInfo } = info.node.props;
+    const { nodeInfo } = info.node.props;
 
-  this.props.setActiveNode(nodeInfo.path);
-  if (this.props.onSelect) {
-    this.props.onSelect(nodeInfo);
-  }
+    this.props.setActiveNode(nodeInfo.path);
+    if (this.props.onSelect) {
+        this.props.onSelect(nodeInfo);
+    }
 }

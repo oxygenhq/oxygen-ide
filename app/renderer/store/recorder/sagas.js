@@ -31,14 +31,14 @@ const EXTENSION_CHECK_TIMEOUT = 4500;
  */
 export default function* root() {
     yield all([
-      takeLatest(ActionTypes.RECORDER_START, startRecorder),
-      takeLatest(ActionTypes.RECORDER_STOP, stopRecorder),
-      takeLatest(ActionTypes.RECORDER_START_WATCHER, startRecorderWatcher),
-      takeLatest(success(ActionTypes.WB_CLOSE_FILE), wbCloseFileSuccess),
-      takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
-      takeLatest('RECORDER_START_SUCCESS', recorderAddStepChannelInnit),
-      takeLatest('RECORDER_NEW_CAN_RECORD', recorderNewCanRecord),
-      takeLatest('RESET', reset)
+        takeLatest(ActionTypes.RECORDER_START, startRecorder),
+        takeLatest(ActionTypes.RECORDER_STOP, stopRecorder),
+        takeLatest(ActionTypes.RECORDER_START_WATCHER, startRecorderWatcher),
+        takeLatest(success(ActionTypes.WB_CLOSE_FILE), wbCloseFileSuccess),
+        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
+        takeLatest('RECORDER_START_SUCCESS', recorderAddStepChannelInnit),
+        takeLatest('RECORDER_NEW_CAN_RECORD', recorderNewCanRecord),
+        takeLatest('RESET', reset)
     ]);
 }
 
@@ -84,7 +84,7 @@ export function* wbCloseFileSuccess({ payload }) {
 
     if(isRecording){
         if(payload && payload.path){
-            if(payload.path === "unknown") {
+            if(payload.path === 'unknown') {
                 if(payload.path === activeFile && payload.name === activeFileName){
                     yield stopRecorderAfterFileClose();
                 }
@@ -105,7 +105,7 @@ export function* wbCloseFileSuccess({ payload }) {
 
 
 export function* recorderAddStepChannelInnit({ payload }) {
-    const channel = yield actionChannel("RECORDER_SERVICE_ADD_STEP");
+    const channel = yield actionChannel('RECORDER_SERVICE_ADD_STEP');
 
     while(true) {
         const { payload } = yield take(channel);
@@ -187,7 +187,7 @@ function* handleRequest(payload) {
             yield all([
                 put(wbActions.onContentUpdate(activeFile, newContent, activeFileName)),
                 put(recorderActions.addSteps(steps))
-            ])
+            ]);
         } else {
             if (!activeFile) {
                 yield stopRecorderAfterFileClose();
@@ -220,7 +220,7 @@ function* handleRequest(payload) {
             yield all([
                 put(wbActions.onContentUpdate(activeFile, newContent)),
                 put(recorderActions.addSteps(steps))
-            ])
+            ]);
         }    
     } catch(e) {
         yield put(reportError(e));

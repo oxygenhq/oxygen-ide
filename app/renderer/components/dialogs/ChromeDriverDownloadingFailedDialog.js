@@ -12,14 +12,14 @@ export default class ChromeDriverDownloadingFailedDialog extends PureComponent {
 
     processLink = (event) => {
         if(event){
-          event.preventDefault();
+            event.preventDefault();
     
-          if (event.target instanceof HTMLAnchorElement) {
-            const url = event.target.getAttribute('href');
-            electron.shell.openExternal(url);
-          } else {
-            console.log('bad event.target', event.target);
-          }
+            if (event.target instanceof HTMLAnchorElement) {
+                const url = event.target.getAttribute('href');
+                electron.shell.openExternal(url);
+            } else {
+                console.log('bad event.target', event.target);
+            }
         }
     }
 
@@ -46,10 +46,10 @@ export default class ChromeDriverDownloadingFailedDialog extends PureComponent {
                 )}
             >
                 <div>
-                    <p>{`Download the appropriate driver for your version of Chrome from`} <a href='https://chromedriver.chromium.org/downloads' onClick={this.processLink}>here.</a></p>
-                    <p>{`Extract the archive.`}</p>
+                    <p>{'Download the appropriate driver for your version of Chrome from'} <a href='https://chromedriver.chromium.org/downloads' onClick={this.processLink}>here.</a></p>
+                    <p>{'Extract the archive.'}</p>
                     <p>{`Place the ChromeDriver executable directly into ${path}`}</p>
-                    <p>{`Restart Oxygen IDE afterwards for the changes to take effect. `}</p>
+                    <p>{'Restart Oxygen IDE afterwards for the changes to take effect. '}</p>
 
                 </div>
             </Modal>

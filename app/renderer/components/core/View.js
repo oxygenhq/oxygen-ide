@@ -11,10 +11,10 @@
 import styled from '@emotion/styled';
 
 const View = styled.div(props => ({
-  height: props.grow ? '100%' : 'auto',
-  overflow: props.scrollable ? 'auto' : 'visible',
-  position: 'relative',
-  width: props.grow ? '100%' : 'auto',
+    height: props.grow ? '100%' : 'auto',
+    overflow: props.scrollable ? 'auto' : 'visible',
+    position: 'relative',
+    width: props.grow ? '100%' : 'auto',
 }));
 
 export default View;

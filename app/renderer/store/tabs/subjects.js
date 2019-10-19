@@ -6,12 +6,12 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { Subject } from "rxjs";
+import { Subject } from 'rxjs';
 
 let fileChildrenLoadedSubject = new Subject();
 let fileRenamedSubject = new Subject();
 
 export default {
-    "TAB.ADD": fileChildrenLoadedSubject,
-    "FILE.RENAMED": fileRenamedSubject,
+    'TAB.ADD': fileChildrenLoadedSubject,
+    'FILE.RENAMED': fileRenamedSubject,
 };

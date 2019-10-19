@@ -23,20 +23,20 @@ export default class Settings extends PureComponent<Props> {
 
   render() {
       return (
-        <Panel header="Settings">
-            <ScrollContainer
-                refreshScroll={this.props.refreshScroll}
-                disableHorizontal
-                classes="tree-wrapper scroller"
-            >
-                {() => (
-                    <PropertyList>
-                        <PropertyItem base="iterations" label="Iterations" value="0" type="number" editable />
-                        <PropertyItem base="params-file" label="Parameter File" value="" type="string" editable />
-                    </PropertyList>
-                )}
-            </ScrollContainer>
-        </Panel>
+          <Panel header="Settings">
+              <ScrollContainer
+                  refreshScroll={this.props.refreshScroll}
+                  disableHorizontal
+                  classes="tree-wrapper scroller"
+              >
+                  {() => (
+                      <PropertyList>
+                          <PropertyItem base="iterations" label="Iterations" value="0" type="number" editable />
+                          <PropertyItem base="params-file" label="Parameter File" value="" type="string" editable />
+                      </PropertyList>
+                  )}
+              </ScrollContainer>
+          </Panel>
       );    
   }
 }

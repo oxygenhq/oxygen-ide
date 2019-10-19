@@ -8,7 +8,7 @@
  */
 
 import Mixpanel from 'mixpanel';
-import ServiceBase from "./ServiceBase";
+import ServiceBase from './ServiceBase';
 import moment from 'moment';
 import { version }  from '../../../package.json';
 import os from 'os';
@@ -71,63 +71,63 @@ export default class AnalyticsService extends ServiceBase {
         const language = await osLocale();
 
         try{
-            const { net } = require('electron')
-            const request = net.request('https://api.ipdata.co/?api-key=143415c75d2d5036d29cc48ecb1c742bfef9ab3f25af45fbd0939367')
+            const { net } = require('electron');
+            const request = net.request('https://api.ipdata.co/?api-key=143415c75d2d5036d29cc48ecb1c742bfef9ab3f25af45fbd0939367');
             request.on('response', (response) => {
-                    response.on('data', (chunk) => {
-                        try{
-                            var json = JSON.parse(chunk);
+                response.on('data', (chunk) => {
+                    try{
+                        var json = JSON.parse(chunk);
     
-                            if(json){
-                                if(json.country_code){
-                                    country_code = json.country_code;
-                                }
-
-                                if(json.country_name){
-                                    country_name = json.country_name;
-                                }
-                                
-                                if(json.region){
-                                    region = json.region;
-                                }
-
-                                if(json.city){
-                                    city = json.city;
-                                }
-
-                                if(json.continent_name){
-                                    continent_name = json.continent_name;
-                                }
-
-                                if(json.continent_code){
-                                    continent_code = json.continent_code;
-                                }
-
-                                try{
-                                    if(this.mixpanel && this.mixpanel.people && this.mixpanel.people.set){
-                                        this.mixpanel.people.set(uuid, {
-                                            $region: region,
-                                            $country_code: country_code,
-                                            'Сountry Name': country_name,
-                                            'City': city,
-                                            'Continent Name': continent_name,
-                                            'Continent Code': continent_code
-                                        });
-                                    }
-                                } catch(e){
-                                    console.warn('mixpanel e', e);
-                                    Sentry.captureException(e);
-                                }
+                        if(json){
+                            if(json.country_code){
+                                country_code = json.country_code;
                             }
-                        } catch(e){
-                            console.warn('e',e);
-                            Sentry.captureException(e);
+
+                            if(json.country_name){
+                                country_name = json.country_name;
+                            }
+                                
+                            if(json.region){
+                                region = json.region;
+                            }
+
+                            if(json.city){
+                                city = json.city;
+                            }
+
+                            if(json.continent_name){
+                                continent_name = json.continent_name;
+                            }
+
+                            if(json.continent_code){
+                                continent_code = json.continent_code;
+                            }
+
+                            try{
+                                if(this.mixpanel && this.mixpanel.people && this.mixpanel.people.set){
+                                    this.mixpanel.people.set(uuid, {
+                                        $region: region,
+                                        $country_code: country_code,
+                                        'Сountry Name': country_name,
+                                        'City': city,
+                                        'Continent Name': continent_name,
+                                        'Continent Code': continent_code
+                                    });
+                                }
+                            } catch(e){
+                                console.warn('mixpanel e', e);
+                                Sentry.captureException(e);
+                            }
                         }
-                    })
+                    } catch(e){
+                        console.warn('e',e);
+                        Sentry.captureException(e);
+                    }
+                });
                 response.on('end', () => {
                     // console.log('No more data in response.')
-                })
-            })
+                });
+            });
             request.end();
         } catch(e){
             console.warn('e', e);
@@ -166,7 +166,7 @@ export default class AnalyticsService extends ServiceBase {
 
             if(Sentry && Sentry.configureScope){
                 Sentry.configureScope((scope) => {
-                    scope.setUser({"userId": this.uuid});
+                    scope.setUser({'userId': this.uuid});
                 });
             }
 
@@ -193,7 +193,7 @@ export default class AnalyticsService extends ServiceBase {
                 Sentry.captureException(e);
             }
             setTimeout(() => {
-                resolve("result");
+                resolve('result');
             }, 2000);
         });
     }

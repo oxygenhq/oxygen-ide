@@ -9,83 +9,83 @@
 import * as Const from '../const';
 
 export const CONTEXT_MENU_FILE_EXPLORER_FOLDER = [
-	{
-		label: 'New File',
-		accelerator: 'CommandOrControl+N',
-		cmd: Const.MENU_CMD_NEW_FILE,
-	},
-	{
-		label: 'New Folder',
-		cmd: Const.MENU_CMD_NEW_FOLDER,
-	},
-	{
-		type: 'separator',
-	},
-	{
-		label: 'Rename',
-		cmd: Const.MENU_CMD_RENAME_FOLDER,
-	},
-	{
-		label: 'Delete',
-		cmd: Const.MENU_CMD_DELETE_FOLDER,
-	},
+    {
+        label: 'New File',
+        accelerator: 'CommandOrControl+N',
+        cmd: Const.MENU_CMD_NEW_FILE,
+    },
+    {
+        label: 'New Folder',
+        cmd: Const.MENU_CMD_NEW_FOLDER,
+    },
+    {
+        type: 'separator',
+    },
+    {
+        label: 'Rename',
+        cmd: Const.MENU_CMD_RENAME_FOLDER,
+    },
+    {
+        label: 'Delete',
+        cmd: Const.MENU_CMD_DELETE_FOLDER,
+    },
 ];
 
 export const CONTEXT_MENU_FILE_EXPLORER_FILE = [
-	{
-		label: 'Rename',
-		cmd: Const.MENU_CMD_RENAME_FILE,
-	},
-	{
-		label: 'Delete',
-		cmd: Const.MENU_CMD_DELETE_FILE,
-	},
+    {
+        label: 'Rename',
+        cmd: Const.MENU_CMD_RENAME_FILE,
+    },
+    {
+        label: 'Delete',
+        cmd: Const.MENU_CMD_DELETE_FILE,
+    },
 ];
 
 export const CONTEXT_MENU_OBJECT_REPOSITORY_FILE_EXPLORER_FILE = [
-	{
-		label: 'Open',
-		cmd: Const.MENU_CMD_OPEN_OR_FILE,
-	},
-	{
-		label: 'Rename',
-		cmd: Const.MENU_CMD_RENAME_FILE,
-	},
-	{
-		label: 'Delete',
-		cmd: Const.MENU_CMD_DELETE_FILE,
-	},
+    {
+        label: 'Open',
+        cmd: Const.MENU_CMD_OPEN_OR_FILE,
+    },
+    {
+        label: 'Rename',
+        cmd: Const.MENU_CMD_RENAME_FILE,
+    },
+    {
+        label: 'Delete',
+        cmd: Const.MENU_CMD_DELETE_FILE,
+    },
 ];
 
 export const CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_ELEMENT = [
-	{
-		label: 'Rename',
-		cmd: Const.MENU_CMD_ORE_RENAME_ELEMENT,
-	},
-	{
-		label: 'Delete',
-		cmd: Const.MENU_CMD_ORE_DELETE_ELEMENT,
-	}
+    {
+        label: 'Rename',
+        cmd: Const.MENU_CMD_ORE_RENAME_ELEMENT,
+    },
+    {
+        label: 'Delete',
+        cmd: Const.MENU_CMD_ORE_DELETE_ELEMENT,
+    }
 ];
 
 export const CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_CONTAINER = [
-	{
-		label: 'New Container',
-		cmd: Const.MENU_CMD_ORE_NEW_CONTAINER,
-	},
-	{
-		label: 'New Element',
-		cmd: Const.MENU_CMD_ORE_NEW_ELEMENT,
-	},
-	{
-		type: 'separator',
-	},
-	{
-		label: 'Rename',
-		cmd: Const.MENU_CMD_ORE_RENAME_CONTAINER,
-	},
-	{
-		label: 'Delete',
-		cmd: Const.MENU_CMD_ORE_DELETE_CONTAINER,
-	}
+    {
+        label: 'New Container',
+        cmd: Const.MENU_CMD_ORE_NEW_CONTAINER,
+    },
+    {
+        label: 'New Element',
+        cmd: Const.MENU_CMD_ORE_NEW_ELEMENT,
+    },
+    {
+        type: 'separator',
+    },
+    {
+        label: 'Rename',
+        cmd: Const.MENU_CMD_ORE_RENAME_CONTAINER,
+    },
+    {
+        label: 'Delete',
+        cmd: Const.MENU_CMD_ORE_DELETE_CONTAINER,
+    }
 ];

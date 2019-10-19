@@ -9,39 +9,39 @@
 import * as ActionTypes from './types';
 
 export const addTab = (key, title) => {
-  return {
-    type: ActionTypes.TABS_ADD,
-    payload: { key, title },
-  };
+    return {
+        type: ActionTypes.TABS_ADD,
+        payload: { key, title },
+    };
 };
 
 export const removeTab = (key, title = null) => {
-  return {
-    type: ActionTypes.TABS_REMOVE,
-    payload: { key, title },
-  };
+    return {
+        type: ActionTypes.TABS_REMOVE,
+        payload: { key, title },
+    };
 };
 
 export const renameTab = (oldKey, newKey, newTitle) => {
-  return {
-    type: ActionTypes.TABS_RENAME,
-    payload: { key: oldKey, newKey, newTitle },
-  };
+    return {
+        type: ActionTypes.TABS_RENAME,
+        payload: { key: oldKey, newKey, newTitle },
+    };
 };
 
 export const setActiveTab = (key, title = null) => {
-  return {
-    type: ActionTypes.TABS_SET_ACTIVE,
-    payload: { key, title },
-  };
+    return {
+        type: ActionTypes.TABS_SET_ACTIVE,
+        payload: { key, title },
+    };
 };
 
 export const setTabTouched = (key, touched, name = null) => ({
-  type: ActionTypes.TABS_SET_TOUCHED,
-  payload: { key, value: touched, title: name },
+    type: ActionTypes.TABS_SET_TOUCHED,
+    payload: { key, value: touched, title: name },
 });
 
 export const changeTabOrder = (fromIndex, toIndex) => ({
-  type: ActionTypes.TABS_CHANGE_ORDER,
-  payload: { fromIndex, toIndex },
+    type: ActionTypes.TABS_CHANGE_ORDER,
+    payload: { fromIndex, toIndex },
 });

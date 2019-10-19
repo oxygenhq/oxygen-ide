@@ -39,7 +39,7 @@ export default class RecorderService extends ServiceBase {
         }
         this.httpSrv = http.createServer(::this._onRequest);
         this.httpSrv.on('error', (err) => {
-            console.log("Unable to bind recorder's HTTP listener. " + err)
+            console.log("Unable to bind recorder's HTTP listener. " + err);
         });
 
         // here be horrors...
@@ -74,7 +74,7 @@ export default class RecorderService extends ServiceBase {
 
     _onRequest(request, response) {
         response.setHeader('Access-Control-Allow-Origin', '*');
-        response.setHeader("Access-Control-Allow-Headers", "*");
+        response.setHeader('Access-Control-Allow-Headers', '*');
         // disable keep-alive. 
         // otherwise connection pooling might prevent the recorder stopping in a timely manner.
         response.setHeader('Connection', 'close');
@@ -129,12 +129,12 @@ export default class RecorderService extends ServiceBase {
     _emit = (steps) => {
         setTimeout(() => {
     
-            let stepsArray = []
+            let stepsArray = [];
             for (var step of steps) {
                 const stp = {
                     ...step,
                     module: step.module || 'web',   // use default module (Web) if module name is not returned by recorder extension
-                }
+                };
                 stepsArray.push(stp);
             }
     

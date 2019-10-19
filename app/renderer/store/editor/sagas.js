@@ -21,9 +21,9 @@ import ActionTypes from '../types';
  */
 export default function* root() {
     yield all([
-      takeLatest(ActionTypes.EDITOR_OPEN_FILE, openFile),
-      takeLatest(ActionTypes.SAVE_SETTINGS, saveSettings),
-      takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
+        takeLatest(ActionTypes.EDITOR_OPEN_FILE, openFile),
+        takeLatest(ActionTypes.SAVE_SETTINGS, saveSettings),
+        takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
     ]);
 }
 

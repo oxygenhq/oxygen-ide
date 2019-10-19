@@ -25,74 +25,74 @@ export default class FileRenameDialog extends PureComponent<Props> {
   props: Props;
 
   state = {
-    visible: this.props.visible ? this.props.visible : false,
-    name: this.props.name ? this.props.name : null,
+      visible: this.props.visible ? this.props.visible : false,
+      name: this.props.name ? this.props.name : null,
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.visible == false) {
-      return ({
-        visible: false,
-      });
-    }
-    else if (nextProps.visible != prevState.visible) {
-      return({
-        visible: nextProps.visible,
-        name: nextProps.name ? nextProps.name : null,
-      });
-    }
-    return null;
+      if (nextProps.visible == false) {
+          return ({
+              visible: false,
+          });
+      }
+      else if (nextProps.visible != prevState.visible) {
+          return({
+              visible: nextProps.visible,
+              name: nextProps.name ? nextProps.name : null,
+          });
+      }
+      return null;
   }
 
   onChangeName(e) {
-    this.setState({
-      name: e.target.value,
-    });
+      this.setState({
+          name: e.target.value,
+      });
   }
   handleOk() {
-    const { name } = this.state;
-    const { path, type } = this.props;
-    if (!name || name.length == 0) {
-      return;
-    }
-    this.props.onSubmit(path, type, name);
+      const { name } = this.state;
+      const { path, type } = this.props;
+      if (!name || name.length == 0) {
+          return;
+      }
+      this.props.onSubmit(path, type, name);
   }
 
   render() {
-    const {
-      type,
-      path,
-      onSubmit,
-      onCancel,
-    } = this.props;
+      const {
+          type,
+          path,
+          onSubmit,
+          onCancel,
+      } = this.props;
 
-    if (!path) {
-      return null;
-    }
-    const {
-      name,
-      visible,
-    } = this.state;
-    if (!type) {
-      return null;
-    }
+      if (!path) {
+          return null;
+      }
+      const {
+          name,
+          visible,
+      } = this.state;
+      if (!type) {
+          return null;
+      }
     
-    return (
-      <Modal
-        title={`Rename ${capitalizeFirst(type)}`}
-        okText="Rename"
-        width={700}
-        visible={visible}
-        onOk={this.handleOk.bind(this)}
-        onCancel={onCancel}
-      >
-        <Input
-          onChange={this.onChangeName.bind(this)}
-          style={{ marginBottom: 15 }}
-          value={ name }
-          placeholder={`Enter ${type} name...`}
-        />
-      </Modal>
-    );
+      return (
+          <Modal
+              title={`Rename ${capitalizeFirst(type)}`}
+              okText="Rename"
+              width={700}
+              visible={visible}
+              onOk={this.handleOk.bind(this)}
+              onCancel={onCancel}
+          >
+              <Input
+                  onChange={this.onChangeName.bind(this)}
+                  style={{ marginBottom: 15 }}
+                  value={ name }
+                  placeholder={`Enter ${type} name...`}
+              />
+          </Modal>
+      );
   }
 }

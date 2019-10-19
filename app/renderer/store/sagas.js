@@ -25,24 +25,24 @@ const services = ServicesSingleton();
  * rootSaga
  */
 export default function* root() {
-  const sagas = [
-    fork(workbench),
-    fork(fs),
-    fork(editor),
-    fork(test),
-    fork(recorder),
-    fork(settings),
-    fork(objrepo),
-    fork(dealog),
-  ];
-  // check if any service has saga functions as well
-  if (services && Object.keys(services).length > 0) {
-    for (let serviceId of Object.keys(services)) {
-      const service = services[serviceId];
-      if (service.sagas && typeof service.sagas === 'function') {
-        sagas.push(fork(service.sagas.bind(service)));
-      }
+    const sagas = [
+        fork(workbench),
+        fork(fs),
+        fork(editor),
+        fork(test),
+        fork(recorder),
+        fork(settings),
+        fork(objrepo),
+        fork(dealog),
+    ];
+    // check if any service has saga functions as well
+    if (services && Object.keys(services).length > 0) {
+        for (let serviceId of Object.keys(services)) {
+            const service = services[serviceId];
+            if (service.sagas && typeof service.sagas === 'function') {
+                sagas.push(fork(service.sagas.bind(service)));
+            }
+        }
     }
-  }
-  yield all(sagas);
+    yield all(sagas);
 }

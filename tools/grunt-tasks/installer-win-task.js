@@ -33,7 +33,7 @@ module.exports = function(grunt) {
 
             var x, y, z, n;
             if (version.indexOf('-rc') > 0) {
-                var tokens = version.replace('-rc', '').split('.');
+                let tokens = version.replace('-rc', '').split('.');
                 x = tokens[0];
                 y = tokens[1];
                 z = tokens[2];
@@ -44,7 +44,7 @@ module.exports = function(grunt) {
             } else if (version.indexOf('-') > 0) {
                 grunt.fail.fatal('Invalid version specified: ' + version);
             } else {
-                var tokens = version.split('.');
+                let tokens = version.split('.');
                 x = tokens[0];
                 y = tokens[1];
                 z = tokens[2];
@@ -53,46 +53,46 @@ module.exports = function(grunt) {
             version = x + '.' + y + '.' + (10000 + parseInt(z) * 100 + parseInt(n));
             
             cp.execFileSync('heat', 
-                            [ 'dir', 'dist\\temp',
-                              '-o', wixRoot + 'files.wxs',
-                              '-scom',
-                              '-frag',
-                              '-srd',
-                              '-sreg',
-                              '-gg',
-                              '-cg', 'ApplicationFiles',
-                              '-dr', 'INSTALLFOLDER',
-                              '-t', wixRoot + 'files.xslt'],
-                            { stdio : 'inherit'});
+                [ 'dir', 'dist\\temp',
+                    '-o', wixRoot + 'files.wxs',
+                    '-scom',
+                    '-frag',
+                    '-srd',
+                    '-sreg',
+                    '-gg',
+                    '-cg', 'ApplicationFiles',
+                    '-dr', 'INSTALLFOLDER',
+                    '-t', wixRoot + 'files.xslt'],
+                { stdio : 'inherit'});
                             
             cp.execFileSync('candle', 
-                            [ '-arch', arch,
-                              '-dVersion=' + version,
-                              '-ext', 'WixFirewallExtension',
-                              '-ext', 'WixUtilExtension',
-                              '-o', wixRoot + 'config.wixobj',
-                              wixRoot + 'config.wxs'],
-                            { stdio : 'inherit'});
+                [ '-arch', arch,
+                    '-dVersion=' + version,
+                    '-ext', 'WixFirewallExtension',
+                    '-ext', 'WixUtilExtension',
+                    '-o', wixRoot + 'config.wixobj',
+                    wixRoot + 'config.wxs'],
+                { stdio : 'inherit'});
                             
             cp.execFileSync('candle', 
-                            [ '-arch', arch,
-                              '-ext', 'WixFirewallExtension',
-                              '-o', wixRoot + 'files.wixobj',
-                              wixRoot + 'files.wxs'],
-                            { stdio : 'inherit'});
+                [ '-arch', arch,
+                    '-ext', 'WixFirewallExtension',
+                    '-o', wixRoot + 'files.wixobj',
+                    wixRoot + 'files.wxs'],
+                { stdio : 'inherit'});
                             
             cp.execFileSync('light', 
-                            [ '-ext', 'WixNetFxExtension',
-                              '-ext', 'WixUIExtension',
-                              '-ext', 'WixFirewallExtension',
-                              '-ext', 'WixUtilExtension',
-                              '-spdb',
-                              '-sice:ICE60',
-                              '-b', 'dist\\temp',
-                              '-o', 'dist\\oxygen-' + cfg.version + '-win-' + cfg.arch + '.msi',
-                              wixRoot + 'config.wixobj',
-                              wixRoot + 'files.wixobj'],
-                            { stdio : 'inherit'});
+                [ '-ext', 'WixNetFxExtension',
+                    '-ext', 'WixUIExtension',
+                    '-ext', 'WixFirewallExtension',
+                    '-ext', 'WixUtilExtension',
+                    '-spdb',
+                    '-sice:ICE60',
+                    '-b', 'dist\\temp',
+                    '-o', 'dist\\oxygen-' + cfg.version + '-win-' + cfg.arch + '.msi',
+                    wixRoot + 'config.wixobj',
+                    wixRoot + 'files.wixobj'],
+                { stdio : 'inherit'});
         }
     });
 };

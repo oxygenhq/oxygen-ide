@@ -10,27 +10,27 @@ import PerfectScrollbar from 'perfect-scrollbar';
 
 /* eslint-disable import/prefer-default-export */
 export const initializeScroll = (
-  container,
-  disableHorizontal = false,
-  disableVertical = false,
+    container,
+    disableHorizontal = false,
+    disableVertical = false,
 ) => {
-  if (!container) {
-    return false;
-  }
+    if (!container) {
+        return false;
+    }
 
-  const config = {
-    wheelSpeed: 0.8,
-    wheelPropagation: true,
-    minScrollbarLength: 20,
-  };
+    const config = {
+        wheelSpeed: 0.8,
+        wheelPropagation: true,
+        minScrollbarLength: 20,
+    };
 
-  if (disableHorizontal) {
-    config.suppressScrollX = true;
-  }
+    if (disableHorizontal) {
+        config.suppressScrollX = true;
+    }
 
-  if (disableVertical) {
-    config.suppressScrollY = true;
-  }
+    if (disableVertical) {
+        config.suppressScrollY = true;
+    }
 
-  return new PerfectScrollbar(container, config);
+    return new PerfectScrollbar(container, config);
 };

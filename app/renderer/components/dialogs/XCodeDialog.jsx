@@ -3,37 +3,37 @@ import { Modal, Button } from 'antd';
 
 export default class XCodeDialog extends PureComponent {
   close = () => {
-    if(this.props.clean){
-      this.props.clean();
-    }
+      if(this.props.clean){
+          this.props.clean();
+      }
   }
   
   render() {
-    return (
-      <Modal
-        title="Device Discovery Service"
-        width={480}
-        visible={true}
-        onCancel={this.close}
-        footer={(
-          <Fragment>
-            <Button
-              onClick={this.close}
-            >
+      return (
+          <Modal
+              title="Device Discovery Service"
+              width={480}
+              visible={true}
+              onCancel={this.close}
+              footer={(
+                  <Fragment>
+                      <Button
+                          onClick={this.close}
+                      >
               Ok
-            </Button>
-          </Fragment>
-        )}
-      >
-        <div>
-          { 'Could not find the instruments binary.' }
-          <br />
-          { 'Please ensure `xcrun -find instruments` can locate it.' }
-          <br />
-          <br />
-          { 'Possible reasons for this could be: Xcode not being installed or license not accepted for `xcrun`.' }
-        </div>
-      </Modal>
-    );
+                      </Button>
+                  </Fragment>
+              )}
+          >
+              <div>
+                  { 'Could not find the instruments binary.' }
+                  <br />
+                  { 'Please ensure `xcrun -find instruments` can locate it.' }
+                  <br />
+                  <br />
+                  { 'Possible reasons for this could be: Xcode not being installed or license not accepted for `xcrun`.' }
+              </div>
+          </Modal>
+      );
   }
 }

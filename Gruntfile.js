@@ -103,11 +103,11 @@ module.exports = function(grunt) {
         },
         'concat-files': {
             src: [RECORDER + 'utils.js',
-                    RECORDER + 'elementFinder.js',
-                    RECORDER + 'locatorCss.js',
-                    RECORDER + 'locatorBuilders.js',
-                    RECORDER + 'recorder.js',
-                    RECORDER + 'engineXpath.js'],
+                RECORDER + 'elementFinder.js',
+                RECORDER + 'locatorCss.js',
+                RECORDER + 'locatorBuilders.js',
+                RECORDER + 'recorder.js',
+                RECORDER + 'engineXpath.js'],
             dest: [CHROME_EXT_DIST + 'recorder.js']
         },
         comments: {
@@ -126,31 +126,31 @@ module.exports = function(grunt) {
                     { 
                         expand: true, 
                         cwd: 'app/node_modules', src: prodDeps.concat(['!fibers/src/**',
-                                                                   '!oxygen-cli/lib/reporters/pdf/**',
-                                                                   '!oxygen-cli/lib/reporters/html/**',
-                                                                   '!**/obj/**',
-                                                                   '!monaco-editor/dev/**',
-                                                                   '!monaco-editor/esm/**',
-                                                                   '!codepage/bits/**',
-                                                                   '!moment/src/**',
-                                                                   '!node-idevice/apps/TestApp.ipa',
-                                                                   '!appium-ios-driver/instruments-iwd/iwd4/**',
-                                                                   '!appium-ios-driver/instruments-iwd/iwd5/**',
-                                                                   '!appium-ios-driver/instruments-iwd/iwd6/**']),
+                            '!oxygen-cli/lib/reporters/pdf/**',
+                            '!oxygen-cli/lib/reporters/html/**',
+                            '!**/obj/**',
+                            '!monaco-editor/dev/**',
+                            '!monaco-editor/esm/**',
+                            '!codepage/bits/**',
+                            '!moment/src/**',
+                            '!node-idevice/apps/TestApp.ipa',
+                            '!appium-ios-driver/instruments-iwd/iwd4/**',
+                            '!appium-ios-driver/instruments-iwd/iwd5/**',
+                            '!appium-ios-driver/instruments-iwd/iwd6/**']),
                         dest: OUTDIR + RESOURCES + '/app/node_modules' 
                     },
                     { 
                         expand: true, 
                         cwd: 'app', src: ['dist/**',
-                                        'renderer/img/**',
-                                        'main/selenium/*.jar',
-                                        'main/selenium/' + process.platform + '/**',
-                                        'renderer/app.html',
-                                        'main/recorder/**',
-                                        'renderer/index.js',
-                                        'main/main.prod.*',
-                                        'main/config.json',
-                                        'package.json'],
+                            'renderer/img/**',
+                            'main/selenium/*.jar',
+                            'main/selenium/' + process.platform + '/**',
+                            'renderer/app.html',
+                            'main/recorder/**',
+                            'renderer/index.js',
+                            'main/main.prod.*',
+                            'main/config.json',
+                            'package.json'],
                         dest: OUTDIR + RESOURCES + '/app' 
                     }
                 ]
@@ -198,13 +198,13 @@ module.exports = function(grunt) {
             },
             chromedriver: {
                 src: [process.platform === 'linux' ? 
-                        OUTDIR + RESOURCES + '/app/main/selenium/linux/**/chromedriver' :
-                        OUTDIR + RESOURCES + '/app/main/selenium/darwin/**/chromedriver']
+                    OUTDIR + RESOURCES + '/app/main/selenium/linux/**/chromedriver' :
+                    OUTDIR + RESOURCES + '/app/main/selenium/darwin/**/chromedriver']
             },
             geckodriver: {
                 src: [process.platform === 'linux' ? 
-                        OUTDIR + RESOURCES + '/app/main/selenium/linux/geckodriver' :
-                        OUTDIR + RESOURCES + '/app/main/selenium/darwin/geckodriver']
+                    OUTDIR + RESOURCES + '/app/main/selenium/linux/geckodriver' :
+                    OUTDIR + RESOURCES + '/app/main/selenium/darwin/geckodriver']
             },
             oxygendarwin: {
                 src: [OUTDIR + RESOURCES + '/../MacOS/Electron']

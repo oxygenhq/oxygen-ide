@@ -9,76 +9,76 @@
 import * as ActionTypes from './types';
 
 const defaultState = {
-  logs: {
-    general: [],
-    selenium: [],
-    appium: [],
-  },
-  active: 'general',
+    logs: {
+        general: [],
+        selenium: [],
+        appium: [],
+    },
+    active: 'general',
 };
 
 export default (state = defaultState, action) => {
-  const payload = action.payload || {};
-  const { message, severity, logger, timestamp, extra, cache } = payload;
+    const payload = action.payload || {};
+    const { message, severity, logger, timestamp, extra, cache } = payload;
 
-  switch (action.type) {
+    switch (action.type) {
     // LOGGER_ADD_LOG
     case ActionTypes.LOGGER_ADD_LOG:
-      const newState = {
-        ...state,
-        logs: cloneLogs(state.logs),
-      };
-      if (!state.logs.hasOwnProperty(logger)) {
-        newState.logs[logger] = {};
-      }
-      const logs = newState.logs[logger];
-      logs.push({
-        timestamp,
-        severity,
-        message: (message ? message.trim() : null),
-        extra,
-      });
-      return newState;
+        const newState = {
+            ...state,
+            logs: cloneLogs(state.logs),
+        };
+        if (!state.logs.hasOwnProperty(logger)) {
+            newState.logs[logger] = {};
+        }
+        const logs = newState.logs[logger];
+        logs.push({
+            timestamp,
+            severity,
+            message: (message ? message.trim() : null),
+            extra,
+        });
+        return newState;
 
     // LOG_SET_ACTIVE
     case ActionTypes.LOGGER_SET_ACTIVE:
-      return {
-        ...state,
-        //$FlowFixMe
-        active: logger,
-      };
+        return {
+            ...state,
+            //$FlowFixMe
+            active: logger,
+        };
 
     // RESET_GENERAL_LOGS
     case ActionTypes.LOGGER_RESET_GENERAL:
-      return {
-        active: state.active,
-        logs: {
-          ...state.logs,
-          ['general']: [],
-        },
-      };
+        return {
+            active: state.active,
+            logs: {
+                ...state.logs,
+                ['general']: [],
+            },
+        };
 
     case 'FROM_CACHE': 
-      return {
-        ...defaultState,
-        ...cache.logger
-      }
+        return {
+            ...defaultState,
+            ...cache.logger
+        };
 
     case 'RESET': {
-      return defaultState;
+        return defaultState;
     }
 
     default:
-      return state;
-  }
+        return state;
+    }
 };
 
 function cloneLogs(logs) {
-  let clone = {};
-  for (let key of Object.keys(logs)) {
-    clone[key] = [
-      ...logs[key]
-    ];
-  }
-  return clone;
+    let clone = {};
+    for (let key of Object.keys(logs)) {
+        clone[key] = [
+            ...logs[key]
+        ];
+    }
+    return clone;
 }

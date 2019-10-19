@@ -67,7 +67,7 @@ export default class MenuService extends ServiceBase {
         }
         else if (cmd === Const.MENU_CMD_COPY) {
             if (this.mainWindow.webContents.isDevToolsFocused()) {
-                this.mainWindow.webContents.devToolsWebContents.copy()
+                this.mainWindow.webContents.devToolsWebContents.copy();
             }
             else {
                 focusedWindow.webContents.copy();
@@ -76,7 +76,7 @@ export default class MenuService extends ServiceBase {
         }
         else if (cmd === Const.MENU_CMD_PASTE) {
             if (this.mainWindow.webContents.isDevToolsFocused()) {
-                this.mainWindow.webContents.devToolsWebContents.paste()
+                this.mainWindow.webContents.devToolsWebContents.paste();
             }
             else {
                 focusedWindow.webContents.paste();
@@ -85,7 +85,7 @@ export default class MenuService extends ServiceBase {
         }
         else if (cmd === Const.MENU_CMD_CUT) {
             if (this.mainWindow.webContents.isDevToolsFocused()) {
-                this.mainWindow.webContents.devToolsWebContents.cut()
+                this.mainWindow.webContents.devToolsWebContents.cut();
             }
             else {
                 focusedWindow.webContents.cut();
@@ -129,7 +129,7 @@ export default class MenuService extends ServiceBase {
             var details = 'Oxygen: ' + (oxVersion.startsWith('git') ? oxVersion.substring(oxVersion.length - 40) : oxVersion) + '\n' +
                     'Electron: ' + process.versions.electron + '\n' +
                     'Node: ' + process.versions.node + '\n' +
-                    'Architecture: ' + process.arch + '\n'
+                    'Architecture: ' + process.arch + '\n';
             electron.dialog.showMessageBox({
                 type: 'info', 
                 title: pkgInfo.productName, 

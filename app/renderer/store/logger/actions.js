@@ -9,22 +9,22 @@
 import * as ActionTypes from './types';
 
 export const setActiveLogger = (logger) => ({
-  type: ActionTypes.LOGGER_SET_ACTIVE,
-  payload: { logger },
+    type: ActionTypes.LOGGER_SET_ACTIVE,
+    payload: { logger },
 });
 
 export const addLog = (message, severity = 'INFO', logger = 'general', timestamp = null, extra = null) => ({
-  type: ActionTypes.LOGGER_ADD_LOG,
-  payload: {
-    message,
-    severity,
-    logger,
-    timestamp: timestamp || (new Date()).getTime(),
-    extra,
-  },
+    type: ActionTypes.LOGGER_ADD_LOG,
+    payload: {
+        message,
+        severity,
+        logger,
+        timestamp: timestamp || (new Date()).getTime(),
+        extra,
+    },
 });
 
 export const resetGeneralLogs = () => ({
-  type: ActionTypes.LOGGER_RESET_GENERAL,
-  payload: null,
+    type: ActionTypes.LOGGER_RESET_GENERAL,
+    payload: null,
 });

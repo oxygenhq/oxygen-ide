@@ -13,49 +13,49 @@ import { cardSource, cardTarget } from '../../components/dndHelper';
 
 class DraggableTab extends Component {
   static propTypes = {
-    connectDragSource: PropTypes.func.isRequired,
-    connectDropTarget: PropTypes.func.isRequired,
-    isDragging: PropTypes.bool,
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.node),
-      PropTypes.node
-    ])
+      connectDragSource: PropTypes.func.isRequired,
+      connectDropTarget: PropTypes.func.isRequired,
+      isDragging: PropTypes.bool,
+      children: PropTypes.oneOfType([
+          PropTypes.arrayOf(PropTypes.node),
+          PropTypes.node
+      ])
   }
 
   render() {
-    const {
-      connectDragSource, connectDropTarget, isDragging,
-    } = this.props;
-    const style = {
-//      borderBottom: '1px solid #d9d9d9',
-      opacity: isDragging ? 0.1 : 1,
-      cursor: 'move',
-    };
+      const {
+          connectDragSource, connectDropTarget, isDragging,
+      } = this.props;
+      const style = {
+          //      borderBottom: '1px solid #d9d9d9',
+          opacity: isDragging ? 0.1 : 1,
+          cursor: 'move',
+      };
 
-    return connectDragSource(connectDropTarget(
-      <div style={style}>
-        {this.props.children}
-      </div>,
-    ));
+      return connectDragSource(connectDropTarget(
+          <div style={style}>
+              {this.props.children}
+          </div>,
+      ));
   }
 }
 
 // export default DraggableTab;
 
 export default DropTarget(
-  'menuitem',
-  cardTarget,
-  connect => ({
-    connectDropTarget: connect.dropTarget(),
-  }))(
-  DragSource(
     'menuitem',
-    cardSource,
-    (connect, monitor) => ({
-      connectDragSource: connect.dragSource(),
-      isDragging: monitor.isDragging()
+    cardTarget,
+    connect => ({
+        connectDropTarget: connect.dropTarget(),
     }))(
-    DraggableTab
-  )
+    DragSource(
+        'menuitem',
+        cardSource,
+        (connect, monitor) => ({
+            connectDragSource: connect.dragSource(),
+            isDragging: monitor.isDragging()
+        }))(
+        DraggableTab
+    )
 );
 

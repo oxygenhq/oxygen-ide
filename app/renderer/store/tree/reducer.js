@@ -11,183 +11,183 @@ import { ipcRenderer } from 'electron';
 import * as types from './types';
 
 const defaultState = {
-  nodes: [],
-  refreshScroll: false,
-  baseRoot: '',
-  currentFile: {
-    path: false,
-  },
-  activeFiles: [], // tabs
+    nodes: [],
+    refreshScroll: false,
+    baseRoot: '',
+    currentFile: {
+        path: false,
+    },
+    activeFiles: [], // tabs
 };
 
 export default (state = defaultState, action) => {
-  let { activeFiles } = state;
-  const { currentFile, refreshScroll } = state;
+    let { activeFiles } = state;
+    const { currentFile, refreshScroll } = state;
 
-  switch (action.type) {
+    switch (action.type) {
     case types.BASE_ROOT_PATH:
-      return { ...state, baseRoot: action.payload };
+        return { ...state, baseRoot: action.payload };
 
     case types.CLEAR_TABS_BUNDLE:
-      ipcRenderer.send('latestSelectedFile', null);
-      ipcRenderer.send('latestOpenedTabs', null);
-      return {
-        ...state,
-        activeFiles: [],
-        currentFile: {
-          path: false,
-        },
-      };
+        ipcRenderer.send('latestSelectedFile', null);
+        ipcRenderer.send('latestOpenedTabs', null);
+        return {
+            ...state,
+            activeFiles: [],
+            currentFile: {
+                path: false,
+            },
+        };
 
     case types.UPDATE_FILE_DATA:
-      const file = action.payload;
-      const af = [...activeFiles];
-      const index = af.findIndex((item) => item.path === file.path);
-      af[index] = file;
+        const file = action.payload;
+        const af = [...activeFiles];
+        const index = af.findIndex((item) => item.path === file.path);
+        af[index] = file;
 
-      const data = {
-        ...state,
-        activeFiles: af,
-      };
-
-      if (currentFile.path === file.path) {
-        data.currentFile = {
-          ...file,
-          meta: {
-            touched: file.meta.touched,
-            content: file.meta.content,
-          }
+        const data = {
+            ...state,
+            activeFiles: af,
         };
-      }
 
-      return data;
+        if (currentFile.path === file.path) {
+            data.currentFile = {
+                ...file,
+                meta: {
+                    touched: file.meta.touched,
+                    content: file.meta.content,
+                }
+            };
+        }
+
+        return data;
 
     case types.SET_NEW_TABS_ORDER:
-      return {
-        ...state,
-        activeFiles: action.payload,
-      };
+        return {
+            ...state,
+            activeFiles: action.payload,
+        };
 
     case types.SET_TABS:
-      return {
-        ...state,
-        activeFiles: action.payload,
-      };
+        return {
+            ...state,
+            activeFiles: action.payload,
+        };
 
     case types.TREE_NODES_BUNDLE:
-      return {
-        ...state,
-        nodes: action.payload,
-      };
+        return {
+            ...state,
+            nodes: action.payload,
+        };
 
     case types.SET_CURRENT_FILE:
-      ipcRenderer.send('latestSelectedFile', action.payload);
-      ipcRenderer.send('latestOpenedTabs', activeFiles);
+        ipcRenderer.send('latestSelectedFile', action.payload);
+        ipcRenderer.send('latestOpenedTabs', activeFiles);
 
-      return {
-        ...state,
-        currentFile: action.payload,
-      };
+        return {
+            ...state,
+            currentFile: action.payload,
+        };
 
     case types.EXCLUDE_NODE_FROM_TABS:
-      // set first file from stack active if removed file also is active
-      const newStack = state.activeFiles
-        .filter((item) => item.path !== action.payload.path);
+        // set first file from stack active if removed file also is active
+        const newStack = state.activeFiles
+            .filter((item) => item.path !== action.payload.path);
 
-      if (state.currentFile.path !== false && state.currentFile.path === action.payload.path) {
-        ipcRenderer.send('latestOpenedTabs', newStack);
-        if (newStack.length === 0) {
-          ipcRenderer.send('latestSelectedFile', null);
+        if (state.currentFile.path !== false && state.currentFile.path === action.payload.path) {
+            ipcRenderer.send('latestOpenedTabs', newStack);
+            if (newStack.length === 0) {
+                ipcRenderer.send('latestSelectedFile', null);
+            }
+            return {
+                ...state,
+                currentFile: newStack.length ? newStack[0] : {
+                    path: false,
+                },
+                activeFiles: newStack,
+            };
         }
-        return {
-          ...state,
-          currentFile: newStack.length ? newStack[0] : {
-            path: false,
-          },
-          activeFiles: newStack,
+
+        ipcRenderer.send('latestOpenedTabs', newStack);
+
+        const newState = {
+            ...state,
+            activeFiles: newStack,
         };
-      }
 
-      ipcRenderer.send('latestOpenedTabs', newStack);
+        if (newStack.length === 0) {
+            ipcRenderer.send('latestSelectedFile', null);
+            newState.currentFile = {
+                path: false,
+            };
+        }
 
-      const newState = {
-        ...state,
-        activeFiles: newStack,
-      };
-
-      if (newStack.length === 0) {
-        ipcRenderer.send('latestSelectedFile', null);
-        newState.currentFile = {
-          path: false,
-        };
-      }
-
-      return newState;
+        return newState;
 
     case types.ADD_NODE_TO_TABS:
-      // Add file to stack if not exists
-      if (!state.activeFiles.find((item) => item.path === action.payload.path)) {
-        activeFiles = [
-          ...state.activeFiles,
-          {
-            ...action.payload,
-            order: state.activeFiles.length + 1
-          },
-        ];
-      }
+        // Add file to stack if not exists
+        if (!state.activeFiles.find((item) => item.path === action.payload.path)) {
+            activeFiles = [
+                ...state.activeFiles,
+                {
+                    ...action.payload,
+                    order: state.activeFiles.length + 1
+                },
+            ];
+        }
 
-      return {
-        ...state,
-        currentFile: action.payload,
-        activeFiles,
-      };
+        return {
+            ...state,
+            currentFile: action.payload,
+            activeFiles,
+        };
 
     case types.REMOVE_UNTITLED:
 
-      return {
-        ...state,
-        activeFiles: [...activeFiles.filter((item) => !item.path.includes('unknown'))],
-      };
+        return {
+            ...state,
+            activeFiles: [...activeFiles.filter((item) => !item.path.includes('unknown'))],
+        };
 
     case types.CREATE_NEW_FILE:
-      const idenity = activeFiles.filter((item) => item.path.includes('unknown'));
-      const prepareNewFile = {
-        extension: '',
-        name: `Untitled-${idenity.length}`,
-        type: 'file',
-        path: `unknown-${idenity.length}`,
-        meta: {
-          touched: true,
-          content: '',
-        }
-      };
+        const idenity = activeFiles.filter((item) => item.path.includes('unknown'));
+        const prepareNewFile = {
+            extension: '',
+            name: `Untitled-${idenity.length}`,
+            type: 'file',
+            path: `unknown-${idenity.length}`,
+            meta: {
+                touched: true,
+                content: '',
+            }
+        };
 
-      return {
-        ...state,
-        currentFile: prepareNewFile,
-        activeFiles: [
-          ...activeFiles,
-          prepareNewFile
-        ],
-      };
+        return {
+            ...state,
+            currentFile: prepareNewFile,
+            activeFiles: [
+                ...activeFiles,
+                prepareNewFile
+            ],
+        };
 
     case types.REFRESH_SCROLL:
-      return {
-        ...state,
-        refreshScroll: !refreshScroll,
-      };
+        return {
+            ...state,
+            refreshScroll: !refreshScroll,
+        };
 
     case 'FROM_CACHE': 
-      return {
-        ...defaultState,
-        ...action.payload.cache.tree
-      }
+        return {
+            ...defaultState,
+            ...action.payload.cache.tree
+        };
       
     case 'RESET': {
-      return defaultState;
+        return defaultState;
     }
     
     default:
-      return state;
-  }
+        return state;
+    }
 };

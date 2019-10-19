@@ -18,7 +18,7 @@ export default class AddToRootRow extends PureComponent {
     }
   
     focusTextInput = () => {
-      if (this.textInput && this.textInput.focus) this.textInput.focus();
+        if (this.textInput && this.textInput.focus) this.textInput.focus();
     };
   
     setTextInputRef = element => {
@@ -126,6 +126,6 @@ export default class AddToRootRow extends PureComponent {
                     />
                 </Modal>
             </div>
-        )
+        );
     }
 }

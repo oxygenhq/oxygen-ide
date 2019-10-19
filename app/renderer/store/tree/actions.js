@@ -9,57 +9,57 @@
 import * as types from './types';
 
 export const removeUntitled = () => ({
-  type: types.REMOVE_UNTITLED,
+    type: types.REMOVE_UNTITLED,
 });
 
 export const setBaseRoot = (path) => ({
-  type: types.BASE_ROOT_PATH,
-  payload: path,
+    type: types.BASE_ROOT_PATH,
+    payload: path,
 });
 
 export const createEmptyFile = () => ({
-  type: types.CREATE_NEW_FILE,
+    type: types.CREATE_NEW_FILE,
 });
 
 export const updateFileData = data => ({
-  type: types.UPDATE_FILE_DATA,
-  payload: data,
+    type: types.UPDATE_FILE_DATA,
+    payload: data,
 });
 
 export const setTreeNodes = nodes => ({
-  type: types.TREE_NODES_BUNDLE,
-  payload: nodes,
+    type: types.TREE_NODES_BUNDLE,
+    payload: nodes,
 });
 
 export const addNodeToTabs = node => ({
-  type: types.ADD_NODE_TO_TABS,
-  payload: node,
+    type: types.ADD_NODE_TO_TABS,
+    payload: node,
 });
 
 export const excludeNodeFromTabs = node => ({
-  type: types.EXCLUDE_NODE_FROM_TABS,
-  payload: node,
+    type: types.EXCLUDE_NODE_FROM_TABS,
+    payload: node,
 });
 
 export const setCurrentFile = file => ({
-  type: types.SET_CURRENT_FILE,
-  payload: file,
+    type: types.SET_CURRENT_FILE,
+    payload: file,
 });
 
 export const setNewTabsOrder = (tabs) => ({
-  type: types.SET_NEW_TABS_ORDER,
-  payload: tabs,
+    type: types.SET_NEW_TABS_ORDER,
+    payload: tabs,
 });
 
 export const setTabs = (tabs) => ({
-  type: types.SET_TABS,
-  payload: tabs,
+    type: types.SET_TABS,
+    payload: tabs,
 });
 
 export const cleanTabs = () => ({
-  type: types.CLEAR_TABS_BUNDLE,
+    type: types.CLEAR_TABS_BUNDLE,
 });
 
 export const invokeRefreshScroll = () => ({
-  type: types.REFRESH_SCROLL,
+    type: types.REFRESH_SCROLL,
 });

@@ -11,79 +11,79 @@ import docs from './doc';
 const intellisenseJson = docs.init();
 
 const createModuleAndMethods = (jsonData) => { // eslint-disable-line
-  let methodArr = [];
-  if (Object.keys(jsonData).length === 0) {
-    return [];
-  }
+    let methodArr = [];
+    if (Object.keys(jsonData).length === 0) {
+        return [];
+    }
 
-  Object.keys(jsonData).forEach((item) => {
-    const theEntity = jsonData[item];
+    Object.keys(jsonData).forEach((item) => {
+        const theEntity = jsonData[item];
 
-    // entity starts
-    methodArr = [
-      ...methodArr,
-      '/**',
-      `* ${theEntity.description}`,
-      '*/',
-      `declare var ${item} = (function(){`,
-    ];
+        // entity starts
+        methodArr = [
+            ...methodArr,
+            '/**',
+            `* ${theEntity.description}`,
+            '*/',
+            `declare var ${item} = (function(){`,
+        ];
 
-    // describe methods
-    theEntity.methods.forEach((method) => {
-      const mName = method.getMethod();
-      const mDescription = method.getDescription();
-      const mParams = method.getParams();
-      const mSummary = method.getSummary();
-      const mReturn = method.getReturn();
-      let paramsInBrackets = '';
-      let paramsDescription = [];
-      if (mParams.length > 0) {
-        mParams.forEach((param) => {
-          paramsInBrackets += `, ${param.name}: ${param.type}`;
-          paramsDescription = [
-            ...paramsDescription,
-            `@param {} **${param.name}** ${param.description}`
-          ];
+        // describe methods
+        theEntity.methods.forEach((method) => {
+            const mName = method.getMethod();
+            const mDescription = method.getDescription();
+            const mParams = method.getParams();
+            const mSummary = method.getSummary();
+            const mReturn = method.getReturn();
+            let paramsInBrackets = '';
+            let paramsDescription = [];
+            if (mParams.length > 0) {
+                mParams.forEach((param) => {
+                    paramsInBrackets += `, ${param.name}: ${param.type}`;
+                    paramsDescription = [
+                        ...paramsDescription,
+                        `@param {} **${param.name}** ${param.description}`
+                    ];
+                });
+                if (paramsInBrackets.length > 1) {
+                    paramsInBrackets = paramsInBrackets.substring(2);
+                }
+            }
+
+            methodArr = [
+                ...methodArr,
+                '/**',
+                mSummary ? ` * ${mSummary}` : '',
+                mDescription ? ` * @description ${mDescription}` : '',
+                ...paramsDescription,
+                mReturn ? ` * @return ${mReturn.description}` : '',
+                ' */',
+                `declare function ${mName}(${paramsInBrackets}): ${mReturn ? mReturn.type : 'void'};`,
+            ];
         });
-        if (paramsInBrackets.length > 1) {
-          paramsInBrackets = paramsInBrackets.substring(2);
-        }
-      }
 
-      methodArr = [
-        ...methodArr,
-        '/**',
-        mSummary ? ` * ${mSummary}` : '',
-        mDescription ? ` * @description ${mDescription}` : '',
-        ...paramsDescription,
-        mReturn ? ` * @return ${mReturn.description}` : '',
-        ' */',
-        `declare function ${mName}(${paramsInBrackets}): ${mReturn ? mReturn.type : 'void'};`,
-      ];
+        methodArr = [...methodArr, 'return {'];
+
+        // render return
+        theEntity.methods.forEach((method) => {
+            const mName = method.getMethod();
+            methodArr = [
+                ...methodArr,
+                `${mName}: ${mName}`,
+            ];
+        });
+
+        methodArr = [...methodArr, '}'];
+
+        // Entity ends
+        methodArr = [...methodArr, '}());'];
     });
 
-    methodArr = [...methodArr, 'return {'];
-
-    // render return
-    theEntity.methods.forEach((method) => {
-      const mName = method.getMethod();
-      methodArr = [
-        ...methodArr,
-        `${mName}: ${mName}`,
-      ];
-    });
-
-    methodArr = [...methodArr, '}'];
-
-    // Entity ends
-    methodArr = [...methodArr, '}());'];
-  });
-
-  return methodArr;
+    return methodArr;
 };
 
 const arrdata = createModuleAndMethods(intellisenseJson);
 
 export default function () {
-  monaco.languages.typescript.javascriptDefaults.addExtraLib(arrdata.join('\n'));
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(arrdata.join('\n'));
 }

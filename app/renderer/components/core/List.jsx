@@ -36,7 +36,7 @@ export default class List extends PureComponent<ListProps> {
     }));
 
     handleKeyPress(e) {
-        console.log('key press', e)
+        console.log('key press', e);
     }
 
 
@@ -54,7 +54,7 @@ export default class List extends PureComponent<ListProps> {
             const { locator, path } = object;
 
             if(locator && path){
-                startEdit(locator, path)
+                startEdit(locator, path);
             } else {
                 console.warn('no locator or path');
             }
@@ -71,7 +71,7 @@ export default class List extends PureComponent<ListProps> {
             const { path } = object;
 
             if(path){
-                startEdit("", path)
+                startEdit('', path);
             } else {
                 console.warn('no path');
             }
@@ -156,7 +156,7 @@ export default class List extends PureComponent<ListProps> {
             <Fragment>
                 { this.renderInner() }
             </Fragment>
-        )
+        );
     }
 }
 
@@ -179,7 +179,7 @@ class ListItem extends PureComponent<ListItemProps> {
 
     componentDidMount() {
         if (this.props.editable) {
-          document.addEventListener('click', ::this.handleClickOutside, true);
+            document.addEventListener('click', ::this.handleClickOutside, true);
         }
     }
     
@@ -215,7 +215,7 @@ class ListItem extends PureComponent<ListItemProps> {
     }
 
     handleKeyPress(e) {
-        console.log('key press', e)
+        console.log('key press', e);
     }
 
     render() {
@@ -232,7 +232,7 @@ class ListItem extends PureComponent<ListItemProps> {
             <ListItem.Container 
                 className="list-item" 
                 ref={node => (this.row = node)}
-                >
+            >
 
                 { editable && editing ? 
                     <input
@@ -251,7 +251,7 @@ class ListItem extends PureComponent<ListItemProps> {
                     </div>
                 }
             </ListItem.Container>
-        )
+        );
     }
 }
 
@@ -261,4 +261,4 @@ const EmptyList = () => {
             <p>No Data</p>
         </div>
     );
-}
+};

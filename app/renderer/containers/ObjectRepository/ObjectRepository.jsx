@@ -25,44 +25,44 @@ type Props = {
 };
 
 export default class ObjectRepository extends PureComponent<Props> {
-  constructor(props: Props) {
-    super(props: Props);
-    this.state = {
-        searchResults: []
-    };
+    constructor(props: Props) {
+        super(props: Props);
+        this.state = {
+            searchResults: []
+        };
 
-     this.inputRef = React.createRef();
-  }
+        this.inputRef = React.createRef();
+    }
 
   static Container = styled(FlexColumn)(props => ({
-    height: '100vh',
-    flexShrink: 0,
-    padding: props.floating ? 10 : 0,
-    //borderBottom: props.collapsed ? 'none' : BORDER,
+      height: '100vh',
+      flexShrink: 0,
+      padding: props.floating ? 10 : 0,
+      //borderBottom: props.collapsed ? 'none' : BORDER,
   }));
 
   onSelectNode(path) {
-    this.props.setActive(path);
+      this.props.setActive(path);
   }
 
   setSearchResults = searchResults => {
-    this.setState({
-        searchResults: searchResults
-    })
+      this.setState({
+          searchResults: searchResults
+      });
   }
 
   closeSelectedObject = () => {
-    const { closeActive } = this.props;
-    if(closeActive){
-      closeActive();
-    }
+      const { closeActive } = this.props;
+      if(closeActive){
+          closeActive();
+      }
   }
 
   closeObjectRepository= () => {
-    const { clearObjectRepositoryFile } = this.props;
-    if(clearObjectRepositoryFile){
-      clearObjectRepositoryFile();
-    }
+      const { clearObjectRepositoryFile } = this.props;
+      if(clearObjectRepositoryFile){
+          clearObjectRepositoryFile();
+      }
   }
   
   render() {
@@ -73,77 +73,77 @@ export default class ObjectRepository extends PureComponent<Props> {
           repoPanelTitle += ` - ${name}`;
       }
       if (selectedObject && selectedObject.name !== '') {
-        editorPanelTitle += ` - ${selectedObject.name}`;
+          editorPanelTitle += ` - ${selectedObject.name}`;
       }
 
       const editorPanelTitleWrap = (
-        <Fragment>
-          {editorPanelTitle} 
-          <div onClick={this.closeSelectedObject} className={`header-control`}>
-            <Icon type="close" />
-          </div>
-        </Fragment>
+          <Fragment>
+              {editorPanelTitle} 
+              <div onClick={this.closeSelectedObject} className={'header-control'}>
+                  <Icon type="close" />
+              </div>
+          </Fragment>
       );
 
       const repoPanelTitleWrap = (
-        <Fragment>
-          {repoPanelTitle} 
-          <div onClick={this.closeObjectRepository} className={`header-control`}>
-            <Icon type="close" />
-          </div>
-        </Fragment>
+          <Fragment>
+              {repoPanelTitle} 
+              <div onClick={this.closeObjectRepository} className={'header-control'}>
+                  <Icon type="close" />
+              </div>
+          </Fragment>
       );
 
       return (
-        <ObjectRepository.Container>
-            <Panel 
-                header={ repoPanelTitleWrap }
-                afterHeader = {
-                  <Fragment>
-                    <SearchRow
-                      setSearchResults={ this.setSearchResults }
-                      tree={ tree }
-                    />
-                    <AddToRootRow
-                      orAddToRoot={this.props.orAddToRoot}
-                    />
-                  </Fragment>
-                }
-                scroller
-                scrollWrapperClass="tree-wrapper tree-wrapper-half"
-                scrollRefresh={ this.props.refreshScroll }
-                scrollVerticalOnly
-            >
-                <ObjectTree
-                    searchResults= { this.state.searchResults }
-                    tree={ tree }
-                    active={ active }
-                    onSelect={ (path) => setActive(path) }
-                    showContextMenu = {this.props.showContextMenu}
-                />
-            </Panel>
-            { selectedObject &&
+          <ObjectRepository.Container>
               <Panel 
-                header={ editorPanelTitleWrap } 
-                noBodyPadding={ true } 
+                  header={ repoPanelTitleWrap }
+                  afterHeader = {
+                      <Fragment>
+                          <SearchRow
+                              setSearchResults={ this.setSearchResults }
+                              tree={ tree }
+                          />
+                          <AddToRootRow
+                              orAddToRoot={this.props.orAddToRoot}
+                          />
+                      </Fragment>
+                  }
+                  scroller
+                  scrollWrapperClass="tree-wrapper tree-wrapper-half"
+                  scrollRefresh={ this.props.refreshScroll }
+                  scrollVerticalOnly
               >
-                <ObjectEditor 
-                  refreshScroll={ this.props.refreshScroll }
-                  addLocator = {this.props.addLocator}
-                  addArrayObjectLocator = {this.props.addArrayObjectLocator}
-                  moveLocator = {this.props.moveLocator}
-                  moveArrayObjectLocator = {this.props.moveArrayObjectLocator}
-                  deleteLocator = {this.props.deleteLocator}
-                  updateLocator = {this.props.updateLocator}
-                  updateLocatorValue = {this.props.updateLocatorValue}
-                  updateArrayObjecLocatorValue = {this.props.updateArrayObjecLocatorValue}
-                  removeObjectOrFolder = {this.props.removeObjectOrFolder}
-                  removeArrayObjectLocator = {this.props.removeArrayObjectLocator}
-                  object={ selectedObject } 
-                />
+                  <ObjectTree
+                      searchResults= { this.state.searchResults }
+                      tree={ tree }
+                      active={ active }
+                      onSelect={ (path) => setActive(path) }
+                      showContextMenu = {this.props.showContextMenu}
+                  />
               </Panel>
-            }
-        </ObjectRepository.Container>
+              { selectedObject &&
+              <Panel 
+                  header={ editorPanelTitleWrap } 
+                  noBodyPadding={ true } 
+              >
+                  <ObjectEditor 
+                      refreshScroll={ this.props.refreshScroll }
+                      addLocator = {this.props.addLocator}
+                      addArrayObjectLocator = {this.props.addArrayObjectLocator}
+                      moveLocator = {this.props.moveLocator}
+                      moveArrayObjectLocator = {this.props.moveArrayObjectLocator}
+                      deleteLocator = {this.props.deleteLocator}
+                      updateLocator = {this.props.updateLocator}
+                      updateLocatorValue = {this.props.updateLocatorValue}
+                      updateArrayObjecLocatorValue = {this.props.updateArrayObjecLocatorValue}
+                      removeObjectOrFolder = {this.props.removeObjectOrFolder}
+                      removeArrayObjectLocator = {this.props.removeArrayObjectLocator}
+                      object={ selectedObject } 
+                  />
+              </Panel>
+              }
+          </ObjectRepository.Container>
       );    
   }
 }

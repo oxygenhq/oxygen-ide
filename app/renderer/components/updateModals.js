@@ -11,49 +11,49 @@ import electron from 'electron';
 import { Modal, Button } from 'antd';
 
 export default function () {
-  const { showNoUpdatesDialog, showUpdatesDialog, url, version } = this.state;
+    const { showNoUpdatesDialog, showUpdatesDialog, url, version } = this.state;
   
-  return (
-    <div>
-      <Modal
-        title="Update"
-        width={400}
-        visible={showNoUpdatesDialog}
-        onCancel={() => { this.setState({ showNoUpdatesDialog: false }); }}
-        footer={
-          <Button
-            type="primary"
-            onClick={() => this.setState({ showNoUpdatesDialog: false })}
-          >OK</Button>
-        }
-      >
-      <p>No update available.</p>
-      </Modal>
+    return (
+        <div>
+            <Modal
+                title="Update"
+                width={400}
+                visible={showNoUpdatesDialog}
+                onCancel={() => { this.setState({ showNoUpdatesDialog: false }); }}
+                footer={
+                    <Button
+                        type="primary"
+                        onClick={() => this.setState({ showNoUpdatesDialog: false })}
+                    >OK</Button>
+                }
+            >
+                <p>No update available.</p>
+            </Modal>
 
-      <Modal
-        title="Update"
-        width={400}
-        visible={showUpdatesDialog}
-        onCancel={() => { this.setState({ showUpdatesDialog: false }); }}
-        footer={[
-          <Button
-            key="download"
-            type="primary"
-            onClick={() => {
-              electron.shell.openExternal(url);
-              this.setState({ showNoUpdatesDialog: false })
-              }
-            }
-          >Download</Button>,
-          <Button
-            key="later"
-            type="default"
-            onClick={() => this.setState({ showUpdatesDialog: false })}
-          >Remind Me Later</Button>
-        ]}
-      >
-      <p>New version is available: {version}</p>
-      </Modal>
-    </div>
-  );
+            <Modal
+                title="Update"
+                width={400}
+                visible={showUpdatesDialog}
+                onCancel={() => { this.setState({ showUpdatesDialog: false }); }}
+                footer={[
+                    <Button
+                        key="download"
+                        type="primary"
+                        onClick={() => {
+                            electron.shell.openExternal(url);
+                            this.setState({ showNoUpdatesDialog: false });
+                        }
+                        }
+                    >Download</Button>,
+                    <Button
+                        key="later"
+                        type="default"
+                        onClick={() => this.setState({ showUpdatesDialog: false })}
+                    >Remind Me Later</Button>
+                ]}
+            >
+                <p>New version is available: {version}</p>
+            </Modal>
+        </div>
+    );
 }

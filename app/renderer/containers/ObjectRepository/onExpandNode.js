@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 export default function (expandedKeys, info) {
-    console.log('onExpand:')
-    console.log('expandedKeys', expandedKeys)
-    console.log('info', info)
+    console.log('onExpand:');
+    console.log('expandedKeys', expandedKeys);
+    console.log('info', info);
 }

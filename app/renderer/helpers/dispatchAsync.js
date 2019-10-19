@@ -13,27 +13,27 @@ import 'babel-polyfill';
 * This does the async request and provides Redux thunk feedback 
 */
 export default function dispatchAsync(promise, dispatch, type, payload) {
-  if (typeof dispatch !== 'function'){
-    throw new Error('dispatch was not a function. Did you miss an update to the call?')
-  }
-  const TYPE_REQ = type + "_REQ";
-  const TYPE_RSP = type + "_RSP";
-  const TYPE_ERR = type + "_ERR";
+    if (typeof dispatch !== 'function'){
+        throw new Error('dispatch was not a function. Did you miss an update to the call?');
+    }
+    const TYPE_REQ = type + '_REQ';
+    const TYPE_RSP = type + '_RSP';
+    const TYPE_ERR = type + '_ERR';
 
-  dispatch({ 
-    type: TYPE_REQ,
-    payload: Object.assign({}, payload),
-  });
-  promise.then(
-    (response)  => dispatch({
-        type: TYPE_RSP,
-        success: true,
-        payload: Object.assign({}, payload, { response }),
-    }),
-    (error)  => dispatch({
-        type: TYPE_ERR,
-        success: false,
-        payload: Object.assign({}, payload, { error }),
-    })
-  );
+    dispatch({ 
+        type: TYPE_REQ,
+        payload: Object.assign({}, payload),
+    });
+    promise.then(
+        (response)  => dispatch({
+            type: TYPE_RSP,
+            success: true,
+            payload: Object.assign({}, payload, { response }),
+        }),
+        (error)  => dispatch({
+            type: TYPE_ERR,
+            success: false,
+            payload: Object.assign({}, payload, { error }),
+        })
+    );
 };

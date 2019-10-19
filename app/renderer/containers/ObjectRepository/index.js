@@ -12,32 +12,6 @@ import ObjectRepository from './ObjectRepository';
 import * as orActions from '../../store/obj-repo/actions';
 import { findObject } from '../../helpers/objrepo';
 import { 
-  showContextMenu, 
-  addLocator, 
-  addArrayObjectLocator,
-  moveLocator,
-  moveArrayObjectLocator,
-  deleteLocator, 
-  updateLocator, 
-  removeObjectOrFolder, 
-  removeArrayObjectLocator,
-  updateLocatorValue,
-  updateArrayObjecLocatorValue,
-  orAddToRoot
-} from '../../store/workbench/actions';
-
-const mapStoreToProps = (state) => {
-  return {
-    tree: state.objrepo.tree,
-    active: state.objrepo.active,
-    selectedObject: findObject(state.objrepo.tree, state.objrepo.active),
-    name: state.objrepo.name,
-  };
-};
-  
-const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ 
-    ...orActions, 
     showContextMenu, 
     addLocator, 
     addArrayObjectLocator,
@@ -50,7 +24,33 @@ const mapDispatchToProps = (dispatch) => (
     updateLocatorValue,
     updateArrayObjecLocatorValue,
     orAddToRoot
-  } , dispatch)
+} from '../../store/workbench/actions';
+
+const mapStoreToProps = (state) => {
+    return {
+        tree: state.objrepo.tree,
+        active: state.objrepo.active,
+        selectedObject: findObject(state.objrepo.tree, state.objrepo.active),
+        name: state.objrepo.name,
+    };
+};
+  
+const mapDispatchToProps = (dispatch) => (
+    bindActionCreators({ 
+        ...orActions, 
+        showContextMenu, 
+        addLocator, 
+        addArrayObjectLocator,
+        moveLocator,
+        moveArrayObjectLocator,
+        deleteLocator, 
+        updateLocator, 
+        removeObjectOrFolder, 
+        removeArrayObjectLocator,
+        updateLocatorValue,
+        updateArrayObjecLocatorValue,
+        orAddToRoot
+    } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(ObjectRepository);

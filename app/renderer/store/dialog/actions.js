@@ -9,26 +9,26 @@
 import * as types from './types';
 
 export const showDialog = (dialog, params) => ({
-  type: types.DIALOG,
-  payload: { dialog, visible: true, ...params },
+    type: types.DIALOG,
+    payload: { dialog, visible: true, ...params },
 });
 
 export const hideDialog = (dialog) => ({
-  type: types.DIALOG,
-  payload: { dialog, visible: false },
+    type: types.DIALOG,
+    payload: { dialog, visible: false },
 });
 
 export const setParamstoDialog = (dialog, params) => ({
-  type: types.DIALOG,
-  payload: { dialog, visible: false, ...params },
+    type: types.DIALOG,
+    payload: { dialog, visible: false, ...params },
 });
 
 export const startDownloadChromeDriver = (chromeDriverVersion) => ({
-  type: types.DIALOG_START_DOWNLOAD_CHROME_DRIVER,
-  payload: { chromeDriverVersion },
+    type: types.DIALOG_START_DOWNLOAD_CHROME_DRIVER,
+    payload: { chromeDriverVersion },
 });
 
 export const showDownloadChromeDriverError = () => ({
-  type: types.DIALOG_SHOW_DOWNLOADING_CHROME_DRIVER_FAILED,
-  payload: {  },
+    type: types.DIALOG_SHOW_DOWNLOADING_CHROME_DRIVER_FAILED,
+    payload: {  },
 });

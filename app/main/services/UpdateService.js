@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import https from 'https';
-import ServiceBase from "./ServiceBase";
+import ServiceBase from './ServiceBase';
 import pkgInfo from '../../../package.json';
 import * as Sentry from '@sentry/electron';
 
@@ -43,13 +43,13 @@ const isNewer = (latest, current) => {
 const getDownloadUrl = (downloads) => {
     var platform;
     switch (process.platform) {
-        case 'win32':
-            platform = 'win'; break;
-        case 'darwin':
-            platform = 'osx'; break;
-        case 'linux':
-        default:
-            platform = 'linux'; break;
+    case 'win32':
+        platform = 'win'; break;
+    case 'darwin':
+        platform = 'osx'; break;
+    case 'linux':
+    default:
+        platform = 'linux'; break;
     }
 
     var pkg = platform  + '-' + process.arch;
@@ -59,7 +59,7 @@ const getDownloadUrl = (downloads) => {
             return download;
         }
     }
-}
+};
 
 const getLatestReleaseDetails = (onResult) => {
     var options = {
@@ -161,6 +161,6 @@ export default class UpdateService extends ServiceBase {
                     }
                 }
             });
-        })
+        });
     }
 }

@@ -32,8 +32,8 @@ const services = ServicesSingleton();
  */
 export default function* root() {
     yield all([
-      takeLatest(ActionTypes.OR_OPEN_FILE, openFile),
-      takeLatest(ActionTypes.OR_OBJECT_REPOSITORY_FILE, clearObjectRepositoryFile)
+        takeLatest(ActionTypes.OR_OPEN_FILE, openFile),
+        takeLatest(ActionTypes.OR_OBJECT_REPOSITORY_FILE, clearObjectRepositoryFile)
     ]);
 }
 
@@ -100,7 +100,7 @@ export function* openFile({ payload }) {
             
             start = content.split('{')[0] || 'const po = ';
             const endArray = content.split('}');
-            end = endArray[endArray.length-1] || `;module.exports = po;`;
+            end = endArray[endArray.length-1] || ';module.exports = po;';
         }
         catch (e) {
             yield put(repoActions._openFile_Failure(path, e));

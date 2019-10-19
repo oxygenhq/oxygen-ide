@@ -12,39 +12,39 @@ import * as helpers from './helpers';
    * Handle changed empty lines with active breakpoints
    */
 export default function (e) {
-  const { editorClasses } = this.state;
-  const editor = this.editor;
+    const { editorClasses } = this.state;
+    const editor = this.editor;
 
-  if (this.__prevent_trigger_change_event) {
-    return;
-  }
+    if (this.__prevent_trigger_change_event) {
+        return;
+    }
 
-  // identify if user has added or removed a line - if the number of lines hasn't change, then we have nothing to do here
-  const newLineAddedOrDeleted = e.changes.some(change => ( change.text === e.eol || (change.range.startLineNumber != change.range.endLineNumber) ));
-  //const newLineAddedOrDeleted = e.changes.some(change => { console.dir(change); return false;});
-  if (!newLineAddedOrDeleted) {
-    return;
-  }
-  const lineNum = editor.getPosition().lineNumber;
-  const editorContent = editor.getModel().getValue();
-  const currentLength = editorContent.split('\n').length;
-  let newEditorClasses = [];
+    // identify if user has added or removed a line - if the number of lines hasn't change, then we have nothing to do here
+    const newLineAddedOrDeleted = e.changes.some(change => ( change.text === e.eol || (change.range.startLineNumber != change.range.endLineNumber) ));
+    //const newLineAddedOrDeleted = e.changes.some(change => { console.dir(change); return false;});
+    if (!newLineAddedOrDeleted) {
+        return;
+    }
+    const lineNum = editor.getPosition().lineNumber;
+    const editorContent = editor.getModel().getValue();
+    const currentLength = editorContent.split('\n').length;
+    let newEditorClasses = [];
 
-  if (currentLength > 999 && !editorClasses.includes('extendedMarginEditor')) {
+    if (currentLength > 999 && !editorClasses.includes('extendedMarginEditor')) {
     //newEditorClasses = editorClass.split(' ');
-    newEditorClasses = [
-      ...editorClasses,
-      'extendedMarginEditor',
-    ];
-    this.setState({
-      editorClasses: newEditorClasses,
-    });
-  }
-  else if (currentLength < 1000 && editorClasses.includes('extendedMarginEditor')) {
+        newEditorClasses = [
+            ...editorClasses,
+            'extendedMarginEditor',
+        ];
+        this.setState({
+            editorClasses: newEditorClasses,
+        });
+    }
+    else if (currentLength < 1000 && editorClasses.includes('extendedMarginEditor')) {
     //newEditorClasses = editorClass.split(' ');
-    newEditorClasses = editorClasses
-      .filter((item) => item !== 'extendedMarginEditor');
-    this.setState({ editorClasses: newEditorClasses });
-  }
-  this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+        newEditorClasses = editorClasses
+            .filter((item) => item !== 'extendedMarginEditor');
+        this.setState({ editorClasses: newEditorClasses });
+    }
+    this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
 }

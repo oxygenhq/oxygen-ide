@@ -13,8 +13,8 @@ import FormItem from 'antd/lib/form/FormItem';
 
 const { Option } = Select;
 const DEFAULT_STATE = {
-  name: '',
-  type: null,
+    name: '',
+    type: null,
 };
 
 type Props = {
@@ -26,102 +26,102 @@ type Props = {
 };
 
 export default class ObjectContainerCreateDialog extends PureComponent<Props> {
-  constructor(props: Props) {
-    super(props: Props);
+    constructor(props: Props) {
+        super(props: Props);
 
-    this.textInput = null;
+        this.textInput = null;
 
-    this.state = {
-        ...DEFAULT_STATE,
-        type: this.props.type ? this.props.type : 'container',
+        this.state = {
+            ...DEFAULT_STATE,
+            type: this.props.type ? this.props.type : 'container',
+        };
     }
-  }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    let newState = {};
-    if (nextProps.visible == false) {
-      return {
-        ...DEFAULT_STATE,
-      };
+    static getDerivedStateFromProps(nextProps, prevState) {
+        let newState = {};
+        if (nextProps.visible == false) {
+            return {
+                ...DEFAULT_STATE,
+            };
+        }
+        if (nextProps.type != prevState.type) {
+            newState.type = nextProps.type;
+        }
+        if (nextProps.visible != prevState.visible) {
+            newState.visible = nextProps.visible;
+        }
+        // see if new state is not empty
+        if (newState.hasOwnProperty('type') || newState.hasOwnProperty('visible')) {
+            return newState;
+        }
+        // or return null if no changes were made
+        return null;
     }
-    if (nextProps.type != prevState.type) {
-      newState.type = nextProps.type;
-    }
-    if (nextProps.visible != prevState.visible) {
-      newState.visible = nextProps.visible;
-    }
-    // see if new state is not empty
-    if (newState.hasOwnProperty('type') || newState.hasOwnProperty('visible')) {
-      return newState;
-    }
-    // or return null if no changes were made
-    return null;
-  }
   
-  componentDidMount(){
-    this.focusTextInput();
-  }
+    componentDidMount(){
+        this.focusTextInput();
+    }
 
   focusTextInput = () => {
-    if (this.textInput && this.textInput.focus) this.textInput.focus();
+      if (this.textInput && this.textInput.focus) this.textInput.focus();
   };
 
   setTextInputRef = element => {
-    if(element){
-        this.textInput = element;
-        if(this.textInput && this.textInput.focus){
-            this.textInput.focus();
-        }
-    }
+      if(element){
+          this.textInput = element;
+          if(this.textInput && this.textInput.focus){
+              this.textInput.focus();
+          }
+      }
   };
 
   onChangeName(e) {
-    this.setState({
-      name: e.target.value,
-    });
+      this.setState({
+          name: e.target.value,
+      });
   }
 
   handleOk() {
-    const { name } = this.state;
-    if (!name || name.length == 0) {
-      message.error(`Container name cannot be blank!`);
-      return;
-    }
-    this.props.onSubmit(name, this.props.type, this.props.path);
+      const { name } = this.state;
+      if (!name || name.length == 0) {
+          message.error('Container name cannot be blank!');
+          return;
+      }
+      this.props.onSubmit(name, this.props.type, this.props.path);
   }
 
   render() {
-    const {
-      visible,
-      type,
-      onSubmit,
-      onCancel,
-    } = this.props;
+      const {
+          visible,
+          type,
+          onSubmit,
+          onCancel,
+      } = this.props;
 
-    if (!type) {
-      return null;
-    }
-    const {
-      name
-    } = this.state;
+      if (!type) {
+          return null;
+      }
+      const {
+          name
+      } = this.state;
 
-    return (
-      <Modal
-        title={`Create New Container`}
-        okText="Create"
-        width={700}
-        visible={visible}
-        onOk={this.handleOk.bind(this)}
-        onCancel={onCancel}
-      >
-        <Input
-          ref={this.setTextInputRef}
-          onChange={this.onChangeName.bind(this)}
-          style={{ marginBottom: 15 }}
-          value={ name }
-          placeholder={`Enter new Container name...`}
-        />
-      </Modal>
-    );
+      return (
+          <Modal
+              title={'Create New Container'}
+              okText="Create"
+              width={700}
+              visible={visible}
+              onOk={this.handleOk.bind(this)}
+              onCancel={onCancel}
+          >
+              <Input
+                  ref={this.setTextInputRef}
+                  onChange={this.onChangeName.bind(this)}
+                  style={{ marginBottom: 15 }}
+                  value={ name }
+                  placeholder={'Enter new Container name...'}
+              />
+          </Modal>
+      );
   }
 }

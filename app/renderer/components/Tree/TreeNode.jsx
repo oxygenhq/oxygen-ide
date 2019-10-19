@@ -14,10 +14,10 @@ import toArray from 'rc-util/lib/Children/toArray';
 import { polyfill } from 'react-lifecycles-compat';
 import { nodeContextTypes } from './contextTypes';
 import {
-  getNodeChildren,
-  getDataAndAria,
-  mapChildren,
-  warnOnlyTreeNode,
+    getNodeChildren,
+    getDataAndAria,
+    mapChildren,
+    warnOnlyTreeNode,
 } from './util';
 
 const ICON_OPEN = 'open';
@@ -27,35 +27,35 @@ const defaultTitle = '---';
 
 class TreeNode extends React.Component {
   static propTypes = {
-    eventKey: PropTypes.string, // Pass by parent `cloneElement`
-    prefixCls: PropTypes.string,
-    className: PropTypes.string,
-    style: PropTypes.object,
-    root: PropTypes.object,
-    onSelect: PropTypes.func,
+      eventKey: PropTypes.string, // Pass by parent `cloneElement`
+      prefixCls: PropTypes.string,
+      className: PropTypes.string,
+      style: PropTypes.object,
+      root: PropTypes.object,
+      onSelect: PropTypes.func,
 
-    // By parent
-    expanded: PropTypes.bool,
-    selected: PropTypes.bool,
-    checked: PropTypes.bool,
-    loaded: PropTypes.bool,
-    loading: PropTypes.bool,
-    halfChecked: PropTypes.bool,
-    children: PropTypes.node,
-    title: PropTypes.node,
-    pos: PropTypes.string,
-    dragOver: PropTypes.bool,
-    dragOverGapTop: PropTypes.bool,
-    dragOverGapBottom: PropTypes.bool,
+      // By parent
+      expanded: PropTypes.bool,
+      selected: PropTypes.bool,
+      checked: PropTypes.bool,
+      loaded: PropTypes.bool,
+      loading: PropTypes.bool,
+      halfChecked: PropTypes.bool,
+      children: PropTypes.node,
+      title: PropTypes.node,
+      pos: PropTypes.string,
+      dragOver: PropTypes.bool,
+      dragOverGapTop: PropTypes.bool,
+      dragOverGapBottom: PropTypes.bool,
 
-    // By user
-    isLeaf: PropTypes.bool,
-    highLightChild: PropTypes.bool,
-    selectable: PropTypes.bool,
-    disabled: PropTypes.bool,
-    disableCheckbox: PropTypes.bool,
-    icon: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-    switcherIcon: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+      // By user
+      isLeaf: PropTypes.bool,
+      highLightChild: PropTypes.bool,
+      selectable: PropTypes.bool,
+      disabled: PropTypes.bool,
+      disableCheckbox: PropTypes.bool,
+      icon: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+      switcherIcon: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   };
 
   static contextTypes = nodeContextTypes;
@@ -63,509 +63,509 @@ class TreeNode extends React.Component {
   static childContextTypes = nodeContextTypes;
 
   static defaultProps = {
-    title: defaultTitle,
+      title: defaultTitle,
   };
 
   constructor(props) {
-    super(props);
+      super(props);
 
-    this.state = {
-      dragNodeHighlight: false,
-    };
+      this.state = {
+          dragNodeHighlight: false,
+      };
   }
 
   getChildContext() {
-    return {
-      ...this.context,
-      rcTreeNode: {
-        // onUpCheckConduct: this.onUpCheckConduct,
-      },
-    };
+      return {
+          ...this.context,
+          rcTreeNode: {
+              // onUpCheckConduct: this.onUpCheckConduct,
+          },
+      };
   }
 
   // Isomorphic needn't load data in server side
   componentDidMount() {
-    this.syncLoadData(this.props);
+      this.syncLoadData(this.props);
   }
 
   componentDidUpdate() {
-    this.syncLoadData(this.props);
+      this.syncLoadData(this.props);
   }
 
   onSelectorClick = (e) => {
-    // Click trigger before select/check operation
-    const { rcTree: { onNodeClick } } = this.context;
-    onNodeClick(e, this);
+      // Click trigger before select/check operation
+      const { rcTree: { onNodeClick } } = this.context;
+      onNodeClick(e, this);
 
-    if (this.isSelectable()) {
-      this.onSelect(e);
-    } else {
-      this.onCheck(e);
-    }
+      if (this.isSelectable()) {
+          this.onSelect(e);
+      } else {
+          this.onCheck(e);
+      }
   };
 
   onSelectorDoubleClick = (e) => {
-    const { rcTree: { onNodeDoubleClick } } = this.context;
-    onNodeDoubleClick(e, this);
+      const { rcTree: { onNodeDoubleClick } } = this.context;
+      onNodeDoubleClick(e, this);
   };
 
   onSelect = (e) => {
-    if (this.isDisabled()) return;
+      if (this.isDisabled()) return;
 
-    const { rcTree: { onNodeSelect } } = this.context;
-    e.preventDefault();
-    onNodeSelect(e, this);
+      const { rcTree: { onNodeSelect } } = this.context;
+      e.preventDefault();
+      onNodeSelect(e, this);
   };
 
   onCheck = (e) => {
-    if (this.isDisabled()) return;
+      if (this.isDisabled()) return;
 
-    const { disableCheckbox, checked } = this.props;
-    const {
-      rcTree: { checkable, onNodeCheck },
-    } = this.context;
+      const { disableCheckbox, checked } = this.props;
+      const {
+          rcTree: { checkable, onNodeCheck },
+      } = this.context;
 
-    if (!checkable || disableCheckbox) return;
+      if (!checkable || disableCheckbox) return;
 
-    e.preventDefault();
-    const targetChecked = !checked;
-    onNodeCheck(e, this, targetChecked);
+      e.preventDefault();
+      const targetChecked = !checked;
+      onNodeCheck(e, this, targetChecked);
   };
 
   onMouseEnter = (e) => {
-    const { rcTree: { onNodeMouseEnter } } = this.context;
-    onNodeMouseEnter(e, this);
+      const { rcTree: { onNodeMouseEnter } } = this.context;
+      onNodeMouseEnter(e, this);
   };
 
   onMouseLeave = (e) => {
-    const { rcTree: { onNodeMouseLeave } } = this.context;
-    onNodeMouseLeave(e, this);
+      const { rcTree: { onNodeMouseLeave } } = this.context;
+      onNodeMouseLeave(e, this);
   };
 
   onContextMenu = (e) => {
-    const { rcTree: { onNodeContextMenu } } = this.context;
-    onNodeContextMenu(e, this);
+      const { rcTree: { onNodeContextMenu } } = this.context;
+      onNodeContextMenu(e, this);
   };
 
   onDragStart = (e) => {
-    const { rcTree: { onNodeDragStart } } = this.context;
+      const { rcTree: { onNodeDragStart } } = this.context;
 
-    e.stopPropagation();
-    this.setState({
-      dragNodeHighlight: true,
-    });
-    onNodeDragStart(e, this);
+      e.stopPropagation();
+      this.setState({
+          dragNodeHighlight: true,
+      });
+      onNodeDragStart(e, this);
 
-    try {
+      try {
       // ie throw error
       // firefox-need-it
-      e.dataTransfer.setData('text/plain', '');
-    } catch (error) {
+          e.dataTransfer.setData('text/plain', '');
+      } catch (error) {
       // empty
-    }
+      }
   };
 
   onDrag = (event) => {
-    const { onDrag } = this.props;
-    if(onDrag){
-      onDrag(event.clientY);
-    }
+      const { onDrag } = this.props;
+      if(onDrag){
+          onDrag(event.clientY);
+      }
   }
 
   onDragEnter = (e) => {
-    const { rcTree: { onNodeDragEnter } } = this.context;
+      const { rcTree: { onNodeDragEnter } } = this.context;
 
-    e.preventDefault();
-    e.stopPropagation();
-    onNodeDragEnter(e, this);
+      e.preventDefault();
+      e.stopPropagation();
+      onNodeDragEnter(e, this);
   };
 
   onDragOver = (e) => {
-    const { rcTree: { onNodeDragOver } } = this.context;
+      const { rcTree: { onNodeDragOver } } = this.context;
 
-    e.preventDefault();
-    e.stopPropagation();
-    onNodeDragOver(e, this);
+      e.preventDefault();
+      e.stopPropagation();
+      onNodeDragOver(e, this);
   };
 
   onDragLeave = (e) => {
-    const { rcTree: { onNodeDragLeave } } = this.context;
+      const { rcTree: { onNodeDragLeave } } = this.context;
 
-    e.stopPropagation();
-    onNodeDragLeave(e, this);
+      e.stopPropagation();
+      onNodeDragLeave(e, this);
   };
 
   onDragEnd = (e) => {
-    const { rcTree: { onNodeDragEnd } } = this.context;
+      const { rcTree: { onNodeDragEnd } } = this.context;
 
-    e.stopPropagation();
-    this.setState({
-      dragNodeHighlight: false,
-    });
-    onNodeDragEnd(e, this);
+      e.stopPropagation();
+      this.setState({
+          dragNodeHighlight: false,
+      });
+      onNodeDragEnd(e, this);
   };
 
   onDrop = (e) => {
-    const { rcTree: { onNodeDrop } } = this.context;
+      const { rcTree: { onNodeDrop } } = this.context;
 
-    e.preventDefault();
-    e.stopPropagation();
-    this.setState({
-      dragNodeHighlight: false,
-    });
-    onNodeDrop(e, this);
+      e.preventDefault();
+      e.stopPropagation();
+      this.setState({
+          dragNodeHighlight: false,
+      });
+      onNodeDrop(e, this);
   };
 
   // Disabled item still can be switch
   onExpand = (e) => {
-    const { rcTree: { onNodeExpand } } = this.context;
-    onNodeExpand(e, this);
+      const { rcTree: { onNodeExpand } } = this.context;
+      onNodeExpand(e, this);
   };
 
   // Drag usage
   setSelectHandle = (node) => {
-    this.selectHandle = node;
+      this.selectHandle = node;
   };
 
   getNodeChildren = () => {
-    const { children } = this.props;
-    const originList = toArray(children).filter(node => node);
-    const targetList = getNodeChildren(originList);
+      const { children } = this.props;
+      const originList = toArray(children).filter(node => node);
+      const targetList = getNodeChildren(originList);
 
-    if (originList.length !== targetList.length) {
-      warnOnlyTreeNode();
-    }
+      if (originList.length !== targetList.length) {
+          warnOnlyTreeNode();
+      }
 
-    return targetList;
+      return targetList;
   };
 
   getNodeState = () => {
-    const { expanded } = this.props;
+      const { expanded } = this.props;
 
-    if (this.isLeaf()) {
-      return null;
-    }
+      if (this.isLeaf()) {
+          return null;
+      }
 
-    return expanded ? ICON_OPEN : ICON_CLOSE;
+      return expanded ? ICON_OPEN : ICON_CLOSE;
   };
 
   isLeaf = () => {
-    const { isLeaf, loaded } = this.props;
-    const { rcTree: { loadData } } = this.context;
+      const { isLeaf, loaded } = this.props;
+      const { rcTree: { loadData } } = this.context;
 
-    const hasChildren = this.getNodeChildren().length !== 0;
+      const hasChildren = this.getNodeChildren().length !== 0;
 
-    if (isLeaf === false) {
-      return false;
-    }
+      if (isLeaf === false) {
+          return false;
+      }
 
-    return (
-      isLeaf ||
+      return (
+          isLeaf ||
       (!loadData && !hasChildren) ||
       (loadData && loaded && !hasChildren)
-    );
+      );
   };
 
   isDisabled = () => {
-    const { disabled } = this.props;
-    const { rcTree: { disabled: treeDisabled } } = this.context;
+      const { disabled } = this.props;
+      const { rcTree: { disabled: treeDisabled } } = this.context;
 
-    // Follow the logic of Selectable
-    if (disabled === false) {
-      return false;
-    }
+      // Follow the logic of Selectable
+      if (disabled === false) {
+          return false;
+      }
 
-    return !!(treeDisabled || disabled);
+      return !!(treeDisabled || disabled);
   };
 
   isSelectable() {
-    const { selectable } = this.props;
-    const { rcTree: { selectable: treeSelectable } } = this.context;
+      const { selectable } = this.props;
+      const { rcTree: { selectable: treeSelectable } } = this.context;
 
-    // Ignore when selectable is undefined or null
-    if (typeof selectable === 'boolean') {
-      return selectable;
-    }
+      // Ignore when selectable is undefined or null
+      if (typeof selectable === 'boolean') {
+          return selectable;
+      }
 
-    return treeSelectable;
+      return treeSelectable;
   }
 
   // Load data to avoid default expanded tree without data
   syncLoadData = (props) => {
-    const { expanded, loading, loaded } = props;
-    const { rcTree: { loadData, onNodeLoad } } = this.context;
-    if (loading) return;
+      const { expanded, loading, loaded } = props;
+      const { rcTree: { loadData, onNodeLoad } } = this.context;
+      if (loading) return;
 
-    // read from state to avoid loadData at same time
-    if (loadData && expanded && !this.isLeaf()) {
+      // read from state to avoid loadData at same time
+      if (loadData && expanded && !this.isLeaf()) {
       // We needn't reload data when has children in sync logic
       // It's only needed in node expanded
-      const hasChildren = this.getNodeChildren().length !== 0;
-      if (!hasChildren && !loaded) {
-        onNodeLoad(this);
+          const hasChildren = this.getNodeChildren().length !== 0;
+          if (!hasChildren && !loaded) {
+              onNodeLoad(this);
+          }
       }
-    }
   };
 
   // Switcher
   renderSwitcher = () => {
-    const {
-      highLightChild,
-      expanded,
-      switcherIcon: switcherIconFromProps,
-    } = this.props;
-    const {
-      rcTree: {
-        prefixCls,
-        switcherIcon: switcherIconFromCtx,
+      const {
+          highLightChild,
+          expanded,
+          switcherIcon: switcherIconFromProps,
+      } = this.props;
+      const {
+          rcTree: {
+              prefixCls,
+              switcherIcon: switcherIconFromCtx,
+          }
+      } = this.context;
+
+      const switcherIcon = switcherIconFromProps || switcherIconFromCtx;
+
+      if (this.isLeaf()) {
+          return (
+              <span className={classNames(`${prefixCls}-switcher`, `${prefixCls}-switcher-noop`)}>
+                  {typeof switcherIcon === 'function' ?
+                      React.createElement(switcherIcon, { ...this.props, isLeaf: true }) : switcherIcon}
+              </span>
+          );
       }
-    } = this.context;
 
-    const switcherIcon = switcherIconFromProps || switcherIconFromCtx;
-
-    if (this.isLeaf()) {
-      return (
-        <span className={classNames(`${prefixCls}-switcher`, `${prefixCls}-switcher-noop`)}>
-          {typeof switcherIcon === 'function' ?
-            React.createElement(switcherIcon, { ...this.props, isLeaf: true }) : switcherIcon}
-        </span>
-      );
-    }
-
-    let highLight = '';
+      let highLight = '';
     
-    if(highLightChild){
-      highLight = '_and_highLight';
-    }
+      if(highLightChild){
+          highLight = '_and_highLight';
+      }
 
-    const switcherCls = classNames(`${prefixCls}-switcher`, `${prefixCls}-switcher_${expanded ? ICON_OPEN : ICON_CLOSE}${highLight}`);
+      const switcherCls = classNames(`${prefixCls}-switcher`, `${prefixCls}-switcher_${expanded ? ICON_OPEN : ICON_CLOSE}${highLight}`);
 
-    return (
-      <span onClick={this.onExpand} className={switcherCls}>
-        {typeof switcherIcon === 'function' ?
-          React.createElement(switcherIcon, { ...this.props, isLeaf: false }) : switcherIcon}
-      </span>
-    );
+      return (
+          <span onClick={this.onExpand} className={switcherCls}>
+              {typeof switcherIcon === 'function' ?
+                  React.createElement(switcherIcon, { ...this.props, isLeaf: false }) : switcherIcon}
+          </span>
+      );
   };
 
   // Checkbox
   renderCheckbox = () => {
-    const { checked, halfChecked, disableCheckbox } = this.props;
-    const { rcTree: { prefixCls, checkable } } = this.context;
-    const disabled = this.isDisabled();
+      const { checked, halfChecked, disableCheckbox } = this.props;
+      const { rcTree: { prefixCls, checkable } } = this.context;
+      const disabled = this.isDisabled();
 
-    if (!checkable) return null;
+      if (!checkable) return null;
 
-    // [Legacy] Custom element should be separate with `checkable` in future
-    const $custom = typeof checkable !== 'boolean' ? checkable : null;
+      // [Legacy] Custom element should be separate with `checkable` in future
+      const $custom = typeof checkable !== 'boolean' ? checkable : null;
 
-    return (
-      <span
-        className={classNames(
-          `${prefixCls}-checkbox`,
-          checked && `${prefixCls}-checkbox-checked`,
-          !checked && halfChecked && `${prefixCls}-checkbox-indeterminate`,
-          (disabled || disableCheckbox) && `${prefixCls}-checkbox-disabled`,
-        )}
-        onClick={this.onCheck}
-      >
-        {$custom}
-      </span>
-    );
+      return (
+          <span
+              className={classNames(
+                  `${prefixCls}-checkbox`,
+                  checked && `${prefixCls}-checkbox-checked`,
+                  !checked && halfChecked && `${prefixCls}-checkbox-indeterminate`,
+                  (disabled || disableCheckbox) && `${prefixCls}-checkbox-disabled`,
+              )}
+              onClick={this.onCheck}
+          >
+              {$custom}
+          </span>
+      );
   };
 
   renderIcon = () => {
-    const { loading } = this.props;
-    const { rcTree: { prefixCls } } = this.context;
+      const { loading } = this.props;
+      const { rcTree: { prefixCls } } = this.context;
 
-    return (
-      <span
-        onContextMenu={this.onIconContextMenu}
-        className={classNames(
-          `${prefixCls}-iconEle`,
-          `${prefixCls}-icon__${this.getNodeState() || 'docu'}`,
-          loading && `${prefixCls}-icon_loading`,
-        )}
-      />
-    );
+      return (
+          <span
+              onContextMenu={this.onIconContextMenu}
+              className={classNames(
+                  `${prefixCls}-iconEle`,
+                  `${prefixCls}-icon__${this.getNodeState() || 'docu'}`,
+                  loading && `${prefixCls}-icon_loading`,
+              )}
+          />
+      );
   };
 
   onIconContextMenu = (e) => {
-    e.preventDefault();
-    if (this.props.onIconContextMenu) {
-      this.props.onIconContextMenu(e);
-    }
+      e.preventDefault();
+      if (this.props.onIconContextMenu) {
+          this.props.onIconContextMenu(e);
+      }
   }
 
   // Icon + Title
   renderSelector = () => {
-    const { dragNodeHighlight } = this.state;
-    const { 
-      title,
-      selected,
-      icon,
-      loading,
-      onContextMenuHendler
-    } = this.props;
-    const { rcTree: { prefixCls, showIcon, icon: treeIcon, draggable, loadData } } = this.context;
-    const disabled = this.isDisabled();
+      const { dragNodeHighlight } = this.state;
+      const { 
+          title,
+          selected,
+          icon,
+          loading,
+          onContextMenuHendler
+      } = this.props;
+      const { rcTree: { prefixCls, showIcon, icon: treeIcon, draggable, loadData } } = this.context;
+      const disabled = this.isDisabled();
 
-    const wrapClass = `${prefixCls}-node-content-wrapper`;
+      const wrapClass = `${prefixCls}-node-content-wrapper`;
 
-    // Icon - Still show loading icon when loading without showIcon
-    let $icon;
+      // Icon - Still show loading icon when loading without showIcon
+      let $icon;
 
-    if (showIcon) {
-      const currentIcon = icon || treeIcon;
+      if (showIcon) {
+          const currentIcon = icon || treeIcon;
 
-      $icon = currentIcon ? (
-        <span
-          className={classNames(
-            `${prefixCls}-iconEle`,
-            `${prefixCls}-icon__customize`,
-          )}
-        >
-          {typeof currentIcon === 'function' ?
-            React.createElement(currentIcon, {
-              ...this.props,
-            }) : currentIcon}
-        </span>
-      ) : this.renderIcon();
-    } else if (loadData && loading) {
-      $icon = this.renderIcon();
-    }
+          $icon = currentIcon ? (
+              <span
+                  className={classNames(
+                      `${prefixCls}-iconEle`,
+                      `${prefixCls}-icon__customize`,
+                  )}
+              >
+                  {typeof currentIcon === 'function' ?
+                      React.createElement(currentIcon, {
+                          ...this.props,
+                      }) : currentIcon}
+              </span>
+          ) : this.renderIcon();
+      } else if (loadData && loading) {
+          $icon = this.renderIcon();
+      }
 
-    // Title
-    const $title = <span className={`${prefixCls}-title`}>{title}</span>;
+      // Title
+      const $title = <span className={`${prefixCls}-title`}>{title}</span>;
 
-    return (
-      <span
-        ref={this.setSelectHandle}
-        title={typeof title === 'string' ? title : ''}
-        className={classNames(
-          `${wrapClass}`,
-          `${wrapClass}-${this.getNodeState() || 'normal'}`,
-          (!disabled && (selected || dragNodeHighlight)) && `${prefixCls}-node-selected`,
-          (!disabled && draggable) && 'draggable'
-        )}
-        draggable={(!disabled && draggable) || undefined}
-        aria-grabbed={(!disabled && draggable) || undefined}
-        onMouseEnter={this.onMouseEnter}
-        onMouseLeave={this.onMouseLeave}
-        onContextMenu={this.onContextMenu}
-        onClick={this.onSelectorClick}
-        onDoubleClick={this.onSelectorDoubleClick}
-        onDragStart={draggable ? this.onDragStart : undefined}
-        onDrag={ this.onDrag }
-        onContextMenu={onContextMenuHendler || null}
-      >
-        {$icon}{$title}
-      </span>
-    );
+      return (
+          <span
+              ref={this.setSelectHandle}
+              title={typeof title === 'string' ? title : ''}
+              className={classNames(
+                  `${wrapClass}`,
+                  `${wrapClass}-${this.getNodeState() || 'normal'}`,
+                  (!disabled && (selected || dragNodeHighlight)) && `${prefixCls}-node-selected`,
+                  (!disabled && draggable) && 'draggable'
+              )}
+              draggable={(!disabled && draggable) || undefined}
+              aria-grabbed={(!disabled && draggable) || undefined}
+              onMouseEnter={this.onMouseEnter}
+              onMouseLeave={this.onMouseLeave}
+              onContextMenu={this.onContextMenu}
+              onClick={this.onSelectorClick}
+              onDoubleClick={this.onSelectorDoubleClick}
+              onDragStart={draggable ? this.onDragStart : undefined}
+              onDrag={ this.onDrag }
+              onContextMenu={onContextMenuHendler || null}
+          >
+              {$icon}{$title}
+          </span>
+      );
   };
 
   // Children list wrapped with `Animation`
   renderChildren = () => {
-    const { expanded, pos } = this.props;
-    const { rcTree: {
-      prefixCls,
-      openTransitionName, openAnimation,
-      renderTreeNode,
-    } } = this.context;
+      const { expanded, pos } = this.props;
+      const { rcTree: {
+          prefixCls,
+          openTransitionName, openAnimation,
+          renderTreeNode,
+      } } = this.context;
 
-    const animProps = {};
-    if (openTransitionName) {
-      animProps.transitionName = openTransitionName;
-    } else if (typeof openAnimation === 'object') {
-      animProps.animation = { ...openAnimation };
-    }
+      const animProps = {};
+      if (openTransitionName) {
+          animProps.transitionName = openTransitionName;
+      } else if (typeof openAnimation === 'object') {
+          animProps.animation = { ...openAnimation };
+      }
 
-    // Children TreeNode
-    const nodeList = this.getNodeChildren();
+      // Children TreeNode
+      const nodeList = this.getNodeChildren();
 
-    if (nodeList.length === 0) {
-      return null;
-    }
+      if (nodeList.length === 0) {
+          return null;
+      }
 
-    let $children;
-    if (expanded) {
-      $children = (
-        <ul
-          className={classNames(
-            `${prefixCls}-child-tree`,
-            expanded && `${prefixCls}-child-tree-open`,
-          )}
-          data-expanded={expanded}
-          role="group"
-        >
-          {mapChildren(nodeList, (node, index) => (
-            renderTreeNode(node, index, pos)
-          ))}
-        </ul>
+      let $children;
+      if (expanded) {
+          $children = (
+              <ul
+                  className={classNames(
+                      `${prefixCls}-child-tree`,
+                      expanded && `${prefixCls}-child-tree-open`,
+                  )}
+                  data-expanded={expanded}
+                  role="group"
+              >
+                  {mapChildren(nodeList, (node, index) => (
+                      renderTreeNode(node, index, pos)
+                  ))}
+              </ul>
+          );
+      }
+
+      return (
+          <Animate
+              {...animProps}
+              showProp="data-expanded"
+              component=""
+          >
+              {$children}
+          </Animate>
       );
-    }
-
-    return (
-      <Animate
-        {...animProps}
-        showProp="data-expanded"
-        component=""
-      >
-        {$children}
-      </Animate>
-    );
   };
 
   render() {
-    const { loading } = this.props;
-    const {
-      className, style,
-      dragOver, dragOverGapTop, dragOverGapBottom,
-      isLeaf,
-      expanded, selected, checked, halfChecked,
-      onContextMenu,
-      ...otherProps
-    } = this.props;
-    const { rcTree: {
-      prefixCls,
-      filterTreeNode,
-      draggable,
-    } } = this.context;
-    const disabled = this.isDisabled();
-    const dataOrAriaAttributeProps = getDataAndAria(otherProps);
-    return (
-      <li
-        className={classNames(className, {
-          [`${prefixCls}-treenode-disabled`]: disabled,
-          [`${prefixCls}-treenode-switcher-${expanded ? 'open' : 'close'}`]: !isLeaf,
-          [`${prefixCls}-treenode-checkbox-checked`]: checked,
-          [`${prefixCls}-treenode-checkbox-indeterminate`]: halfChecked,
-          [`${prefixCls}-treenode-selected`]: selected,
-          [`${prefixCls}-treenode-loading`]: loading,
+      const { loading } = this.props;
+      const {
+          className, style,
+          dragOver, dragOverGapTop, dragOverGapBottom,
+          isLeaf,
+          expanded, selected, checked, halfChecked,
+          onContextMenu,
+          ...otherProps
+      } = this.props;
+      const { rcTree: {
+          prefixCls,
+          filterTreeNode,
+          draggable,
+      } } = this.context;
+      const disabled = this.isDisabled();
+      const dataOrAriaAttributeProps = getDataAndAria(otherProps);
+      return (
+          <li
+              className={classNames(className, {
+                  [`${prefixCls}-treenode-disabled`]: disabled,
+                  [`${prefixCls}-treenode-switcher-${expanded ? 'open' : 'close'}`]: !isLeaf,
+                  [`${prefixCls}-treenode-checkbox-checked`]: checked,
+                  [`${prefixCls}-treenode-checkbox-indeterminate`]: halfChecked,
+                  [`${prefixCls}-treenode-selected`]: selected,
+                  [`${prefixCls}-treenode-loading`]: loading,
 
-          'drag-over': !disabled && dragOver,
-          'filter-node': filterTreeNode && filterTreeNode(this)
-        })}
+                  'drag-over': !disabled && dragOver,
+                  'filter-node': filterTreeNode && filterTreeNode(this)
+              })}
 
-        onContextMenu={this.props.onContextMenu}
+              onContextMenu={this.props.onContextMenu}
 
-        style={style}
+              style={style}
 
-        role="treeitem"
+              role="treeitem"
 
-        onDragEnter={(!this.isLeaf() && draggable) ? this.onDragEnter : undefined}
-        onDragOver={draggable ? this.onDragOver : undefined}
-        onDragLeave={draggable ? this.onDragLeave : undefined}
-        onDrop={(!this.isLeaf() && draggable) ? this.onDrop : undefined}
-        onDragEnd={draggable ? this.onDragEnd : undefined}
-        {...dataOrAriaAttributeProps}
-      >
-        {this.renderSwitcher()}
-        {this.renderCheckbox()}
-        {this.renderSelector()}
-        {this.renderChildren()}
-      </li>
-    );
+              onDragEnter={(!this.isLeaf() && draggable) ? this.onDragEnter : undefined}
+              onDragOver={draggable ? this.onDragOver : undefined}
+              onDragLeave={draggable ? this.onDragLeave : undefined}
+              onDrop={(!this.isLeaf() && draggable) ? this.onDrop : undefined}
+              onDragEnd={draggable ? this.onDragEnd : undefined}
+              {...dataOrAriaAttributeProps}
+          >
+              {this.renderSwitcher()}
+              {this.renderCheckbox()}
+              {this.renderSelector()}
+              {this.renderChildren()}
+          </li>
+      );
   }
 }
 

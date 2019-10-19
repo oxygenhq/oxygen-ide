@@ -12,6 +12,6 @@
 * This function calls the original 'require' method, omitting Webpack wrapper.
 */
 export default function require(moduleName) {
-    const requireFunc = typeof __webpack_require__ === "function" ? __non_webpack_require__ : require;
+    const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
     return requireFunc(moduleName);
 };

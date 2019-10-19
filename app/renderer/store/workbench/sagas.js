@@ -60,51 +60,51 @@ const services = ServicesSingleton();
  */
 export default function* root() {
     yield all([
-      takeLatest(ActionTypes.WB_OPEN_FOLDER, openFolder),
-      takeLatest(ActionTypes.WB_INIT, initialize),
-      takeLatest(ActionTypes.WB_DEACTIVATE, deactivate),
-      takeLatest(ActionTypes.WB_OPEN_FILE, openFile),
-      takeLatest(ActionTypes.WB_OPEN_FAKE_FILE, openFakeFile),
-      takeLatest(ActionTypes.WB_CREATE_NEW_REAL_FILE, createNewRealFile),
-      takeLatest(ActionTypes.WB_SHOW_DIALOG, showDialog),
-      takeLatest(ActionTypes.WB_HIDE_DIALOG, hideDialog),
-      takeLatest(ActionTypes.WB_CLOSE_FILE, closeFile),
-      takeLatest(ActionTypes.WB_CLOSE_ALL_FILES, closeAllFiles),
-      takeLatest(ActionTypes.WB_RENAME_FILE, renameFile),
-      takeLatest(ActionTypes.WB_SHOW_NEW_FILE_DIALOG, showNewFileDialog),
-      takeLatest(ActionTypes.WB_CREATE_FILE, createFile),
-      takeLatest(ActionTypes.WB_CREATE_OBJECT_ELEMENT, createObjectElement),
-      takeLatest(ActionTypes.WB_CREATE_OBJECT_CONTAINER, createObjectContainer),
-      takeLatest(ActionTypes.WB_RENAME_OBJECT_ELEMENT_OR_CONTAINER, renameObjectElementOrContainer),
-      takeLatest(ActionTypes.WB_REMOVE_OBJECT_ELEMENT_OR_CONTAINER, removeObjectElementOrContainer),
-      takeLatest(ActionTypes.WB_ADD_LOCATOR, addLocator),
-      takeLatest(ActionTypes.WB_ADD_ARRAY_OBJECT_LOCATOR, addArrayObjectLocator),
-      takeLatest(ActionTypes.WB_MOVE_LOCATOR, moveLocator),
-      takeLatest(ActionTypes.WB_MOVE_ARRAY_OBJECT_LOCATOR, moveArrayObjectLocator),
-      takeLatest(ActionTypes.WB_DELETE_LOCATOR, deleteLocator),
-      takeLatest(ActionTypes.WB_UPDATE_LOCATOR, updateLocator),
-      takeLatest(ActionTypes.WB_UPDATE_LOCATOR_VALUE, updateLocatorValue),
-      takeLatest(ActionTypes.WB_UPDATE_ARRAY_OBJECT_LOCATOR_VALUE, updateArrayObjecLocatorValue),
-      takeLatest(ActionTypes.WB_REMOVE_OBJECT_OR_FOLDER, removeObjectOrFolder),
-      takeLatest(ActionTypes.WB_REMOVE_ARRAY_OBJECT_LOCATOR, removeArrayObjectLocator),
-      takeLatest(ActionTypes.WB_CREATE_FOLDER, createFolder),
-      takeLatest(ActionTypes.WB_DELETE_FILE, deleteFile),
-      takeLatest(ActionTypes.WB_SAVE_CURRENT_FILE, saveCurrentFile),   
-      takeLatest(ActionTypes.WB_START_RECORDER, startRecorder),         
-      takeLatest(ActionTypes.WB_STOP_RECORDER, stopRecorder),
-      takeLatest(ActionTypes.WB_RECORDER_START_WATCHER, startRecorderWatcher),
-      takeLatest(ActionTypes.WB_SHOW_CONTEXT_MENU, showContextMenu),      
-      takeLatest(ActionTypes.WB_ON_TAB_CHANGE, changeTab),
-      takeLatest(ActionTypes.WB_ON_CONTENT_UPDATE, contentUpdate),      
-      takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
-      takeLatest(success(ActionTypes.FS_DELETE), handleFileDelete),
-      takeLatest(ActionTypes.UPDATE_CLOUD_PROVIDERS_SETTINGS, handleUpdatedCloudProvidersSettings),
-      takeLatest(ActionTypes.TEST_UPDATE_RUN_SETTINGS, handleUpdatedRunSettings),      
-      takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
-      takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
-      takeLatest(JAVA_NOT_FOUND, handleJavaNotFound),
-      takeLatest(JAVA_BAD_VERSION, handleJavaBadVersion),
-      takeLatest(ActionTypes.WB_OR_ADD_TO_ROOT, orAddToRoot)
+        takeLatest(ActionTypes.WB_OPEN_FOLDER, openFolder),
+        takeLatest(ActionTypes.WB_INIT, initialize),
+        takeLatest(ActionTypes.WB_DEACTIVATE, deactivate),
+        takeLatest(ActionTypes.WB_OPEN_FILE, openFile),
+        takeLatest(ActionTypes.WB_OPEN_FAKE_FILE, openFakeFile),
+        takeLatest(ActionTypes.WB_CREATE_NEW_REAL_FILE, createNewRealFile),
+        takeLatest(ActionTypes.WB_SHOW_DIALOG, showDialog),
+        takeLatest(ActionTypes.WB_HIDE_DIALOG, hideDialog),
+        takeLatest(ActionTypes.WB_CLOSE_FILE, closeFile),
+        takeLatest(ActionTypes.WB_CLOSE_ALL_FILES, closeAllFiles),
+        takeLatest(ActionTypes.WB_RENAME_FILE, renameFile),
+        takeLatest(ActionTypes.WB_SHOW_NEW_FILE_DIALOG, showNewFileDialog),
+        takeLatest(ActionTypes.WB_CREATE_FILE, createFile),
+        takeLatest(ActionTypes.WB_CREATE_OBJECT_ELEMENT, createObjectElement),
+        takeLatest(ActionTypes.WB_CREATE_OBJECT_CONTAINER, createObjectContainer),
+        takeLatest(ActionTypes.WB_RENAME_OBJECT_ELEMENT_OR_CONTAINER, renameObjectElementOrContainer),
+        takeLatest(ActionTypes.WB_REMOVE_OBJECT_ELEMENT_OR_CONTAINER, removeObjectElementOrContainer),
+        takeLatest(ActionTypes.WB_ADD_LOCATOR, addLocator),
+        takeLatest(ActionTypes.WB_ADD_ARRAY_OBJECT_LOCATOR, addArrayObjectLocator),
+        takeLatest(ActionTypes.WB_MOVE_LOCATOR, moveLocator),
+        takeLatest(ActionTypes.WB_MOVE_ARRAY_OBJECT_LOCATOR, moveArrayObjectLocator),
+        takeLatest(ActionTypes.WB_DELETE_LOCATOR, deleteLocator),
+        takeLatest(ActionTypes.WB_UPDATE_LOCATOR, updateLocator),
+        takeLatest(ActionTypes.WB_UPDATE_LOCATOR_VALUE, updateLocatorValue),
+        takeLatest(ActionTypes.WB_UPDATE_ARRAY_OBJECT_LOCATOR_VALUE, updateArrayObjecLocatorValue),
+        takeLatest(ActionTypes.WB_REMOVE_OBJECT_OR_FOLDER, removeObjectOrFolder),
+        takeLatest(ActionTypes.WB_REMOVE_ARRAY_OBJECT_LOCATOR, removeArrayObjectLocator),
+        takeLatest(ActionTypes.WB_CREATE_FOLDER, createFolder),
+        takeLatest(ActionTypes.WB_DELETE_FILE, deleteFile),
+        takeLatest(ActionTypes.WB_SAVE_CURRENT_FILE, saveCurrentFile),   
+        takeLatest(ActionTypes.WB_START_RECORDER, startRecorder),         
+        takeLatest(ActionTypes.WB_STOP_RECORDER, stopRecorder),
+        takeLatest(ActionTypes.WB_RECORDER_START_WATCHER, startRecorderWatcher),
+        takeLatest(ActionTypes.WB_SHOW_CONTEXT_MENU, showContextMenu),      
+        takeLatest(ActionTypes.WB_ON_TAB_CHANGE, changeTab),
+        takeLatest(ActionTypes.WB_ON_CONTENT_UPDATE, contentUpdate),      
+        takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
+        takeLatest(success(ActionTypes.FS_DELETE), handleFileDelete),
+        takeLatest(ActionTypes.UPDATE_CLOUD_PROVIDERS_SETTINGS, handleUpdatedCloudProvidersSettings),
+        takeLatest(ActionTypes.TEST_UPDATE_RUN_SETTINGS, handleUpdatedRunSettings),      
+        takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
+        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
+        takeLatest(JAVA_NOT_FOUND, handleJavaNotFound),
+        takeLatest(JAVA_BAD_VERSION, handleJavaBadVersion),
+        takeLatest(ActionTypes.WB_OR_ADD_TO_ROOT, orAddToRoot)
     ]);
 }
 
@@ -120,19 +120,19 @@ export function* handleMainMenuEvents({ payload }) {
         yield put(wbActions.saveCurrentFile(true));
     }
     else if (cmd === Const.MENU_CMD_UNDO) {
-        yield editorSubjects["EDITOR.TRIGGER"].next({ trigger: 'undo' });
+        yield editorSubjects['EDITOR.TRIGGER'].next({ trigger: 'undo' });
     }
     else if (cmd === Const.MENU_CMD_REDO) {
-        yield editorSubjects["EDITOR.TRIGGER"].next({ trigger: 'redo' });
+        yield editorSubjects['EDITOR.TRIGGER'].next({ trigger: 'redo' });
     }
     else if (cmd === Const.MENU_CMD_SELECT_ALL) {
-        yield editorSubjects["EDITOR.TRIGGER"].next({ trigger: 'selectall' });
+        yield editorSubjects['EDITOR.TRIGGER'].next({ trigger: 'selectall' });
     }
     else if (cmd === Const.MENU_CMD_FIND) {
-        yield editorSubjects["EDITOR.TRIGGER"].next({ trigger: 'find' });
+        yield editorSubjects['EDITOR.TRIGGER'].next({ trigger: 'find' });
     }
     else if (cmd === Const.MENU_CMD_REPLACE) {
-        yield editorSubjects["EDITOR.TRIGGER"].next({ trigger: 'replace' });
+        yield editorSubjects['EDITOR.TRIGGER'].next({ trigger: 'replace' });
     }
     else if (cmd === Const.MENU_CMD_HELP_CHECK_UPDATES) {
         yield services.mainIpc.call('UpdateService', 'start', [true]).then(() => {});
@@ -377,7 +377,7 @@ export function* openFolder({ payload }) {
 export function* changeTab({ payload }) {
     const { key, name } = payload;
 
-    if(key === "unknown"){
+    if(key === 'unknown'){
         yield put(tabActions.setActiveTab(key, name));
         yield put(testActions.setMainFile(key, name));
         yield put(editorActions.setActiveFile(key, name));
@@ -458,7 +458,7 @@ export function* createNewRealFile({ payload }){
             );
 
             if (error) {
-                console.warn('error')
+                console.warn('error');
 
                 yield put(wbActions._openFile_Failure(folderPath, error));
                 return;
@@ -482,7 +482,7 @@ const getMaxIndex = (tabs) => {
 
     if(Array.isArray(tabs)){
         tabs.map(tab => {
-            if(tab && tab.title && tab.key && tab.key === "unknown"){
+            if(tab && tab.title && tab.key && tab.key === 'unknown'){
                 const number = parseInt(tab.title.replace( /^\D+/g, ''));
 
                 if(isNaN(number)){
@@ -493,18 +493,18 @@ const getMaxIndex = (tabs) => {
                     }
                 }
             }
-        })
+        });
     }
 
     return index;
-}
+};
 
 export function* openFakeFile(){
     let tabs = yield select(state => state.tabs);
     let idenity;
 
     if(tabs && tabs.list && Array.isArray(tabs.list)){
-        idenity = tabs.list.filter((tab) => tab.key === "unknown");
+        idenity = tabs.list.filter((tab) => tab.key === 'unknown');
         if(!idenity){
             idenity = [];
         }
@@ -512,8 +512,8 @@ export function* openFakeFile(){
         idenity = [];
     }
 
-    const key = "unknown";
-    let name = "Untitled-"+(idenity.length+1);
+    const key = 'unknown';
+    let name = 'Untitled-'+(idenity.length+1);
 
     
     const tmpFileExist = tabs.list.some((tab) => tab.key === key && tab.title === name );
@@ -522,9 +522,9 @@ export function* openFakeFile(){
         const index = getMaxIndex(tabs.list);
         if(index === 0){
             const timestamp = + new Date();
-            name = "Untitled-"+(timestamp);
+            name = 'Untitled-'+(timestamp);
         } else {
-            name = "Untitled-"+(index+1);
+            name = 'Untitled-'+(index+1);
         }
     }
 
@@ -642,7 +642,7 @@ export function* createObjectContainer({ payload }) {
 
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
-    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ name,  newFileContent, true])
+    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ name,  newFileContent, true]);
 }
 
 export function* createObjectElement({ payload }) {
@@ -659,7 +659,7 @@ export function* createObjectElement({ payload }) {
 
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
-    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ name,  newFileContent, true])
+    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ name,  newFileContent, true]);
 }
 
 export function* renameObjectElementOrContainer({ payload }) {
@@ -677,7 +677,7 @@ export function* renameObjectElementOrContainer({ payload }) {
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
     
-    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true])
+    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true]);
 }
 
 export function* removeObjectElementOrContainer({ payload }) {
@@ -695,7 +695,7 @@ export function* removeObjectElementOrContainer({ payload }) {
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
     
-    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true])
+    yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  newFileContent, true]);
 }
 
 export function* removeObjectOrFolder({ payload }) {
@@ -956,9 +956,9 @@ export function* closeFile({ payload }) {
         yield put(testActions.setMainFile(null));
     }
 
-    if(path === "unknown"){
+    if(path === 'unknown'){
 
-       yield put(settingsActions.removeFile(path, name));
+        yield put(settingsActions.removeFile(path, name));
     }
 
     yield put(wbActions._closeFile_Success(path, name));
@@ -1021,7 +1021,7 @@ export function* contentUpdate({ payload }) {
         yield put(tabActions.setTabTouched(path, true, name));
     }    
 
-    if(path === "unknown"){
+    if(path === 'unknown'){
         yield put(settingsActions.updateFileContent(path, content, name));
     } else {
         yield put(fsActions.updateFileContent(path, content));
@@ -1048,7 +1048,7 @@ export function* saveCurrentFile({ payload }) {
 
     const { activeFile, activeFileName } = editor;
 
-    if(activeFile === "unknown"){
+    if(activeFile === 'unknown'){
         const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, rootPath, [ 
             { name: 'JavaScript file', extensions:['js'] },
             { name: 'All Files', extensions: ['*'] } 
@@ -1207,7 +1207,7 @@ export function* handleFileDelete({ payload }) {
         const splitResult = path.split('.js');
         splitResult.pop();
         splitResult.push('.repo.js');
-        const repoFilePath = splitResult.join('')
+        const repoFilePath = splitResult.join('');
         const repoFile = files[repoFilePath];
     
         if(repoFile && objrepoPath && repoFilePath === objrepoPath){
@@ -1271,8 +1271,8 @@ export function* copyStringToClipboard(str) {
 
 const openCopyNotificationWithIcon = type => {
     notification[type]({
-      message: 'Copy object',
-      description: type,
+        message: 'Copy object',
+        description: type,
     });
 };
 
@@ -1309,7 +1309,7 @@ export function* showNewObjectElementDialog({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { path, parent } = objrepo;
     if (path) {
-        let safeParent = null
+        let safeParent = null;
         if(parent) {
             safeParent = parent;
         }
@@ -1326,7 +1326,7 @@ export function* showRenameObjectElementOrContainerDialog({ type }) {
 
     const { path, parent } = objrepo;
     if (path) {
-        let safeParent = null
+        let safeParent = null;
         if(parent) {
             safeParent = parent;
         }
@@ -1344,7 +1344,7 @@ export function* showRemoveObjectElementOrContainerDialog({ type }) {
 
     const { path, parent } = objrepo;
     if (path) {
-        let safeParent = null
+        let safeParent = null;
         if(parent) {
             safeParent = parent;
         }
@@ -1454,7 +1454,7 @@ export function* openOrFile({ payload }) {
         return;
     }
 
-    yield openFile({payload: {path:activeNodePath, force: true}})
+    yield openFile({payload: {path:activeNodePath, force: true}});
 }
 
 export function* showRenameFileDialog({ payload }) {   
@@ -1589,21 +1589,21 @@ const getValueByKey = key => {
 
     try {
         switch(key){
-            case 'container':
-                result = {};
-                break;
-            case 'array_object':
-                result = [];
-                break;
-            default:
-                result = false;
+        case 'container':
+            result = {};
+            break;
+        case 'array_object':
+            result = [];
+            break;
+        default:
+            result = false;
         }
     } catch(e) {
         console.warn('e', e);
     }
 
     return result;
-}
+};
 export function* orAddToRoot({payload}){    
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { start, end, repoRoot, parent, path } = objrepo;
@@ -1618,7 +1618,7 @@ export function* orAddToRoot({payload}){
     }
     
     if(!end){
-        safeEnd = `;module.exports = po;`;
+        safeEnd = ';module.exports = po;';
     } else {
         safeEnd = end;
     }

@@ -19,21 +19,21 @@ export default class Navbar extends Component<Props> {
   props: Props;
 
   render() {
-    return (
-      <div className="asidenav">
-        <NavLink exact activeClassName="selected" to="/">
-          <Icon type="home" />
-        </NavLink>
-        {/* <NavLink exact activeClassName="selected" to="/oxyide">
+      return (
+          <div className="asidenav">
+              <NavLink exact activeClassName="selected" to="/">
+                  <Icon type="home" />
+              </NavLink>
+              {/* <NavLink exact activeClassName="selected" to="/oxyide">
           <Icon type="star" />
         </NavLink> */}
-        <NavLink exact activeClassName="selected" to="/counter">
-          <Icon type="star-o" />
-        </NavLink>
-        <NavLink exact activeClassName="selected" to="/user">
-          <Icon type="user" />
-        </NavLink>
-      </div>
-    );
+              <NavLink exact activeClassName="selected" to="/counter">
+                  <Icon type="star-o" />
+              </NavLink>
+              <NavLink exact activeClassName="selected" to="/user">
+                  <Icon type="user" />
+              </NavLink>
+          </div>
+      );
   }
 }

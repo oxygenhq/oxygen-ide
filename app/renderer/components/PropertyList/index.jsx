@@ -56,12 +56,12 @@ function renderPropertyValue(props) {
     if (type === 'number' && editable) {
         return (
             <EditableNumber { ...props } />
-        )
+        );
     }
     else {
         return (
             <FormattedValue { ...props } />
-        )
+        );
     }
 }
 
