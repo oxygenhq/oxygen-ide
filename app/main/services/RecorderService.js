@@ -24,7 +24,7 @@ export default class RecorderService extends ServiceBase {
         super(mainWindow);
         this.windowGroups = [];
         
-        this.lastExtensionTime = 0;
+        this.lastExtensionTime = Date.now();
         this.intervalId = setInterval(this.timer, EXTENSION_CHECK_TIMEOUT);
     }
 
