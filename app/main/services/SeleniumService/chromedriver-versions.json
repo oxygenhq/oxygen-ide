@@ -1,7 +1,7 @@
 {
   "versions": [
     {
-      "driverVersion": "78.0.3904.11",
+      "driverVersion": "78.0.3904.70",
       "chromeMax": 78,
       "chromeMin": 78
     },
