@@ -25,28 +25,28 @@ module.exports = function(grunt) {
 
             // re-brand icon & version
             var child = cp.spawnSync(path.resolve(__dirname, 'rcedit.exe'), 
-                                    [ path.join(distPath, electronExe + '.exe'), 
-                                      '--set-icon', 'resources/app.ico',
-                                      '--set-file-version', cfg.version,
-                                      '--set-product-version', cfg.version,
-                                      '--set-version-string', 'LegalCopyright', 'Copyright (C) 2015-2019 CloudBeat Ltd.',
-                                      '--set-version-string', 'ProductName', 'Oxygen IDE',
-                                      '--set-version-string', 'FileDescription', 'Oxygen IDE',
-                                      '--set-version-string', 'CompanyName', 'CloudBeat Ltd.']);
+                [ path.join(distPath, electronExe + '.exe'), 
+                    '--set-icon', 'resources/app.ico',
+                    '--set-file-version', cfg.version,
+                    '--set-product-version', cfg.version,
+                    '--set-version-string', 'LegalCopyright', 'Copyright (C) 2015-2019 CloudBeat Ltd.',
+                    '--set-version-string', 'ProductName', 'Oxygen IDE',
+                    '--set-version-string', 'FileDescription', 'Oxygen IDE',
+                    '--set-version-string', 'CompanyName', 'CloudBeat Ltd.']);
             if (child.error) {
                 grunt.fail.fatal(child.error);
             }
 
             // rename
             fs.renameSync(path.join(distPath, electronExe + '.exe'), 
-                            cfg.dist + '/' + cfg.name + '.exe');
+                cfg.dist + '/' + cfg.name + '.exe');
         } else if (os.platform() === 'linux') {
             // remove unnecessary folders/files
             fs.unlinkSync(path.join(distPath, 'version'));
 
             // rename
             fs.renameSync(path.join(distPath, electronExe), 
-                            cfg.dist + '/' + cfg.name);
+                cfg.dist + '/' + cfg.name);
         } else if (os.platform() === 'darwin') {
             // remove unnecessary folders/files
             fs.unlinkSync(path.join(distPath, 'version'));
@@ -54,10 +54,10 @@ module.exports = function(grunt) {
 
             // rename
             fs.renameSync(cfg.dist + '/Electron.app/Contents/MacOS/' + electronExeDarwin, 
-                            cfg.dist + '/Electron.app/Contents/MacOS/Oxygen');
+                cfg.dist + '/Electron.app/Contents/MacOS/Oxygen');
                             
             fs.renameSync(cfg.dist + '/Electron.app', 
-                            cfg.dist + '/Oxygen.app');
+                cfg.dist + '/Oxygen.app');
                             
             // update Info.plist
             var plist = '<?xml version="1.0" encoding="UTF-8"?>' +
@@ -78,7 +78,7 @@ module.exports = function(grunt) {
                         '</dict></plist>';
 
             fs.writeFileSync(cfg.dist + '/Oxygen.app/Contents/Info.plist', 
-                            plist.replace('%VERSION%', cfg.version));
+                plist.replace('%VERSION%', cfg.version));
         }
     });
 };

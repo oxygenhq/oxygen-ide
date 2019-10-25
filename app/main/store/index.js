@@ -13,13 +13,13 @@ import { forwardToRenderer, triggerAlias, replayActionMain } from 'electron-redu
 const rootReducer = combineReducers(reducers);
 
 const store = createStore(
-  todoApp,
-  initialState, // optional
-  applyMiddleware(
-    triggerAlias, // optional, see below
-    ...otherMiddleware,
-    forwardToRenderer, // IMPORTANT! This goes last
-  ),
+    todoApp,
+    initialState, // optional
+    applyMiddleware(
+        triggerAlias, // optional, see below
+        ...otherMiddleware,
+        forwardToRenderer, // IMPORTANT! This goes last
+    ),
 );
 
 replayActionMain(store);
@@ -34,13 +34,13 @@ import modals from './modals/reducer';
 import toolbar from './toolbar/reducer';
 
 const rootReducer = combineReducers({
-  counter,
-  router,
-  tree,
-  settings,
-  editor,
-  modals,
-  toolbar,
+    counter,
+    router,
+    tree,
+    settings,
+    editor,
+    modals,
+    toolbar,
 });
 
 export default rootReducer;

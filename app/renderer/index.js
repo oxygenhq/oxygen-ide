@@ -28,20 +28,20 @@ window.dispatch = store.dispatch;
 configureServices(store);
 
 render(
-  <AppContainer>
-    <App store={store} history={history} />
-  </AppContainer>,
-  document.getElementById('root')
+    <AppContainer>
+        <App store={store} history={history} />
+    </AppContainer>,
+    document.getElementById('root')
 );
 
 if (module.hot) {
-  module.hot.accept('./containers/App.js', () => {
-    const NextRoot = require('./containers/App'); // eslint-disable-line global-require
-    render(
-      <AppContainer>
-        <NextRoot store={store} history={history} />
-      </AppContainer>,
-      document.getElementById('root')
-    );
-  });
+    module.hot.accept('./containers/App.js', () => {
+        const NextRoot = require('./containers/App'); // eslint-disable-line global-require
+        render(
+            <AppContainer>
+                <NextRoot store={store} history={history} />
+            </AppContainer>,
+            document.getElementById('root')
+        );
+    });
 }

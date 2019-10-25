@@ -15,7 +15,7 @@ import styled from '@emotion/styled';
  * A container dispalying its children horizontally and vertically centered.
  */
 export default styled(View)({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
 });

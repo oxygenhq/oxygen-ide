@@ -46,12 +46,12 @@ export var language = {
         common: [
             // identifiers and keywords
             [/[a-z_$][\w$]*/, {
-                    cases: {
-                        '@typeKeywords': 'keyword',
-                        '@keywords': 'keyword',
-                        '@default': 'identifier'
-                    }
-                }],
+                cases: {
+                    '@typeKeywords': 'keyword',
+                    '@keywords': 'keyword',
+                    '@default': 'identifier'
+                }
+            }],
             [/[A-Z][\w\$]*/, 'type.identifier'],
             // [/[A-Z][\w\$]*/, 'identifier'],
             // whitespace
@@ -62,11 +62,11 @@ export var language = {
             [/[()\[\]]/, '@brackets'],
             [/[<>](?!@symbols)/, '@brackets'],
             [/@symbols/, {
-                    cases: {
-                        '@operators': 'delimiter',
-                        '@default': ''
-                    }
-                }],
+                cases: {
+                    '@operators': 'delimiter',
+                    '@default': ''
+                }
+            }],
             // numbers
             [/(@digits)[eE]([\-+]?(@digits))?/, 'number.float'],
             [/(@digits)\.(@digits)([eE][\-+]?(@digits))?/, 'number.float'],

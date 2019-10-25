@@ -90,7 +90,7 @@ function* handleSeleniumRuntimeError(event) {
         } = result;
 
         if(error && chromeDriverVersion && chromeVersion){
-             yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, {chromeDriverVersion, chromeVersion}));
+            yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, {chromeDriverVersion, chromeVersion}));
         } else if(error && chromeVersion){
             yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, { chromeVersion }));
         }

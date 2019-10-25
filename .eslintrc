@@ -4,13 +4,17 @@
     "sourceType": "module",
     "allowImportExportEverywhere": true
   },
-  "extends": "airbnb",
+  "extends": ["eslint:recommended", "plugin:react/recommended"],
   "env": {
     "browser": true,
     "node": true
   },
   "rules": {
     "indent": ["error", 4],
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "semi": ["error", "always"],
+    "semi-spacing": ["error", {"before": false, "after": true}],
+    "no-unused-vars": ["error", {"args": "none"}],
     "global-require": "off",
     "no-lonely-if": "off",
     "linebreak-style": 0,
@@ -48,10 +52,5 @@
     "react"
   ],
   "settings": {
-    "import/resolver": {
-      "webpack": {
-        "config": "webpack.config.eslint.js"
-      }
-    }
   }
 }

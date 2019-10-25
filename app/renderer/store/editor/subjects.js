@@ -6,12 +6,12 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { Subject } from "rxjs";
+import { Subject } from 'rxjs';
 
 let editorTriggerSubject = new Subject();
 let editorEventSubject = new Subject();
 
 export default {
-    "EDITOR.TRIGGER": editorTriggerSubject,
-    "EDITOR.EVENT": editorEventSubject,
+    'EDITOR.TRIGGER': editorTriggerSubject,
+    'EDITOR.EVENT': editorEventSubject,
 };

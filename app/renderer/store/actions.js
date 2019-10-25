@@ -14,12 +14,12 @@ import * as testActions from './test/actions';
 import * as recorderActions from './recorder/actions';
 
 const rootActionCreator = {
-  ...dialogActions,
-  ...treeActions,
-  ...editorActions,
-  ...fsActions,
-  ...recorderActions,
-  ...testActions,
+    ...dialogActions,
+    ...treeActions,
+    ...editorActions,
+    ...fsActions,
+    ...recorderActions,
+    ...testActions,
 };
 
 export default rootActionCreator;

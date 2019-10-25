@@ -25,13 +25,13 @@ const services = ServicesSingleton();
  */
 export default function* root() {
     yield all([
-      takeLatest(ActionTypes.LOGGER_SET_VISIBLE, onSetLoggerVisible),
-      takeLatest(ActionTypes.TMP_ADD_FILE, tmpAddFile),
-      takeLatest(ActionTypes.TMP_REMOVE_FILE, tmpRemoveFile),
-      takeLatest(ActionTypes.TMP_UPDATE_FILE_CONTENT, tmpUpdateFileContent),
-      takeLatest(ActionTypes.FIRST_OPEN, firstOpen),
-      takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),,
-      takeLatest(types.TEST_UPDATE_BREAKPOINTS, testUpdateBreakpoints)
+        takeLatest(ActionTypes.LOGGER_SET_VISIBLE, onSetLoggerVisible),
+        takeLatest(ActionTypes.TMP_ADD_FILE, tmpAddFile),
+        takeLatest(ActionTypes.TMP_REMOVE_FILE, tmpRemoveFile),
+        takeLatest(ActionTypes.TMP_UPDATE_FILE_CONTENT, tmpUpdateFileContent),
+        takeLatest(ActionTypes.FIRST_OPEN, firstOpen),
+        takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),,
+        takeLatest(types.TEST_UPDATE_BREAKPOINTS, testUpdateBreakpoints)
     ]);
 }
 

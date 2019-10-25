@@ -13,8 +13,8 @@ import FormItem from 'antd/lib/form/FormItem';
 
 const { Option } = Select;
 const DEFAULT_STATE = {
-  name: '',
-  type: null,
+    name: '',
+    type: null,
 };
 
 type Props = {
@@ -41,7 +41,7 @@ export default class ObjectElementOrContainerRenameDialog extends PureComponent<
         this.state = {
             name: name,
             type: this.props.type ? this.props.type : 'element',
-        }
+        };
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -112,7 +112,7 @@ export default class ObjectElementOrContainerRenameDialog extends PureComponent<
         let result = '';
 
         if(this.props.parent && this.props.parent.name){
-        result = this.props.parent.name;
+            result = this.props.parent.name;
         }
 
         return result;

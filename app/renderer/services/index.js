@@ -6,15 +6,15 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import MainIpcService from "./MainIpc";
-import JavaService from "./JavaService";
-import UserHintsService from "./UserHints";
+import MainIpcService from './MainIpc';
+import JavaService from './JavaService';
+import UserHintsService from './UserHints';
 
 const services = {
     mainIpc: new MainIpcService(),
     javaService: new JavaService(),
     userHints: new UserHintsService(),
-}
+};
 export function configureServices(store, action$) {
     // bind all services to the store and action$ subject
     for (var name in services) {

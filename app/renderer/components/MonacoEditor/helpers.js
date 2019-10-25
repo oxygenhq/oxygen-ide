@@ -34,7 +34,7 @@ export function  getBreakpointMarkers(editor) {
 export function addBreakpointMarker(editor, line, fontSize=null) {
     // check if this line already has breakpoint marker
     if (!fontSize && getBreakpointMarker(editor, line)) {
-      return false;
+        return false;
     }
     const columnNum = editor.getModel().getLineFirstNonWhitespaceColumn(line);
 
@@ -47,10 +47,10 @@ export function addBreakpointMarker(editor, line, fontSize=null) {
     const newDecorators = [{
         range: new monaco.Range(line, columnNum, line, columnNum),
         options: {
-          isWholeLine: true,
-          className: 'myContentClass',
-          linesDecorationsClassName: 'breakpointStyle '+fontSizeClassName,
-          stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
+            isWholeLine: true,
+            className: 'myContentClass',
+            linesDecorationsClassName: 'breakpointStyle '+fontSizeClassName,
+            stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
         }
     }];
     
@@ -76,8 +76,8 @@ export function removeBreakpointMarker(editor, lineOrMarker) {
 
 export function getBreakpointMarker(editor, line) {
     let firstMatch = getAllMarkers(editor).find((marker) => {
-      // return the first marker that matches
-      return isBreakpointMarker(marker) && marker.range.startLineNumber === line;
+        // return the first marker that matches
+        return isBreakpointMarker(marker) && marker.range.startLineNumber === line;
     });
     return firstMatch || null;
 }
@@ -90,10 +90,10 @@ export function getBreakpointMarker(editor, line) {
 export function decoratorsToFlat (decorators) {
     let newArr = [];
     if (!decorators) {
-      return newArr;
+        return newArr;
     }
     decorators.forEach((decorator) => {
-      newArr = [...newArr, decorator.id];
+        newArr = [...newArr, decorator.id];
     });
 
     return newArr;
@@ -124,9 +124,9 @@ export function updateActiveLineMarker(editor, line, fontSize=null) {
         const updatedLineDecorator = Number.isInteger(line) ? {
             range: new monaco.Range(line, columnNum, line, columnNum),
             options: {
-            isWholeLine: true,
-            className: 'myContentClass',
-            linesDecorationsClassName: 'currentLineDecoratorStyle '+fontSizeClassName
+                isWholeLine: true,
+                className: 'myContentClass',
+                linesDecorationsClassName: 'currentLineDecoratorStyle '+fontSizeClassName
             }
         } : null;
 

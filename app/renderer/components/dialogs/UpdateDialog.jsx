@@ -22,95 +22,95 @@ export default class UpdateDialog extends PureComponent<Props> {
   props: Props;
 
   state = {
-    visible: this.props.visible ? this.props.visible : false,
-    name: this.props.name ? this.props.name : null,
+      visible: this.props.visible ? this.props.visible : false,
+      name: this.props.name ? this.props.name : null,
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.visible == false) {
-      return ({
-        visible: false,
-      });
-    }
-    else if (nextProps.visible != prevState.visible) {
-      return({
-        visible: nextProps.visible,
-        name: nextProps.name ? nextProps.name : null,
-      });
-    }
-    return null;
+      if (nextProps.visible == false) {
+          return ({
+              visible: false,
+          });
+      }
+      else if (nextProps.visible != prevState.visible) {
+          return({
+              visible: nextProps.visible,
+              name: nextProps.name ? nextProps.name : null,
+          });
+      }
+      return null;
   }
 
   onChangeName(e) {
-    this.setState({
-      name: e.target.value,
-    });
+      this.setState({
+          name: e.target.value,
+      });
   }
   handleOk() {
-    const { name } = this.state;
-    const { path, type } = this.props;
-    if (!name || name.length == 0) {
-      return;
-    }
-    this.props.onSubmit(path, type, name);
+      const { name } = this.state;
+      const { path, type } = this.props;
+      if (!name || name.length == 0) {
+          return;
+      }
+      this.props.onSubmit(path, type, name);
   }
 
   render() {
-    const {
-      version,
-      url,
-      onSubmit,
-      onCancel,
-    } = this.props;
+      const {
+          version,
+          url,
+          onSubmit,
+          onCancel,
+      } = this.props;
 
-    const {
-      visible
-    } = this.state;
+      const {
+          visible
+      } = this.state;
 
-    return (
-      <div>
-        {version ? (
-          <Modal
-            title="Update"
-            width={400}
-            visible={visible}
-            onCancel={onCancel}
-            footer={[
-              <Button
-                key="download"
-                type="primary"
-                onClick={() => {
-                  electron.shell.openExternal(url);
-                  this.props.onCancel();
-                  }
-                }
-              >Download</Button>,
-              <Button
-                key="later"
-                type="default"
-                onClick={onCancel}
-              >Remind Me Later</Button>
-            ]}
-          >
-          <p>New version is available: {version}</p>
-          </Modal>
-        ) : (
-          <Modal
-            title="Update"
-            width={400}
-            visible={visible}
-            onCancel={onCancel}
-            footer={
-              <Button
-                type="primary"
-                onClick={onCancel}
-              >OK</Button>
-            }
-          >
-          <p>No update available.</p>
-          </Modal>
-        )}
-      </div>
-    );
+      return (
+          <div>
+              {version ? (
+                  <Modal
+                      title="Update"
+                      width={400}
+                      visible={visible}
+                      onCancel={onCancel}
+                      footer={[
+                          <Button
+                              key="download"
+                              type="primary"
+                              onClick={() => {
+                                  electron.shell.openExternal(url);
+                                  this.props.onCancel();
+                              }
+                              }
+                          >Download</Button>,
+                          <Button
+                              key="later"
+                              type="default"
+                              onClick={onCancel}
+                          >Remind Me Later</Button>
+                      ]}
+                  >
+                      <p>New version is available: {version}</p>
+                  </Modal>
+              ) : (
+                  <Modal
+                      title="Update"
+                      width={400}
+                      visible={visible}
+                      onCancel={onCancel}
+                      footer={
+                          <Button
+                              type="primary"
+                              onClick={onCancel}
+                          >OK</Button>
+                      }
+                  >
+                      <p>No update available.</p>
+                  </Modal>
+              )}
+          </div>
+      );
   }
 }

@@ -19,5 +19,5 @@ export default function createActionToSubjectMiddleware(action$) {
         action$.next(action);
 
         return result;
-    }
+    };
 }

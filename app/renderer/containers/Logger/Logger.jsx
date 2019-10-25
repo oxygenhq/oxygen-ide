@@ -32,48 +32,48 @@ export default class Logger extends PureComponent<Props> {
   props: Props;
 
   state = {
-    dragFlag: false,
-    panelHeight: MIN_HEIGHT,
-    viewerHeight: MIN_HEIGHT,
+      dragFlag: false,
+      panelHeight: MIN_HEIGHT,
+      viewerHeight: MIN_HEIGHT,
   };
 
   componentDidMount() {
-    window.addEventListener('mouseup', this.handleMouseUp);
-    window.addEventListener('mousemove', this.handleLoggerDrag);
-    // adjust log viewer height
-    this.setState({ viewerHeight: this.state.panelHeight - this.headerRef.height });
+      window.addEventListener('mouseup', this.handleMouseUp);
+      window.addEventListener('mousemove', this.handleLoggerDrag);
+      // adjust log viewer height
+      this.setState({ viewerHeight: this.state.panelHeight - this.headerRef.height });
   }
   
   componentWillUnmount() {
-    window.removeEventListener('mouseup', this.handleMouseUp);
-    window.removeEventListener('mousemove', this.handleLoggerDrag);
+      window.removeEventListener('mouseup', this.handleMouseUp);
+      window.removeEventListener('mousemove', this.handleLoggerDrag);
   }
 
   handleMouseDown = () => {
-    this.setState({ dragFlag: true });
+      this.setState({ dragFlag: true });
   }
 
   handleMouseUp = () => {
-    if (this.state.dragFlag) {
-      this.setState({ dragFlag: false });
-    }
+      if (this.state.dragFlag) {
+          this.setState({ dragFlag: false });
+      }
   }
 
   handleLoggerDrag = (e) => {
-    if (this.state.dragFlag) {
-      const height = window.innerHeight - e.pageY;
-      const panelHeight = height < MIN_HEIGHT ? MIN_HEIGHT : height;
-      const viewerHeight = panelHeight - this.headerRef.height;
-      // don't allow to drag logger out of the window
-      this.setState({ 
-        panelHeight: panelHeight,
-        viewerHeight: viewerHeight,
-      });
-    }
+      if (this.state.dragFlag) {
+          const height = window.innerHeight - e.pageY;
+          const panelHeight = height < MIN_HEIGHT ? MIN_HEIGHT : height;
+          const viewerHeight = panelHeight - this.headerRef.height;
+          // don't allow to drag logger out of the window
+          this.setState({ 
+              panelHeight: panelHeight,
+              viewerHeight: viewerHeight,
+          });
+      }
   }
 
   handleTabChange(tabKey) {
-    this.props.setActiveLogger(tabKey);
+      this.props.setActiveLogger(tabKey);
   }
 
   render() {
@@ -81,43 +81,43 @@ export default class Logger extends PureComponent<Props> {
     const { visible = true, logs, active, category, variables } = this.props;
     const activeLogs = active ? logs[active] : null;
 
-    return (
-      <div
-        className="ide-logger"
-        style={{
-          height: this.state.panelHeight,
-          minHeight: this.state.panelHeight - 1,
-          display: visible ? 'block' : 'none'
-        }}
-      >
-        <button
-          onMouseDown={ ::this.handleMouseDown }
-          className="dragline"
-        />
-        <div className="panel-header logger-header" ref={headerRef => { this.headerRef = headerRef; }}>
-          <Tabs
-            defaultActiveKey={ active }
-            activeKey={ active }
-            onChange={ ::this.handleTabChange }
-            className="logger-tabs"
+      return (
+          <div
+              className="ide-logger"
+              style={{
+                  height: this.state.panelHeight,
+                  minHeight: this.state.panelHeight - 1,
+                  display: visible ? 'block' : 'none'
+              }}
           >
-            <TabPane tab="General" key="general" />
-            <TabPane tab="Selenium" key="selenium" />
-            { variables && <TabPane tab="Variables" key="variables" /> }
-          </Tabs>
-          <Icon
-            type="close"
-            className="logClose"
-            onClick={ () => this.props.onHide() }
-          />
-        </div>
-        { active !== 'variables' && 
-          <LogViewer logs={ activeLogs } category={ active } height={ panelHeight } />
-        }
-        { active === 'variables' && 
-          <VariablesViewer variables={variables} height={ panelHeight } />
-        }
-      </div>
-    );
+              <button
+                  onMouseDown={ ::this.handleMouseDown }
+                  className="dragline"
+              />
+              <div className="panel-header logger-header" ref={headerRef => { this.headerRef = headerRef; }}>
+                  <Tabs
+                      defaultActiveKey={ active }
+                      activeKey={ active }
+                      onChange={ ::this.handleTabChange }
+                      className="logger-tabs"
+                  >
+                      <TabPane tab="General" key="general" />
+                      <TabPane tab="Selenium" key="selenium" />
+                      { variables && <TabPane tab="Variables" key="variables" /> }
+                  </Tabs>
+                  <Icon
+                      type="close"
+                      className="logClose"
+                      onClick={ () => this.props.onHide() }
+                  />
+              </div>
+              { active !== 'variables' && 
+                <LogViewer logs={ activeLogs } category={ active } height={ panelHeight } />
+              }
+              { active === 'variables' && 
+                <VariablesViewer variables={variables} height={ panelHeight } />
+              }
+          </div>
+      );
   }
 }

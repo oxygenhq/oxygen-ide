@@ -16,84 +16,84 @@ import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
 CheckNodeEnv('production');
 
 export default merge.smart(baseConfig, {
-  devtool: 'source-map',
+    devtool: 'source-map',
 
-  target: 'electron-renderer',
+    target: 'electron-renderer',
 
-  entry: './app/renderer/index',
+    entry: './app/renderer/index',
 
-  output: {
-    path: path.join(__dirname, 'app/dist'),
-    publicPath: '',
-    filename: 'renderer.prod.js'
-  },
+    output: {
+        path: path.join(__dirname, 'app/dist'),
+        publicPath: '',
+        filename: 'renderer.prod.js'
+    },
 
-  module: {
-    rules: [
-      // Extract all .global.css to style.css as is
-      {
-        test: /\.global\.css$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
+    module: {
+        rules: [
+            // Extract all .global.css to style.css as is
+            {
+                test: /\.global\.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                ]
+            },
+            // Pipe other styles through css modules and append to style.css
+            {
+                test: /^((?!\.global).)*\.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                ]
+            },
+            // Add SASS support  - compile all .global.scss files and pipe it to style.css
+            {
+                test: /\.global\.(scss|sass)$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: { importLoaders: 1 },
+                    },
+                    'postcss-loader',
+                    'sass-loader'
+                ]
+            },
+            // Add SASS support  - compile all other .scss files and pipe it to style.css
+            {
+                test: /^((?!\.global).)*\.(scss|sass)$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: { importLoaders: 1 },
+                    },
+                    'sass-loader'
+                ]
+            },
+            // Fonts
+            {
+                test: /\.(woff|woff2|eot|ttf|otf|svg)(\?v=\d+\.\d+\.\d+)?$/,
+                use: {
+                    loader: 'file-loader'
+                }
+            },
+            // Common Image Formats
+            {
+                test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
+                use: 'url-loader',
+            }
         ]
-      },
-      // Pipe other styles through css modules and append to style.css
-      {
-        test: /^((?!\.global).)*\.css$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-        ]
-      },
-      // Add SASS support  - compile all .global.scss files and pipe it to style.css
-      {
-        test: /\.global\.(scss|sass)$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: 'css-loader',
-            options: { importLoaders: 1 },
-          },
-          'postcss-loader',
-          'sass-loader'
-        ]
-      },
-      // Add SASS support  - compile all other .scss files and pipe it to style.css
-      {
-        test: /^((?!\.global).)*\.(scss|sass)$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {
-            loader: 'css-loader',
-            options: { importLoaders: 1 },
-          },
-          'sass-loader'
-        ]
-      },
-      // Fonts
-      {
-        test: /\.(woff|woff2|eot|ttf|otf|svg)(\?v=\d+\.\d+\.\d+)?$/,
-        use: {
-          loader: 'file-loader'
-        }
-      },
-      // Common Image Formats
-      {
-        test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
-        use: 'url-loader',
-      }
-    ]
-  },
+    },
 
-  optimization: {
-    minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
-  },
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.type': '"renderer"'
-    }),
-    /**
+    optimization: {
+        minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
+    },
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.type': '"renderer"'
+        }),
+        /**
      * Create global constants which can be configured at compile time.
      *
      * Useful for allowing different behaviour between development builds and
@@ -102,22 +102,22 @@ export default merge.smart(baseConfig, {
      * NODE_ENV should be production so that modules do not perform certain
      * development checks
      */
-    new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production'
-    }),
+        new webpack.EnvironmentPlugin({
+            NODE_ENV: 'production'
+        }),
 
-    new UglifyJSPlugin({
-      parallel: true,
-      sourceMap: true
-    }),
+        new UglifyJSPlugin({
+            parallel: true,
+            sourceMap: true
+        }),
 
-    new MiniCssExtractPlugin({
-      filename: 'style.css'
-    }),
+        new MiniCssExtractPlugin({
+            filename: 'style.css'
+        }),
 
-    new BundleAnalyzerPlugin({
-      analyzerMode: process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
-      openAnalyzer: process.env.OPEN_ANALYZER === 'true'
-    })
-  ],
+        new BundleAnalyzerPlugin({
+            analyzerMode: process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
+            openAnalyzer: process.env.OPEN_ANALYZER === 'true'
+        })
+    ],
 });

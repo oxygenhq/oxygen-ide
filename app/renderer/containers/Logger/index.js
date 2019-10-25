@@ -20,7 +20,7 @@ const mapStoreToProps = (state) => {
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...logActions } , dispatch)
+    bindActionCreators({ ...logActions } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Logger);

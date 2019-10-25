@@ -96,17 +96,17 @@ Recorder.prototype.attach = function() {
     this.initializeFrameHorrors();
 
     this.__specialKeyCodes = {
-      Backspace: '\\uE003',
-      Clear: '\\uE005',
-      Return: '\\uE006',
-      Enter: '\\uE007',
-      End: '\\uE010',
-      Home: '\\uE011',
-      ArrowLeft: '\\uE012',
-      ArrowUp: '\\uE013',
-      ArrowRight: '\\uE014',
-      ArrowDown: '\\uE015',
-      Delete: '\\uE017'
+        Backspace: '\\uE003',
+        Clear: '\\uE005',
+        Return: '\\uE006',
+        Enter: '\\uE007',
+        End: '\\uE010',
+        Home: '\\uE011',
+        ArrowLeft: '\\uE012',
+        ArrowUp: '\\uE013',
+        ArrowRight: '\\uE014',
+        ArrowDown: '\\uE015',
+        Delete: '\\uE017'
     };
 };
 
@@ -187,29 +187,29 @@ Recorder.prototype.initializeFrameHorrors = function() {
             } else if (msg.type === 'CONTEXT_MENU_RECORD') { // not related to frames...
                 var el = self.__contextmenuEl;
                 switch (msg.cmd) {
-                    case 'waitForText':
-                    case 'assertText':
-                        var txt = getText(el);
-                        if (!txt) {
-                            ox_log('ox: error: selected element doesn\'t have text');
-                            return;
-                        }
-                        self.record(msg.cmd, self.findLocators(el), txt);
-                        break;
-                    case 'waitForValue':
-                    case 'assertValue':
-                        if (!el.getAttribute('value')) {
-                            ox_log('ox: error: selected element doesn\'t have value attribute');
-                            return;
-                        }
-                        self.record(msg.cmd, self.findLocators(el), el.value);
-                        break;
-                    case 'waitForExist':
-                        self.record(msg.cmd, self.findLocators(el));
-                        break;
-                    case 'assertTitle':
-                        self.record(msg.cmd, document.title, null);
-                        break;
+                case 'waitForText':
+                case 'assertText':
+                    var txt = getText(el);
+                    if (!txt) {
+                        ox_log('ox: error: selected element doesn\'t have text');
+                        return;
+                    }
+                    self.record(msg.cmd, self.findLocators(el), txt);
+                    break;
+                case 'waitForValue':
+                case 'assertValue':
+                    if (!el.getAttribute('value')) {
+                        ox_log('ox: error: selected element doesn\'t have value attribute');
+                        return;
+                    }
+                    self.record(msg.cmd, self.findLocators(el), el.value);
+                    break;
+                case 'waitForExist':
+                    self.record(msg.cmd, self.findLocators(el));
+                    break;
+                case 'assertTitle':
+                    self.record(msg.cmd, document.title, null);
+                    break;
                 }
             } else if (msg.type === 'SETTINGS_DEBUG') { // not related to frames...
                 window.ox_debug = msg.enable;
@@ -226,7 +226,7 @@ Recorder.prototype.initializeFrameHorrors = function() {
         window.parent.postMessage(JSON.stringify({type: FRAME_IS_READY}), '*');
         window.parent.postMessage(JSON.stringify({type: WINDOW_GROUP, data: window.__hash}), '*');
     }
-}
+};
 
 Recorder.prototype.record = function (command, target, value) {
     // in case no locators were generated
@@ -296,7 +296,7 @@ Recorder.prototype.recordSendCommand = function (lastWindow) {
 
     var validCommands = 0;
     if (this._ox_command) {
-cmdsLoop:
+        cmdsLoop:
         for (var i = 0; i < this._ox_command.length; i++) {
             var c = this._ox_command[i];
 
@@ -332,7 +332,7 @@ cmdsLoop:
     ox_log('ox: ' + data);
 
     window.postMessage(JSON.stringify({cmd: 'RECORDER_COMMAND', data: data }), '*');
-}
+};
 
 Recorder.prototype.findLocator = function (element) {
     return this.locatorBuilders.build(element);

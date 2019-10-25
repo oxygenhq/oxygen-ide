@@ -29,9 +29,9 @@ export default class Workbench {
     openFolder(path) {
         this.store.dispatch({ type: 'FS_REQUEST' });
         waitForAction('FS_RESPONSE', this.action$)
-        .then((action) => {
-            console.log('all is right');
-        });
+            .then((action) => {
+                console.log('all is right');
+            });
         //action$.ofType(ActionTypes.FS_OPEN_FOLDER_RSP)
         //.mapTo({ type: 'UPS' });
         /*

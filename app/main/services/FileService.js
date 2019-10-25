@@ -187,7 +187,7 @@ export default class FileService extends ServiceBase {
     getFolderContent(folderPath) {
         let stats = fs.lstatSync(folderPath);
         if (!stats.isDirectory()) {
-            throw Error(`Path is pointing to a file instead of folder.`);
+            throw Error('Path is pointing to a file instead of folder.');
         }
         let fileNames = fs.readdirSync(folderPath);
         let children = fileNames
@@ -301,8 +301,8 @@ export default class FileService extends ServiceBase {
             fs.access(newPath, (error) => {
                 if (!error) {
                     reject(this._humanizeErrorCode({
-                      code: 'EEXIST',
-                      path: orgPath
+                        code: 'EEXIST',
+                        path: orgPath
                     }));
                 } else {
                     fs.rename(orgPath, newPath, (error) => {
@@ -329,7 +329,7 @@ export default class FileService extends ServiceBase {
                 } else {
                     fsExtra.move(oldPath, newPath, error => {
                         if(error){
-                            console.error('error',error)
+                            console.error('error',error);
                         } else {
                             //do nothing, file watcher will do all work
                         }

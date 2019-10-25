@@ -143,13 +143,13 @@ export default class FileExplorer extends Component<Props> {
     doRefreshScrollBottom = () => {
         this.setState({
             refreshScrollBottom: !this.state.refreshScrollBottom
-        })
+        });
     }
 
     doRefreshScrollTop = () => {
         this.setState({
             refreshScroll: !this.state.refreshScroll
-        })
+        });
     }
 
     render() {
@@ -157,7 +157,7 @@ export default class FileExplorer extends Component<Props> {
         const { selectedKeys, refreshScroll, refreshScrollBottom } = this.state;
         const headerTitle = (
             <Tooltip title={(rootPath ? rootPath : '')}>
-              <span>{'File Explorer' + (rootName ? ` - ${rootName}` : '')}</span>
+                <span>{'File Explorer' + (rootName ? ` - ${rootName}` : '')}</span>
             </Tooltip>
         );
 
@@ -176,7 +176,7 @@ export default class FileExplorer extends Component<Props> {
                     showLine
                     draggable
                     checkable={false}
-                    defaultExpandedKeys={["nonexistingkey"]}
+                    defaultExpandedKeys={['nonexistingkey']}
                     autoExpandParent
                     selectedKeys={selectedKeys}
                     rootPath={rootPath}

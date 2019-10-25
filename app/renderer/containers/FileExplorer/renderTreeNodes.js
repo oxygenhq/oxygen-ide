@@ -10,9 +10,9 @@ import React from 'react';
 import Tree from '../../components/Tree';
 
 function handleContextMenuEvent(e, node, menuName) {
-  e.preventDefault();
-  this.props.setActiveNode(node.path);
-  this.props.showContextMenu(menuName, e);
+    e.preventDefault();
+    this.props.setActiveNode(node.path);
+    this.props.showContextMenu(menuName, e);
 }
 
 function renderTreeNodes(nodes) {
@@ -21,76 +21,76 @@ function renderTreeNodes(nodes) {
     }
     handleContextMenuEvent = handleContextMenuEvent.bind(this);
     return nodes.map(element => {
-      const resolveClassName = element.name === '.emptyfile'
-        ? 'hidden-node' : element.type;
+        const resolveClassName = element.name === '.emptyfile'
+            ? 'hidden-node' : element.type;
 
-      let theTitle = element.name;
-      let onIconContextMenu = () => {};
+        let theTitle = element.name;
+        let onIconContextMenu = () => {};
 
-      if(element.type === 'file' && element.name !== '.emptyfile' && element.name.endsWith('.repo.js')){
-        theTitle = (
-          <span 
-            className="tree-row-title" 
-            title={ element.name } 
-            style={{ userSelect: 'none' }} 
-            onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_OBJECT_REPOSITORY_FILE_EXPLORER_FILE') }
-          >{element.name}</span>
-        );
-        onIconContextMenu = (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_OBJECT_REPOSITORY_FILE_EXPLORER_FILE');
-      }
-      else if (element.type === 'file' && element.name !== '.emptyfile') {
-        theTitle = (
-          <span 
-            className="tree-row-title" 
-            title={ element.name } 
-            style={{ userSelect: 'none' }} 
-            onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FILE') }
-          >{element.name}</span>
-        );
-        onIconContextMenu = (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FILE');
-      }
-      else if (element.type === 'folder' && element.name !== '.emptyfile') {
-        theTitle = (
-          <span 
-            className="tree-row-title" 
-            title={ element.name } 
-            style={{ userSelect: 'none' }} 
-            onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FOLDER') }
-          >{element.name}</span>
-        );
-        onIconContextMenu = (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FOLDER');
-      }
+        if(element.type === 'file' && element.name !== '.emptyfile' && element.name.endsWith('.repo.js')){
+            theTitle = (
+                <span 
+                    className="tree-row-title" 
+                    title={ element.name } 
+                    style={{ userSelect: 'none' }} 
+                    onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_OBJECT_REPOSITORY_FILE_EXPLORER_FILE') }
+                >{element.name}</span>
+            );
+            onIconContextMenu = (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_OBJECT_REPOSITORY_FILE_EXPLORER_FILE');
+        }
+        else if (element.type === 'file' && element.name !== '.emptyfile') {
+            theTitle = (
+                <span 
+                    className="tree-row-title" 
+                    title={ element.name } 
+                    style={{ userSelect: 'none' }} 
+                    onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FILE') }
+                >{element.name}</span>
+            );
+            onIconContextMenu = (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FILE');
+        }
+        else if (element.type === 'folder' && element.name !== '.emptyfile') {
+            theTitle = (
+                <span 
+                    className="tree-row-title" 
+                    title={ element.name } 
+                    style={{ userSelect: 'none' }} 
+                    onContextMenu={ (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FOLDER') }
+                >{element.name}</span>
+            );
+            onIconContextMenu = (e) => handleContextMenuEvent(e, element, 'CONTEXT_MENU_FILE_EXPLORER_FOLDER');
+        }
 
-      if (element.type === 'folder') { // && element.children && element.children.length > 0
+        if (element.type === 'folder') { // && element.children && element.children.length > 0
+            return (
+                <Tree.TreeNode
+                    nodeInfo={element}
+                    key={element.path}
+                    onIconContextMenu={onIconContextMenu}
+                    title={theTitle}
+                    className={resolveClassName}
+                    dataRef={element}
+                    style={{ userSelect: 'none' }}
+                    isLeaf={false}
+                >
+                    {element.children ? renderTreeNodes.apply(this, [element.children]) : []}
+                </Tree.TreeNode>
+            );
+        }
+
         return (
-          <Tree.TreeNode
-            nodeInfo={element}
-            key={element.path}
-            onIconContextMenu={onIconContextMenu}
-            title={theTitle}
-            className={resolveClassName}
-            dataRef={element}
-            style={{ userSelect: 'none' }}
-            isLeaf={false}
-          >
-            {element.children ? renderTreeNodes.apply(this, [element.children]) : []}
-          </Tree.TreeNode>
+            <Tree.TreeNode
+                nodeInfo={element}
+                onIconContextMenu={onIconContextMenu}
+                title={theTitle}
+                key={element.path}
+                className={resolveClassName}
+                dataRef={element}
+                style={{ userSelect: 'none' }}
+                isLeaf={true}
+            />
         );
-      }
-
-      return (
-        <Tree.TreeNode
-          nodeInfo={element}
-          onIconContextMenu={onIconContextMenu}
-          title={theTitle}
-          key={element.path}
-          className={resolveClassName}
-          dataRef={element}
-          style={{ userSelect: 'none' }}
-          isLeaf={true}
-        />
-      );
     });
-  };
+};
 
-  export default renderTreeNodes;
+export default renderTreeNodes;

@@ -119,14 +119,14 @@ export function* handleServiceEvents({ payload }) {
                     if(content !== file.content){
                         const ansver = yield call(
                             services.mainIpc.call,
-                            "ElectronService",
-                            "showConfirmFileChangeBox",
+                            'ElectronService',
+                            'showConfirmFileChangeBox',
                             [
-                              "Oxygen-ide",
-                              "Fike has changed on disk. Do yo want to reload it?",
-                              ['Cancel', 'Reload']
+                                'Oxygen-ide',
+                                'Fike has changed on disk. Do yo want to reload it?',
+                                ['Cancel', 'Reload']
                             ]
-                          );
+                        );
                         if(typeof ansver !== 'undefined'){
                             if(ansver === 1){
                                 // 1 - Reload
@@ -159,16 +159,16 @@ export function* handleServiceEvents({ payload }) {
     if (service === 'FileService' && event === 'ObjectRepoWatcher' ) {
         if(path && content){
             const [qwe, ...cont] = content.split('{');
-            const conte = "{"+cont.join("{");
+            const conte = '{'+cont.join('{');
     
-            const conten = conte.split('};')[0] + "}";
+            const conten = conte.split('};')[0] + '}';
     
             const repoRoot = JSON.parse(conten);
 
             const activeNode = yield select(state => state.objrepo.path);
             
             if (activeNode && path && activeNode === path) {
-                yield put(objRepActions.openFile(path, true, repoRoot))
+                yield put(objRepActions.openFile(path, true, repoRoot));
             } else {
                 console.warn(`${activeNode} === ${path}`);
             }
@@ -305,7 +305,7 @@ export function* initializeSuccess() {
 
                                 result = allFiles.some(file => {
                                     return file.path === openFilePath;
-                                })
+                                });
 
                             } else {
                                 // not in root folder
@@ -342,9 +342,18 @@ export function* initializeSuccess() {
                                     return pRes;
                                 }
                                 
+                            } else {
+                                const resp = call(
+                                    services.mainIpc.call,
+                                    'FileService',
+                                    'returnFileContent',
+                                    [openFilePath]
+                                );
+
+                                fileContentArray.push(resp);
                             }
                         }
-                    }))
+                    }));
 
                     try{
                         if(fileContentArray && Array.isArray(fileContentArray) && fileContentArray.length > 0){
@@ -357,6 +366,12 @@ export function* initializeSuccess() {
                                     typeof file.content === 'string'
                                 ){
                                     // file exist
+                                    
+                                    const pRes = all([
+                                        put(fsActions._fetchFileContent_Success(file.filePath, file.content))
+                                    ]);
+
+                                    allResults.push(pRes);
                                 } else {
                                     let unlinkedFileContent = fs.files[file.filePath]['content']|| '';
                                     const pathSplit = file.filePath.split(pathLib.sep);
@@ -373,7 +388,7 @@ export function* initializeSuccess() {
     
                                     allResults.push(pRes);
                                 }
-                            })
+                            });
                         }
                     } catch(e){
                         yield put(reportError(e));
@@ -537,7 +552,7 @@ export function* renameFileOrFolder({ payload }) {
     try {
         const fileInfo = yield call(services.mainIpc.call, 'FileService', 'renameFileOrFolder', [path, newName]);
         // raise FILE.RENAMED event
-        yield fileSubjects["FILE.RENAMED"].next({ oldPath: path, newPath: fileInfo.path });
+        yield fileSubjects['FILE.RENAMED'].next({ oldPath: path, newPath: fileInfo.path });
         // refresh File Explorer tree since we need to sort again
         yield put(fsActions.treeLoadNodeChildren(pathNode.dirname(path), true));
         // report success

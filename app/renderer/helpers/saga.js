@@ -11,7 +11,7 @@ import { success, failure, successOrFailure, actionCreator } from './redux';
 
 export function* putAndTake(requestAction) {
     yield put(requestAction);
-    const responseAction = yield take(successOrFailure(requestAction.type))
+    const responseAction = yield take(successOrFailure(requestAction.type));
     return responseAction.payload || {};
     /*if (responseAction.type === failure(requestAction.type)) {
         yield put(actionCreator(failureType, { ...failureArgs, error: responseAction.payload.error }));

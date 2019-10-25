@@ -78,11 +78,11 @@ function renderChildrenWithScroller(children, wrapperClass = null, scrollVertica
     }
     return (
         <ScrollContainer
-          refreshScroll={ refreshScroll }
-          disableHorizontal={ scrollVerticalOnly }
-          classes={ classes }
+            refreshScroll={ refreshScroll }
+            disableHorizontal={ scrollVerticalOnly }
+            classes={ classes }
         >
-          { () => children }
+            { () => children }
         </ScrollContainer>
-    )
+    );
 }

@@ -19,7 +19,7 @@ const DEVICE_MONITOR_INTERVAL = 10000;
 
 let isError = function(e){
     return e && e.stack && e.message;
-}
+};
 
 const DEVICE_INFO = {
     os: {
@@ -210,7 +210,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
             }
         }
         catch (e) {
-            if(e && e.message && e.message === "Could not find the instruments binary. Please ensure `xcrun -find instruments` can locate it."){
+            if(e && e.message && e.message === 'Could not find the instruments binary. Please ensure `xcrun -find instruments` can locate it.'){
                 if(this.xCodeNotified){
                     // ignore
                 } else {
@@ -242,7 +242,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
     _delay(timeout, f) {
         var self = this;
         return new Promise(function(resolve) {
-            setTimeout(resolve.bind(null, f), timeout)
+            setTimeout(resolve.bind(null, f), timeout);
         });
     }
 

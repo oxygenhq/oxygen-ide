@@ -15,10 +15,10 @@ export default function loggerSetup() {
     // prefix messages so we know they came from renderer process
     global.log = {};
     const prefix = (args) => { args[0] = '[R] ' + args[0]; };
-    log.info = (...args) => { prefix(args); return _log.info.apply(log, args); }
-    log.warn = (...args) => { prefix(args); return _log.warn.apply(log, args); }
-    log.error = (...args) => { prefix(args); return _log.error.apply(log, args); }
-    log.debug = (...args) => { prefix(args); return _log.debug.apply(log, args); }
+    log.info = (...args) => { prefix(args); return _log.info.apply(log, args); };
+    log.warn = (...args) => { prefix(args); return _log.warn.apply(log, args); };
+    log.error = (...args) => { prefix(args); return _log.error.apply(log, args); };
+    log.debug = (...args) => { prefix(args); return _log.debug.apply(log, args); };
 
     process.on('uncaughtException', error => {
         // ignore Monaco Editor error related to jsonMode.js

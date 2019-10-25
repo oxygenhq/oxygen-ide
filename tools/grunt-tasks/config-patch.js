@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,16 +16,16 @@ module.exports = function(grunt) {
         var cfgPath = path.resolve(__dirname, '..', '..', cfg.dist, 'config', 'default.json');
 
         if (os.platform() === 'win32') {
-            updateLogPath(cfgPath, '%LOCALAPPDATA%\\Oxygen IDE\\log.txt');
+            updateLogPath(grunt, cfgPath, '%LOCALAPPDATA%\\Oxygen IDE\\log.txt');
         } else if (os.platform() === 'linux') {
-            updateLogPath(cfgPath, '$HOME/.OxygenIDE/log.txt');
+            updateLogPath(grunt, cfgPath, '$HOME/.OxygenIDE/log.txt');
         } else if (os.platform() === 'darwin') {
-           // TODO
+            // TODO
         }
     });
 };
 
-function updateLogPath(cfgPath, path) {
+function updateLogPath(grunt, cfgPath, path) {
     var file = fs.readFileSync(cfgPath);
     var data;
     
@@ -43,4 +43,3 @@ function updateLogPath(cfgPath, path) {
         grunt.fail.fatal(e);
     }
 }
-

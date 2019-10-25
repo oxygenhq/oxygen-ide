@@ -95,7 +95,7 @@ ElementFinder.prototype.locateElementById = function(identifier, inDocument, inW
         // make sure the ID is unique (it should be as per HTML spec, but not always the case in the wild)
         var nodes = this.xpathEvaluator.selectNodes('//*[@id="' + identifier + '"]', inDocument,
             inDocument.createNSResolver ?
-            inDocument.createNSResolver(inDocument.documentElement) : this._namespaceResolver);
+                inDocument.createNSResolver(inDocument.documentElement) : this._namespaceResolver);
         return nodes && nodes.length === 1 ? element : null;
     } else {
         return null;
@@ -167,7 +167,7 @@ ElementFinder.prototype.locateElementByName = function(locator, inDocument, inWi
 ElementFinder.prototype.locateElementByXPath = function(xpath, inDocument, inWindow, unique) {
     var nodes = this.xpathEvaluator.selectNodes(xpath, inDocument,
         inDocument.createNSResolver ?
-          inDocument.createNSResolver(inDocument.documentElement) : this._namespaceResolver);
+            inDocument.createNSResolver(inDocument.documentElement) : this._namespaceResolver);
 
     if (nodes && nodes.length === 1) {
         return nodes[0];

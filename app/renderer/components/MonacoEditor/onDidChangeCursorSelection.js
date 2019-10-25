@@ -7,10 +7,10 @@
  * (at your option) any later version.
  */
 export default function () {
-  const editor = this.editor;
-  const editorModel = editor.getModel();
-  const selectedText = editorModel
-    .getValueInRange(editor.getSelection());
+    const editor = this.editor;
+    const editorModel = editor.getModel();
+    const selectedText = editorModel
+        .getValueInRange(editor.getSelection());
 
-  this.props.onSelectionChange(selectedText);
+    this.props.onSelectionChange(selectedText);
 }

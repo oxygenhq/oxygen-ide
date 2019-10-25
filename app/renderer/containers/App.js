@@ -18,13 +18,13 @@ type Props = {
 };
 
 export default class App extends Component<Props> {
-  render() {
-    return (
-      <Provider store={this.props.store}>
-        <ConnectedRouter history={this.props.history}>
-          <Workbench />
-        </ConnectedRouter>
-      </Provider>
-    );
-  }
+    render() {
+        return (
+            <Provider store={this.props.store}>
+                <ConnectedRouter history={this.props.history}>
+                    <Workbench />
+                </ConnectedRouter>
+            </Provider>
+        );
+    }
 }

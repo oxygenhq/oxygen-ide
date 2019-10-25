@@ -30,55 +30,55 @@ const history = createHashHistory();
 let action$ = new Subject();
 
 const configureStore = (initialState?: counterStateType) => {
-  // prevent duplicated store initialization
-  if (global.store) {
-    return global.store;
-  }
-
-  // Redux Configuration
-  const middleware = [];
-  const enhancers = [];
-
-  // Saga Middleware
-  const sagaMiddleware = createSagaMiddleware({
-    onError(error) {
-      console.log('saga error', error);
-
-      const err = new Error(error.message || error);
-
-      sendError(err);
+    // prevent duplicated store initialization
+    if (global.store) {
+        return global.store;
     }
-  });
-  middleware.push(sagaMiddleware);
 
-  // Thunk Middleware
-  middleware.push(thunk);
+    // Redux Configuration
+    const middleware = [];
+    const enhancers = [];
 
-  // Router Middleware
-  const router = routerMiddleware(history);
-  middleware.push(router);
+    // Saga Middleware
+    const sagaMiddleware = createSagaMiddleware({
+        onError(error) {
+            console.log('saga error', error);
 
-  // Apply redux-logger if we are in debugging mode
-  if (process.env.NODE_ENV === 'development') {
-    const { createLogger } = require('redux-logger');
-    middleware.push(createLogger({ 
-      collapsed: true,      
-      predicate: (getState, action) => !((
-        action.payload && 
+            const err = new Error(error.message || error);
+
+            sendError(err);
+        }
+    });
+    middleware.push(sagaMiddleware);
+
+    // Thunk Middleware
+    middleware.push(thunk);
+
+    // Router Middleware
+    const router = routerMiddleware(history);
+    middleware.push(router);
+
+    // Apply redux-logger if we are in debugging mode
+    if (process.env.NODE_ENV === 'development') {
+        const { createLogger } = require('redux-logger');
+        middleware.push(createLogger({ 
+            collapsed: true,      
+            predicate: (getState, action) => !((
+                action.payload && 
         action.payload.event && 
         action.payload.event.type && 
-        ["CHROME_EXTENSION_ENABLED", "RECORDER_NEW_CAN_RECORD"].includes(action.payload.event.type)
-      ))
-    }));
-  }
+        ['CHROME_EXTENSION_ENABLED', 'RECORDER_NEW_CAN_RECORD'].includes(action.payload.event.type)
+            ))
+        }));
+    }
 
-  // Apply Rxjs Action to Subject middleware
-  middleware.push(createActionToSubjectMiddleware(action$));
+    // Apply Rxjs Action to Subject middleware
+    middleware.push(createActionToSubjectMiddleware(action$));
 
-  // Redux DevTools Configuration
-  // If Redux DevTools Extension is installed use it, otherwise use Redux compose
-  /* eslint-disable no-underscore-dangle */
-  /*
+    // Redux DevTools Configuration
+    // If Redux DevTools Extension is installed use it, otherwise use Redux compose
+    /* eslint-disable no-underscore-dangle */
+    /*
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
       // Options: http://zalmoxisus.github.io/redux-devtools-extension/API/Arguments.html
@@ -86,131 +86,131 @@ const configureStore = (initialState?: counterStateType) => {
     })
     : compose;
   */
-  const composeEnhancers = compose;
-  /* eslint-enable no-underscore-dangle */
+    const composeEnhancers = compose;
+    /* eslint-enable no-underscore-dangle */
 
-  const ignoreTypes = [
-    'MAIN_SERVICE_EVENT',
-    'RESET'
-  ] 
+    const ignoreTypes = [
+        'MAIN_SERVICE_EVENT',
+        'RESET'
+    ]; 
 
-  async function updateCache(cache, action) {
-    if(action && ignoreTypes.includes(action.type)){
-      return;
+    async function updateCache(cache, action) {
+        if(action && ignoreTypes.includes(action.type)){
+            return;
+        }
+
+        if(action && action.type.startsWith('RECORDER_')){
+            return;
+        }
+
+        if(action && action.type.startsWith('TEST_')){
+            return;
+        }
+
+        if(action && action.type === 'LOGGER_SET_VISIBLE'){
+            // add to save cache
+        } else if(action && action.type.startsWith('LOGGER_')){
+            return;
+        }
+
+        const state = { ...cache };
+
+        delete state.cache;
+        delete state.settings.cache;
+        delete state.dialog;
+        delete state.logger;
+        delete state.router;
+        delete state.test;
+        delete state.recorder;
+        delete state.wb;
+
+        const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [state] );
+
+        return state;
     }
 
-    if(action && action.type.startsWith('RECORDER_')){
-      return;
+    const cache = store => next => action => {
+        let result = next(action);
+        const state = store.getState();
+        // console.log('str', JSON.stringify(state));
+
+        if(state.settings.cacheUsed){
+            updateCache(state, action);
+            // const cacheStatePromise = updateCache(state, action);
+            // cacheStatePromise.then((cacheState) => {
+            //   if(typeof cacheState !== 'undefined'){
+            //     console.log('cacheState', cacheState);
+            //     console.log('cacheState stringify', JSON.stringify(cacheState));
+            //   }
+            // })
+        }
+
+        return result;
+    };
+
+    async function sendError(error) {
+        try{
+            window.Sentry.captureException(error);
+        } catch(e){
+            console.warn('sendError error', e);
+        }
     }
 
-    if(action && action.type.startsWith('TEST_')){
-      return;
+    async function setUserIdToSentry(userId) {
+        try{
+
+            if(userId && window && window.Sentry && window.Sentry.configureScope){
+                window.Sentry.configureScope((scope) => {
+                    scope.setUser({'userId': userId});
+                });
+            } else {
+                console.log('maybe bad userId', userId);
+                console.log('or window.Sentry', window.Sentry);
+            }
+
+        } catch(e){
+            console.warn('setUserIdToSentry error', e);
+        }
     }
 
-    if(action && action.type === 'LOGGER_SET_VISIBLE'){
-      // add to save cache
-    } else if(action && action.type.startsWith('LOGGER_')){
-      return;
-    }
+    middleware.push(cache);
 
-    const state = { ...cache };
+    // UNIVERSAL_ERROR
+    const universalError = store => next => action => {
+        let result = next(action);
 
-    delete state.cache;
-    delete state.settings.cache;
-    delete state.dialog;
-    delete state.logger;
-    delete state.router;
-    delete state.test;
-    delete state.recorder;
-    delete state.wb;
+        if(action && action.type && action.payload && action.payload.error && action.type === UNIVERSAL_ERROR){
+            sendError(action.payload.error);
+        }
+    
+        if(action && action.type && action.payload && action.payload.userId && action.type === SET_USER_ID_TO_SENTRY){
+            setUserIdToSentry(action.payload.userId);
+        }
+    
+        return result;
+    };
+  
+    middleware.push(universalError);
+  
+    // Apply Middleware & Compose Enhancers
+    enhancers.push(applyMiddleware(...middleware));
+    const enhancer = composeEnhancers(...enhancers);
 
-    const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [state] );
+    // Create Store
+    const store = createStore(rootReducer, initialState, enhancer);
 
-    return state;
-  }
-
-  const cache = store => next => action => {
-    let result = next(action);
-    const state = store.getState();
-    // console.log('str', JSON.stringify(state));
-
-    if(state.settings.cacheUsed){
-      updateCache(state, action);
-      // const cacheStatePromise = updateCache(state, action);
-      // cacheStatePromise.then((cacheState) => {
-      //   if(typeof cacheState !== 'undefined'){
-      //     console.log('cacheState', cacheState);
-      //     console.log('cacheState stringify', JSON.stringify(cacheState));
-      //   }
-      // })
-    }
-
-    return result;
-  }
-
-  async function sendError(error) {
-    try{
-      window.Sentry.captureException(error);
-    } catch(e){
-      console.warn('sendError error', e);
-    }
-  }
-
-  async function setUserIdToSentry(userId) {
-    try{
-
-      if(userId && window && window.Sentry && window.Sentry.configureScope){
-        window.Sentry.configureScope((scope) => {
-          scope.setUser({"userId": userId});
+    // add hot reducer reloading if we are in debugging mode
+    if (process.env.NODE_ENV === 'development' && module.hot) {
+        module.hot.accept('./reducers.js', () => {
+            store.replaceReducer(require('./reducers'));
         });
-      } else {
-        console.log('maybe bad userId', userId);
-        console.log('or window.Sentry', window.Sentry);
-      }
-
-    } catch(e){
-      console.warn('setUserIdToSentry error', e);
     }
-  }
 
-  middleware.push(cache);
+    // Run Saga Middleware (must be ran after applyMiddleware is being called)
+    sagaMiddleware.run(rootSaga);
 
-  // UNIVERSAL_ERROR
-  const universalError = store => next => action => {
-    let result = next(action);
-
-    if(action && action.type && action.payload && action.payload.error && action.type === UNIVERSAL_ERROR){
-      sendError(action.payload.error);
-    }
-    
-    if(action && action.type && action.payload && action.payload.userId && action.type === SET_USER_ID_TO_SENTRY){
-      setUserIdToSentry(action.payload.userId);
-    }
-    
-    return result;
-  }
-  
-  middleware.push(universalError);
-  
-  // Apply Middleware & Compose Enhancers
-  enhancers.push(applyMiddleware(...middleware));
-  const enhancer = composeEnhancers(...enhancers);
-
-  // Create Store
-  const store = createStore(rootReducer, initialState, enhancer);
-
-  // add hot reducer reloading if we are in debugging mode
-  if (process.env.NODE_ENV === 'development' && module.hot) {
-    module.hot.accept('./reducers.js', () => {
-      store.replaceReducer(require('./reducers'));
-    });
-  }
-
-  // Run Saga Middleware (must be ran after applyMiddleware is being called)
-  sagaMiddleware.run(rootSaga);
-
-  global.store = store;
-  return store;
-}
+    global.store = store;
+    return store;
+};
 
 export default { configureStore, history, action$ };

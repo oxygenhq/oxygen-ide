@@ -4,50 +4,50 @@ import electron from 'electron';
 
 export default class JavaDialog extends PureComponent {
   clean = () => {
-    if(this.props.clean){
-      this.props.clean();
-    }
+      if(this.props.clean){
+          this.props.clean();
+      }
   }
 
   processLink = (event) => {
-    event.preventDefault();
-    const javaUrl = 'https://www.java.com/en/download/';
-    electron.shell.openExternal(javaUrl);
+      event.preventDefault();
+      const javaUrl = 'https://www.java.com/en/download/';
+      electron.shell.openExternal(javaUrl);
   }
   
   render() {
-    const {
-      javaError
-    } = this.props;
+      const {
+          javaError
+      } = this.props;
     
-    let title;
-    let message;
+      let title;
+      let message;
 
-    if (javaError.reason === 'bad-version') {
-      title = 'Unsupported Java version';
-      message = (<p>Oxygen IDE requires Java 8-10 version.<br/>Your version: {javaError.version}.<br/><br/>Install <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE.</p>);
-    } else {
-      title = 'Unable to find Java';
-      message = (<p>Install <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE.</p>);
-    }
+      if (javaError.reason === 'bad-version') {
+          title = 'Unsupported Java version';
+          message = (<p>Oxygen IDE requires Java 8-10 version.<br/>Your version: {javaError.version}.<br/><br/>Install <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE.</p>);
+      } else {
+          title = 'Unable to find Java';
+          message = (<p>Install <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE.</p>);
+      }
 
-    return (
-      <Modal
-        title={title}
-        width={400}
-        visible={true}
-        onCancel={this.clean}
-        footer={
-          <Button
-            type="primary"
-            onClick={this.clean}
-          >OK</Button>
-        }
-      >
-        <div>
-          { message }
-        </div>
-      </Modal>
-    );
+      return (
+          <Modal
+              title={title}
+              width={400}
+              visible={true}
+              onCancel={this.clean}
+              footer={
+                  <Button
+                      type="primary"
+                      onClick={this.clean}
+                  >OK</Button>
+              }
+          >
+              <div>
+                  { message }
+              </div>
+          </Modal>
+      );
   }
 }

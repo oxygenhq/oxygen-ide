@@ -14,17 +14,17 @@ module.exports = function(grunt) {
     grunt.registerTask('module-cleanup', 'Removes unneeded files from node_modules', function() {
         var done = this.async();
 
-        var mc = new modclean.ModClean({
+        new modclean.ModClean({
             cwd: path.join(process.cwd(), 'app', 'node_modules'),
             patterns: ['default:safe'],
             additionalPatterns: ['doc', 'docs', 'documentation',
-                                'coverage',
-                                '*.txt',
-                                'gruntfile.js',
-                                'quick-test.js',
-                                '*.c', '*.cpp',
-                                '*.d.ts',
-                                '*.html', '*.htm', '*.png', '*.map'],
+                'coverage',
+                '*.txt',
+                'gruntfile.js',
+                'quick-test.js',
+                '*.c', '*.cpp',
+                '*.d.ts',
+                '*.html', '*.htm', '*.png', '*.map'],
             test: true
         }, function(err, results) {
             if (err) {
@@ -35,7 +35,7 @@ module.exports = function(grunt) {
             var syncSrcs = syncConfig.main.files[0].src;
 
             var count = 0;
-            for (file of results) {
+            for (var file of results) {
                 if (file) {
                     var isdir = fs.statSync(path.join(process.cwd(), 'app', 'node_modules', file)).isDirectory();
                     syncSrcs.push(isdir ? '!' + file + '/**' : '!' + file);

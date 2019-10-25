@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 export const NEW_FILE = 'NEW_FILE';
+export const NEW_FOLDER = 'NEW_FOLDER';
 export const OPEN_FOLDER = 'OPEN_FOLDER';
 export const SAVE_FILE = 'SAVE_FILE';
 export const CUT = 'CUT';

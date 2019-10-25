@@ -21,9 +21,9 @@ import ActionTypes from '../types';
  */
 export default function* root() {
     yield all([
-      takeLatest(ActionTypes.EDITOR_OPEN_FILE, openFile),
-      takeLatest(ActionTypes.SAVE_SETTINGS, saveSettings),
-      takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
+        takeLatest(ActionTypes.EDITOR_OPEN_FILE, openFile),
+        takeLatest(ActionTypes.SAVE_SETTINGS, saveSettings),
+        takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
     ]);
 }
 
@@ -52,11 +52,13 @@ export function* openFile({ payload }) {
         return;
     }
     const fileCache = yield select(state => state.fs.files);
-    const file = fileCache[path];
-    if (!file || !file.hasOwnProperty('content')) {
-        yield put(editorActions._openFile_Failure(path, { message: 'File not found in the file cache or content is missing.'} ));
-        return;
-    }
+    
+    // const file = fileCache[path];
+    // if (!file || !file.hasOwnProperty('content')) {
+    //     yield put(editorActions._openFile_Failure(path, { message: 'File not found in the file cache or content is missing.'} ));
+    //     return;
+    // }
+
     yield put(editorActions.addFile(path));
     yield put(editorActions.setActiveFile(path));
     yield put(editorActions._openFile_Success(path));

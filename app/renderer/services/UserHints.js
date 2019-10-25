@@ -23,7 +23,7 @@ export default class UserHintsService {
 
     *sagas() {
         yield all([
-          takeLatest(MAIN_SERVICE_EVENT, ::this._onMainServiceEvent),
+            takeLatest(MAIN_SERVICE_EVENT, ::this._onMainServiceEvent),
         ]);
     }
 
@@ -65,7 +65,7 @@ export default class UserHintsService {
     }
 
     *_handleAppiumServerUnavailable() {
-        if (!confirm(`Appium server is not accessible.\n\nIn order to run mobile tests, you need to install and run Appium server manually.\n\nDo you want to read a tutorial on how to install and run Appium server?`)) {
+        if (!confirm('Appium server is not accessible.\n\nIn order to run mobile tests, you need to install and run Appium server manually.\n\nDo you want to read a tutorial on how to install and run Appium server?')) {
             return;
         }
         yield call(services.mainIpc.call, 'ElectronService', 'shellOpenExternal', ['http://docs.oxygenhq.org/download-mobile.html']);

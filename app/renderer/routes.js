@@ -14,10 +14,10 @@ import UserPage from './containers/UserPage';
 import IdeScreen from './containers/IdeScreen';
 
 export default () => (
-  <App>
-    <Switch>
-      <Route path="/user" component={UserPage} />
-      <Route exact path="/" component={IdeScreen} />
-    </Switch>
-  </App>
+    <App>
+        <Switch>
+            <Route path="/user" component={UserPage} />
+            <Route exact path="/" component={IdeScreen} />
+        </Switch>
+    </App>
 );

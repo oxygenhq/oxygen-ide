@@ -23,44 +23,44 @@ export default class ObjectTree extends PureComponent<Props> {
   props: Props;
 
   state = {
-    selectedKeys: [],
+      selectedKeys: [],
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.active !== nextProps.active) {
-      if (!nextProps.active) {
-        this.setState({
-          selectedKeys: [],
-        });
+      if (this.props.active !== nextProps.active) {
+          if (!nextProps.active) {
+              this.setState({
+                  selectedKeys: [],
+              });
+          }
+          else {
+              this.setState({
+                  selectedKeys: [nextProps.active],
+              });
+          }
       }
-      else {
-        this.setState({
-          selectedKeys: [nextProps.active],
-        });
-      }
-    }
   }
 
   handleSelectNode = (selectedKeys, info) => {
-    const { nodeInfo } = info.node.props;
-    this.props.onSelect(nodeInfo.path);
+      const { nodeInfo } = info.node.props;
+      this.props.onSelect(nodeInfo.path);
   }
 
   render() {
-    const { tree, active, onSelect, searchResults } = this.props;
-    const { selectedKeys } = this.state;
+      const { tree, active, onSelect, searchResults } = this.props;
+      const { selectedKeys } = this.state;
     
-    return (
-        <Tree
-            showLine
-            checkable={ false }              
-            defaultExpandedKeys={ ['nonexistingkey'] }
-            autoExpandParent
-            selectedKeys={ selectedKeys }
-            onSelect={ this.handleSelectNode }
-        >
-            { renderTreeNodes.apply(this, [tree, searchResults]) }
-        </Tree>
-    );
+      return (
+          <Tree
+              showLine
+              checkable={ false }              
+              defaultExpandedKeys={ ['nonexistingkey'] }
+              autoExpandParent
+              selectedKeys={ selectedKeys }
+              onSelect={ this.handleSelectNode }
+          >
+              { renderTreeNodes.apply(this, [tree, searchResults]) }
+          </Tree>
+      );
   }
 }

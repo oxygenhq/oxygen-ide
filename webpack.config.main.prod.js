@@ -12,33 +12,33 @@ import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
 CheckNodeEnv('production');
 
 export default merge.smart(baseConfig, {
-  devtool: 'source-map',
+    devtool: 'source-map',
 
-  target: 'electron-main',
+    target: 'electron-main',
 
-  entry: './app/main/main.dev',
+    entry: './app/main/main.dev',
 
-  output: {
-    path: __dirname,
-    filename: './app/main/main.prod.js'
-  },
+    output: {
+        path: __dirname,
+        filename: './app/main/main.prod.js'
+    },
 
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.type': '"browser"'
-    }),
+    plugins: [
+        new webpack.DefinePlugin({
+            'process.type': '"browser"'
+        }),
     
-    new UglifyJSPlugin({
-      parallel: true,
-      sourceMap: true
-    }),
+        new UglifyJSPlugin({
+            parallel: true,
+            sourceMap: true
+        }),
 
-    new BundleAnalyzerPlugin({
-      analyzerMode: process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
-      openAnalyzer: process.env.OPEN_ANALYZER === 'true'
-    }),
+        new BundleAnalyzerPlugin({
+            analyzerMode: process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
+            openAnalyzer: process.env.OPEN_ANALYZER === 'true'
+        }),
 
-    /**
+        /**
      * Create global constants which can be configured at compile time.
      *
      * Useful for allowing different behaviour between development builds and
@@ -47,12 +47,12 @@ export default merge.smart(baseConfig, {
      * NODE_ENV should be production so that modules do not perform certain
      * development checks
      */
-    new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production',
-      DEBUG_PROD: 'false'
-    }),
+        new webpack.EnvironmentPlugin({
+            NODE_ENV: 'production',
+            DEBUG_PROD: 'false'
+        }),
 
-    // adbkit has a double require for CoffeScript and Javascript and packing fails if we don't ingore the CS ones.
-    new webpack.IgnorePlugin(/(\.\/src\/adb)|(\.\/src\/monkey)|(\.\/src\/logcat)/)
-  ],
+        // adbkit has a double require for CoffeScript and Javascript and packing fails if we don't ingore the CS ones.
+        new webpack.IgnorePlugin(/(\.\/src\/adb)|(\.\/src\/monkey)|(\.\/src\/logcat)/)
+    ],
 });

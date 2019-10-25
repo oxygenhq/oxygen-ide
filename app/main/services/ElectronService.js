@@ -9,13 +9,19 @@
 import electron, { app } from 'electron'; 
 import appSettings from 'electron-settings';
 
-import ServiceBase from "./ServiceBase";
+import ServiceBase from './ServiceBase';
+var decache = require('decache');
 
 const { dialog } = electron;
 
 export default class ElectronService extends ServiceBase {
     constructor(mainWindow) {
         super(mainWindow);
+    }
+
+    orgRequire(moduleName) {
+        decache(moduleName);
+        return require(moduleName);
     }
 
     addFile(key, name, content = ''){
@@ -27,12 +33,12 @@ export default class ElectronService extends ServiceBase {
                 ...newSettings.files,
                 [key+name] : {
                     content: content,
-                    ext: ".js",
+                    ext: '.js',
                     name: name,
                     path: key,
-                    type: "file"
+                    type: 'file'
                 }
-            }
+            };
         } else {
             return null;
         }
@@ -72,7 +78,7 @@ export default class ElectronService extends ServiceBase {
                     ...newSettings.files[key+name],
                     content: content
                 }
-            }
+            };
         } else {
             return null;
         }

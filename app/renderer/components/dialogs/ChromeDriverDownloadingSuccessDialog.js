@@ -29,7 +29,7 @@ export default class ChromeDriverDownloadingSuccessDialog extends PureComponent 
 
             >  
                 <div>
-                    <p>{`ChromeDriver was successfully installed. Restart the IDE for changes to take effect.`}</p> 
+                    <p>{'ChromeDriver was successfully installed. Restart the IDE for changes to take effect.'}</p> 
                 </div>
             </Modal>
         );

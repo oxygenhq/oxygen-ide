@@ -13,72 +13,72 @@ import * as editorActions from '../../store/editor/actions';
 import { zoomIn, zoomOut } from '../../store/settings/actions';
 
 const checkForBreakpoints = (path, breakpoints) => {
-  let result = [];
+    let result = [];
 
-  if(path && breakpoints && breakpoints[path]){
-    result = breakpoints[path];
-  }
+    if(path && breakpoints && breakpoints[path]){
+        result = breakpoints[path];
+    }
 
-  return result;
-}
+    return result;
+};
 
 const mapStoreToProps = (state) => {
-  let breakpoints;
+    let breakpoints;
 
-  if(state && state.test && state.test.breakpoints){
-    breakpoints = state.test.breakpoints;
-  };
+    if(state && state.test && state.test.breakpoints){
+        breakpoints = state.test.breakpoints;
+    };
 
-  // combine file data and editor related metadata
-  let openFiles = Object.keys(state.editor.openFiles).map(path => {
+    // combine file data and editor related metadata
+    let openFiles = Object.keys(state.editor.openFiles).map(path => {
 
 
-    if(path.startsWith('unknownUntitled')){
-      return {
-        ...state.settings.files[path],
-        ...state.editor.openFiles[path]
-      }
-    } else if(path.endsWith('(deleted from disk)')){
+        if(path.startsWith('unknownUntitled')){
+            return {
+                ...state.settings.files[path],
+                ...state.editor.openFiles[path]
+            };
+        } else if(path.endsWith('(deleted from disk)')){
 
-      let fileData = null;
+            let fileData = null;
 
-      if(state.settings.files['unknown'+path]){
-        fileData = { ...state.settings.files['unknown'+path] };
-      } else if(state.settings.files[path]){
-        fileData = { ...state.settings.files[path] };
-      }
+            if(state.settings.files['unknown'+path]){
+                fileData = { ...state.settings.files['unknown'+path] };
+            } else if(state.settings.files[path]){
+                fileData = { ...state.settings.files[path] };
+            }
 
-      if(fileData){
-        return {
-          ...fileData,
-          ...state.editor.openFiles[path],
+            if(fileData){
+                return {
+                    ...fileData,
+                    ...state.editor.openFiles[path],
+                };
+            }
+
+        } else {
+            return {
+                ...state.fs.files[path],
+                ...state.editor.openFiles[path],
+                breakpoints: checkForBreakpoints(path, breakpoints)
+            };
         }
-      }
+    });
 
-    } else {
-      return {
-        ...state.fs.files[path],
-        ...state.editor.openFiles[path],
-        breakpoints: checkForBreakpoints(path, breakpoints)
-      }
-    }
-  });
+    openFiles = openFiles.filter(function (el) {
+        return el != null;
+    });
 
-  openFiles = openFiles.filter(function (el) {
-    return el != null;
-  });
-
-  return {
-    editorReadOnly: state.test.isRunning,
-    activeFile: state.editor.activeFile,
-    activeFileName: state.editor.activeFileName,
-    fontSize: state.settings.fontSize,
-    openFiles: openFiles, //state.editor.openFiles,
-  };
+    return {
+        editorReadOnly: state.test.isRunning,
+        activeFile: state.editor.activeFile,
+        activeFileName: state.editor.activeFileName,
+        fontSize: state.settings.fontSize,
+        openFiles: openFiles, //state.editor.openFiles,
+    };
 };
   
 const mapDispatchToProps = (dispatch) => (
-  bindActionCreators({ ...editorActions, zoomIn, zoomOut } , dispatch)
+    bindActionCreators({ ...editorActions, zoomIn, zoomOut } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(TextEditor);

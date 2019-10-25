@@ -48,7 +48,7 @@ export default class ChromeDriverDialog extends PureComponent {
                 )}
             >
                 <div>
-                    <p>{`Chrome requires matching version of ChromeDriver. Currently installed ChromeDriver is outdated.`}</p> 
+                    <p>{'Chrome requires matching version of ChromeDriver. Currently installed ChromeDriver is outdated.'}</p> 
                     <p>{`Click Download to download the appropriate driver for Chrome ${chromeVersion}.`}</p>
                 </div>
             </Modal>

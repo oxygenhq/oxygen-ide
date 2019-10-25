@@ -25,90 +25,87 @@ type Props = {
 };
 
 export default class ObjectRepositoryNotValidView extends PureComponent<Props> {
-  constructor(props: Props) {
-    super(props: Props);
-    this.state = {
-        searchResults: []
-    };
+    constructor(props: Props) {
+        super(props: Props);
+        this.state = {
+            searchResults: []
+        };
 
-     this.inputRef = React.createRef();
-  }
+        this.inputRef = React.createRef();
+    }
 
   static Container = styled(FlexColumn)(props => ({
-    height: '100vh',
-    flexShrink: 0,
-    padding: props.floating ? 10 : 0,
-    //borderBottom: props.collapsed ? 'none' : BORDER,
+      height: '100vh',
+      flexShrink: 0,
+      padding: props.floating ? 10 : 0,
+      //borderBottom: props.collapsed ? 'none' : BORDER,
   }));
 
   onSelectNode(path) {
-    this.props.setActive(path);
+      this.props.setActive(path);
   }
 
   setSearchResults = searchResults => {
-    this.setState({
-        searchResults: searchResults
-    })
+      this.setState({
+          searchResults: searchResults
+      });
   }
 
   closeSelectedObject = () => {
-    const { closeActive } = this.props;
-    if(closeActive){
-      closeActive();
-    }
+      const { closeActive } = this.props;
+      if(closeActive){
+          closeActive();
+      }
   }
 
   closeObjectRepository= () => {
-    const { clearObjectRepositoryFile } = this.props;
-    if(clearObjectRepositoryFile){
-      clearObjectRepositoryFile();
-    }
+      const { clearObjectRepositoryFile } = this.props;
+      if(clearObjectRepositoryFile){
+          clearObjectRepositoryFile();
+      }
   }
   
   render() {
       const { tree, active, name, selectedObject, setActive } = this.props;
-
-      console.log('name', name);
-
       let repoPanelTitle = 'Repository';
       let editorPanelTitle = 'Object';
       if (name && name !== '') {
           repoPanelTitle += ` - ${name}`;
       }
       if (selectedObject && selectedObject.name !== '') {
-        editorPanelTitle += ` - ${selectedObject.name}`;
+          editorPanelTitle += ` - ${selectedObject.name}`;
       }
 
       const editorPanelTitleWrap = (
-        <Fragment>
-          {editorPanelTitle} 
-          <div onClick={this.closeSelectedObject} className={`header-control`}>
-            <Icon type="close" />
-          </div>
-        </Fragment>
+          <Fragment>
+              {editorPanelTitle} 
+              <div onClick={this.closeSelectedObject} className={'header-control'}>
+                  <Icon type="close" />
+              </div>
+          </Fragment>
       );
 
       const repoPanelTitleWrap = (
-        <Fragment>
-          {repoPanelTitle} 
-          <div onClick={this.closeObjectRepository} className={`header-control`}>
-            <Icon type="close" />
-          </div>
-        </Fragment>
+          <Fragment>
+              {repoPanelTitle} 
+              <div onClick={this.closeObjectRepository} className={'header-control'}>
+                  <Icon type="close" />
+              </div>
+          </Fragment>
       );
 
       return (
-        <ObjectRepositoryNotValidView.Container>
-            <Panel 
-                header={ repoPanelTitleWrap }
-                scroller
-                scrollWrapperClass="tree-wrapper tree-wrapper-half"
-                scrollRefresh={ this.props.refreshScroll }
-                scrollVerticalOnly
-            >
-              <p>Object Repository is not valid</p>
-            </Panel>
-        </ObjectRepositoryNotValidView.Container>
+          <ObjectRepositoryNotValidView.Container>
+              <Panel 
+                  header={ repoPanelTitleWrap }
+                  scroller
+                  scrollWrapperClass="tree-wrapper tree-wrapper-half"
+                  scrollRefresh={ this.props.refreshScroll }
+                  scrollVerticalOnly
+              >
+                  <p>Object Repository is not valid</p>
+              </Panel>
+          </ObjectRepositoryNotValidView.Container>
       );    
   }
 }

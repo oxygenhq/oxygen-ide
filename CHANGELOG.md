@@ -1,21 +1,26 @@
 # CHANGELOG
 
-## v1.11.0 (2019-10-xx)
+## v1.11.0 (2019-10-23)
 
 #### :tada: New Feature
 * Add `build` property to LambdaTest provider settings.
 
 #### :beetle: Bug Fix
 * Unable to create nested folders.
+* Opened file content not being restored properly if the file was modified outside the IDE.
 * Issue with Firefox tests not working on Windows machines which don't have MSVC installed.
+* Unable to create new folders at the root of the currently opened location.
+* Recording button not working if Chrome is launched after the IDE.
 * Various other fixes.
 
 #### :nail_care: Polish
 * Various Object Repository UI improvements.
+* Warn if iOS device discovery fails due to `xcrun -find instruments` failure.
 
 #### :house: Internal
 * Bump Chokidar (should reduce memory consumption and improve responsiveness)
-* Bump oxygen-cli to v0.50.1. See [Oxygen ChhangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver 78.
+* Bump oxygen-cli from v0.48.5 to v0.51.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 
 ## v1.10.0 (2019-09-26)
 

@@ -28,7 +28,7 @@ const ON_SELENIUM_STOPPED = 'SELENIUM_STOPPED';
 const ON_SELENIUM_LOG_ENTRY = 'ON_SELENIUM_LOG_ENTRY';
 const ON_CHROME_DRIVER_ERROR = 'ON_CHROME_DRIVER_ERROR';
 
-const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.googleapis.com'
+const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.googleapis.com';
 
 export default class SeleniumService extends ServiceBase {
     seleniumProc = null;
@@ -238,10 +238,10 @@ export default class SeleniumService extends ServiceBase {
         proc.on('exit', (code) => {
             console.log('Selenium process finished.');
             if (code === 1) {
-              // logGeneral.add('ERROR', 'Selenium couldn\'t be started.
-              // See the Selenium Server log for more details.');
-              const msg = 'ERROR: Selenium couldn\'t be started. See the Selenium Server log for more details.';
-              this._emitStoppedEvent(true, msg);
+                // logGeneral.add('ERROR', 'Selenium couldn\'t be started.
+                // See the Selenium Server log for more details.');
+                const msg = 'ERROR: Selenium couldn\'t be started. See the Selenium Server log for more details.';
+                this._emitStoppedEvent(true, msg);
             }
             else {
                 this._emitStoppedEvent();
@@ -275,14 +275,14 @@ export default class SeleniumService extends ServiceBase {
                 console.log('Found Chrome at: ', installations);
                 if (process.platform === 'win32') {
                     const cp = spawn('wmic',
-                    [
-                        'datafile',
-                        'where',
-                        `name='${installations[0].replace(/\\/g, '\\\\')}'`,
-                        'get',
-                        'version',
-                        '/value'
-                    ]);
+                        [
+                            'datafile',
+                            'where',
+                            `name='${installations[0].replace(/\\/g, '\\\\')}'`,
+                            'get',
+                            'version',
+                            '/value'
+                        ]);
                     cp.on('exit', () => reject(new Error('Unable to get Chrome version')));
                     cp.stderr.on('data', () => reject(new Error('Unable to get Chrome version')));
                     cp.stdout.on('data', (data) => {
@@ -325,7 +325,7 @@ export default class SeleniumService extends ServiceBase {
                     if (!res.ok) {
                         reject(new Error('Unable to get ChromeDriver version: ' + res.statusText));
                     }
-                    return res.buffer()
+                    return res.buffer();
                 })
                 .then(body => resolve(body))
                 .catch(err => reject(err));
@@ -335,14 +335,14 @@ export default class SeleniumService extends ServiceBase {
     getChromeDriverDownloadUrl = (driverVersion) => {
         var zipFilename;
         switch (process.platform) {
-            case 'win32':
-              zipFilename = 'chromedriver_win32.zip'; break;
-            case 'darwin':
-              zipFilename = 'chromedriver_mac64.zip'; break;
-            case 'linux':
-              zipFilename = 'chromedriver_linux64.zip'; break;
-            default:
-              zipFilename = null;
+        case 'win32':
+            zipFilename = 'chromedriver_win32.zip'; break;
+        case 'darwin':
+            zipFilename = 'chromedriver_mac64.zip'; break;
+        case 'linux':
+            zipFilename = 'chromedriver_linux64.zip'; break;
+        default:
+            zipFilename = null;
         }
 
         return `${CHROMEDRIVER_BASE_URL}/${driverVersion}/${zipFilename}`;
@@ -394,34 +394,34 @@ export default class SeleniumService extends ServiceBase {
         return new Promise((resolve, reject) => {
             try{
                 fetch(downloadUrl)
-                .then(res => {
-                    if (!res.ok) {
-                        return new Error('Unable to download ChromeDriver: ' + res.statusText);
-                    }
+                    .then(res => {
+                        if (!res.ok) {
+                            return new Error('Unable to download ChromeDriver: ' + res.statusText);
+                        }
 
-                    if(res && res.buffer){
-                        return res.buffer();
-                    } else {
-                        return new Error('res.buffer is not defined');
-                    }
-                })
-                .then(buffer => {
-                    if(buffer instanceof Error){
-                        resolve(buffer);
-                    } else {
-                        var zipPath = tmp.tmpNameSync();
-                        fs.writeFile(zipPath, buffer, err => {
-                            if (err) {
-                                console.log('writeFile error', err);
-                                resolve(err);
-                            }
-                            resolve(zipPath);
-                        });
-                    }
-                }).catch(err => {
-                    console.log('fetchChromeDriver fetch error', err);
-                    resolve(err);
-                });
+                        if(res && res.buffer){
+                            return res.buffer();
+                        } else {
+                            return new Error('res.buffer is not defined');
+                        }
+                    })
+                    .then(buffer => {
+                        if(buffer instanceof Error){
+                            resolve(buffer);
+                        } else {
+                            var zipPath = tmp.tmpNameSync();
+                            fs.writeFile(zipPath, buffer, err => {
+                                if (err) {
+                                    console.log('writeFile error', err);
+                                    resolve(err);
+                                }
+                                resolve(zipPath);
+                            });
+                        }
+                    }).catch(err => {
+                        console.log('fetchChromeDriver fetch error', err);
+                        resolve(err);
+                    });
             } catch(error){
                 console.log('fetchChromeDriver error', error);
                 resolve(error);

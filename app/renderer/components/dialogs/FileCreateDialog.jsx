@@ -35,34 +35,34 @@ export default class FileCreateDialog extends PureComponent<Props> {
 
         this.state = {
             ...DEFAULT_STATE,
-            type: this.props.type ? this.props.type : 'file',
-        }
-    }
-
-  static getDerivedStateFromProps(nextProps, prevState) {
-
-    const newState = {};
-    if (nextProps.visible === false) {
-        return {
-            ...DEFAULT_STATE,
+            type: this.props.type ? this.props.type : 'folder',
         };
     }
-    if (nextProps.type !== prevState.type) {
-        newState.type = nextProps.type;
-        if (nextProps.type === 'file') {
-            newState.ext = DEFAULT_EXT;
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+
+        const newState = {};
+        if (nextProps.visible === false) {
+            return {
+                ...DEFAULT_STATE,
+            };
         }
+        if (nextProps.type !== prevState.type) {
+            newState.type = nextProps.type;
+            if (nextProps.type === 'folder') {
+                newState.ext = DEFAULT_EXT;
+            }
+        }
+        if (nextProps.visible !== prevState.visible) {
+            newState.visible = nextProps.visible;
+        }
+        // see if new state is not empty
+        if (newState.hasOwnProperty('type') || newState.hasOwnProperty('visible')) {
+            return newState;
+        }
+        // or return null if no changes were made
+        return null;
     }
-    if (nextProps.visible !== prevState.visible) {
-        newState.visible = nextProps.visible;
-    }
-    // see if new state is not empty
-    if (newState.hasOwnProperty('type') || newState.hasOwnProperty('visible')) {
-        return newState;
-    }
-    // or return null if no changes were made
-    return null;
-  }
 
     componentDidMount(){
         this.focusTextInput();
@@ -111,7 +111,7 @@ export default class FileCreateDialog extends PureComponent<Props> {
             if (this.props.type === 'file') {
                 message.error('Filename cannot be blank!');
             } else {
-                message.error(`Folder name cannot be blank!`);
+                message.error('Folder name cannot be blank!');
             }
 
             return;
@@ -174,16 +174,16 @@ export default class FileCreateDialog extends PureComponent<Props> {
             : null;
 
         return (
-                <Form
-                    id="createDialogForm"
-                >
-                    <Modal
-                        title={`Create New ${capitalizeFirst(type)}`}
-                        width={700}
-                        visible={visible}
-                        onCancel={onCancel}
-                        footer={(
-                            <Fragment>
+            <Form
+                id="createDialogForm"
+            >
+                <Modal
+                    title={`Create New ${capitalizeFirst(type)}`}
+                    width={700}
+                    visible={visible}
+                    onCancel={onCancel}
+                    footer={(
+                        <Fragment>
                             <Button
                                 onClick={onCancel}
                             >
@@ -198,27 +198,27 @@ export default class FileCreateDialog extends PureComponent<Props> {
                             >
                                 Create
                             </Button>
-                            </Fragment>
-                        )}
-                    >
+                        </Fragment>
+                    )}
+                >
+                    <Input
+                        ref={this.setTextInputRef}
+                        onKeyPress={this.handleKeyPress}
+                        onChange={this.onChangeName}
+                        style={{ marginBottom: 15 }}
+                        value={name}
+                        placeholder={`Enter new ${type} name...`}
+                        addonAfter={addonAfter}
+                    />
+                    <Form.Item label="Destination">
                         <Input
-                            ref={this.setTextInputRef}
-                            onKeyPress={this.handleKeyPress}
-                            onChange={this.onChangeName}
-                            style={{ marginBottom: 15 }}
-                            value={name}
-                            placeholder={`Enter new ${type} name...`}
-                            addonAfter={addonAfter}
-                        />
-                        <Form.Item label="Destination">
-                            <Input
                             style={{ marginBottom: 15 }}
                             value={this.props.path}
                             readOnly
-                            />
-                        </Form.Item>
-                    </Modal>
-                </Form>
+                        />
+                    </Form.Item>
+                </Modal>
+            </Form>
         );
     }
 }
