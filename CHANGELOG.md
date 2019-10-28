@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.11.0 (2019-10-23)
+## v1.11.0 (2019-10-28)
 
 #### :tada: New Feature
 * Add `build` property to LambdaTest provider settings.
