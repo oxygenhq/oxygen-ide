@@ -38,6 +38,7 @@ module.exports = function(grunt) {
         defaultTasks.push('chmod:geckodriver');
         defaultTasks.push('chmod:oxygendarwin');
     } else if (process.platform === 'win32') {
+        //ignore
     }
     defaultTasks.push('rebrand');
     defaultTasks.push('sentry-browser');
@@ -150,6 +151,8 @@ module.exports = function(grunt) {
                             'renderer/index.js',
                             'main/main.prod.*',
                             'main/config.json',
+                            'main/services/backslash.js',
+                            'main/services/require.js',
                             'package.json'],
                         dest: OUTDIR + RESOURCES + '/app' 
                     }
