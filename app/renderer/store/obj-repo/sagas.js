@@ -6,14 +6,11 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
+import { all, put, select, takeLatest, call } from 'redux-saga/effects';
 
 /* Helpers */
 import { putAndTake } from '../../helpers/saga';
 import { convertToObjectTree, getRepositoryNameFromFileName } from '../../helpers/objrepo';
-import { success, failure, successOrFailure } from '../../helpers/redux';
-import orgRequire from '../../helpers/require';
-import { notification } from 'antd';
 
 /* Types */
 import ActionTypes from '../types';
@@ -82,7 +79,15 @@ export function* openFile({ payload }) {
 
             } else {
                 repoRoot = yield call(services.mainIpc.call, 'ElectronService', 'orgRequire', [file.path]);
-
+                console.log('#82', repoRoot);
+                try {
+                    repoRoot = JSON.parse(repoRoot.replace(/'/g, '"'));
+                }
+                catch (e) {
+                    console.error(e);
+                    yield put(repoActions._openFile_Failure(file.path, e));
+                    return;
+                }   
             }
 
             const fetchFileContent = yield call(

@@ -6,11 +6,12 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import electron, { app } from 'electron'; 
+import electron from 'electron'; 
 import appSettings from 'electron-settings';
-
+import { spawn  } from 'child_process';
 import ServiceBase from './ServiceBase';
 var decache = require('decache');
+var path = require('path');
 
 const { dialog } = electron;
 
@@ -19,9 +20,100 @@ export default class ElectronService extends ServiceBase {
         super(mainWindow);
     }
 
-    orgRequire(moduleName) {
-        decache(moduleName);
-        return require(moduleName);
+    replaceBackslash(moduleName){
+        return new Promise((resolve, reject) => {
+            try{                
+                const pathToFile = __dirname+path.sep+'services'+path.sep+'backslash.js';
+                
+                const cp = spawn('node', [pathToFile, moduleName]);
+            
+                cp.stderr.on('data', (stderr) => {
+                    console.log('replaceBackslash stderr', stderr);
+                    if(stderr.toString()){
+                        console.log('replaceBackslash stderr.toString()', stderr.toString());
+                        resolve(stderr.toString());
+                    } else {
+                        reject(stderr);
+                    }
+                });
+            
+                cp.stdout.on('data', (stdout) => {
+                    if(stdout && stdout.toString()){
+                        resolve(stdout.toString());
+                    } else {
+                        reject();
+                    }
+                    
+                });
+            } catch(e){
+                console.log('e', e);
+                reject(e);
+            }
+        });
+    }
+
+    require(moduleName){
+        return new Promise((resolve, reject) => {
+            try{                
+                const pathToFile = __dirname+path.sep+'services'+path.sep+'require.js';
+                
+                const cp = spawn('node', [pathToFile, moduleName]);
+            
+                cp.stderr.on('data', (stderr) => {
+                    console.log('require stderr', stderr);
+                    if(stderr.toString()){
+                        console.log('require stderr.toString()', stderr.toString());
+                        resolve(stderr.toString());
+                    } else {
+                        reject(stderr);
+                    }
+                });
+            
+                cp.stdout.on('data', (stdout) => {
+                    if(stdout && stdout.toString()){
+                        resolve(stdout.toString());
+                    } else {
+                        reject();
+                    }
+                    
+                });
+            } catch(e){
+                console.log('e', e);
+                reject(e);
+            }
+        });
+    }
+
+    async orgRequire(moduleName) {
+        if (process.platform === 'win32') {
+            if(process.env.NODE_ENV === 'development'){
+                decache(moduleName);
+                return require(moduleName);
+            } else {
+                try{
+                    let newModuleName = await this.replaceBackslash(moduleName);
+                    
+                    if(newModuleName){
+                        newModuleName = newModuleName.slice(0, -1);
+                        decache(newModuleName);
+
+                        try{
+                            const requireResult = await this.require(newModuleName);
+                            return requireResult;
+                        } catch(e){
+                            console.log('orgRequire win32 e2', e);
+                        }
+                    }
+                } catch(e){
+                    console.log('orgRequire win32 e', e);
+                }
+            }
+        } else  {
+            decache(moduleName);
+            return require(moduleName);
+        }
+        
+
     }
 
     addFile(key, name, content = ''){
