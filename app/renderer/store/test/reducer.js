@@ -60,10 +60,6 @@ if (process.platform === 'darwin') {
 }
 
 export default (state = defaultState, action) => {
-  const payload = action.payload || {};
-  const { value, settings, device, breakpoints, path, error, cache, fileName, variables } = payload;
-  let _newDevices = [];
-  let _newBreakpoints = {};
     const payload = action.payload || {};
     const { value, settings, device, breakpoints, path, error, cache, fileName, variables } = payload;
     let _newDevices = [];
