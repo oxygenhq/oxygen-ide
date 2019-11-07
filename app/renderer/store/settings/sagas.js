@@ -76,13 +76,6 @@ export function* firstOpen({ payload }){
     yield put(tabActions.setActiveTab('welcome', 'Welcome'));
     yield put(editorActions.setActiveFile('welcome', 'Welcome'));
     yield put(editorActions.addFile('welcome', 'Welcome'));
-
-    const pltfm = process.platform;
-    if(pltfm !== 'win32'){
-        yield put(
-            wbActions.showDialog('DIALOG_NEED_ISTALL_EXTENSION')
-        );
-    }
 }
 
 export function* tmpAddFile({ payload }) {
