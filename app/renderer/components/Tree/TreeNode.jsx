@@ -399,69 +399,70 @@ class TreeNode extends React.Component {
 
   // Icon + Title
   renderSelector = () => {
-      const { dragNodeHighlight } = this.state;
-      const { 
-          title,
-          selected,
-          icon,
-          loading,
-          onContextMenuHendler
-      } = this.props;
-      const { rcTree: { prefixCls, showIcon, icon: treeIcon, draggable, loadData } } = this.context;
-      const disabled = this.isDisabled();
+    const { dragNodeHighlight } = this.state;
+    const { 
+      title,
+      selected,
+      icon,
+      loading,
+      onContextMenuHendler,
+      showIcon
+    } = this.props;
+    const { rcTree: { prefixCls, icon: treeIcon, draggable, loadData } } = this.context;
+    const disabled = this.isDisabled();
 
-      const wrapClass = `${prefixCls}-node-content-wrapper`;
+    const wrapClass = `${prefixCls}-node-content-wrapper`;
 
-      // Icon - Still show loading icon when loading without showIcon
-      let $icon;
+    // Icon - Still show loading icon when loading without showIcon
+    let $icon;
+    
+    if (showIcon) {
+      const currentIcon = icon || treeIcon;
 
-      if (showIcon) {
-          const currentIcon = icon || treeIcon;
+      $icon = currentIcon ? (
+        <span
+          className={classNames(
+            `${prefixCls}-iconEle`,
+            `${prefixCls}-icon__customize`,
+          )}
+        >
+          {typeof currentIcon === 'function' ?
+            React.createElement(currentIcon, {
+              ...this.props,
+            }) : currentIcon}
+        </span>
+      ) : this.renderIcon();
+    } else if (loadData && loading) {
+      $icon = this.renderIcon();
+    }
 
-          $icon = currentIcon ? (
-              <span
-                  className={classNames(
-                      `${prefixCls}-iconEle`,
-                      `${prefixCls}-icon__customize`,
-                  )}
-              >
-                  {typeof currentIcon === 'function' ?
-                      React.createElement(currentIcon, {
-                          ...this.props,
-                      }) : currentIcon}
-              </span>
-          ) : this.renderIcon();
-      } else if (loadData && loading) {
-          $icon = this.renderIcon();
-      }
+    // Title
+    const $title = <span className={`${prefixCls}-title`}>{title}</span>;
 
-      // Title
-      const $title = <span className={`${prefixCls}-title`}>{title}</span>;
-
-      return (
-          <span
-              ref={this.setSelectHandle}
-              title={typeof title === 'string' ? title : ''}
-              className={classNames(
-                  `${wrapClass}`,
-                  `${wrapClass}-${this.getNodeState() || 'normal'}`,
-                  (!disabled && (selected || dragNodeHighlight)) && `${prefixCls}-node-selected`,
-                  (!disabled && draggable) && 'draggable'
-              )}
-              draggable={(!disabled && draggable) || undefined}
-              aria-grabbed={(!disabled && draggable) || undefined}
-              onMouseEnter={this.onMouseEnter}
-              onMouseLeave={this.onMouseLeave}
-              onContextMenu={this.onContextMenu}
-              onClick={this.onSelectorClick}
-              onDoubleClick={this.onSelectorDoubleClick}
-              onDragStart={draggable ? this.onDragStart : undefined}
-              onDrag={ this.onDrag }
-              onContextMenu={onContextMenuHendler || null}
-          >
-              {$icon}{$title}
-          </span>
-      );
+    return (
+      <span
+        ref={this.setSelectHandle}
+        title={typeof title === 'string' ? title : ''}
+        className={classNames(
+          `${wrapClass}`,
+          `${wrapClass}-${this.getNodeState() || 'normal'}`,
+          (!disabled && (selected || dragNodeHighlight)) && `${prefixCls}-node-selected`,
+          (!disabled && draggable) && 'draggable'
+        )}
+        draggable={(!disabled && draggable) || undefined}
+        aria-grabbed={(!disabled && draggable) || undefined}
+        onMouseEnter={this.onMouseEnter}
+        onMouseLeave={this.onMouseLeave}
+        onContextMenu={this.onContextMenu}
+        onClick={this.onSelectorClick}
+        onDoubleClick={this.onSelectorDoubleClick}
+        onDragStart={draggable ? this.onDragStart : undefined}
+        onDrag={ this.onDrag }
+        onContextMenu={onContextMenuHendler || null}
+      >
+        {$icon}{$title}
+      </span>
+    );
   };
 
   // Children list wrapped with `Animation`

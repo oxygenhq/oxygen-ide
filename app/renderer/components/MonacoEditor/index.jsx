@@ -53,6 +53,8 @@ const MONACO_DEFAULT_OPTIONS = {
     theme: 'oxygen-theme'
 };
 
+const variables = ['a', 'b'];
+
 export default class MonacoEditor extends React.Component {
   state = {
       // editorClass holds an optional class name which will be added to editor's container DIV 

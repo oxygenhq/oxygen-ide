@@ -286,7 +286,10 @@ export default class TestRunnerService extends ServiceBase {
 
         // @params breakpoint, testcase
         this.oxRunner.on('breakpoint', (breakpoint) => {
-            const { lineNumber, fileName } = breakpoint;
+
+            // console.log('breakpoint', breakpoint);
+
+            const { lineNumber, fileName, variables } = breakpoint;
             const { getScriptContentLineOffset } = this.oxRunner;
             // if no fileName is received from the debugger (not suppose to happen), assume we are in the main script file
             const editorFile = fileName ? fileName : this.mainFilePath;
@@ -304,12 +307,14 @@ export default class TestRunnerService extends ServiceBase {
                 // alway open the tab (make it active) in which breakpoint occured
                 primary: true,
             });
+
             // notify GUI that we hit a breakpoint
             this.notify({
                 type: EVENT_BREAKPOINT,
                 time,
                 file: editorFile,
                 line: editorLine,
+                variables: variables
             });
         });
 
