@@ -6,13 +6,12 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
+import { all, put, select, takeLatest, call } from 'redux-saga/effects';
 import * as ActionTypes from './types';
 import * as types from '../types';
 import * as tabActions from '../tabs/actions';
 import * as editorActions from '../editor/actions';
 import * as settingsActions from './actions';
-import * as wbActions from '../workbench/actions';
 import { reportError } from '../sentry/actions';
 import * as Const from '../../../const';
 import { MAIN_MENU_EVENT } from '../../services/MainIpc';
@@ -30,7 +29,7 @@ export default function* root() {
         takeLatest(ActionTypes.TMP_REMOVE_FILE, tmpRemoveFile),
         takeLatest(ActionTypes.TMP_UPDATE_FILE_CONTENT, tmpUpdateFileContent),
         takeLatest(ActionTypes.FIRST_OPEN, firstOpen),
-        takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),,
+        takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
         takeLatest(types.TEST_UPDATE_BREAKPOINTS, testUpdateBreakpoints)
     ]);
 }
@@ -66,7 +65,7 @@ export function* testUpdateBreakpoints({ payload }){
         // right now run test
         if(testBreakpoints && testBreakpoints[path]){
             // the file where breackpoints changed in files, where test runs
-            const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'updateBreakpoints', [ breakpoints, path ]);
+            yield call(services.mainIpc.call, 'TestRunnerService', 'updateBreakpoints', [ breakpoints, path ]);
         }
     }
 }
@@ -127,7 +126,7 @@ export function* tmpUpdateFileContent({ payload }) {
 }
 
 export function* handleMainMenuEvents({ payload }) {
-    const { cmd, args } = payload;
+    const { cmd } = payload;
     if (!cmd) {
         return;
     }

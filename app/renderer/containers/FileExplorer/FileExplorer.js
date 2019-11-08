@@ -11,7 +11,7 @@ import React, { Component } from 'react';
 import { Tooltip } from 'antd';
 import path from 'path';
 import Tree from '../../components/Tree';
-import Panel from '../../components/Panel';
+import Panel from '../../components/Panel.jsx';
 import onSelectNode from './onSelectNode';
 import renderTreeNodes from './renderTreeNodes';
 import fsSubjects from '../../store/fs/subjects';
@@ -21,7 +21,12 @@ type Props = {
   refreshScroll: boolean,
   treeData: Array<mixed> | undefined,
   activeNodePath: Array<mixed> | undefined,
-  rootName: string | null
+  rootName: string | null,
+  treeLoadNodeChildren: Function,
+  unWatchFolder: Function,
+  watchFolder: Function,
+  onMove: Function,
+  rootPath: string | null
 };
 
 export default class FileExplorer extends Component<Props> {
@@ -49,7 +54,7 @@ export default class FileExplorer extends Component<Props> {
         };
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (this.props.activeNodePath !== nextProps.activeNodePath) {
             if (!nextProps.activeNodePath) {
                 this.setState({
@@ -167,7 +172,6 @@ export default class FileExplorer extends Component<Props> {
                 header={headerTitle}
                 scroller
                 scrollWrapperClass="tree-wrapper"
-                scrollRefresh={this.props.refreshScroll}
                 refreshScrollBottom={refreshScrollBottom}
                 scrollRefresh={refreshScroll}
                 scrollVerticalOnly

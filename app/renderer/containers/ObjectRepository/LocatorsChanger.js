@@ -207,7 +207,5 @@ export default class LocatorsChanger extends PureComponent<Props> {
               {child}
           </Fragment>
       );
-
-      return null;
   }
 }

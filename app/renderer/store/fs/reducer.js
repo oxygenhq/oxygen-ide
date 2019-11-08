@@ -118,7 +118,7 @@ export default (state = defaultState, action, dispatch) => {
       _newActiveNode = state.tree.activeNode === path ? null : state.tree.activeNode;
       let filesClons = {};
       // clone all files except the one we just renamed
-      for (let filePath of Object.keys(state.files)) {
+      for (var filePath of Object.keys(state.files)) {
         if (path !== filePath) {
           filesClons[filePath] = state.files[filePath];
         }

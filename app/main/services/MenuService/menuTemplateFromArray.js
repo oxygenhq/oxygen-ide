@@ -6,8 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import * as Const from '../../../const';
-import { app } from 'electron';
 /**
  * @param  {Function} cmdHandler - function that will handle menu command
  * @param  {Array} menuItems - an array of menu items (similar to standard Electron menu item, but without click() handler)
@@ -19,7 +17,7 @@ const menuTemplateFromArray = (cmdHandler, menuItems) => {
     if (!menuItems || !menuItems.length || menuItems.length === 0) {
         return template;
     }
-    for (let item of menuItems) {
+    for (var item of menuItems) {
     // ignore menu entries without defined command handler name
         const templateItem = {
             type: item.type || null,

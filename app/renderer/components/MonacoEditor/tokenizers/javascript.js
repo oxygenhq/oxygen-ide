@@ -6,6 +6,7 @@
 // based on monaco-languages/typescript and monaco-languages/javascript
 // with addition of Oxygen specific tokens
 
+/*eslint-disable */
 export var language = {
     // Set defaultToken to invalid to see what you do not tokenize yet
     defaultToken: 'invalid',
@@ -144,3 +145,4 @@ export var language = {
         ],
     },
 };
+/*eslint-enable */

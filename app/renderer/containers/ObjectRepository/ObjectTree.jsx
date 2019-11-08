@@ -7,16 +7,16 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import Tree from '../../components/Tree';
 
 import renderTreeNodes from './renderTreeNodes';
-import onSelectNode from './onSelectNode';
-import onExpandNode from './onExpandNode';
 
 type Props = {
   tree: null | object,
   active: null | object,
+  onSelect: Function,
+  searchResults: Array
 };
 
 export default class ObjectTree extends PureComponent<Props> {
@@ -26,7 +26,7 @@ export default class ObjectTree extends PureComponent<Props> {
       selectedKeys: [],
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
       if (this.props.active !== nextProps.active) {
           if (!nextProps.active) {
               this.setState({
@@ -47,7 +47,7 @@ export default class ObjectTree extends PureComponent<Props> {
   }
 
   render() {
-      const { tree, active, onSelect, searchResults } = this.props;
+      const { tree, searchResults } = this.props;
       const { selectedKeys } = this.state;
     
       return (

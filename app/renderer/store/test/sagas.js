@@ -6,10 +6,9 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
-import { putAndTake } from '../../helpers/saga';
+import { all, put, select, takeLatest, call } from 'redux-saga/effects';
 
-import { success, failure, successOrFailure } from '../../helpers/redux';
+import { success, failure } from '../../helpers/redux';
 import * as testActions from './actions';
 import * as wbActions from '../workbench/actions';
 import * as editorActions from '../editor/actions';
@@ -17,6 +16,8 @@ import * as tabActions from '../tabs/actions';
 import * as loggerActions from '../logger/actions';
 import ActionTypes from '../types';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
+import ServicesSingleton from '../../services';
+const services = ServicesSingleton();
 /**
  * Test Sagas
  */
@@ -169,7 +170,7 @@ export function* startTest({ payload }) {
         // call TestRunner service to start the test
         
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', []);
-        const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
+        yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
         yield put({
             type: success(ActionTypes.TEST_START),
             payload: null,

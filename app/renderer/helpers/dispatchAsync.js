@@ -6,9 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import 'babel-polyfill';
-
-
 /**
 * This does the async request and provides Redux thunk feedback 
 */
@@ -24,6 +21,7 @@ export default function dispatchAsync(promise, dispatch, type, payload) {
         type: TYPE_REQ,
         payload: Object.assign({}, payload),
     });
+    /* eslint-disable */
     promise.then(
         (response)  => dispatch({
             type: TYPE_RSP,
@@ -36,4 +34,5 @@ export default function dispatchAsync(promise, dispatch, type, payload) {
             payload: Object.assign({}, payload, { error }),
         })
     );
-};
+    /* eslint-enable */
+}

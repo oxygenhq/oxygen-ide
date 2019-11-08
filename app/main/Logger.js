@@ -104,15 +104,16 @@ export default class Logger {
         const formatArgs = (args) => {
             return [util.format.apply(util.format, Array.prototype.slice.call(args))];
         };
-        console.log = (...args) => log.info.apply(log, formatArgs(args));
-        console.info = (...args) => log.info.apply(log, formatArgs(args));
-        console.warn = (...args) => log.info.apply(log, formatArgs(args));
-        console.error = (...args) => log.error.apply(log, formatArgs(args));
-        console.debug = (...args) => log.debug.apply(log, formatArgs(args));
+        console.log = (...args) => global.log.info.apply(global.log, formatArgs(args));
+        console.info = (...args) => global.log.info.apply(global.log, formatArgs(args));
+        console.warn = (...args) => global.log.info.apply(global.log, formatArgs(args));
+        console.error = (...args) => global.log.error.apply(global.log, formatArgs(args));
+        console.debug = (...args) => global.log.debug.apply(global.log, formatArgs(args));
     }
 
     _overrideLog(_log) {
-        const showDialog = (msg, err, type) => {
+        const showDialog = (msg, inputErr, type) => {
+            let err = inputErr;
             if (!err) {
                 err = '';
             }
@@ -188,11 +189,11 @@ export default class Logger {
 
     _catchTheUncaught() {
         process.on('uncaughtException', error => {
-            log.warn('Unhandled Error.', error);
+            global.log.warn('Unhandled Error.', error);
         });
 
         process.on('unhandledRejection', error => {
-            log.warn('Unhandled Promise Rejection.', error);
+            global.log.warn('Unhandled Promise Rejection.', error);
         });
     }
 }

@@ -1,7 +1,11 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Modal, Button } from 'antd';
 
-export default class XCodeDialog extends PureComponent {
+type Props = {
+    clean: Function
+};
+
+export default class XCodeDialog extends PureComponent<Props> {
   close = () => {
       if(this.props.clean){
           this.props.clean();

@@ -8,14 +8,12 @@
  */
 // @flow
 /* eslint-disable react/no-unused-state */
-/* eslint-disable ident */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { message } from 'antd';
 import difference from 'lodash.difference';
 import { type LogEntry } from '../types/LogEntry';
-import ScrollContainer from './ScrollContainer';
+import ScrollContainer from './ScrollContainer.jsx';
 import { AutoSizer, Grid } from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import os from 'os';
@@ -47,7 +45,7 @@ export default class LogViewer extends PureComponent<Props> {
         document.addEventListener('mousedown', this.handleClickOutside);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const diff = difference(nextProps.logs, this.props.logs);   
         let newState = {};
         let maxWidth = 1;
@@ -179,7 +177,7 @@ export default class LogViewer extends PureComponent<Props> {
   }
 
   render() {
-      const { height, logs, category } = this.props;
+      const { height } = this.props;
       const { refreshScroll, selected, copyValue, lines, maxWidth } = this.state;
     
       const getRowHeight = ({index}) => {

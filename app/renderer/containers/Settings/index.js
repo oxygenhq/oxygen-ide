@@ -8,7 +8,7 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import Settings from './Settings';
+import Settings from './Settings.jsx';
 import * as actions from '../../store/test/actions';
 
 const mapStoreToProps = (state) => {

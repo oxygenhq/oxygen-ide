@@ -10,7 +10,7 @@ import { message } from 'antd';
 
 import * as ActionTypes from './types';
 import * as Const from '../../../const';
-import { success, failure } from '../../helpers/redux';
+import { failure } from '../../helpers/redux';
 
 const defaultState = {
     isRunning: false,         // indicates if a test is currently running
@@ -98,28 +98,28 @@ export default (state = defaultState, action) => {
         };
     // TEST_EVENT_ENDED
     case ActionTypes.TEST_EVENT_ENDED:
-      return {
-        ...state,
-        isRunning: false,
-        isPaused: false,
-        variables: null
-      };
+        return {
+            ...state,
+            isRunning: false,
+            isPaused: false,
+            variables: null
+        };
     // TEST_EVENT_BREAKPOINT
     case ActionTypes.TEST_EVENT_BREAKPOINT:
-      return {
-        ...state,
-        isRunning: true,
-        isPaused: true,
-        variables: variables
-      };
+        return {
+            ...state,
+            isRunning: true,
+            isPaused: true,
+            variables: variables
+        };
     // TEST_STOP
     case ActionTypes.TEST_STOP:
-      return {
-        ...state,
-        isRunning: false,
-        isPaused: false,
-        variables: null
-      };
+        return {
+            ...state,
+            isRunning: false,
+            isPaused: false,
+            variables: null
+        };
     // TEST_SET_MAIN
     case ActionTypes.TEST_SET_MAIN:
         return {

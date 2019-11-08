@@ -19,7 +19,9 @@ function renderTreeNodes(nodes) {
     if (!nodes || !nodes.length || nodes.length === 0) {
         return null;
     }
+    /*eslint-disable */
     handleContextMenuEvent = handleContextMenuEvent.bind(this);
+    /*eslint-enable */
     return nodes.map(element => {
         const resolveClassName = element.name === '.emptyfile'
             ? 'hidden-node' : element.type;
@@ -91,6 +93,6 @@ function renderTreeNodes(nodes) {
             />
         );
     });
-};
+}
 
 export default renderTreeNodes;

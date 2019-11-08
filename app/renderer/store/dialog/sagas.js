@@ -1,11 +1,11 @@
-import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
-import { putAndTake } from '../../helpers/saga';
+import { all, put, takeLatest} from 'redux-saga/effects';
 import * as ActionTypes from './types';
 import * as actions from './actions';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 import { reportError } from '../sentry/actions';
+import ServicesSingleton from '../../services';
+const services = ServicesSingleton();
 
-import { success, failure, successOrFailure } from '../../helpers/redux';
 
 export default function* root() {
     yield all([

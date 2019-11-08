@@ -67,7 +67,6 @@ export default class AnalyticsService extends ServiceBase {
         let city = 'unknown';
         let continent_name = 'unknown';
         let continent_code = 'unknown';
-        const env = process.env;
         const language = await osLocale();
 
         try{

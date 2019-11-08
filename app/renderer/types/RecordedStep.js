@@ -13,5 +13,5 @@ export type RecordedStep = {
     target?: string,
     locators?: Array<any>,
     value?: string,
-    timestamp: number,
+    timestamp: number
 };

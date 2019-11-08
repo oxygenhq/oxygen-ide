@@ -14,16 +14,18 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { Icon, Tooltip, Modal, Button } from 'antd';
 import debounce from 'lodash.debounce';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
-import DraggableTab from './DraggableTab';
+import DraggableTab from './DraggableTab.jsx';
 import '../../css/tabs.scss';
 
-function noop() {}
-
 type Props = {
-  active: null | string,
-  tabs: Array,
-  onChange: (string) => void,
-  onClose: (string) => void
+    sidebarCollapsed: boolean | undefined,
+    active: null | string,
+    tabs: Array,
+    onChange: (string) => void,
+    onClose: (string) => void,
+    changeTabOrder: Function,
+    recorder: Object,
+    activeTitle: string | null
 };
 
 const circle = () => {
@@ -35,164 +37,163 @@ const circle = () => {
 };
 
 class Tabs extends Component<Props, void> {
-  static defaultProps = {
-      onClose: noop,
-  };
+    constructor(props){
+        super(props);
+        // holds PerfectScrollbar instance
+        this.ps = null;
+      
+        this.state = {
+            closeTabAsk: false
+        };
+    }
 
-  // holds PerfectScrollbar instance
-  ps = null
+    componentDidMount() {
+        if(this.tabsRef){
+            this.ps = new PerfectScrollbar(this.tabsRef, {
+                suppressScrollY: true,
+                useBothWheelAxes: true,
+            });
+        }
 
-  state = {
-      closeTabAsk: false
-  }
+        window.addEventListener('resize', debounce((e) => {
+            e.preventDefault();
+            if (this.ps) {
+                this.ps.destroy();
+                if(this.tabsRef){
+                    this.ps = new PerfectScrollbar(this.tabsRef, {
+                        suppressScrollY: true,
+                        useBothWheelAxes: true,
+                    });
+                }
+            } else {
+                if(this.tabsRef){
+                    this.ps = new PerfectScrollbar(this.tabsRef, {
+                        suppressScrollY: true,
+                        useBothWheelAxes: true,
+                    });
+                }
+            }
+        }, 150), false);
+    }
 
-  componentDidMount() {
-      if(this.tabsRef){
-          this.ps = new PerfectScrollbar(this.tabsRef, {
-              suppressScrollY: true,
-              useBothWheelAxes: true,
-          });
-      }
+    // nextProps, nextState
+    UNSAFE_componentWillUpdate(nextProps) {
+        const { sidebarCollapsed, tabs } = this.props;
+        if (this.ps) {
+            if (nextProps.sidebarCollapsed !== sidebarCollapsed) {
+                this.ps.update();
+            }
+            if (nextProps.tabs.length !== tabs.length) {
+                this.ps.update();
+            }
+        }
+    }
 
-      window.addEventListener('resize', debounce((e) => {
-          e.preventDefault();
-          if (this.ps) {
-              this.ps.destroy();
-              if(this.tabsRef){
-                  this.ps = new PerfectScrollbar(this.tabsRef, {
-                      suppressScrollY: true,
-                      useBothWheelAxes: true,
-                  });
-              }
-          } else {
-              if(this.tabsRef){
-                  this.ps = new PerfectScrollbar(this.tabsRef, {
-                      suppressScrollY: true,
-                      useBothWheelAxes: true,
-                  });
-              }
-          }
-      }, 150), false);
-  }
+    changeTabOrder = (dragIndex, hoverIndex) => {
+        this.props.changeTabOrder(dragIndex, hoverIndex);
+    }
 
-  // nextProps, nextState
-  componentWillUpdate(nextProps) {
-      const { sidebarCollapsed, tabs } = this.props;
-      if (this.ps) {
-          if (nextProps.sidebarCollapsed !== sidebarCollapsed) {
-              this.ps.update();
-          }
-          if (nextProps.tabs.length !== tabs.length) {
-              this.ps.update();
-          }
-      }
-  }
+    render() {
+        const { active, tabs, recorder, activeTitle } = this.props;
+        let activeTab;
 
-  changeTabOrder = (dragIndex, hoverIndex) => {
-      this.props.changeTabOrder(dragIndex, hoverIndex);
-  }
+        if(active === 'unknown'){
+            activeTab = active ? tabs.find(x => x.key === active && x.title === activeTitle) : null;
+        } else {
+            activeTab = active ? tabs.find(x => x.key === active) : null;
+        }
+        
+        let confirmFooter = [
+            <Button key="close-without-saving" onClick={this.onCloseWithoutConfirm}>Close without saving</Button>,
+            <Button key="just-cancel" type="danger" onClick={this.onCancelClose}>Cancel</Button>,
+        ];
+        if (activeTab && !activeTab.key.includes('unknown')) {
+            confirmFooter = [
+                <Button key="save-n-close" type="primary" onClick={this.onSaveAndClose}>
+            Save and close
+                </Button>,
+                ...confirmFooter
+            ];
+        }
 
-  render() {
-      const { active, tabs, recorder, activeTitle } = this.props;
-      let activeTab;
+        return (
+            <Fragment>
+                <Modal
+                    title="Confirm your actions"
+                    okText="Don`t save"
+                    cancelText="Cancel"
+                    visible={this.state.closeTabAsk}
+                    onCancel={this.onCancelClose}
+                    footer={confirmFooter}
+                >
+                    <p>Are you sure, you want to close unsaved tab?</p>
+                </Modal>
 
-      if(active === 'unknown'){
-          activeTab = active ? tabs.find(x => x.key === active && x.title === activeTitle) : null;
-      } else {
-          activeTab = active ? tabs.find(x => x.key === active) : null;
-      }
-    
-      let confirmFooter = [
-          <Button key="close-without-saving" onClick={this.onCloseWithoutConfirm}>Close without saving</Button>,
-          <Button key="just-cancel" type="danger" onClick={this.onCancelClose}>Cancel</Button>,
-      ];
-      if (activeTab && !activeTab.key.includes('unknown')) {
-          confirmFooter = [
-              <Button key="save-n-close" type="primary" onClick={this.onSaveAndClose}>
-          Save and close
-              </Button>,
-              ...confirmFooter
-          ];
-      }
+                <div
+                    className="tabs-bar-wrapper"
+                    ref={theRef => { this.tabsRef = theRef; }}
+                >
 
-      return (
-          <Fragment>
-              <Modal
-                  title="Confirm your actions"
-                  okText="Don`t save"
-                  cancelText="Cancel"
-                  visible={this.state.closeTabAsk}
-                  onCancel={this.onCancelClose}
-                  footer={confirmFooter}
-              >
-                  <p>Are you sure, you want to close unsaved tab?</p>
-              </Modal>
+                    {tabs.length > 0 && (
+                        tabs.map((tab, index) => {
+        
+                            let itemClass = activeTab && activeTab.key === tab.key && activeTab.title === tab.title ?
+                                'tabItemElem activeTabitem' : 'tabItemElem';
 
-              <div
-                  className="tabs-bar-wrapper"
-                  ref={theRef => { this.tabsRef = theRef; }}
-              >
+                            const { isRecording, activeFile, activeFileName } = recorder;
 
-                  {tabs.length > 0 && (
-                      tabs.map((tab, index) => {
-    
-                          let itemClass = activeTab && activeTab.key === tab.key && activeTab.title === tab.title ?
-                              'tabItemElem activeTabitem' : 'tabItemElem';
+                            if(isRecording){
+                                if(activeFile === 'unknown'){
+                                    if(activeFile === tab.key && activeFileName === tab.title){
+                                        itemClass += ' green-bg';
+                                    }
+                                } else if(activeFile === tab.key){
+                                    itemClass += ' green-bg';
+                                }
+                            }
 
-                          const { isRecording, activeFile, activeFileName } = recorder;
+                            return (
+                                <DraggableTab
+                                    id={tab.key}
+                                    index={index}
+                                    key={tab.key+tab.title}
+                                    moveCard={this.changeTabOrder}
+                                >
+                                    <div className={itemClass}>
+                                        <Tooltip
+                                            mouseEnterDelay={0.5}
+                                            placement="top"
+                                            title={tab.key}
+                                        >
+                                            <button onClick={() => this.props.onChange(tab.key, tab.title)}>
+                                                {tabs.length < 6 && <Icon type="file" />}
+                                                <span style={{ marginLeft: 5 }}>{tab.title}</span>
+                                            </button>
+                                        </Tooltip>
 
-                          if(isRecording){
-                              if(activeFile === 'unknown'){
-                                  if(activeFile === tab.key && activeFileName === tab.title){
-                                      itemClass += ' green-bg';
-                                  }
-                              } else if(activeFile === tab.key){
-                                  itemClass += ' green-bg';
-                              }
-                          }
-
-                          return (
-                              <DraggableTab
-                                  id={tab.key}
-                                  index={index}
-                                  key={tab.key+tab.title}
-                                  moveCard={this.changeTabOrder}
-                              >
-                                  <div className={itemClass}>
-                                      <Tooltip
-                                          mouseEnterDelay={0.5}
-                                          placement="top"
-                                          title={tab.key}
-                                      >
-                                          <button onClick={() => this.props.onChange(tab.key, tab.title)}>
-                                              {tabs.length < 6 && <Icon type="file" />}
-                                              <span style={{ marginLeft: 5 }}>{tab.title}</span>
-                                          </button>
-                                      </Tooltip>
-
-                                      { tab.touched &&
-                    <Icon
-                        className="close-icon"
-                        onClick={() => this.props.onClose(tab.key, tab.title)}
-                        component={circle}
-                    />
-                                      }
-                                      { !tab.touched &&
-                    <Icon
-                        className="close-icon"
-                        onClick={() => this.props.onClose(tab.key, tab.title)}
-                        type={'close'}
-                    />
-                                      }
-                                  </div>
-                              </DraggableTab>
-                          );
-                      })
-                  )}
-              </div>
-          </Fragment>
-      );
-  }
+                                        { tab.touched &&
+                        <Icon
+                            className="close-icon"
+                            onClick={() => this.props.onClose(tab.key, tab.title)}
+                            component={circle}
+                        />
+                                        }
+                                        { !tab.touched &&
+                        <Icon
+                            className="close-icon"
+                            onClick={() => this.props.onClose(tab.key, tab.title)}
+                            type={'close'}
+                        />
+                                        }
+                                    </div>
+                                </DraggableTab>
+                            );
+                        })
+                    )}
+                </div>
+            </Fragment>
+        );
+    }
 }
 
 export default DragDropContext(HTML5Backend)(Tabs);

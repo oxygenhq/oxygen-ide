@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import type { Element } from 'react';
 import '../../css/property-list.scss';
 
@@ -38,7 +38,7 @@ export class PropertyItem extends PureComponent
     |}> {
 
     render() {
-        const { base, label, value, editable = false } = this.props;
+        const { label } = this.props;
 
         return (
             <div className="property-item">
@@ -65,7 +65,11 @@ function renderPropertyValue(props) {
     }
 }
 
-class FormattedValue extends PureComponent {
+type FormattedValueProps = {
+    value: any
+};
+
+class FormattedValue extends PureComponent<FormattedValueProps> {
     render() {
         const { value } = this.props;
         return (
@@ -74,7 +78,11 @@ class FormattedValue extends PureComponent {
     }
 }
 
-class EditableNumber extends PureComponent {
+type EditableNumberProps = {
+    value: number
+};
+
+class EditableNumber extends PureComponent<EditableNumberProps> {
     render() {
         const { value } = this.props;
 

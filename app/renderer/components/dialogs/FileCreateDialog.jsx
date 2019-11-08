@@ -88,7 +88,10 @@ export default class FileCreateDialog extends PureComponent<Props> {
     }
 
     onChangeName = (e) => {
+        /* eslint-disable */
         const illegalCharacters = /(\\)|(\/)|(\:)|(\;)|(\*)|(\?)|(")|(')|(,)|(\.)|(\<)|(\>)|(\|)/gi;
+        /* eslint-enable */
+
         let result = e.target.value.match( illegalCharacters );
         
         if(result){
