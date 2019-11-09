@@ -30,10 +30,10 @@ import path from 'path';
 try {
     if (
         typeof process !== 'undefined' && 
-    process && 
-    process.env && 
-    process.env.NODE_ENV && 
-    process.env.NODE_ENV === 'development'
+        process && 
+        process.env && 
+        process.env.NODE_ENV && 
+        process.env.NODE_ENV === 'development'
     ) {
     // dev mode
     // ignore sentry logging
@@ -78,6 +78,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+    const sourceMapSupport = require('source-map-support');
+    sourceMapSupport.install();
     require('electron-debug')();
     const p = path.join(__dirname, 'node_modules');
     require('module').globalPaths.push(p);

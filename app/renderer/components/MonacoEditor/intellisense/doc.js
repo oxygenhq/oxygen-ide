@@ -15,7 +15,7 @@
   var fs = require('fs');
   var path = require('path');
   var doctrine = require('doctrine');
-  var modPath = path.resolve(__dirname, '../node_modules/oxygen-cli/ox_modules');
+  var modPath = path.resolve(__dirname, '../node_modules/oxygen-cli/build/ox_modules');
   module.exports = {};
 
   var docs = {};
