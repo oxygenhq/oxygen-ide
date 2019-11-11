@@ -163,8 +163,7 @@ export default class TestRunnerService extends ServiceBase {
         
         // initialize Oxygen Runner
         try {
-            this.reporter = new ReportAggregator(options);
-            this._hookToOxygenEvents();
+            this.reporter = new ReportAggregator(options);            
             await this._launchTest(options, caps);
         } catch (e) {
             // the error at .init stage can be caused by parallel call to .kill() method
@@ -226,6 +225,7 @@ export default class TestRunnerService extends ServiceBase {
             const framework = opts.framework;
             throw new Error(`Cannot find runner for the specified framework: ${framework}.`);
         }
+        this._hookToOxygenEvents();
         try {
             // initialize runner
             await runner.init(opts, caps, this.reporter);   
@@ -309,33 +309,9 @@ export default class TestRunnerService extends ServiceBase {
             }            
         });
 
-        // @params breakpoint, testcase
-        this.reporter.on('breakpoint', (breakpoint) => {
-            const { lineNumber, fileName } = breakpoint;
-            const { getScriptContentLineOffset } = this.oxRunner;
-            // if no fileName is received from the debugger (not suppose to happen), assume we are in the main script file
-            const editorFile = fileName ? fileName : this.mainFilePath;
-            // if we are in the main script file, adjust line number according to script boilerplate offset
-            // if we are in the secondary file (loaded via `require`) add 1 since BP indices are 0-based.
-            let editorLine = editorFile !== this.mainFilePath ? lineNumber + 1 : lineNumber - getScriptContentLineOffset;
-            
-            const time = moment.utc().valueOf();
-            // make sure to mark breakpoint line with current line mark
-            this.notify({
-                type: EVENT_LINE_UPDATE,
-                time,
-                file: editorFile,
-                line: editorLine,
-                // alway open the tab (make it active) in which breakpoint occured
-                primary: true,
-            });
-            // notify GUI that we hit a breakpoint
-            this.notify({
-                type: EVENT_BREAKPOINT,
-                time,
-                file: editorFile,
-                line: editorLine,
-            });
+        // @params breakpoint
+        this.runner.on('breakpoint', (breakpoint) => {
+            this.handleBreakpoint(breakpoint);            
         });
 
         this.reporter.on('test-error', (err) => {
@@ -366,6 +342,34 @@ export default class TestRunnerService extends ServiceBase {
             this._emitLogEvent(SEVERITY_INFO, `Test finished with status --> ${status}`);
         });
     }
+
+    _handleBreakpoint(breakpoint) {
+        const { lineNumber, fileName } = breakpoint;
+        // if no fileName is received from the debugger (not suppose to happen), assume we are in the main script file
+        const editorFile = fileName ? fileName : this.mainFilePath;
+        // if we are in the main script file, adjust line number according to script boilerplate offset
+        // if we are in the secondary file (loaded via `require`) add 1 since BP indices are 0-based.
+        let editorLine = editorFile !== this.mainFilePath ? lineNumber + 1 : lineNumber;
+        
+        const time = moment.utc().valueOf();
+        // make sure to mark breakpoint line with current line mark
+        this.notify({
+            type: EVENT_LINE_UPDATE,
+            time,
+            file: editorFile,
+            line: editorLine,
+            // alway open the tab (make it active) in which breakpoint occured
+            primary: true,
+        });
+        // notify GUI that we hit a breakpoint
+        this.notify({
+            type: EVENT_BREAKPOINT,
+            time,
+            file: editorFile,
+            line: editorLine,
+        });
+    }
+
     _getLocationInfo(location) {
         if (!location) {
             return null;
