@@ -14,7 +14,7 @@ import { version }  from '../../../package.json';
 import os from 'os';
 import osLocale from 'os-locale';
 import uuidv4 from'uuid/v4';
-import * as Sentry from '@sentry/electron';
+// import * as Sentry from '@sentry/electron';
 
 export default class AnalyticsService extends ServiceBase {
     constructor() {
@@ -28,7 +28,7 @@ export default class AnalyticsService extends ServiceBase {
             }
         } catch(e){
             console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
     }
 
@@ -116,12 +116,12 @@ export default class AnalyticsService extends ServiceBase {
                                 }
                             } catch(e){
                                 console.warn('mixpanel e', e);
-                                Sentry.captureException(e);
+                                // Sentry.captureException(e);
                             }
                         }
                     } catch(e){
                         console.warn('e',e);
-                        Sentry.captureException(e);
+                        // Sentry.captureException(e);
                     }
                 });
                 response.on('end', () => {
@@ -131,7 +131,7 @@ export default class AnalyticsService extends ServiceBase {
             request.end();
         } catch(e){
             console.warn('e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
 
         
@@ -149,7 +149,7 @@ export default class AnalyticsService extends ServiceBase {
             }
         } catch(e){
             console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
         this.ideOpen();
     }
@@ -164,15 +164,15 @@ export default class AnalyticsService extends ServiceBase {
                 }); 
             }
 
-            if(Sentry && Sentry.configureScope){
-                Sentry.configureScope((scope) => {
-                    scope.setUser({'userId': this.uuid});
-                });
-            }
+            // if(Sentry && Sentry.configureScope){
+            //     Sentry.configureScope((scope) => {
+            //         scope.setUser({'userId': this.uuid});
+            //     });
+            // }
 
         } catch(e){
             console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
     }
 
@@ -190,7 +190,7 @@ export default class AnalyticsService extends ServiceBase {
                 }
             } catch(e){
                 console.warn('mixpanel e', e);
-                Sentry.captureException(e);
+                // Sentry.captureException(e);
             }
             setTimeout(() => {
                 resolve('result');
@@ -211,7 +211,7 @@ export default class AnalyticsService extends ServiceBase {
             }
         } catch(e){
             console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
     }
 
@@ -230,7 +230,7 @@ export default class AnalyticsService extends ServiceBase {
             }
         } catch(e){
             console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
         this.recStartMoment = null;
     }
@@ -247,7 +247,7 @@ export default class AnalyticsService extends ServiceBase {
             }
         } catch(e){
             console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
     }
 
@@ -267,7 +267,7 @@ export default class AnalyticsService extends ServiceBase {
             }
         } catch(e){
             console.log('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
 
         this.playStartMoment = null;

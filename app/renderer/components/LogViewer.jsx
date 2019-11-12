@@ -48,11 +48,12 @@ export default class LogViewer extends PureComponent<Props> {
     }
 
     componentWillReceiveProps(nextProps) {
-        const diff = difference(nextProps.logs, this.props.logs);   
+        const diff = difference(nextProps.logs, this.props.logs); 
+        const lengthDiff = !(nextProps.logs.length === this.props.logs.length);
         let newState = {};
         let maxWidth = 1;
 
-        if ((this.props.category !== nextProps.category) || diff && diff.length) {
+        if ((this.props.category !== nextProps.category) || (diff && diff.length) || lengthDiff) {
             newState = {
                 refreshScroll: !this.state.refreshScroll,
                 keyKeys: [],
@@ -63,7 +64,7 @@ export default class LogViewer extends PureComponent<Props> {
             };
         }
 
-        if(diff && diff.length){
+        if(lengthDiff || (diff && diff.length)){
 
             const { logs } = nextProps;
 
@@ -102,7 +103,6 @@ export default class LogViewer extends PureComponent<Props> {
             }
       
         }
-
         this.setState(
             newState
         );

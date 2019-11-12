@@ -36,6 +36,7 @@ export default class TestRunnerService extends ServiceBase {
     }
     
     async start(mainFilePath, breakpoints, runtimeSettings) {
+        console.log('breakpoints', breakpoints);
         if (this.oxRunner) {
             throw Error('Previous test is still running. Stop the previous test before calling "start" method.');
         }
@@ -80,6 +81,11 @@ export default class TestRunnerService extends ServiceBase {
         }
         // set iterations count
         testsuite.cases[0].iterationCount = iterations;
+        const casesBreakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
+
+        console.log('casesBreakpoints', casesBreakpoints);
+
+        testsuite.cases[0].breakpoints = casesBreakpoints;
         // prepare launch options and capabilities
         const caps = {};
         const options = {};
@@ -171,14 +177,18 @@ export default class TestRunnerService extends ServiceBase {
             if (!this.isStopping) {
                 if(typeof e === 'string'){
                     this._emitLogEvent(SEVERITY_ERROR, `Test Failed!: ${e}`);
+                    this._emitTestEnded(null, e);
                 } else {
                     this._emitLogEvent(SEVERITY_ERROR, `Test Failed!: ${e.message}. ${e.stack || ''}`);
+                    this._emitTestEnded(null, e);
                 }
             }            
         }      
         finally {
             this.isRunning = false;
-        }  
+            // dispose Oxygen Runner and mark the state as not running, before updating the UI
+            await this.dispose();            
+        };
     }
 
     async stop() {
@@ -199,8 +209,15 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     updateBreakpoints(breakpoints, filePath) {        
-        if (this.oxRunner && breakpoints && filePath) {
-            this.oxRunner.updateBreakpoints(breakpoints, filePath);
+
+        console.log('--- updateBreakpoints ---');
+        console.log('this.oxRunner', this.oxRunner);
+        console.log('breakpoints', breakpoints);
+        console.log('filePath', filePath);
+        console.log('--- updateBreakpoints ---');
+
+        if (this.runner && breakpoints && filePath) {
+            this.runner.updateBreakpoints(breakpoints, filePath);
         }
     }
 
@@ -311,6 +328,7 @@ export default class TestRunnerService extends ServiceBase {
 
         // @params breakpoint
         this.runner.on('breakpoint', (breakpoint) => {
+            console.log('this.runner.on breakpoint', breakpoint);
             this.handleBreakpoint(breakpoint);            
         });
 
@@ -329,7 +347,7 @@ export default class TestRunnerService extends ServiceBase {
             this._emitLogEvent(SEVERITY_ERROR, message);
         });
 
-        this.reporter.on('log-add', (level, msg) => {
+        this.reporter.on('log-add', ({level, msg}) => {            
             this._emitLogEvent(SEVERITY_INFO, `LEVEL: ${level} MSG: ${msg}`);
         });
 

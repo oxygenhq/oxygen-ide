@@ -8,7 +8,7 @@
  */
 import * as Const from '../../../const';
 import { app } from 'electron';
-import * as Sentry from '@sentry/electron';
+// import * as Sentry from '@sentry/electron';
 /**
  * @param  {Function} cmdHandler - function that will handle menu command
  * @param  {Object} settings - a set of settings for selected menu items
@@ -60,7 +60,7 @@ export default (cmdHandler, settings) => {
                     app.exit();
                 } catch (e) {
                     console.warn(e.message);
-                    Sentry.captureException(e);
+                    // Sentry.captureException(e);
                 }
             }
         },

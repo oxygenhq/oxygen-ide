@@ -8,7 +8,7 @@
  */
 import http from 'http';
 import dns from 'dns';
-import * as Sentry from '@sentry/electron';
+// import * as Sentry from '@sentry/electron';
 
 import ServiceBase from './ServiceBase';
 
@@ -59,7 +59,7 @@ export default class RecorderService extends ServiceBase {
             try{
                 this.httpSrv.listen(PORT_HTTP, hostname, function(){ });
             } catch (e){
-                Sentry.captureException(e);
+                // Sentry.captureException(e);
                 console.error('Unable to open ' + hostname + ':' + PORT_HTTP, e);
             }
         });
