@@ -411,10 +411,16 @@ LocatorBuilders.add('css', function(e) {
 });
 
 LocatorBuilders.add('css2', function(e) {
+    // do not calculate css for frames
+    if (e.nodeName === 'IFRAME' || e.nodeName === 'FRAME') {
+        return null;
+    }
+
     try {
         var loc = 'css=' + cssFinder(e);
         return this.findElement(loc, true) ? loc : null;
-    } catch (e) {   // might fail during frame locator generation
+    } catch (e) {
+        ox_error('ox: error calculating CSS locator', e);
         return null;
     }
 });

@@ -13,6 +13,12 @@ var ox_log = function (msg) {
     }
 };
 
+var ox_error = function (msg, e) {
+    if (window.ox_debug) {
+        console.error(msg, e);
+    }
+};
+
 var BrowserVersion = function () {
     // http://stackoverflow.com/a/9851769/217039
     this.isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
