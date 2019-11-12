@@ -191,18 +191,6 @@ LocatorBuilders.add('id', function(e) {
     return null;
 });
 
-LocatorBuilders.add('link', function(e) {
-    if (e.nodeName == 'A') {
-        var text = e.textContent;
-        if (!text.match(/^\s*$/)) {
-            text = applyTextTransformation(e, text);
-            var loc = 'link=' + text.replace(/\xA0/g, ' ').replace(/^\s*(.*?)\s*$/, '$1');
-            return this.findElement(loc, true) ? loc : null;
-        }
-    }
-    return null;
-});
-
 LocatorBuilders.add('name', function(e) {
     if (e.name && this.findElement('name=' + e.name, true)) {
         return 'name=' + e.name;
@@ -354,6 +342,18 @@ LocatorBuilders.add('xpath:position', function(e, opt_contextNode) {
 
         if (current.nodeType === Node.DOCUMENT_NODE) {
             break;
+        }
+    }
+    return null;
+});
+
+LocatorBuilders.add('link', function(e) {
+    if (e.nodeName == 'A') {
+        var text = e.textContent;
+        if (!text.match(/^\s*$/)) {
+            text = applyTextTransformation(e, text);
+            var loc = 'link=' + text.replace(/\xA0/g, ' ').replace(/^\s*(.*?)\s*$/, '$1');
+            return this.findElement(loc, true) ? loc : null;
         }
     }
     return null;
