@@ -53,9 +53,9 @@ export default class MainIpcService {
                 });
             }
             catch (e) { 
-                if(window && window.Sentry && window.Sentry.captureException){
-                    window.Sentry.captureException(e);
-                }
+                // if(window && window.Sentry && window.Sentry.captureException){
+                //     window.Sentry.captureException(e);
+                // }
                 reject(e); 
             }
 
