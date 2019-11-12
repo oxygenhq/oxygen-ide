@@ -397,6 +397,11 @@ LocatorBuilders.add('xpath:position', function(e, opt_contextNode) {
 });
 
 LocatorBuilders.add('css', function(e) {
+    // do not calculate css for frames
+    if (e.nodeName === 'IFRAME' || e.nodeName === 'FRAME') {
+        return null;
+    }
+
     var current = e;
     var sub_path = this.getCSSSubPath(e);
     while (this.findElement('css=' + sub_path) != e && current.nodeName.toLowerCase() != 'html') {
