@@ -147,28 +147,38 @@ LocatorBuilders.prototype.xpathHtmlElement = function(name) {
 };
 
 LocatorBuilders.prototype.relativeXPathFromParent = function(current) {
-    var index = this.getNodeNbr(current);
+    var index = this.getNodeIndex(current);
     var currentPath = '/' + this.xpathHtmlElement(current.nodeName.toLowerCase());
-    if (index > 0) {
+    if (index !== null) {
         currentPath += '[' + (index + 1) + ']';
     }
     return currentPath;
 };
 
-LocatorBuilders.prototype.getNodeNbr = function(current) {
+LocatorBuilders.prototype.getNodeIndex = function(current) {
     var childNodes = current.parentNode.childNodes;
-    var total = 0;
-    var index = -1;
-    for (var i = 0; i < childNodes.length; i++) {
+
+    // get siblings which have same node type
+    var siblings = [];
+    for (let i = 0; i < childNodes.length; i++) {
         var child = childNodes[i];
-        if (child.nodeName == current.nodeName) {
-            if (child == current) {
-                index = total;
-            }
-            total++;
+        if (child.nodeName === current.nodeName) {
+            siblings.push(child);
         }
     }
-    return index;
+
+    // if no identical siblings
+    if (siblings.length <= 1) {
+        return null;
+    }
+
+    // find the position of our node within its siblings
+    for (let i = 0; i < siblings.length; i++) {
+        if (siblings[i] == current) {
+            return i;
+        }
+    }
+    return null;
 };
 
 LocatorBuilders.prototype.getCSSSubPath = function(e) {
@@ -187,8 +197,8 @@ LocatorBuilders.prototype.getCSSSubPath = function(e) {
             return e.nodeName.toLowerCase() + '[' + attr + '="' + value + '"]';
         }
     }
-    if (this.getNodeNbr(e)) {
-        return e.nodeName.toLowerCase() + ':nth-of-type(' + this.getNodeNbr(e) + ')';
+    if (this.getNodeIndex(e) !== null) {
+        return e.nodeName.toLowerCase() + ':nth-of-type(' + this.getNodeIndex(e) + ')';
     } else {
         return e.nodeName.toLowerCase();
     }
@@ -368,7 +378,7 @@ LocatorBuilders.add('xpath:position', function(e, opt_contextNode) {
             if (currentPath === '/html') {
                 return '/' + path;
             }
-            path = currentPath + path; 
+            path = currentPath + path;
         } else {
             path = currentPath + path;
             var locator = '/' + path;
