@@ -83,7 +83,7 @@ LocatorBuilders.prototype.buildAll = function(el) {
                 }
             }
         } catch (e) {
-            console.error('ox: locator exception: ' + e.message);
+            ox_error('locator exception: ' + e.message);
         }
     }
     return locators;
@@ -420,7 +420,7 @@ LocatorBuilders.add('css2', function(e) {
         var loc = 'css=' + cssFinder(e);
         return this.findElement(loc, true) ? loc : null;
     } catch (e) {
-        ox_error('ox: error calculating CSS locator', e);
+        ox_error('error calculating CSS locator', e);
         return null;
     }
 });

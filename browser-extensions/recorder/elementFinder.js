@@ -39,7 +39,7 @@ ElementFinder.prototype._registerAllLocatorFunctions = function() {
     this.findElementBy = function(locatorType, locator, inDocument, inWindow, unique) {
         var locatorFunction = this.locationStrategies[locatorType];
         if (!locatorFunction) {
-            console.error("Unrecognised locator type: '" + locatorType + "'");
+            ox_error("Unrecognised locator type: '" + locatorType + "'");
             return null;
         }
         return locatorFunction.call(this, locator, inDocument, inWindow, unique);
@@ -224,11 +224,11 @@ ElementFinder.filterFunctions.value = function(value, elements) {
 ElementFinder.filterFunctions.index = function(index, elements) {
     index = Number(index);
     if (isNaN(index) || index < 0) {
-        console.error('ox: illegal index: ' + index);
+        ox_error('illegal index: ' + index);
         return null;
     }
     if (elements.length <= index) {
-        console.error('ox: index out of range: ' + index);
+        ox_error('index out of range: ' + index);
         return null;
     }
     return [elements[index]];
