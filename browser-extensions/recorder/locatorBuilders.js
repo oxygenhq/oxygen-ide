@@ -65,21 +65,7 @@ LocatorBuilders.prototype.buildAll = function(el) {
                 // and fe will be null. in such case just assume the CSS is correct.
                 if (el == fe || fe === null) {
                     locator = locator.replace(/\r\n|\r|\n/g, '\\n');
-
-                    // do not add css2 if it equals to css
-                    var ignore = false;
-                    if (finderName === 'css2') {
-                        for (var loc = 0; loc < locators.length; loc++) {
-                            if (locators[loc][0] === locator) {
-                                ignore = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!ignore) {
-                        locators.push([ locator, finderName ]);
-                    }
+                    locators.push([ locator, finderName ]);
                 }
             }
         } catch (e) {
@@ -179,29 +165,6 @@ LocatorBuilders.prototype.getNodeIndex = function(current) {
         }
     }
     return null;
-};
-
-LocatorBuilders.prototype.getCSSSubPath = function(e) {
-    var css_attributes = ['id', 'name', 'class', 'type', 'alt', 'title', 'value'];
-    for (var i = 0; i < css_attributes.length; i++) {
-        var attr = css_attributes[i];
-        var value = e.getAttribute(attr);
-        if (value) {
-            value = value.trim();
-            if (attr == 'id') {
-                return '#' + value;
-            }
-            if (attr == 'class') {
-                return e.nodeName.toLowerCase() + '.' + value.replace(/\s+/g, '.').replace('..', '.');
-            }
-            return e.nodeName.toLowerCase() + '[' + attr + '="' + value + '"]';
-        }
-    }
-    if (this.getNodeIndex(e) !== null) {
-        return e.nodeName.toLowerCase() + ':nth-of-type(' + this.getNodeIndex(e) + ')';
-    } else {
-        return e.nodeName.toLowerCase();
-    }
 };
 
 LocatorBuilders.prototype.preciseXPath = function(xpath, e){
@@ -397,25 +360,6 @@ LocatorBuilders.add('xpath:position', function(e, opt_contextNode) {
 });
 
 LocatorBuilders.add('css', function(e) {
-    // do not calculate css for frames
-    if (e.nodeName === 'IFRAME' || e.nodeName === 'FRAME') {
-        return null;
-    }
-
-    var current = e;
-    var sub_path = this.getCSSSubPath(e);
-    while (this.findElement('css=' + sub_path) != e && current.nodeName.toLowerCase() != 'html') {
-        // for situations when element was removed from dom after interacting with it
-        if (current.parentNode == null) {
-            break;
-        }
-        sub_path = this.getCSSSubPath(current.parentNode) + ' > ' + sub_path;
-        current = current.parentNode;
-    }
-    return this.findElement('css=' + sub_path, true) ? 'css=' + sub_path : null;
-});
-
-LocatorBuilders.add('css2', function(e) {
     // do not calculate css for frames
     if (e.nodeName === 'IFRAME' || e.nodeName === 'FRAME') {
         return null;
