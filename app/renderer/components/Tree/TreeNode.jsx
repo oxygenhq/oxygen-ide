@@ -62,6 +62,7 @@ class TreeNode extends React.Component {
         onContextMenu: PropTypes.func,
         onContextMenuHendler: PropTypes.func,
         showIcon: PropTypes.func,
+        hideIcon: PropTypes.bool,
     };
 
     static contextTypes = nodeContextTypes;
@@ -411,7 +412,8 @@ class TreeNode extends React.Component {
             selected,
             icon,
             loading,
-            onContextMenuHendler
+            onContextMenuHendler,
+            hideIcon
         } = this.props;
         const { rcTree: { prefixCls, showIcon, icon: treeIcon, draggable, loadData } } = this.context;
         const disabled = this.isDisabled();
@@ -421,25 +423,30 @@ class TreeNode extends React.Component {
         // Icon - Still show loading icon when loading without showIcon
         let $icon;
 
-        if (showIcon) {
-            const currentIcon = icon || treeIcon;
-
-            $icon = currentIcon ? (
-                <span
-                    className={classNames(
-                        `${prefixCls}-iconEle`,
-                        `${prefixCls}-icon__customize`,
-                    )}
-                >
-                    {typeof currentIcon === 'function' ?
-                        React.createElement(currentIcon, {
-                            ...this.props,
-                        }) : currentIcon}
-                </span>
-            ) : this.renderIcon();
-        } else if (loadData && loading) {
-            $icon = this.renderIcon();
+        if(hideIcon){
+            //ignore
+        } else {
+            if (showIcon) {
+                const currentIcon = icon || treeIcon;
+    
+                $icon = currentIcon ? (
+                    <span
+                        className={classNames(
+                            `${prefixCls}-iconEle`,
+                            `${prefixCls}-icon__customize`,
+                        )}
+                    >
+                        {typeof currentIcon === 'function' ?
+                            React.createElement(currentIcon, {
+                                ...this.props,
+                            }) : currentIcon}
+                    </span>
+                ) : this.renderIcon();
+            } else if (loadData && loading) {
+                $icon = this.renderIcon();
+            }
         }
+
 
         // Title
         const $title = <span className={`${prefixCls}-title`}>{title}</span>;

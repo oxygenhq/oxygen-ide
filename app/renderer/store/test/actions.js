@@ -34,13 +34,19 @@ const convertVariablesForTree = (variables, objectId = null) => {
                         variable.value &&
                         variable.value.type
                     ){
-                        result.push({
+
+                        const element = {
                             name: variable.name,
                             type: variable.value.type,
-                            value: variable.value.value || null,
                             id: variable.value.objectId || null,
                             children: convertVariablesForTree(item, variable.value.objectId || null),
-                        });
+                        };
+
+                        if(variable && variable.value && typeof variable.value.value !== 'undefined'){
+                            element.value = variable.value.value;
+                        }
+
+                        result.push(element);
                     }
                 });
             }
@@ -71,10 +77,14 @@ const convertVariablesForTree = (variables, objectId = null) => {
                                         const element = {
                                             name: variable.name,
                                             type: variable.value.type,
-                                            value: variable.value.value || null,
                                             id: variable.value.objectId || null,
                                             children: convertVariablesForTree(item, variable.value.objectId || item.objectId || null),
                                         };
+                                        
+                                        if(variable && variable.value && typeof variable.value.value !== 'undefined'){
+                                            element.value = variable.value.value;
+                                        }
+
                                         result.push(element);
                                     }
                                 });

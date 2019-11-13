@@ -810,8 +810,6 @@ class Tree extends React.Component {
             dragOver = dragOverNodeKey === rootPath;
         }
 
-        console.log('treeNode', treeNode);        
-
         return (
             <ul
                 {...domProps}

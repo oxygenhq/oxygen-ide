@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import Tree from '../components/Tree';
-import React from 'react';
+import React, { Fragment } from 'react';
 
 function handleContextMenuEvent(e, node, menuName) {
     e.preventDefault();
@@ -36,12 +36,21 @@ function renderVariablesTreeNodes(nodes, parentIndex) {
     /*eslint-enable */
     return nodes.map((element, idx) => {
         const resolveClassName = element.name === '.emptyfile' ? 'hidden-node' : element.type;
+        
+        let theTitle = (
+            <Fragment>
+                <span style={{color: '#0000ff'}}>{element.name}</span>
+                {' '}
+                :
+                {' '}
+                <span style={{color: '#a31515'}}>{'<'+element.type+'>'}</span>
 
-        let theTitle = element.name+' : <'+element.type+'>';
-
-        if(element && element.value){
-            theTitle+=' '+element.value;
-        }
+                {
+                    element && typeof element.value !== 'undefined' &&
+                    ' '+element.value
+                }
+            </Fragment>
+        );
 
         let saveParentIndex = '0';
 
@@ -54,7 +63,7 @@ function renderVariablesTreeNodes(nodes, parentIndex) {
         if(element.children && element.children.length){
             return (
                 <Tree.TreeNode
-                    showIcon={false}
+                    hideIcon={true}
                     nodeInfo={element}
                     key={saveParentIndex}
                     title={theTitle}
@@ -70,7 +79,7 @@ function renderVariablesTreeNodes(nodes, parentIndex) {
 
         return (
             <Tree.TreeNode
-                showIcon={false}
+                hideIcon={true}
                 nodeInfo={element}
                 title={theTitle}
                 key={idx}
