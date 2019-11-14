@@ -43,6 +43,46 @@ export default class LogViewer extends PureComponent<Props> {
 
     componentDidMount() {
         document.addEventListener('mousedown', this.handleClickOutside);
+        const { logs } = this.props;        
+        const lines = [];
+        let newState = {};
+        let maxWidth = 1;
+  
+        if(logs && logs.map){
+            logs.map((log) => {
+                const messageSplit = log.message.split('\n');
+
+                if(messageSplit && messageSplit.map){
+                    messageSplit.map((item, i) => {
+          
+                        if(
+                            item &&
+                            item.length &&
+                            maxWidth < item.length
+                        ) {
+                            maxWidth = item.length;
+                        }
+
+                        lines.push({
+                            message: item,
+                            timestamp: log.timestamp+''+i
+                        });
+                    });
+                } else {
+                    lines.push({
+                        message: log.message,
+                        timestamp: log.timestamp
+                    });
+                }
+            });
+
+            newState.lines = lines;
+            newState.maxWidth = maxWidth;
+        }
+
+        this.setState(
+            newState
+        );
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
@@ -76,8 +116,8 @@ export default class LogViewer extends PureComponent<Props> {
               
                             if(
                                 item &&
-                item.length &&
-                maxWidth < item.length
+                                item.length &&
+                                maxWidth < item.length
                             ) {
                                 maxWidth = item.length;
                             }

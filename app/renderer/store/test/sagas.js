@@ -54,6 +54,12 @@ function* handleTestRunnerServiceEvent(event) {
     else if (event.type === 'TEST_ENDED') {
         yield put(testActions.onTestEnded());
 
+        const { active } = yield select(state => state.logger);
+
+        if(active && active === 'variables'){
+            yield put(loggerActions.setActiveLogger('general'));
+        }
+
         if(event && event.result && event.result.summary){
             const { summary } = event.result;
             if(summary && summary._status && summary._status ==='passed'){
