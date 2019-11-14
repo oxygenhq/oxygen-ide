@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { all, put, select, takeLatest, take, call, fork } from 'redux-saga/effects';
+import { all, select, takeLatest, call } from 'redux-saga/effects';
 import { MAIN_SERVICE_EVENT } from './MainIpc';
 
 export default class UserHintsService {
@@ -57,7 +57,7 @@ export default class UserHintsService {
             (message.includes('This version of ChromeDriver only supports Chrome version') ||
                 message.includes('Chrome version must be between'))
         ){
-            store.dispatch({
+            this.store.dispatch({
                 type: 'SELENIUM_RUNTIME_ERROR',
                 payload: {},
             });
@@ -68,6 +68,6 @@ export default class UserHintsService {
         if (!confirm('Appium server is not accessible.\n\nIn order to run mobile tests, you need to install and run Appium server manually.\n\nDo you want to read a tutorial on how to install and run Appium server?')) {
             return;
         }
-        yield call(services.mainIpc.call, 'ElectronService', 'shellOpenExternal', ['http://docs.oxygenhq.org/download-mobile.html']);
+        yield call(global.services.mainIpc.call, 'ElectronService', 'shellOpenExternal', ['http://docs.oxygenhq.org/download-mobile.html']);
     }
 }

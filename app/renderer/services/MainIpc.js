@@ -43,6 +43,7 @@ export default class MainIpcService {
         let _this = this;
         const id = uniqid(); //(new Date()).getTime();
 
+        /* eslint-disable */
         let promise = new Promise((resolve, reject) => {
             try {
                 ipcRenderer.send('MAIN_SERVICE_CALL', {
@@ -61,6 +62,7 @@ export default class MainIpcService {
 
             _this.requests[id] = { resolve, reject };
         });
+        /* eslint-enable */
         
         return promise;
     }
@@ -83,37 +85,37 @@ export default class MainIpcService {
     }
 
     _handleServiceEvent(e, event) {
-        if (!store || !event) {
+        if (!this.store || !event) {
             return;
         }
         if (event && event.event && event.event.type === 'RECORDER_EVENT') {
-            store.dispatch({
+            this.store.dispatch({
                 type: 'RECORDER_SERVICE_ADD_STEP',
                 payload: { ...event },
             });    
         }
         else if (event && event.event && event.event.type === 'RECORDER_NEW_CAN_RECORD') {
-            store.dispatch({
+            this.store.dispatch({
                 type: 'RECORDER_NEW_CAN_RECORD',
                 payload: { ...event },
             });    
         }
         
         else if (event.type === 'LOG_ENTRY') {
-            store.dispatch({
+            this.store.dispatch({
                 type: 'MAIN_SERVICE_LOG',
                 payload: { ...event },
             });    
         }
         // dispatch MAIN_MENU_CMD events directly, without MAIN_SERVICE_EVENT wrap up
         else if (event.event.type === 'MAIN_MENU_CMD') {
-            store.dispatch({
+            this.store.dispatch({
                 type: 'MAIN_MENU_EVENT',
                 payload: { cmd: event.event.cmd, args: event.event.args },
             });  
         }
         else {
-            store.dispatch({
+            this.store.dispatch({
                 type: 'MAIN_SERVICE_EVENT',
                 payload: { ...event },
             });

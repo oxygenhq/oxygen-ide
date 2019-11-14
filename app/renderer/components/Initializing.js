@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 
 export default class Initializing extends PureComponent {
     constructor(props) {
@@ -12,7 +12,7 @@ export default class Initializing extends PureComponent {
                     <h1 className="initializing-title">
             Initializing...
                     </h1>
-                    <p className="initializing-text">(Shouldn't take more than a minute)</p>
+                    <p className="initializing-text">(Shouldn&apos;t take more than a minute)</p>
                 </div>
             </div>
         );

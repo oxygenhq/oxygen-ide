@@ -25,7 +25,6 @@ export default function (e) {
     if (!newLineAddedOrDeleted) {
         return;
     }
-    const lineNum = editor.getPosition().lineNumber;
     const editorContent = editor.getModel().getValue();
     const currentLength = editorContent.split('\n').length;
     let newEditorClasses = [];

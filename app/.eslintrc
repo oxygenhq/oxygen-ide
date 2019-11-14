@@ -1,13 +1,18 @@
 {
   "rules": {
+    "no-prototype-builtins": 0,
     "no-restricted-globals": 0,
     "no-case-declarations": 0,
     "flowtype/boolean-style": ["error", "boolean"],
     "flowtype/define-flow-type": "warn",
     "flowtype/delimiter-dangle": ["error", "never"],
     "flowtype/generic-spacing": ["error", "never"],
-    "flowtype/no-primitive-constructor-types": "error",
-    "flowtype/no-weak-types": "warn",
+    "flowtype/no-primitive-constructor-types": 2,
+    "flowtype/no-weak-types": [2, {
+      "any": false,
+      "Object": false,
+      "Function": false
+    }],
     "flowtype/object-type-delimiter": ["error", "comma"],
     "flowtype/require-parameter-type": "off",
     "flowtype/require-return-type": "off",

@@ -6,9 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { message } from 'antd';
 import * as ActionTypes from './types';
-import subjects from './subjects';
 
 const defaultState = {
     isLoading: false,
@@ -18,7 +16,7 @@ const defaultState = {
 };
 
 export default (state = defaultState, action, dispatch) => {
-    const { key, title, newKey, newTitle, fromIndex, toIndex, value, error, cache } = action.payload || {};
+    const { key, title, newKey, newTitle, fromIndex, toIndex, value, cache } = action.payload || {};
     let _index, _newActive, _newList;
 
     switch (action.type) {

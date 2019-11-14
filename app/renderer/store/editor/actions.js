@@ -77,7 +77,7 @@ export const addFile = (path, name = null) => ({
 /* updateFileBreakpoints */
 export const updateFileBreakpoints = (path, breakpoints) => ({
     type: ActionTypes.EDITOR_UPDATE_FILE_BREAKPOINTS,
-    payload: { file, breakpoints },
+    payload: { path, breakpoints },
 });
 
 export const setEditorInstance = (data) => ({

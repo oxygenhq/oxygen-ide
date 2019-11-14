@@ -1,4 +1,4 @@
-import FileService from '../../../app/main/services/FileService';
+import FileService from '../../../../app/main/services/FileService';
 
 describe('Service: FileService', () => {
     let service = null;

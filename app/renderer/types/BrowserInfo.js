@@ -9,5 +9,5 @@
 // @flow
 export type BrowserInfo = {
     id: string,
-    name: string,
+    name: string
 };

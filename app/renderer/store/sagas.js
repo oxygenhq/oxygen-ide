@@ -37,7 +37,7 @@ export default function* root() {
     ];
     // check if any service has saga functions as well
     if (services && Object.keys(services).length > 0) {
-        for (let serviceId of Object.keys(services)) {
+        for (var serviceId of Object.keys(services)) {
             const service = services[serviceId];
             if (service.sagas && typeof service.sagas === 'function') {
                 sagas.push(fork(service.sagas.bind(service)));

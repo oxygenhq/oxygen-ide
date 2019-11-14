@@ -44,10 +44,7 @@ export function* openFile({ payload }) {
     const { path, force, repoRootCopy } = payload;
     if (!path) {
         return;
-    }
-
-    const currentRepoPath = yield select(state => state.objrepo.path);
-    
+    }    
 
     if(force){
         // info from file watcher that file changed

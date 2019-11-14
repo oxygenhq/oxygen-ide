@@ -7,80 +7,89 @@
  * (at your option) any later version.
  */
 import Tree from '../components/Tree';
-import React from 'react';
+import React, { Fragment } from 'react';
 
 function handleContextMenuEvent(e, node, menuName) {
-  e.preventDefault();
-  if(this.props.setActiveNode){
-    this.props.setActiveNode(node.path);
-  }
-  if(this.props.showContextMenu){
-
-    let safeNode = null;
-
-    if(node){
-      safeNode = node;
+    e.preventDefault();
+    if(this.props.setActiveNode){
+        this.props.setActiveNode(node.path);
     }
+    if(this.props.showContextMenu){
 
-    this.props.showContextMenu(menuName, e, safeNode);
-  }
+        let safeNode = null;
+
+        if(node){
+            safeNode = node;
+        }
+
+        this.props.showContextMenu(menuName, e, safeNode);
+    }
 }
 
 function renderVariablesTreeNodes(nodes, parentIndex) {
-    const { active } = this.props;
 
     if (!nodes || !nodes.length || nodes.length == 0) {
-      return null;
+        return null;
     }
+    /*eslint-disable */
     handleContextMenuEvent = handleContextMenuEvent.bind(this);
+    /*eslint-enable */
     return nodes.map((element, idx) => {
-            const resolveClassName = element.name === '.emptyfile'
-        ? 'hidden-node' : element.type;
+        const resolveClassName = element.name === '.emptyfile' ? 'hidden-node' : element.type;
+        
+        let theTitle = (
+            <Fragment>
+                <span style={{color: '#0000ff'}}>{element.name}</span>
+                {' '}
+                :
+                {' '}
+                <span style={{color: '#a31515'}}>{'<'+element.type+'>'}</span>
 
-      let theTitle = element.name+' : <'+element.type+'>';
-
-      if(element && element.value){
-        theTitle+=' '+element.value;
-      }
-
-      let saveParentIndex = '0';
-
-      if(parentIndex){
-        saveParentIndex = parentIndex;
-      }
-
-      saveParentIndex+='.'+idx;
-      
-      if(element.children && element.children.length){
-        return (
-          <Tree.TreeNode
-            showIcon={false}
-            nodeInfo={element}
-            key={saveParentIndex}
-            title={theTitle}
-            className={resolveClassName}
-            dataRef={element}
-            style={{ userSelect: 'none' }}
-            isLeaf={false}
-          >
-            {element.children ? renderVariablesTreeNodes.apply(this, [element.children, saveParentIndex]) : []}
-          </Tree.TreeNode>
+                {
+                    element && typeof element.value !== 'undefined' &&
+                    ' '+element.value
+                }
+            </Fragment>
         );
-      }
 
-      return (
-        <Tree.TreeNode
-          showIcon={false}
-          nodeInfo={element}
-          title={theTitle}
-          key={idx}
-          className={resolveClassName}
-          dataRef={element}
-          style={{ userSelect: 'none' }}
-          isLeaf={true}
-        />
-      );
+        let saveParentIndex = '0';
+
+        if(parentIndex){
+            saveParentIndex = parentIndex;
+        }
+
+        saveParentIndex+='.'+idx;
+        
+        if(element.children && element.children.length){
+            return (
+                <Tree.TreeNode
+                    hideIcon={true}
+                    nodeInfo={element}
+                    key={saveParentIndex}
+                    title={theTitle}
+                    className={resolveClassName}
+                    dataRef={element}
+                    style={{ userSelect: 'none' }}
+                    isLeaf={false}
+                >
+                    {element.children ? renderVariablesTreeNodes.apply(this, [element.children, saveParentIndex]) : []}
+                </Tree.TreeNode>
+            );
+        }
+
+        return (
+            <Tree.TreeNode
+                hideIcon={true}
+                nodeInfo={element}
+                title={theTitle}
+                key={idx}
+                className={resolveClassName}
+                dataRef={element}
+                style={{ userSelect: 'none' }}
+                isLeaf={true}
+            />
+        );
     });
-  };
+}
 
-  export default renderVariablesTreeNodes;
+export default renderVariablesTreeNodes;

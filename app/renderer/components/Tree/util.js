@@ -9,10 +9,8 @@
 import React, { Children } from 'react';
 import toArray from 'rc-util/lib/Children/toArray';
 import warning from 'warning';
-import TreeNode from './TreeNode';
+import TreeNode from './TreeNode.jsx';
 
-const DRAG_SIDE_RANGE = 0.25;
-const DRAG_MIN_GAP = 2;
 
 let onlyTreeNodeWarned = false;
 
@@ -120,8 +118,6 @@ export function getDragNodesKeys(treeNodes, node) {
 
 // Only used when drag, not affect SSR.
 export function calcDropPosition(event, treeNode) {
-    const { clientY } = event;
-
     return 0;
 }
 
@@ -160,11 +156,16 @@ export function convertDataToTree(treeData, processer) {
 
     const { processProps = internalProcessProps } = processer || {};
     const list = Array.isArray(treeData) ? treeData : [treeData];
-    return list.map(({ children, ...props }) => {
+    
+    console.log('!!list', list);
+
+    return list.map(({ children, ...props }, index)=> {
         const childrenNodes = convertDataToTree(children, processer);
 
+        console.log('!!props', props);
+
         return (
-            <TreeNode {...processProps(props)}>
+            <TreeNode key={index} {...processProps(props)}>
                 {childrenNodes}
             </TreeNode>
         );

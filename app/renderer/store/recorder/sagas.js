@@ -11,7 +11,7 @@ import { all, put, select, takeLatest, take, call, actionChannel } from 'redux-s
 import { putAndTake } from '../../helpers/saga';
 import { toOxygenCode } from '../../helpers/recorder';
 
-import { success, failure, successOrFailure } from '../../helpers/redux';
+import { success } from '../../helpers/redux';
 import * as recorderActions from './actions';
 import * as editorActions from '../editor/actions';
 import * as wbActions from '../workbench/actions';
@@ -24,7 +24,6 @@ const services = ServicesSingleton();
 
 let canRecord = false;
 let waitChromeExtension = true;
-const EXTENSION_CHECK_TIMEOUT = 4500;
 
 /**
  * Recorder Sagas
@@ -42,7 +41,7 @@ export default function* root() {
     ]);
 }
 
-export function* reset(){
+export function reset(){
     canRecord = false;
     waitChromeExtension = true;
 }
@@ -61,8 +60,8 @@ export function* recorderNewCanRecord({ payload }){
         }
     }
     if(waitChromeExtension){
-        yield put(recorderActions.stopWaitChromeExtension());
         waitChromeExtension = false;
+        yield put(recorderActions.stopWaitChromeExtension());
     }
 }
 
@@ -111,7 +110,7 @@ export function* recorderAddStepChannelInnit({ payload }) {
         const { payload } = yield take(channel);
 
         if(payload){
-            const resp = yield call(handleRequest, payload);
+            yield call(handleRequest, payload);
         }
     }
 
@@ -136,7 +135,7 @@ function* handleRequest(payload) {
         if(event.stepsArray && Array.isArray(event.stepsArray)){
     
             yield all(
-                event.stepsArray.map((item) => call(function* () {
+                event.stepsArray.map((item) => call(function () {
                     const step = {
                         module: item.module,
                         cmd: item.cmd,
@@ -229,8 +228,8 @@ function* handleRequest(payload) {
 }
 
 
-export function* handleServiceEvents({ payload }) {
-    const { service, event } = payload;
+export function handleServiceEvents({ payload }) {
+    const { event } = payload;
 
     if (!event) {
         return;
@@ -274,6 +273,6 @@ export function* stopRecorder({ payload }) {
     yield call(services.mainIpc.call, 'AnalyticsService', 'recStop', [recorded_items_count]);
 }
 
-export function* startRecorderWatcher({}){
+export function* startRecorderWatcher(){
     yield call(services.mainIpc.call, 'RecorderService', 'watch', []);
 }

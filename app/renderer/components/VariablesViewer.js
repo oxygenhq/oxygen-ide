@@ -1,19 +1,25 @@
-import React, { PureComponent, Fragment } from 'react';
+//@flow
+import React, { PureComponent } from 'react';
 import Tree from '../components/Tree';
 import renderVariablesTreeNodes from './renderVariablesTreeNodes';
-import ScrollContainer from './ScrollContainer';
+import ScrollContainer from './ScrollContainer.jsx';
 import difference from 'lodash.difference';
 
-export default class VariablesViewer extends PureComponent {
+type Props = {
+    variables: Array | null,
+    height: number
+};
+
+export default class VariablesViewer extends PureComponent<Props> {
     constructor(props) {
-      super(props);
-      
+        super(props);
+        
         this.state = {
             refreshScroll: false,
-        }
+        };
     }
     
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
 
         let nextPropsVariables = [];
         let thisPropVariables = [];
@@ -65,6 +71,6 @@ export default class VariablesViewer extends PureComponent {
                     )}
                 </ScrollContainer>
             </div>
-        )
+        );
     }
 }

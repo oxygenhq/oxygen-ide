@@ -8,7 +8,7 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import TextEditor from './TextEditor';
+import TextEditor from './TextEditor.jsx';
 import * as editorActions from '../../store/editor/actions';
 import { zoomIn, zoomOut } from '../../store/settings/actions';
 
@@ -27,7 +27,7 @@ const mapStoreToProps = (state) => {
 
     if(state && state.test && state.test.breakpoints){
         breakpoints = state.test.breakpoints;
-    };
+    }
 
     // combine file data and editor related metadata
     let openFiles = Object.keys(state.editor.openFiles).map(path => {

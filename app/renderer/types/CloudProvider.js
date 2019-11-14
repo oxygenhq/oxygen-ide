@@ -13,5 +13,5 @@ export type CloudProvider = {
     url: string | void,
     username: string | null | void,
     accessKey: string | null | void,
-    inUse: boolean,
+    inUse: boolean
 };

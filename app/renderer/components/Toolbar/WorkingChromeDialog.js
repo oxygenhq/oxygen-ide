@@ -1,8 +1,15 @@
+//@flow
 import React, { Component, Fragment } from 'react';
 import { Modal, Button, Checkbox } from 'antd';
 import electron from 'electron';
 
-export default class WorkingChromeDialog extends Component {
+type Props = {
+  changeShowRecorderMessageValue: Function,
+  showRecorderMessage: boolean | null,
+  hide: Function
+};
+
+export default class WorkingChromeDialog extends Component<Props> {
     constructor(props){
         super(props);
 

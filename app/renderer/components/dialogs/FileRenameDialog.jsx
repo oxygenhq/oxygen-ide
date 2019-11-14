@@ -7,10 +7,8 @@
  * (at your option) any later version.
  */
 import React, { PureComponent } from 'react';
-import { Input, Select, Modal } from 'antd';
+import { Input, Modal } from 'antd';
 import { capitalizeFirst } from '../../helpers/general';
-
-const { Option } = Select;
 
 type Props = {
   visible: boolean,
@@ -18,7 +16,7 @@ type Props = {
   type?: string,
   path?: string,
   onSubmit: () => void,
-  onCancel: () => void,
+  onCancel: () => void
 };
 
 export default class FileRenameDialog extends PureComponent<Props> {
@@ -62,7 +60,6 @@ export default class FileRenameDialog extends PureComponent<Props> {
       const {
           type,
           path,
-          onSubmit,
           onCancel,
       } = this.props;
 

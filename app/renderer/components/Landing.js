@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import electron from 'electron';
 
 export default class Landing extends PureComponent {
