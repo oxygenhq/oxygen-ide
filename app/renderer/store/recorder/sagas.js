@@ -23,7 +23,6 @@ import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
 
 let canRecord = false;
-let waitChromeExtension = true;
 
 /**
  * Recorder Sagas
@@ -43,10 +42,11 @@ export default function* root() {
 
 export function reset(){
     canRecord = false;
-    waitChromeExtension = true;
 }
 
 export function* recorderNewCanRecord({ payload }){
+    const recorder = yield select(state => state.recorder);
+    const { waitChromeExtension } = recorder;
     const { event } = payload;
     const { newCanRecord } = event;
 
@@ -60,7 +60,6 @@ export function* recorderNewCanRecord({ payload }){
         }
     }
     if(waitChromeExtension){
-        waitChromeExtension = false;
         yield put(recorderActions.stopWaitChromeExtension());
     }
 }
