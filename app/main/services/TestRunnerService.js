@@ -27,7 +27,7 @@ const SEVERITY_INFO = 'INFO';
 export default class TestRunnerService extends ServiceBase {
     isRunning = false;
     isStopping = false;
-    oxRunner = null;
+    runner = null;
     reporter = null;
     mainFilePath = null;
 
@@ -37,7 +37,7 @@ export default class TestRunnerService extends ServiceBase {
     
     async start(mainFilePath, breakpoints, runtimeSettings) {
         console.log('breakpoints', breakpoints);
-        if (this.oxRunner) {
+        if (this.runner) {
             throw Error('Previous test is still running. Stop the previous test before calling "start" method.');
         }
         this.isRunning = true;
@@ -73,18 +73,15 @@ export default class TestRunnerService extends ServiceBase {
             testsuite = await oxutil.generateTestSuiteFromJSFile(mainFilePath, paramFilePath, paramMode, true);
         } catch (e) {
             // could get exception only if param file loading fails
-            this._emitLogEvent(SEVERITY_ERROR, `Test Failed! Unable to load parameters file: ${e.message}`);
+            this._emitLogEvent(SEVERITY_ERROR, `Test failed: Unable to load parameters file: ${e.message}`);
             this._emitTestEnded(null, e);
-            this.isRunning = false; // oxygen crashed - nothing to oxRunner.dispose(), so just unset local vars
-            this.oxRunner = null;
+            this.isRunning = false; // oxygen crashed - nothing to dispose, so just unset local vars
+            this.runner = null;
             return;
         }
         // set iterations count
         testsuite.cases[0].iterationCount = iterations;
         const casesBreakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
-
-        console.log('casesBreakpoints', casesBreakpoints);
-
         testsuite.cases[0].breakpoints = casesBreakpoints;
         // prepare launch options and capabilities
         const caps = {};
@@ -175,13 +172,7 @@ export default class TestRunnerService extends ServiceBase {
             // the error at .init stage can be caused by parallel call to .kill() method
             // make sure in case we are in the middle of stopping the test to ignore any error at this stage
             if (!this.isStopping) {
-                if(typeof e === 'string'){
-                    this._emitLogEvent(SEVERITY_ERROR, `Test Failed!: ${e}`);
-                    this._emitTestEnded(null, e);
-                } else {
-                    this._emitLogEvent(SEVERITY_ERROR, `Test Failed!: ${e.message}. ${e.stack || ''}`);
-                    this._emitTestEnded(null, e);
-                }
+                this._emitTestEnded(null, e);
             }            
         }      
         finally {
@@ -211,7 +202,6 @@ export default class TestRunnerService extends ServiceBase {
     updateBreakpoints(breakpoints, filePath) {        
 
         console.log('--- updateBreakpoints ---');
-        console.log('this.oxRunner', this.oxRunner);
         console.log('breakpoints', breakpoints);
         console.log('filePath', filePath);
         console.log('--- updateBreakpoints ---');
@@ -228,9 +218,9 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     async dispose() {
-        if (this.oxRunner) {
-            await this.oxRunner.dispose();
-            this.oxRunner = null;
+        if (this.runner) {
+            await this.runner.dispose();
+            this.runner = null;
             this.mainFilePath = null;
             this.isRunning = false;
         }
@@ -244,9 +234,11 @@ export default class TestRunnerService extends ServiceBase {
         }
         this._hookToOxygenEvents();
         try {
+            this._emitLogEvent(SEVERITY_INFO, 'Initializing...');
             // initialize runner
             await runner.init(opts, caps, this.reporter);   
             // run test 
+            this._emitLogEvent(SEVERITY_INFO, 'Running test...');
             const results = await runner.run();
             // dispose runner
             await runner.dispose();
@@ -287,7 +279,24 @@ export default class TestRunnerService extends ServiceBase {
         });
     }
 
-    _emitTestEnded(result, error) {
+    _emitTestEnded(result, error, noLog = false) { 
+        if (!noLog) {
+            const status = result && result.status ? result.status.toUpperCase() : 'FAILED';
+            if (error) {
+                if (typeof error === 'string') {
+                    this._emitLogEvent(SEVERITY_ERROR, `Test failed: ${error}.`);
+                }
+                else {
+                    this._emitLogEvent(SEVERITY_ERROR, `Test failed: ${error.message}. ${error.stack || ''}`);
+                }                
+            }
+            else if (result.failure) {
+                const loc = this._getLocationInfo(result.failure.location);
+                const locStr = loc && loc.line && loc.file && loc.file === this.mainFilePath ? ` at line ${loc.line}` : '';
+                this._emitLogEvent(SEVERITY_ERROR, `Test failed: [${result.failure.type}] ${result.failure.message || ''}${locStr}.`);
+            }
+            this._emitLogEvent(SEVERITY_INFO, `Test finished with status --> ${status}.`);
+        }
         this.notify({
             type: EVENT_TEST_ENDED,
             result: result,
@@ -303,6 +312,16 @@ export default class TestRunnerService extends ServiceBase {
         });
     }
 
+    _emitLineUpdate(time, file, line, primary) {
+        this.notify({
+            type: EVENT_LINE_UPDATE,
+            time,
+            file,
+            line,
+            primary,
+        });
+    }
+
     _hookToOxygenEvents() {        
         this.reporter.on('runner:start', ({ rid, opts, caps }) => {
             this._emitTestStarted();
@@ -315,14 +334,9 @@ export default class TestRunnerService extends ServiceBase {
         this.reporter.on('step:start', ({ rid, step }) => {
             const loc = this._getLocationInfo(step.location);
             if (loc) {
-                this.notify({
-                    type: EVENT_LINE_UPDATE,
-                    time: step.time,
-                    file: loc.file,
-                    line: loc.line,
-                    // determine if this the primary file or not (so we can open the relevant tab)
-                    primary: true//primaryFile === stack[0].file
-                });
+                // determine if this the primary file or not (so we can open the relevant tab)
+                const primary = this.mainFilePath === loc.file;
+                this._emitLineUpdate(step.time, loc.file, loc.line, primary);
             }            
         });
 
@@ -347,17 +361,11 @@ export default class TestRunnerService extends ServiceBase {
             this._emitLogEvent(SEVERITY_ERROR, message);
         });
 
-        this.reporter.on('log-add', ({level, msg}) => {            
-            this._emitLogEvent(SEVERITY_INFO, `LEVEL: ${level} MSG: ${msg}`);
-        });
-
-        this.reporter.on('iteration-start', (i) => {
-            this._emitLogEvent(SEVERITY_INFO, `Starting iteration #${i}`);
-        });
-
-        this.reporter.on('iteration-end', (result) => {
-            const status = result.status ? result.status.toUpperCase() : 'UNKOWN';
-            this._emitLogEvent(SEVERITY_INFO, `Test finished with status --> ${status}`);
+        this.reporter.on('log', ({ level, msg, src }) => {    
+            if (src && src !== 'system') {
+                this._emitLogEvent(level ? level.toUpperCase() : SEVERITY_INFO, msg);
+            }
+            
         });
     }
 
