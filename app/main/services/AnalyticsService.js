@@ -270,5 +270,6 @@ export default class AnalyticsService extends ServiceBase {
         }
 
         this.playStartMoment = null;
+        return true;
     }
 }

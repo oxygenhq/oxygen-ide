@@ -66,7 +66,11 @@ function* handleTestRunnerServiceEvent(event) {
                 yield put(editorActions.resetActiveLines());
             }
             
-            yield call(services.mainIpc.call, 'AnalyticsService', 'playStop', [summary]);
+            
+            yield all([
+                call(services.mainIpc.call, 'AnalyticsService', 'playStop', [summary]),
+                call(services.mainIpc.call, 'DeviceDiscoveryService', 'start', [])
+            ]);
         }
     }
     else if (event.type === 'LINE_UPDATE') {
@@ -175,6 +179,8 @@ export function* startTest({ payload }) {
         yield put(loggerActions.resetGeneralLogs());
         // call TestRunner service to start the test
         
+        
+        yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'stop', []);
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', []);
         yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
         yield put({
