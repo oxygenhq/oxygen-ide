@@ -348,47 +348,43 @@ export default class Toolbar extends Component<Props> {
                 />
 
                 <div className="separator" />
-
-                { /* waitChromeExtension &&
-            <span style={{marginLeft:'10px'}}>
-                <Spin indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} />
-                <span className="ext-wait-message">Waiting for extension</span>
-            </span>
-            */
-                }
-                { (waitChromeExtension || testRunning) &&
-            <span
-                style={ getOpacity(false) }
-                className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
-                title="Record"
-            >
-                <FaMicrophone
-                    style={{ marginRight: 0 }}
-                />
-            </span>
+                { 
+                    (waitChromeExtension || testRunning) &&
+                    <span
+                        style={ getOpacity(false) }
+                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
+                        title="Record"
+                    >
+                        <FaMicrophone
+                            style={{ marginRight: 0 }}
+                        />
+                    </span>
                 }
 
-                { !(waitChromeExtension || testRunning) && !canRecord && 
-            <span
-                className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable not-work active' : 'control selectable not-work' }
-                title="Record"
-            >
-                <FaMicrophoneSlash
-                    style={{ marginRight: 0 }}
-                    onClick={ this.showNotWorkingOxygenExtensionModal }
-                />
-            </span>}
+                { 
+                    !(waitChromeExtension || testRunning) && !canRecord && 
+                    <span
+                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable not-work active' : 'control selectable not-work' }
+                        title="Record"
+                    >
+                        <FaMicrophoneSlash
+                            style={{ marginRight: 0 }}
+                            onClick={ this.showNotWorkingOxygenExtensionModal }
+                        />
+                    </span>
+                }
 
-                { !(waitChromeExtension || testRunning) && canRecord &&
-            <span
-                className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active green-bg' : 'control selectable' }
-                title="Record"
-            >
-                <FaMicrophone
-                    style={{ marginRight: 0 }}
-                    onClick={ this.showWorkingOxygenExtensionModal }
-                />
-            </span>
+                { 
+                    !(waitChromeExtension || testRunning) && canRecord &&
+                    <span
+                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active green-bg' : 'control selectable' }
+                        title="Record"
+                    >
+                        <FaMicrophone
+                            style={{ marginRight: 0 }}
+                            onClick={ this.showWorkingOxygenExtensionModal }
+                        />
+                    </span>
                 }
 
                 <span style={{ marginLeft: 'auto' }}>             
