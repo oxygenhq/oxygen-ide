@@ -126,8 +126,8 @@ module.exports = function(grunt) {
                     { 
                         expand: true, 
                         cwd: 'app/node_modules', src: prodDeps.concat(['!fibers/src/**',
-                            '!oxygen-cli/lib/reporters/pdf/**',
-                            '!oxygen-cli/lib/reporters/html/**',
+                            '!oxygen-cli/build/ox_reporters/pdf/**',
+                            '!oxygen-cli/build/ox_reporters/html/**',
                             '!**/obj/**',
                             '!monaco-editor/dev/**',
                             '!monaco-editor/esm/**',
@@ -136,7 +136,9 @@ module.exports = function(grunt) {
                             '!node-idevice/apps/TestApp.ipa',
                             '!appium-ios-driver/instruments-iwd/iwd4/**',
                             '!appium-ios-driver/instruments-iwd/iwd5/**',
-                            '!appium-ios-driver/instruments-iwd/iwd6/**']),
+                            '!appium-ios-driver/instruments-iwd/iwd6/**',
+                            '!chromedriver/**',
+                            '!geckodriver/**']),
                         dest: OUTDIR + RESOURCES + '/app/node_modules' 
                     },
                     { 
