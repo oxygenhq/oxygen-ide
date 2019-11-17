@@ -93,7 +93,7 @@
     "css-loader": "^0.28.11",
     "electron": "^3.1.12",
     "electron-devtools-installer": "^2.2.4",
-    "electron-rebuild": "^1.8.6",
+    "electron-rebuild": "electron/electron-rebuild#master",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "eslint": "^6.1.0",

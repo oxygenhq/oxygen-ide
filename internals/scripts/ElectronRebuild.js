@@ -4,7 +4,7 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import dependencies from '../../app/package.json';
 import rimraf from 'rimraf';
-import { locateElectronPrebuilt } from 'electron-rebuild/lib/src/./electron-locater';
+import { locateElectronPrebuilt } from 'electron-rebuild/lib/src/./electron-locator';
 import nodeAbi from 'node-abi';
 
 const nodeModulesPath =
