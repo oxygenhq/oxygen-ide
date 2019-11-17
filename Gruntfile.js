@@ -69,10 +69,6 @@ module.exports = function(grunt) {
     try {
         var cwd = process.cwd();
         process.chdir('app');
-        // canvas is defined as an optional peer dep in jsdom (which is used in eyes)
-        // and is not installed, as the result `npm ls --prod=true` fails
-        // to sovle this, we install it before `npm ls` and remove afterwards
-        cp.execSync('npm i canvas@^2.5.0');
         var out = cp.execSync('npm ls --prod=true --parseable');
         var prodDepsUnfiltered = out.toString().split(/\r?\n/);
         var si = __dirname.length + 1 + 'app'.length + 1 + 'node_modules'.length + 1;
@@ -83,10 +79,8 @@ module.exports = function(grunt) {
             }
             prodDeps.push(dep + '/**');
         }
-        cp.execSync('npm uninstall canvas');
         process.chdir(cwd);
     } catch (e) {
-        cp.execSync('npm uninstall canvas');
         grunt.fail.fatal('Unable to get production dependencies list', e);
     }
 
