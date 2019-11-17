@@ -292,8 +292,9 @@ export default class TestRunnerService extends ServiceBase {
             }
             else if (result.failure) {
                 const loc = this._getLocationInfo(result.failure.location);
+                const message = result.failure.message ? ` "${result.failure.message}"` : '';
                 const locStr = loc && loc.line && loc.file && loc.file === this.mainFilePath ? ` at line ${loc.line}` : '';
-                this._emitLogEvent(SEVERITY_ERROR, `Test failed: [${result.failure.type}] ${result.failure.message || ''}${locStr}.`);
+                this._emitLogEvent(SEVERITY_ERROR, `Test failed: [${result.failure.type}]${message}${locStr}`);
             }
             this._emitLogEvent(SEVERITY_INFO, `Test finished with status --> ${status}.`);
         }

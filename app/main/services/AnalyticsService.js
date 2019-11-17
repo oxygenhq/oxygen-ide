@@ -27,7 +27,7 @@ export default class AnalyticsService extends ServiceBase {
                 this.mixpanel = Mixpanel.init('e80db0ad2789b5718fa1b84b6661f008');
             }
         } catch(e){
-            console.warn('mixpanel e', e);
+            console.warn('Mixpanel error: ', e);
             // Sentry.captureException(e);
         }
     }
