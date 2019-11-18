@@ -226,7 +226,7 @@ export function* treeLoadNodeChildren({ payload }) {
 export function* treeOpenFolder({ payload }) {
     const { path } = payload;
     try {
-        yield _fetchFolderContent(path);
+        yield _fetchFolderContent(path, false);
     }
     catch (e) {
         yield put(fsActions._treeOpenFolder_Failure(path, e.message));
@@ -234,6 +234,16 @@ export function* treeOpenFolder({ payload }) {
     }
     const folder = yield select(state => state.fs.files[path]);  
     yield put(fsActions._treeOpenFolder_Success(path, folder.children));
+
+    const rootPath = yield select(state => state.fs.rootPath); 
+
+    if(rootPath === path){
+        //root dir
+        yield watchOnFiles(path);
+    }  else {
+        //nor root dir
+        yield watchOnSubFiles(path);
+    }
 }
 
 export function* fromCache({ payload }) {
@@ -411,11 +421,17 @@ export function* initializeSuccess() {
 }
 
 
-export function* _fetchFolderContent(path) {
+export function* _fetchFolderContent(path, addWatcher = true) {
     try {
         let folder = yield call(services.mainIpc.call, 'FileService', 'getFolderContent', [path]);
-        if (folder && path) {
+        yield put({
+            type: success(ActionTypes.FS_FETCH_FOLDER_CONTENT),
+            payload: { path, response: folder },
+        });
+        
+        if (path && addWatcher) {
             const rootPath = yield select(state => state.fs.rootPath); 
+
             if(rootPath === path){
                 //root dir
                 yield watchOnFiles(path);
@@ -424,11 +440,6 @@ export function* _fetchFolderContent(path) {
                 yield watchOnSubFiles(path);
             }
         }
-        yield put({
-            type: success(ActionTypes.FS_FETCH_FOLDER_CONTENT),
-            payload: { path, response: folder },
-        });
-        return folder;
     }
     catch (err) {
         /* istanbul ignore next */
