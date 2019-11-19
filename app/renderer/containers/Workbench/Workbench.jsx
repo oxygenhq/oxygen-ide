@@ -23,7 +23,6 @@ import ObjectContainerCreateDialog from '../../components/dialogs/ObjectContaine
 import UpdateDialog from '../../components/dialogs/UpdateDialog';
 import SettingsDialog from '../../components/dialogs/SettingsDialog';
 import NeedInstallExtension from '../../components/dialogs/NeedInstallExtension';
-import CloudProvidersDialog from '../../components/dialogs/CloudProvidersDialog';
 import ChromeDriverDialog from '../../components/dialogs/ChromeDriverDialog';
 import ChromeDriverDownloadingDialog from '../../components/dialogs/ChromeDriverDownloadingDialog';
 import ChromeDriverDownloadingSuccessDialog from '../../components/dialogs/ChromeDriverDownloadingSuccessDialog';
@@ -236,9 +235,6 @@ export default class Workbench extends Component<Props> {
       else if (ctrlId === Controls.OPEN_FOLDER) {
           this.props.showDialog('OPEN_FOLDER');
       }
-      else if (ctrlId === Controls.CLOUD_PROVIDER_SETTINGS) {
-          this.props.showDialog('DIALOG_CLOUD_PROVIDERS');
-      }
       else if (ctrlId === Controls.SAVE_FILE) {
           this.props.saveCurrentFile();
       }
@@ -307,9 +303,6 @@ export default class Workbench extends Component<Props> {
               selected: isRecording,
           },
           [Controls.TEST_SETTINGS]: {
-              selected: false,
-          },
-          [Controls.CLOUD_PROVIDER_SETTINGS]: {
               selected: false,
           },
       };
@@ -415,20 +408,19 @@ export default class Workbench extends Component<Props> {
       this.props.hideDialog('DIALOG_UPDATE');
   }
   // Settings
-  settingsDialog_onSubmit(settings) {
+  settingsDialog_onSubmit(settings, providers) {
       this.props.hideDialog('DIALOG_SETTINGS');
-      this.props.updateRunSettings(settings);    
+
+      if(settings){
+        this.props.updateRunSettings(settings);    
+      }
+
+      if(providers){
+        this.props.updateCloudProvidersSettings(providers);    
+      }
   }
   settingsDialog_onCancel() {
       this.props.hideDialog('DIALOG_SETTINGS');
-  }
-  // Cloud Providers
-  providersDialog_onSubmit(providers) {
-      this.props.hideDialog('DIALOG_CLOUD_PROVIDERS');
-      this.props.updateCloudProvidersSettings(providers);    
-  }
-  providersDialog_onCancel() {
-      this.props.hideDialog('DIALOG_CLOUD_PROVIDERS');
   }
 
   chromeDrivers_onSubmit = (chromeDriverVersion) => {
@@ -594,6 +586,7 @@ export default class Workbench extends Component<Props> {
             <SettingsDialog 
                 { ...dialog['DIALOG_SETTINGS'] } 
                 settings={ runtimeSettings }
+                providers={ cloudProviders }
                 onSubmit={ ::this.settingsDialog_onSubmit }
                 onCancel={ ::this.settingsDialog_onCancel } 
             />
@@ -601,12 +594,6 @@ export default class Workbench extends Component<Props> {
                 { ...dialog['DIALOG_UPDATE'] }
                 onSubmit={ ::this.updateDialog_onSubmit }
                 onCancel={ ::this.updateDialog_onCancel }
-            />
-            <CloudProvidersDialog
-                { ...dialog['DIALOG_CLOUD_PROVIDERS'] }
-                providers={ cloudProviders }
-                onSubmit={ ::this.providersDialog_onSubmit }
-                onCancel={ ::this.providersDialog_onCancel }
             />
         </Fragment>
               }

@@ -39,9 +39,6 @@ const defaultState = {
     [types.DIALOG_OBJECT_CONTAINER_CREATE]: {
         visible: false,
     },
-    [types.DIALOG_CLOUD_PROVIDERS]: {
-        visible: false,
-    },
     [types.DIALOG_INCORECT_CHROME_DRIVER_VERSION]: {
         visible: false
     },
