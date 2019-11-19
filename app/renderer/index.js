@@ -18,7 +18,7 @@ import 'antd/dist/antd.css';
 import App from './containers/App';
 import { configureStore, history } from './store/configureStore';
 import { configureServices } from './services';
-import './helpers/';
+// import './helpers/';
 import './app.global.scss';
 
 // initialize Redux store

@@ -18,7 +18,6 @@
  *
  * @flow
  */
-
 import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
 
 import Logger from './Logger';

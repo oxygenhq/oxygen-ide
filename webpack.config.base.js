@@ -35,12 +35,17 @@ export default {
 
     module: {
         rules: [{
-            test: /\.jsx?$/,
+            test: /\.(js|jsx)?$/,
             exclude: /node_modules/,
             use: {
                 loader: 'babel-loader',
                 options: {
-                    cacheDirectory: true
+                    cacheDirectory: true,
+                    'plugins': [
+                        // 'babel-plugin-transform-es2015-modules-commonjs',
+                        // 'transform-es2015-modules-commonjs',
+                        'transform-runtime'
+                    ]
                 }
             }
         }]
