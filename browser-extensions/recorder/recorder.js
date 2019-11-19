@@ -436,8 +436,14 @@ Recorder.addEventHandler('focus', function (ev) {
     }
 }, true);
 
-Recorder.addEventHandler('mousedown', function (ev) {
-    ox_log('mousedown ev');
+// PointerEvent supported on Chrome 55+. allows us to record in responsive mode.
+// https://developers.google.com/web/updates/2016/10/pointer-events
+let inputType = window.PointerEvent ? 'pointer' : 'mouse';
+let inputDown = inputType + 'down';
+let inputUp = inputType + 'up';
+
+Recorder.addEventHandler(inputDown, function (ev) {
+    ox_log(inputDown + ' ev');
     var target = ev.target;
     this.__mouseDownTarget = {
         el: target,
@@ -449,7 +455,7 @@ Recorder.addEventHandler('mousedown', function (ev) {
         if ('option' == tagName) {
             var parent = target.parentNode;
             if (parent.multiple) {
-                ox_log('mousedown ev remembering selections');
+                ox_log(inputDown + ' ev remembering selections');
                 var options = parent.options;
                 for (var i = 0; i < options.length; i++) {
                     options[i]._wasSelected = options[i].selected;
@@ -459,16 +465,16 @@ Recorder.addEventHandler('mousedown', function (ev) {
     }
 }, true);
 
-Recorder.addEventHandler('mouseup', function (ev) {
-    ox_log('mouseup ev');
+Recorder.addEventHandler(inputUp, function (ev) {
+    ox_log(inputUp + ' ev');
     if (ev.button !== 0) {
         return;
     }
     var target = ev.target;
 
-    // click event won't be produced if mouseUp happened on different element than mouseDown
-    // this could happen when original element gets modified during mouseDown.
-    // hence we process mouseup events instead of click
+    // click event won't be produced if mouseUp happened on different element than mouseDown/pointerDown
+    // this could happen when original element gets modified during mouseDown/pointerDown
+    // hence we process mouseup/pointerup events instead of click
     var downTarget = this.__mouseDownTarget;
     if (downTarget && downTarget.el !== target) {
         // make sure user just tried to click and not drag-and-drop something
