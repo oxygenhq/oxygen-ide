@@ -360,8 +360,8 @@ Recorder.inputTypes = ['text', 'password', 'file', 'datetime', 'datetime-local',
 Recorder.addEventHandler('change', function (ev) {
     ox_log('change ev');
     var target = ev.target;
-
-    if (target.tagName) {
+    
+    if (target.tagName && !target.readOnly) {
         var tagName = target.tagName.toLowerCase();
         var type = target.type;
         if ('input' == tagName && Recorder.inputTypes.indexOf(type) >= 0 ||
