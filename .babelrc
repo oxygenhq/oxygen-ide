@@ -10,7 +10,10 @@
   "plugins": [
     ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": "css" }],
     "add-module-exports",
-    "transform-decorators-legacy"
+    "transform-decorators-legacy",
+    // "transform-es2015-modules-commonjs",
+    // "babel-plugin-transform-es2015-modules-commonjs",
+    "transform-runtime"
   ],
   "env": {
     "production": {
