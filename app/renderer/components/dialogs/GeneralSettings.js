@@ -193,7 +193,7 @@ const EnhancedForm =  Form.create()(GeneralSettings);
 export default class GeneralSettingsWrap extends PureComponent<Props> {
     render(){
         return(
-            <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} />
+            <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />
         );
     }
 }

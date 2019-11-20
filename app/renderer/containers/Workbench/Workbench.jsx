@@ -462,7 +462,7 @@ export default class Workbench extends Component<Props> {
           objrepoName
       } = this.props;
 
-      const { cloudProviders = {} } = settings;
+      const { cloudProviders = {}, cloudProvidesBrowsersAndDevices = null } = settings;
       const { runtimeSettings } = test;
       // sidebars state
       const leftSidebarSize = settings.sidebars.left.size;
@@ -476,6 +476,8 @@ export default class Workbench extends Component<Props> {
       const showLanding = settings.showLanding;
       const showRecorderMessage = settings.showRecorderMessage;
 
+      console.log('cloudProviders', cloudProviders);
+
       // convert providers dictionary to an array - add only providers marked as 'in use'
       const providers = [];
       for (let providerKey of Object.keys(cloudProviders)) {
@@ -487,6 +489,11 @@ export default class Workbench extends Component<Props> {
               });
           }      
       }
+
+      console.log('providers', providers);
+      console.log('cloudProvidesBrowsersAndDevices', cloudProvidesBrowsersAndDevices);
+      
+
     
       if(!initialized){
           return (
@@ -612,6 +619,7 @@ export default class Workbench extends Component<Props> {
                   browsers={ test.browsers }
                   emulators={ test.emulators }
                   providers={ providers }
+                  cloudProvidesBrowsersAndDevices={ cloudProvidesBrowsersAndDevices }
                   showRecorderMessage={ showRecorderMessage }
                   changeShowRecorderMessageValue={ changeShowRecorderMessageValue }
                   controlsState={ this.getToolbarControlsState() } 

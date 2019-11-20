@@ -1551,10 +1551,25 @@ export function* getOrFetchFileInfo(path) {
     return { response, error };
 }
 
-export function* handleUpdatedCloudProvidersSettings(payload) {
+export function* handleUpdatedCloudProvidersSettings({payload}) {
     const settings = yield select(state => state.settings);
     // persiste settings in the Electron store
     yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
+
+    console.log('payload', payload);
+
+    if(payload && payload.providers && payload.providers.sauceLabs){
+        console.log('getBrowsersAndDevices sauceLabs');
+        const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
+        console.log('browsersAndDevices', browsersAndDevices);
+
+        if(browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0){
+            yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices));
+        }
+
+    } else {
+        console.log('unsupported providers', payload.providers);
+    }
 }
 
 export function* handleUpdatedRunSettings(payload) {

@@ -1,3 +1,3 @@
-export default interface ICloudProvider {
-    getBrowsersAndDevices();
+export default class ICloudProvider {
+    // getBrowsersAndDevices();
 }

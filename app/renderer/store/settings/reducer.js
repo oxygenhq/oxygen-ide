@@ -74,6 +74,7 @@ const defaultAppSettings = {
             inUse: false,
         }
     },
+    cloudProvidesBrowsersAndDevices: null,
     lastSession: {
         tabs: [],
         rootFolder: null,    
@@ -110,7 +111,7 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { value, target, settings, zoom, cache, uuid, providers } = payload;
+    const { value, target, settings, zoom, cache, uuid, providers, browsersAndDevices } = payload;
     switch (action.type) {
     
     // // FIRST OPEN
@@ -308,6 +309,12 @@ export default (state = defaultState, action) => {
         return {
             ...state,
             cloudProviders: providers
+        };
+
+    case types.SET_CLOUD_PROVIDERS_BROWSERS_AND_DEVICES : 
+        return {
+            ...state,
+            cloudProvidesBrowsersAndDevices: browsersAndDevices
         };
 
     case 'RESET': 

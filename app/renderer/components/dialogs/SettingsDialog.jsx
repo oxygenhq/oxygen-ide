@@ -80,6 +80,8 @@ export default class SettingsDialog extends PureComponent<Props> {
             onCancel,
         } = this.props;
 
+        console.log('this.props', this.props);
+
         return (
             <Modal
                 title={'Run Settings'}

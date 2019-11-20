@@ -1,3 +1,5 @@
+import SauceLabsService from './SauceLabsProvider';
+
 export default {
-    sauceLabs: SauceLabsService
-}
+    sauceLabs: new SauceLabsService
+};

@@ -9,7 +9,7 @@
 // @flow
 /* eslint-disable react/no-unused-state */
 import { Spin, Icon, Select, Input, message } from 'antd';
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/lib/fa';
 import {
     MdUndo,
@@ -142,7 +142,8 @@ export default class Toolbar extends Component<Props> {
           testRunning,
           waitChromeExtension,
           showRecorderMessage,
-          changeShowRecorderMessageValue
+          changeShowRecorderMessageValue,
+          cloudProvidesBrowsersAndDevices
       } = this.props;
 
       const {
@@ -154,6 +155,16 @@ export default class Toolbar extends Component<Props> {
       const iOSAndroidSeparator = (
           <Option key='-' value='-'>---------------</Option>
       );
+
+      const providersUnabled = (Array.isArray(providers) && providers.length > 0);
+
+      console.log('providers', providers);
+
+    //   console.log('providersUnabled', providersUnabled);
+    //   console.log('testProvider', testProvider);
+    //   console.log('!providersUnabled || !testProvider', !providersUnabled || !testProvider);
+
+      const cloudProvidesBrowsersAndDevicesEnabled = testProvider && cloudProvidesBrowsersAndDevices && Array.isArray(cloudProvidesBrowsersAndDevices) && cloudProvidesBrowsersAndDevices.length > 0;
 
       return (
           <div className="appTollbar">
@@ -206,51 +217,83 @@ export default class Toolbar extends Component<Props> {
               />
 
               <div className="separator" />
-              <span className={testMode === 'web' ? 'control selectable active' : 'control selectable'}>
-                  <Icon
-                      style={ getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)) }
-                      onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_WEB) }
-                      style={{ marginRight: 0 }}
-                      title="Web Mode"
-                      type="global"
-                  />
-              </span>
 
-              <span className={testMode === 'mob' ? 'control selectable active' : 'control selectable'}>
-                  <Icon
-                      style={ getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)) }
-                      onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_MOB) }
-                      style={{ marginRight: 0 }}
-                      title="Mobile Mode"
-                      type="mobile"
-                  />
-              </span>
+              { providersUnabled && (
+                  <Select
+                      className="control select"
+                      value={ testProvider || '' }
+                      style={{ width: 120 }}
+                      onChange={ (value) => ::this.handleValueChange(Controls.TEST_PROVIDER, value) }
+                  >
+                      <Option key='' value=''>-- Local --</Option>
+                      {
+                          providers.map((provider) => (
+                              <Option key={ provider.id } value={ provider.id }>
+                                  { provider.title }
+                              </Option>
+                          ))
+                      }
+                  </Select>
+              )}
 
-              <span className={testMode === 'resp' ? 'control selectable active' : 'control selectable'}>
-                  <Icon
-                      style={ getOpacity(this._isEnabled(Controls.TEST_MODE_RESP)) }
-                      onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_RESP) }
-                      style={{ marginRight: 0 }}
-                      title="Responsive Mode"
-                      type="scan"
-                  />
-              </span>
+              {
+                  (!providersUnabled || !testProvider) && (
+                      <Fragment>
+                        <span key='web' className={testMode === 'web' ? 'control selectable active' : 'control selectable'}>
+                            <Icon
+                                style={ getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)) }
+                                onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_WEB) }
+                                style={{ marginRight: 0 }}
+                                title="Web Mode"
+                                type="global"
+                            />
+                        </span>
+            
+                        <span key='mob' className={testMode === 'mob' ? 'control selectable active' : 'control selectable'}>
+                            <Icon
+                                style={ getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)) }
+                                onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_MOB) }
+                                style={{ marginRight: 0 }}
+                                title="Mobile Mode"
+                                type="mobile"
+                            />
+                        </span>
+            
+                        <span key='resp' className={testMode === 'resp' ? 'control selectable active' : 'control selectable'}>
+                            <Icon
+                                style={ getOpacity(this._isEnabled(Controls.TEST_MODE_RESP)) }
+                                onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_RESP) }
+                                style={{ marginRight: 0 }}
+                                title="Responsive Mode"
+                                type="scan"
+                            />
+                        </span>
+                      </Fragment>
+                  )
+              }
 
               <Select
                   className="control select"
                   value={this.props.testTarget}
-                  style={{ width: 170 }}
+                  style={{ width: 370 }}
                   onChange={ (value) => ::this.handleValueChange(Controls.TEST_TARGET, value) }
               >
                   {
-                      testMode === 'web' && browsers.map((browser) => (
+                      cloudProvidesBrowsersAndDevicesEnabled && cloudProvidesBrowsersAndDevices.map((item, idx) => (
+                        <Option key={ idx+'_'+item.api_name+item.long_version } value={ idx+'_'+item.api_name+item.long_version  }>
+                            { item.long_name+' '+item.long_version }
+                        </Option>
+                    ))
+                  }
+                  {
+                      !cloudProvidesBrowsersAndDevicesEnabled && testMode === 'web' && browsers.map((browser) => (
                           <Option key={ browser.id } value={ browser.id }>
                               { browser.name }
                           </Option>
                       ))
                   }
                   {
-                      testMode === 'mob' && sortDevices(devices).map(device => {
+                      !cloudProvidesBrowsersAndDevicesEnabled && testMode === 'mob' && sortDevices(devices).map(device => {
                           const options = [];
                           if (prevDevice && prevDevice.osName === 'Android' && device.osName === 'iOS') {
                               options.push(iOSAndroidSeparator);
@@ -265,7 +308,7 @@ export default class Toolbar extends Component<Props> {
                       })
                   }
                   {
-                      testMode === 'resp' && emulators.map((emulator) => (
+                      !cloudProvidesBrowsersAndDevicesEnabled && testMode === 'resp' && emulators.map((emulator) => (
                           <Option key={emulator} value={emulator}>
                               {emulator}
                           </Option>
@@ -314,24 +357,6 @@ export default class Toolbar extends Component<Props> {
                       /> 
                       <span>Stop</span>
                   </button>
-              )}
-
-              { (Array.isArray(providers) && providers.length > 0) && (
-                  <Select
-                      className="control select"
-                      value={ testProvider || '' }
-                      style={{ width: 120 }}
-                      onChange={ (value) => ::this.handleValueChange(Controls.TEST_PROVIDER, value) }
-                  >
-                      <Option key='' value=''>-- Local --</Option>
-                      {
-                          testMode === 'web' && providers.map((provider) => (
-                              <Option key={ provider.id } value={ provider.id }>
-                                  { provider.title }
-                              </Option>
-                          ))
-                      }
-                  </Select>
               )}
 
               <div className="separator" />
