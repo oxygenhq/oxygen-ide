@@ -18,27 +18,31 @@ type Props = {
 };
 
 class CloudProvidersSettings extends PureComponent<Props> {
-    props: Props;
   
-    state = {
-        ...DEFAULT_STATE,
+    constructor(props){
+        super(props);
+        this.state = {
+            ...DEFAULT_STATE,
+            providers: props.providers
+        }
     }
 
-    static getDerivedStateFromProps(nextProps, prevState) {
+
+    // static getDerivedStateFromProps(nextProps, prevState) {
 
         
-        console.log('nextProps', nextProps);
-        console.log('nextProps.providers', nextProps.providers);
-        console.log('nextProps.visible', nextProps.visible);
+    //     console.log('nextProps', nextProps);
+    //     console.log('nextProps.providers', nextProps.providers);
+    //     console.log('nextProps.visible', nextProps.visible);
 
-        if (nextProps.visible == true && nextProps.providers) {
-            return {
-                providers: nextProps.providers || {},
-            };
-        }
-        // else, leave the previous state 
-        return null;
-    }
+    //     if (nextProps.visible == true && nextProps.providers) {
+    //         return {
+    //             providers: nextProps.providers || {},
+    //         };
+    //     }
+    //     // else, leave the previous state 
+    //     return null;
+    // }
 
     onChangeSauceLabsUrl(value) {
         const { providers = {} } = this.state || {};
