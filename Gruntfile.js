@@ -137,7 +137,8 @@ module.exports = function(grunt) {
                             '!node-idevice/apps/TestApp.ipa',
                             '!appium-ios-driver/instruments-iwd/iwd4/**',
                             '!appium-ios-driver/instruments-iwd/iwd5/**',
-                            '!appium-ios-driver/instruments-iwd/iwd6/**']),
+                            '!appium-ios-driver/instruments-iwd/iwd6/**',
+                            '!intl/locale-data/jsonp/**']),
                         dest: OUTDIR + RESOURCES + '/app/node_modules' 
                     },
                     { 
