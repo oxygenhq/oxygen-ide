@@ -111,7 +111,7 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { value, target, settings, zoom, cache, uuid, providers, browsersAndDevices } = payload;
+    const { value, target, settings, zoom, cache, uuid, providers, browsersAndDevices, testProvider } = payload;
     switch (action.type) {
     
     // // FIRST OPEN
@@ -314,7 +314,10 @@ export default (state = defaultState, action) => {
     case types.SET_CLOUD_PROVIDERS_BROWSERS_AND_DEVICES : 
         return {
             ...state,
-            cloudProvidesBrowsersAndDevices: browsersAndDevices
+            cloudProvidesBrowsersAndDevices: {
+                ...state.cloudProvidesBrowsersAndDevices, 
+                [testProvider]: browsersAndDevices
+            }
         };
 
     case 'RESET': 

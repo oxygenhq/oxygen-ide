@@ -1556,19 +1556,22 @@ export function* handleUpdatedCloudProvidersSettings({payload}) {
     // persiste settings in the Electron store
     yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
 
-    console.log('payload', payload);
-
-    if(payload && payload.providers && payload.providers.sauceLabs){
-        console.log('getBrowsersAndDevices sauceLabs');
-        const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
-        console.log('browsersAndDevices', browsersAndDevices);
-
-        if(browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0){
-            yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices));
+    if(payload && payload.providers && payload.providers.lambdaTest && payload.providers.lambdaTest.user && payload.providers.lambdaTest.key){
+        const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['lambdaTest', payload.providers.lambdaTest.user, payload.providers.lambdaTest.key]);
+        
+        if(browsersAndDevices){
+            yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'lambdaTest'));
         }
 
-    } else {
-        console.log('unsupported providers', payload.providers);
+    }
+    if(payload && payload.providers && payload.providers.sauceLabs){
+
+        const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
+
+
+        if(browsersAndDevices){
+            yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'sauceLabs'));
+        }
     }
 }
 

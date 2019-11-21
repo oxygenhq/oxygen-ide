@@ -24,25 +24,9 @@ class CloudProvidersSettings extends PureComponent<Props> {
         this.state = {
             ...DEFAULT_STATE,
             providers: props.providers
-        }
+        };
     }
 
-
-    // static getDerivedStateFromProps(nextProps, prevState) {
-
-        
-    //     console.log('nextProps', nextProps);
-    //     console.log('nextProps.providers', nextProps.providers);
-    //     console.log('nextProps.visible', nextProps.visible);
-
-    //     if (nextProps.visible == true && nextProps.providers) {
-    //         return {
-    //             providers: nextProps.providers || {},
-    //         };
-    //     }
-    //     // else, leave the previous state 
-    //     return null;
-    // }
 
     onChangeSauceLabsUrl(value) {
         const { providers = {} } = this.state || {};
@@ -327,8 +311,6 @@ class CloudProvidersSettings extends PureComponent<Props> {
 
     validateFields(){
         const { providers } = this.state;
-
-        console.log('state providers', providers);
         
         return new Promise((resolve, reject) => {
             this.props.form.validateFields((err, values) => {
@@ -358,7 +340,6 @@ class CloudProvidersSettings extends PureComponent<Props> {
             lambdaTest = {}
         } = providers;
         
-        console.log('state providers', providers);
 
         return(
             <Form>

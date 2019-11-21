@@ -8,7 +8,7 @@
  */
 // @flow
 /* eslint-disable react/no-unused-state */
-import { Spin, Icon, Select, Input, message } from 'antd';
+import { Spin, Icon, Select, Input, message, TreeSelect } from 'antd';
 import React, { Component, Fragment } from 'react';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/lib/fa';
 import {
@@ -28,20 +28,20 @@ import { type CloudProvider } from '../../types/CloudProvider';
 import { type BrowserInfo } from '../../types/BrowserInfo';
 
 type ControlState = {
-  visible?: boolean,
-  enabled?: boolean
+    visible?: boolean,
+    enabled?: boolean
 };
 type Props = {
-  stepDelay: number,
-  testMode: string,
-  testTarget?: ?string,
-  browsers: Array<BrowserInfo>,
-  devices: Array<DeviceInfo>,
-  emulators: Array<string>,
-  providers: Array<CloudProvider>,
-  controlsState: { [string]: ControlState },
-  onValueChange: (string, string) => void,
-  onButtonClick: (string) => void
+    stepDelay: number,
+    testMode: string,
+    testTarget?: ?string,
+    browsers: Array<BrowserInfo>,
+    devices: Array<DeviceInfo>,
+    emulators: Array<string>,
+    providers: Array<CloudProvider>,
+    controlsState: { [string]: ControlState },
+    onValueChange: (string, string) => void,
+    onButtonClick: (string) => void
 };
 
 const { Option } = Select;
@@ -55,210 +55,220 @@ export default class Toolbar extends Component<Props> {
         };
     }
 
-  hideNoChromeDialog = () => {
-      this.setState({
-          showNoChromeDialog: false
-      });
-  }
+    hideNoChromeDialog = () => {
+        this.setState({
+            showNoChromeDialog: false
+        });
+    }
 
-  hideWorkingChromeDialog = () => {
-      this.setState({
-          showWorkingChromeDialog: false
-      });
-  }
+    hideWorkingChromeDialog = () => {
+        this.setState({
+            showWorkingChromeDialog: false
+        });
+    }
 
-  handleClickEvent(ctrlId) {
-      if (this._isEnabled(ctrlId) && this._isVisible(ctrlId) && this.props.onButtonClick) {
-          this.props.onButtonClick(ctrlId);
-      }
-  }
+    handleClickEvent(ctrlId) {
+        if (this._isEnabled(ctrlId) && this._isVisible(ctrlId) && this.props.onButtonClick) {
+            this.props.onButtonClick(ctrlId);
+        }
+    }
 
-  handleValueChange(ctrlId, value) {
-      if (this.props.onValueChange) {
-          this.props.onValueChange(ctrlId, value);
-      }
-  }
+    handleValueChange(ctrlId, value) {
+        if (this.props.onValueChange) {
+            this.props.onValueChange(ctrlId, value);
+        }
+    }
 
-  _isEnabled(ctrlId) {
-      const state = this.props.controlsState ? this.props.controlsState[ctrlId] : null;
-      if (state && state.hasOwnProperty('enabled')) {
-          return state.enabled;
-      }
-      return true;
-  }
+    _isEnabled(ctrlId) {
+        const state = this.props.controlsState ? this.props.controlsState[ctrlId] : null;
+        if (state && state.hasOwnProperty('enabled')) {
+            return state.enabled;
+        }
+        return true;
+    }
 
-  _isVisible(ctrlId) {
-      const state = this.props.controlsState ? this.props.controlsState[ctrlId] : null;
-      if (state && state.hasOwnProperty('visible')) {
-          return state.visible;
-      }
-      return true;
-  }
+    _isVisible(ctrlId) {
+        const state = this.props.controlsState ? this.props.controlsState[ctrlId] : null;
+        if (state && state.hasOwnProperty('visible')) {
+            return state.visible;
+        }
+        return true;
+    }
 
-  _isSelected(ctrlId) {
-      const state = this.props.controlsState ? this.props.controlsState[ctrlId] : null;
-      if (state && state.hasOwnProperty('selected')) {
-          return state.selected;
-      }
-      return true;
-  }
+    _isSelected(ctrlId) {
+        const state = this.props.controlsState ? this.props.controlsState[ctrlId] : null;
+        if (state && state.hasOwnProperty('selected')) {
+            return state.selected;
+        }
+        return true;
+    }
 
-  _getControlClassNames(ctrlId, additionalClass) {
-      // add additional class name, if specified
-      let classNames = additionalClass ? `control ${additionalClass}` : 'control';
-      const enabled = this._isEnabled(ctrlId);
-      if (!enabled) {
-          classNames += `${classNames} disabled`;
-      }
-      return classNames;
-  }
+    _getControlClassNames(ctrlId, additionalClass) {
+        // add additional class name, if specified
+        let classNames = additionalClass ? `control ${additionalClass}` : 'control';
+        const enabled = this._isEnabled(ctrlId);
+        if (!enabled) {
+            classNames += `${classNames} disabled`;
+        }
+        return classNames;
+    }
 
-  showNotWorkingOxygenExtensionModal = () => {
-      this.setState({
-          showNoChromeDialog: true
-      });
-  }
+    showNotWorkingOxygenExtensionModal = () => {
+        this.setState({
+            showNoChromeDialog: true
+        });
+    }
 
-  showWorkingOxygenExtensionModal = () => {
-      this.setState({
-          showWorkingChromeDialog: true
-      }, () => {
-          this.handleClickEvent(Controls.TEST_RECORD);
-      });
-  }
+    showWorkingOxygenExtensionModal = () => {
+        this.setState({
+            showWorkingChromeDialog: true
+        }, () => {
+            this.handleClickEvent(Controls.TEST_RECORD);
+        });
+    }
 
-  render() {
-      const {
-          testMode, 
-          testTarget, 
-          devices, 
-          browsers, 
-          emulators, 
-          providers = [],
-          testProvider = null,
-          stepDelay,
-          isChromeExtensionEnabled,
-          canRecord,
-          testRunning,
-          waitChromeExtension,
-          showRecorderMessage,
-          changeShowRecorderMessageValue,
-          cloudProvidesBrowsersAndDevices
-      } = this.props;
+    render() {
+        const {
+            testMode, 
+            testTarget, 
+            devices, 
+            browsers, 
+            emulators, 
+            providers = [],
+            testProvider = null,
+            stepDelay,
+            isChromeExtensionEnabled,
+            canRecord,
+            testRunning,
+            waitChromeExtension,
+            showRecorderMessage,
+            changeShowRecorderMessageValue,
+            cloudProvidesBrowsersAndDevices = {}
+        } = this.props;
 
-      const {
-          showNoChromeDialog,
-          showWorkingChromeDialog
-      } = this.state;
-      // prevDevice and iOSAndroidSeparator are used to add a separator between Android and iOS devices
-      let prevDevice = null;
-      const iOSAndroidSeparator = (
-          <Option key='-' value='-'>---------------</Option>
-      );
+        let browsersTree = null;
+        let devicesTree = null;
+        let currentCloudProvidesBrowsersAndDevices = null;
 
-      const providersUnabled = (Array.isArray(providers) && providers.length > 0);
+        if(testProvider && cloudProvidesBrowsersAndDevices && cloudProvidesBrowsersAndDevices[testProvider]){
+            currentCloudProvidesBrowsersAndDevices = cloudProvidesBrowsersAndDevices[testProvider];
 
-      console.log('providers', providers);
+            if(currentCloudProvidesBrowsersAndDevices && currentCloudProvidesBrowsersAndDevices.browsersTree){
+                browsersTree = currentCloudProvidesBrowsersAndDevices.browsersTree;
+            }
 
-    //   console.log('providersUnabled', providersUnabled);
-    //   console.log('testProvider', testProvider);
-    //   console.log('!providersUnabled || !testProvider', !providersUnabled || !testProvider);
+            if(currentCloudProvidesBrowsersAndDevices && currentCloudProvidesBrowsersAndDevices.devicesTree){
+                devicesTree = currentCloudProvidesBrowsersAndDevices.devicesTree;
+            }
+        }
 
-      const cloudProvidesBrowsersAndDevicesEnabled = testProvider && cloudProvidesBrowsersAndDevices && Array.isArray(cloudProvidesBrowsersAndDevices) && cloudProvidesBrowsersAndDevices.length > 0;
+        const {
+            showNoChromeDialog,
+            showWorkingChromeDialog
+        } = this.state;
+        // prevDevice and iOSAndroidSeparator are used to add a separator between Android and iOS devices
+        let prevDevice = null;
+        const iOSAndroidSeparator = (
+            <Option key='-' value='-'>---------------</Option>
+        );
 
-      return (
-          <div className="appTollbar">
-              { typeof showNoChromeDialog !== 'undefined' && showNoChromeDialog && 
-          <NoChromeDialog hide={this.hideNoChromeDialog}/>
-              }
+        const providersUnabled = (Array.isArray(providers) && providers.length > 0);
 
-              { showWorkingChromeDialog && this._isSelected(Controls.TEST_RECORD) &&
-          <WorkingChromeDialog 
-              changeShowRecorderMessageValue={changeShowRecorderMessageValue}
-              showRecorderMessage={showRecorderMessage}
-              hide={this.hideWorkingChromeDialog}
-          />
-              }
+        const cloudProvidesBrowsersAndDevicesEnabled = currentCloudProvidesBrowsersAndDevices;
+        const cloudProvidesBrowsersEnabled = cloudProvidesBrowsersAndDevicesEnabled && browsersTree && Array.isArray(browsersTree) && browsersTree.length > 0;
+        const cloudProvidesDevicesEnabled = cloudProvidesBrowsersAndDevicesEnabled && devicesTree && Array.isArray(devicesTree) && devicesTree.length > 0;
+      
+        return (
+            <div className="appTollbar">
+                { typeof showNoChromeDialog !== 'undefined' && showNoChromeDialog && 
+                    <NoChromeDialog hide={this.hideNoChromeDialog}/>
+                }
 
-              { this._isVisible(Controls.NEW_FILE) && (
-                  <Icon
-                      className="control button"
-                      style={ getOpacity(this._isEnabled(Controls.NEW_FILE)) }
-                      onClick={ () => ::this.handleClickEvent(Controls.NEW_FILE) }
-                      type="file-add"
-                      title="New File"
-                  />
-              )}
+                { showWorkingChromeDialog && this._isSelected(Controls.TEST_RECORD) &&
+                    <WorkingChromeDialog 
+                        changeShowRecorderMessageValue={changeShowRecorderMessageValue}
+                        showRecorderMessage={showRecorderMessage}
+                        hide={this.hideWorkingChromeDialog}
+                    />
+                }
 
-              { this._isVisible(Controls.NEW_FOLDER) && (
-                  <Icon
-                      className="control button"
-                      style={ getOpacity(this._isEnabled(Controls.NEW_FOLDER)) }
-                      onClick={ () => ::this.handleClickEvent(Controls.NEW_FOLDER) }
-                      type="folder-add"
-                      title="New Folder"
-                      style={ {'fontSize': '25px'} }
-                  />
-              )}
+                { this._isVisible(Controls.NEW_FILE) && (
+                    <Icon
+                        className="control button"
+                        style={ getOpacity(this._isEnabled(Controls.NEW_FILE)) }
+                        onClick={ () => ::this.handleClickEvent(Controls.NEW_FILE) }
+                        type="file-add"
+                        title="New File"
+                    />
+                )}
 
-              <Icon
-                  className="control button"
-                  onClick={ () => ::this.handleClickEvent(Controls.OPEN_FOLDER) }
-                  type="folder-open"
-                  title="Open Folder"
-                  style={ {'fontSize': '25px'} }
-              />
+                { this._isVisible(Controls.NEW_FOLDER) && (
+                    <Icon
+                        className="control button"
+                        style={ getOpacity(this._isEnabled(Controls.NEW_FOLDER)) }
+                        onClick={ () => ::this.handleClickEvent(Controls.NEW_FOLDER) }
+                        type="folder-add"
+                        title="New Folder"
+                        style={ {'fontSize': '25px'} }
+                    />
+                )}
 
-              <Icon
-                  className="control button"
-                  onClick={ () => ::this.handleClickEvent(Controls.SAVE_FILE) }
-                  title="Save"
-                  type="save"
-              />
+                <Icon
+                    className="control button"
+                    onClick={ () => ::this.handleClickEvent(Controls.OPEN_FOLDER) }
+                    type="folder-open"
+                    title="Open Folder"
+                    style={ {'fontSize': '25px'} }
+                />
 
-              <div className="separator" />
+                <Icon
+                    className="control button"
+                    onClick={ () => ::this.handleClickEvent(Controls.SAVE_FILE) }
+                    title="Save"
+                    type="save"
+                />
 
-              { providersUnabled && (
-                  <Select
-                      className="control select"
-                      value={ testProvider || '' }
-                      style={{ width: 120 }}
-                      onChange={ (value) => ::this.handleValueChange(Controls.TEST_PROVIDER, value) }
-                  >
-                      <Option key='' value=''>-- Local --</Option>
-                      {
-                          providers.map((provider) => (
-                              <Option key={ provider.id } value={ provider.id }>
-                                  { provider.title }
-                              </Option>
-                          ))
-                      }
-                  </Select>
-              )}
+                <div className="separator" />
 
-              {
-                  (!providersUnabled || !testProvider) && (
-                      <Fragment>
-                        <span key='web' className={testMode === 'web' ? 'control selectable active' : 'control selectable'}>
-                            <Icon
-                                style={ getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)) }
-                                onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_WEB) }
-                                style={{ marginRight: 0 }}
-                                title="Web Mode"
-                                type="global"
-                            />
-                        </span>
-            
-                        <span key='mob' className={testMode === 'mob' ? 'control selectable active' : 'control selectable'}>
-                            <Icon
-                                style={ getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)) }
-                                onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_MOB) }
-                                style={{ marginRight: 0 }}
-                                title="Mobile Mode"
-                                type="mobile"
-                            />
-                        </span>
-            
+                { providersUnabled && (
+                    <Select
+                        className="control select"
+                        value={ testProvider || '' }
+                        style={{ width: 120 }}
+                        onChange={ (value) => ::this.handleValueChange(Controls.TEST_PROVIDER, value) }
+                    >
+                        <Option key='' value=''>-- Local --</Option>
+                        {
+                            providers.map((provider) => (
+                                <Option key={ provider.id } value={ provider.id }>
+                                    { provider.title }
+                                </Option>
+                            ))
+                        }
+                    </Select>
+                )}
+
+                    <span key='web' className={testMode === 'web' ? 'control selectable active' : 'control selectable'}>
+                        <Icon
+                            style={ getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)) }
+                            onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_WEB) }
+                            style={{ marginRight: 0 }}
+                            title="Web Mode"
+                            type="global"
+                        />
+                    </span>
+        
+                    <span key='mob' className={testMode === 'mob' ? 'control selectable active' : 'control selectable'}>
+                        <Icon
+                            style={ getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)) }
+                            onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_MOB) }
+                            style={{ marginRight: 0 }}
+                            title="Mobile Mode"
+                            type="mobile"
+                        />
+                    </span>
+                {
+                    (!providersUnabled || !testProvider) && (
                         <span key='resp' className={testMode === 'resp' ? 'control selectable active' : 'control selectable'}>
                             <Icon
                                 style={ getOpacity(this._isEnabled(Controls.TEST_MODE_RESP)) }
@@ -268,171 +278,183 @@ export default class Toolbar extends Component<Props> {
                                 type="scan"
                             />
                         </span>
-                      </Fragment>
-                  )
-              }
+                    )
+                }
+                {
+                    cloudProvidesBrowsersAndDevicesEnabled && testMode === 'web' && browsersTree &&
+                        <TreeSelect
+                            style={{ width: 370 }}
+                            value={this.props.testTarget}
+                            dropdownStyle={{ overflow: 'auto' }}
+                            treeData={browsersTree}
+                            placeholder="Please select"
+                            // treeDefaultExpandAll
+                            onChange={ (value) => ::this.handleValueChange(Controls.TEST_TARGET, value) }
+                        />
+                }
+                {
+                    cloudProvidesBrowsersAndDevicesEnabled && testMode === 'mob' && devicesTree &&
+                        <TreeSelect
+                            style={{ width: 370 }}
+                            value={this.props.testTarget}
+                            dropdownStyle={{ overflow: 'auto' }}
+                            treeData={devicesTree}
+                            placeholder="Please select"
+                            // treeDefaultExpandAll
+                            onChange={ (value) => ::this.handleValueChange(Controls.TEST_TARGET, value) }
+                        />
+                }
+                {
+                    !cloudProvidesBrowsersAndDevicesEnabled && 
+                    <Select
+                        className="control select"
+                        value={this.props.testTarget}
+                        style={{ width: 170 }}
+                        onChange={ (value) => ::this.handleValueChange(Controls.TEST_TARGET, value) }
+                    >
+                        {
+                            testMode === 'web' && browsers.map((browser) => (
+                                <Option key={ browser.id } value={ browser.id }>
+                                    { browser.name }
+                                </Option>
+                            ))
+                        }
+                        {
+                            testMode === 'mob' && sortDevices(devices).map(device => {
+                                const options = [];
+                                if (prevDevice && prevDevice.osName === 'Android' && device.osName === 'iOS') {
+                                    options.push(iOSAndroidSeparator);
+                                }
+                                prevDevice = device;
+                                options.push(
+                                    <Option key={ device.id } value={ device.id } title={ device.name }>
+                                        { device.name }
+                                    </Option>
+                                );
+                                return options;
+                            })
+                        }
+                        {
+                            testMode === 'resp' && emulators.map((emulator) => (
+                                <Option key={emulator} value={emulator}>
+                                    {emulator}
+                                </Option>
+                            ))
+                        }
+                    </Select>
+                }
 
-              <Select
-                  className="control select"
-                  value={this.props.testTarget}
-                  style={{ width: 370 }}
-                  onChange={ (value) => ::this.handleValueChange(Controls.TEST_TARGET, value) }
-              >
-                  {
-                      cloudProvidesBrowsersAndDevicesEnabled && cloudProvidesBrowsersAndDevices.map((item, idx) => (
-                        <Option key={ idx+'_'+item.api_name+item.long_version } value={ idx+'_'+item.api_name+item.long_version  }>
-                            { item.long_name+' '+item.long_version }
-                        </Option>
-                    ))
-                  }
-                  {
-                      !cloudProvidesBrowsersAndDevicesEnabled && testMode === 'web' && browsers.map((browser) => (
-                          <Option key={ browser.id } value={ browser.id }>
-                              { browser.name }
-                          </Option>
-                      ))
-                  }
-                  {
-                      !cloudProvidesBrowsersAndDevicesEnabled && testMode === 'mob' && sortDevices(devices).map(device => {
-                          const options = [];
-                          if (prevDevice && prevDevice.osName === 'Android' && device.osName === 'iOS') {
-                              options.push(iOSAndroidSeparator);
-                          }
-                          prevDevice = device;
-                          options.push(
-                              <Option key={ device.id } value={ device.id } title={ device.name }>
-                                  { device.name }
-                              </Option>
-                          );
-                          return options;
-                      })
-                  }
-                  {
-                      !cloudProvidesBrowsersAndDevicesEnabled && testMode === 'resp' && emulators.map((emulator) => (
-                          <Option key={emulator} value={emulator}>
-                              {emulator}
-                          </Option>
-                      ))
-                  }
-              </Select>
+                <div className="separator" />
 
-              <div className="separator" />
+                {/* RUN part */}
+                { this._isVisible(Controls.TEST_RUN) && (
+                    <button
+                        onClick={ () => ::this.handleClickEvent(Controls.TEST_RUN) }
+                        className={ this._getControlClassNames(Controls.TEST_RUN, 'button') }
+                        disabled={ !this._isEnabled(Controls.TEST_RUN) }
+                    >
+                        <Icon
+                            title="Run Test"
+                            type="play-circle"
+                            theme="filled"
+                        /> <span>Run</span>
+                    </button>
+                )}
 
-              {/* RUN part */}
-              { this._isVisible(Controls.TEST_RUN) && (
-                  <button
-                      onClick={ () => ::this.handleClickEvent(Controls.TEST_RUN) }
-                      className={ this._getControlClassNames(Controls.TEST_RUN, 'button') }
-                      disabled={ !this._isEnabled(Controls.TEST_RUN) }
-                  >
-                      <Icon
-                          title="Run Test"
-                          type="play-circle"
-                          theme="filled"
-                      /> <span>Run</span>
-                  </button>
-              )}
+                { this._isVisible(Controls.TEST_CONTINUE) && (
+                    <Icon
+                        className="control button forward"
+                        style={ getOpacity(this._isEnabled(Controls.TEST_CONTINUE)) }
+                        onClick={ () => ::this.handleClickEvent(Controls.TEST_CONTINUE) }
+                        type="forward"
+                        title="Continue"
+                    />
+                )}
 
-              { this._isVisible(Controls.TEST_CONTINUE) && (
-                  <Icon
-                      className="control button forward"
-                      style={ getOpacity(this._isEnabled(Controls.TEST_CONTINUE)) }
-                      onClick={ () => ::this.handleClickEvent(Controls.TEST_CONTINUE) }
-                      type="forward"
-                      title="Continue"
-                  />
-              )}
+                { this._isVisible(Controls.TEST_STOP) && (
+                    <button
+                        className="control button stop"
+                        style={ getOpacity(this._isEnabled(Controls.TEST_STOP)) }
+                        onClick={ () => ::this.handleClickEvent(Controls.TEST_STOP) }
+                        title="Stop"
+                    >
+                        <Icon
+                            title="Terminate Test"
+                            type="close-circle"
+                            theme="filled"
+                        /> 
+                        <span>Stop</span>
+                    </button>
+                )}
 
-              { this._isVisible(Controls.TEST_STOP) && (
-                  <button
-                      className="control button stop"
-                      style={ getOpacity(this._isEnabled(Controls.TEST_STOP)) }
-                      onClick={ () => ::this.handleClickEvent(Controls.TEST_STOP) }
-                      title="Stop"
-                  >
-                      <Icon
-                          title="Terminate Test"
-                          type="close-circle"
-                          theme="filled"
-                      /> 
-                      <span>Stop</span>
-                  </button>
-              )}
+                <div className="separator" />
 
-              <div className="separator" />
+                <label className="control label" htmlFor="stepDelay">Delay</label>
+                <Input
+                    id="stepDelay"
+                    className="control input"
+                    type="number"
+                    value={ stepDelay }
+                    max={ 99 }
+                    style={{ width: 55, caretColor: 'transparent' }}
+                    onKeyPress={ (e) => e.preventDefault() }
+                    onChange={ (e) => ::this.handleValueChange(Controls.TEST_STEP_DELAY, e.target.value) }
+                />
 
-              <label className="control label" htmlFor="stepDelay">Delay</label>
-              <Input
-                  id="stepDelay"
-                  className="control input"
-                  type="number"
-                  value={ stepDelay }
-                  max={ 99 }
-                  style={{ width: 55, caretColor: 'transparent' }}
-                  onKeyPress={ (e) => e.preventDefault() }
-                  onChange={ (e) => ::this.handleValueChange(Controls.TEST_STEP_DELAY, e.target.value) }
-              />
+                <div className="separator" />
 
-              <div className="separator" />
+                { (waitChromeExtension || testRunning) &&
+                    <span
+                        style={ getOpacity(false) }
+                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
+                        title="Record"
+                    >
+                        <FaMicrophone
+                            style={{ marginRight: 0 }}
+                        />
+                    </span>
+                }
 
-              { /* waitChromeExtension &&
-          <span style={{marginLeft:'10px'}}>
-            <Spin indicator={<Icon type="loading" style={{ fontSize: 24 }} spin />} />
-            <span className="ext-wait-message">Waiting for extension</span>
-          </span>
-           */
-              }
-              { (waitChromeExtension || testRunning) &&
-          <span
-              style={ getOpacity(false) }
-              className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
-              title="Record"
-          >
-              <FaMicrophone
-                  style={{ marginRight: 0 }}
-              />
-          </span>
-              }
+                { !(waitChromeExtension || testRunning) && !canRecord && 
+                <span
+                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable not-work active' : 'control selectable not-work' }
+                        title="Record"
+                    >
+                        <FaMicrophoneSlash
+                            style={{ marginRight: 0 }}
+                            onClick={ this.showNotWorkingOxygenExtensionModal }
+                        />
+                    </span>
+                }
 
-              { !(waitChromeExtension || testRunning) && !canRecord && 
-          <span
-              className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable not-work active' : 'control selectable not-work' }
-              title="Record"
-          >
-              <FaMicrophoneSlash
-                  style={{ marginRight: 0 }}
-                  onClick={ this.showNotWorkingOxygenExtensionModal }
-              />
-          </span>}
+                { !(waitChromeExtension || testRunning) && canRecord &&
+                    <span
+                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active green-bg' : 'control selectable' }
+                        title="Record"
+                    >
+                        <FaMicrophone
+                            style={{ marginRight: 0 }}
+                            onClick={ this.showWorkingOxygenExtensionModal }
+                        />
+                    </span>
+                }
 
-              { !(waitChromeExtension || testRunning) && canRecord &&
-          <span
-              className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active green-bg' : 'control selectable' }
-              title="Record"
-          >
-              <FaMicrophone
-                  style={{ marginRight: 0 }}
-                  onClick={ this.showWorkingOxygenExtensionModal }
-              />
-          </span>
-              }
-
-              <span style={{ marginLeft: 'auto' }}>             
-                  <span 
-                      className={ this._isSelected(Controls.TEST_SETTINGS) ? 'control selectable active' : 'control selectable' }
-                      style={{ float: 'right' }}
-                  >
-                      <Icon
-                          style={ getOpacity(this._isEnabled(Controls.TEST_SETTINGS)) }
-                          onClick={ () => ::this.handleClickEvent(Controls.TEST_SETTINGS) }
-                          type="setting"
-                          title="Test Settings"
-                      />
-                  </span>
-              </span>
-          </div>
-      );
-  }
+                <span style={{ marginLeft: 'auto' }}>             
+                    <span 
+                        className={ this._isSelected(Controls.TEST_SETTINGS) ? 'control selectable active' : 'control selectable' }
+                        style={{ float: 'right' }}
+                    >
+                        <Icon
+                            style={ getOpacity(this._isEnabled(Controls.TEST_SETTINGS)) }
+                            onClick={ () => ::this.handleClickEvent(Controls.TEST_SETTINGS) }
+                            type="setting"
+                            title="Test Settings"
+                        />
+                    </span>
+                </span>
+            </div>
+        );
+    }
 }
 
 function getOpacity(enabled) {

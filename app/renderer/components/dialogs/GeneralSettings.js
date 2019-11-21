@@ -24,25 +24,19 @@ type Props = {
     settings: Object | undefined
 };
 
-class GeneralSettings extends PureComponent<Props> {
-    props: Props;
+class GeneralSettings extends PureComponent<Props> {    
+    constructor(props){
 
-    state = {
-        ...DEFAULT_STATE,
-    }
-    
-    static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.visible == true && nextProps.settings) {
-            return {
-                iterations: nextProps.settings.iterations || 1,
-                paramMode: nextProps.settings.paramMode || 'sequential',
-                paramFilePath: nextProps.settings.paramFilePath || null,
-                reopenSession: nextProps.settings.reopenSession || false,
-                useParams: nextProps.settings.paramFilePath != null,
-            };
-        }
-        // else, leave the previous state 
-        return null;
+
+        super(props);
+        this.state = {
+            ...DEFAULT_STATE,
+            iterations: props.settings.iterations || 1,
+            paramMode: props.settings.paramMode || 'sequential',
+            paramFilePath: props.settings.paramFilePath || null,
+            reopenSession: props.settings.reopenSession || false,
+            useParams: props.settings.paramFilePath != null,
+        };
     }
     
     async onBrowseFile() {

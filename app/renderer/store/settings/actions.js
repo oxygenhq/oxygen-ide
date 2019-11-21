@@ -133,7 +133,7 @@ export const updateCloudProvidersSettings = providers => ({
     payload: { providers }
 });
 
-export const setCloudProvidersBrowsersAndDevices = browsersAndDevices => ({
+export const setCloudProvidersBrowsersAndDevices = (browsersAndDevices, testProvider) => ({
     type: types.SET_CLOUD_PROVIDERS_BROWSERS_AND_DEVICES,
-    payload: { browsersAndDevices },
+    payload: { browsersAndDevices, testProvider },
 });

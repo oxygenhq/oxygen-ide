@@ -163,9 +163,9 @@ export default (state = defaultState, action) => {
         else if (value === 'mob') {
             newTestTarget = state.devices.length > 0 ? state.devices[0].id : null;
 
-            if(newTestTarget === null){
-                message.error('No connected devices or emulators found. Mobile device needs to be connected to the computer in order to run mobile tests.');
-            }
+            // if(newTestTarget === null){
+            //     message.error('No connected devices or emulators found. Mobile device needs to be connected to the computer in order to run mobile tests.');
+            // }
         }
         else if (value === 'resp') {
             newTestProvider = '';

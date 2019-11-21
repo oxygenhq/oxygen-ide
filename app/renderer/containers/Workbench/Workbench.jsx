@@ -476,8 +476,6 @@ export default class Workbench extends Component<Props> {
       const showLanding = settings.showLanding;
       const showRecorderMessage = settings.showRecorderMessage;
 
-      console.log('cloudProviders', cloudProviders);
-
       // convert providers dictionary to an array - add only providers marked as 'in use'
       const providers = [];
       for (let providerKey of Object.keys(cloudProviders)) {
@@ -490,11 +488,8 @@ export default class Workbench extends Component<Props> {
           }      
       }
 
-      console.log('providers', providers);
       console.log('cloudProvidesBrowsersAndDevices', cloudProvidesBrowsersAndDevices);
-      
-
-    
+          
       if(!initialized){
           return (
               <Initializing/>

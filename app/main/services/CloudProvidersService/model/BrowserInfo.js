@@ -1,4 +1,12 @@
-export default BrowserInfo {
+export default class BrowserInfo {
+    constructor(object){
+        this._name = object.name;
+        this._version = object.version;
+        this._osName = object.osName;
+        this._osVersion = object.osVersion;
+        this._apiName = object.apiName;
+        
+    }
     get name() {
         return this._name;
     }
@@ -11,6 +19,12 @@ export default BrowserInfo {
     }
     set version(version) {
         this._version = version;
+    }
+    get apiName() {
+        return this._apiName;
+    }
+    set apiName(apiName) {
+        this._apiName = apiName;
     }
     get osName() {
         return this._osName;
