@@ -11,6 +11,7 @@ import path from 'path';
 import moment from 'moment';
 import detectPort from 'detect-port';
 import ServiceBase from './ServiceBase';
+import * as CloudProviders from './CloudProvidersService/providers';
 
 // Events
 const EVENT_LOG_ENTRY = 'LOG_ENTRY';
@@ -84,8 +85,8 @@ export default class TestRunnerService extends ServiceBase {
         const casesBreakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
         testsuite.cases[0].breakpoints = casesBreakpoints;
         // prepare launch options and capabilities
-        const caps = {};
         const options = {};
+        const caps = {};
         options.suites = [testsuite];
         options.debugPortIde = dbgPort;
         options.require = {
@@ -93,7 +94,14 @@ export default class TestRunnerService extends ServiceBase {
             allowGlobal: true
         };
         options.reopenSession = reopenSession || false;
-
+        const cloudProviderSvc = this.getService('CloudProvidersService');
+        if (cloudProviderSvc) {
+            const provider = cloudProviderSvc.getProvider(testProvider.id);
+            if (provider) {
+                provider.updateCapabilities(testTarget, caps);
+                provider.updateOptions(testTarget, options);
+            }
+        }
         // add provider specific options, if cloud provider was selected
         if (testProvider && testProvider.id) {
             switch (testProvider.id) {

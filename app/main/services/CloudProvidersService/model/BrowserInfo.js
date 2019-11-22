@@ -13,6 +13,7 @@ export default class BrowserInfo {
     set name(name) {
         this._name = name;
     }
+    // providerName
     // e.g. "short_version" property in SauceLabs API response
     get version() {
         return this._version;

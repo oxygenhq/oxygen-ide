@@ -7,6 +7,43 @@ const devicesNames = ['android', 'ipad', 'iphone'];
 const browsersNames = ['internet explorer', 'MicrosoftEdge', 'firefox', 'chrome', 'safari'];
 
 export default class CloudProvidersService extends ServiceBase {
+    constructor(mainWindow, settings) {
+        super(mainWindow, settings);
+        this.providers = {};
+    }
+
+    start() {
+        // initialize each enabled provider
+        const { cloudProviders } = this.settings || {};
+        if (!cloudProviders) {
+            console.warn('No cloud providers defined');
+            return;
+        }
+        for (let providerName in cloudProviders) {
+            const providerSettings = cloudProviders[providerName];
+            if (!Providers.hasOwnProperty(providerName)) {
+                continue;
+            }
+            const provider = this.providers[providerName] = new Providers[providerName](providerSettings);
+            provider.start();
+        }
+    }
+
+    stop() {
+        for (let providerName in this.providers) {
+            const provider = this.providers[providerName];
+            provider.stop();
+            delete providers[providerName];
+        }
+    }
+
+    updateProviderSettings(providerName, settings) {
+        if (!this.providers.hasOwnProperty(providerName)) {
+            return;
+        }
+        const provider = this.providers[providerName];
+        provider.updateSettings(settings);
+    }
 
     getUniqueOsVersions(browsers){
         const result = [];
