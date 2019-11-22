@@ -159,6 +159,9 @@ export function* handleServiceEvents({ payload }) {
     if (service === 'FileService' && event === 'ObjectRepoWatcher' ) {
         if(path && content){
             const [...cont] = content.split('{');
+            
+            cont.shift();
+
             const conte = '{'+cont.join('{');
     
             const conten = conte.split('};')[0] + '}';

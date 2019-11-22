@@ -18,16 +18,24 @@ const menuTemplateFromArray = (cmdHandler, menuItems) => {
         return template;
     }
     for (var item of menuItems) {
-    // ignore menu entries without defined command handler name
+        const clickHandler = (item, saveCmd) => {
+            if(saveCmd){
+                cmdHandler(saveCmd);
+            }
+        };
+
+        const saveCmd = item.cmd || null;
+
+        // ignore menu entries without defined command handler name
         const templateItem = {
             type: item.type || null,
             label: item.label || null,
             accelerator: item.accelerator || null,
             enabled: item.enabled || true,
             submenu: item.submenu ? menuTemplateFromArray(cmdHandler, item.submenu) : null,
-            click: item.cmd ? () => cmdHandler(item.cmd) : null,
-            //click() { cmdHandler(item.cmd) }
+            click: () => { clickHandler(item, saveCmd); }
         };
+        
         template.push(templateItem);
     }
     return template;
