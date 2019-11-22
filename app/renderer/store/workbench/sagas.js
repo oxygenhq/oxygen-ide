@@ -293,6 +293,11 @@ export function* initialize() {
     // retrieve and save merged settings back to Electron store
     const allSettings = yield select(state => state.settings);
     yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [allSettings]);
+
+    //start CloudProvidersService
+    services.mainIpc.call('CloudProvidersService', 'start').then(() => {});
+    yield setCloudProvidersBrowsersAndDevices();
+
     // // if a folder was open in the last session, load this folder in File Explorer 
     // if (allSettings && allSettings.lastSession && allSettings.lastSession.rootFolder) {
     //     const { error } = yield putAndTake(
@@ -1551,28 +1556,35 @@ export function* getOrFetchFileInfo(path) {
     return { response, error };
 }
 
+export function* setCloudProvidersBrowsersAndDevices(){
+    const settings = yield select(state => state.settings);
+    
+    const { cloudProviders } = settings || {};
+
+    if(cloudProviders){
+        if(cloudProviders.lambdaTest && cloudProviders.lambdaTest.user && cloudProviders.lambdaTest.key){
+            const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['lambdaTest', cloudProviders.lambdaTest.user, cloudProviders.lambdaTest.key]);
+            if(browsersAndDevices){
+                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'lambdaTest'));
+            }
+    
+        }
+        if(cloudProviders.sauceLabs){
+            const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
+    
+            if(browsersAndDevices){
+                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'sauceLabs'));
+            }
+        }
+    }
+}
+
 export function* handleUpdatedCloudProvidersSettings({payload}) {
     const settings = yield select(state => state.settings);
     // persiste settings in the Electron store
     yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
 
-    if(payload && payload.providers && payload.providers.lambdaTest && payload.providers.lambdaTest.user && payload.providers.lambdaTest.key){
-        const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['lambdaTest', payload.providers.lambdaTest.user, payload.providers.lambdaTest.key]);
-        
-        if(browsersAndDevices){
-            yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'lambdaTest'));
-        }
-
-    }
-    if(payload && payload.providers && payload.providers.sauceLabs){
-
-        const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
-
-
-        if(browsersAndDevices){
-            yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'sauceLabs'));
-        }
-    }
+    yield setCloudProvidersBrowsersAndDevices();
 }
 
 export function* handleUpdatedRunSettings(payload) {

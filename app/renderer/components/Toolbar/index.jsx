@@ -26,6 +26,7 @@ import WorkingChromeDialog from './WorkingChromeDialog';
 import { type DeviceInfo } from '../../types/DeviceInfo';
 import { type CloudProvider } from '../../types/CloudProvider';
 import { type BrowserInfo } from '../../types/BrowserInfo';
+import { getBrowsersTarget, saveBrowserTarget, getDevicesTarget, saveDeviceTarget } from '../../helpers/cloudProviders';
 
 type ControlState = {
     visible?: boolean,
@@ -33,8 +34,8 @@ type ControlState = {
 };
 type Props = {
     stepDelay: number,
-    testMode: string,
-    testTarget?: ?string,
+    testMode: string | null,
+    testTarget: string | null | object,
     browsers: Array<BrowserInfo>,
     devices: Array<DeviceInfo>,
     emulators: Array<string>,
@@ -125,6 +126,20 @@ export default class Toolbar extends Component<Props> {
         }, () => {
             this.handleClickEvent(Controls.TEST_RECORD);
         });
+    }
+
+    handleBrowsersTreeValueChange = (browsersTree, value, label, extra) => {
+        if(extra && extra.triggerNode && extra.triggerNode && extra.triggerNode.props && extra.triggerNode.props.pos && typeof extra.triggerNode.props.pos === 'string'){
+            const target = getBrowsersTarget(browsersTree, extra.triggerNode.props.pos.substr(2));
+            this.handleValueChange(Controls.TEST_TARGET, target);
+        }
+    }
+
+    handleDevicesTreeValueChange = (devicesTree, value, label, extra) => {
+        if(extra && extra.triggerNode && extra.triggerNode && extra.triggerNode.props && extra.triggerNode.props.pos && typeof extra.triggerNode.props.pos === 'string'){
+            const target = getDevicesTarget(devicesTree, extra.triggerNode.props.pos.substr(2));
+            this.handleValueChange(Controls.TEST_TARGET, target);
+        }
     }
 
     render() {
@@ -248,6 +263,32 @@ export default class Toolbar extends Component<Props> {
                     </Select>
                 )}
 
+                {
+                    !cloudProvidesBrowsersAndDevicesEnabled && 
+                    <Fragment>
+                        <span key='web' className={testMode === 'web' ? 'control selectable active' : 'control selectable'}>
+                            <Icon
+                                style={ getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)) }
+                                onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_WEB) }
+                                style={{ marginRight: 0 }}
+                                title="Web Mode"
+                                type="global"
+                            />
+                        </span>
+            
+                        <span key='mob' className={testMode === 'mob' ? 'control selectable active' : 'control selectable'}>
+                            <Icon
+                                style={ getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)) }
+                                onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_MOB) }
+                                style={{ marginRight: 0 }}
+                                title="Mobile Mode"
+                                type="mobile"
+                            />
+                        </span>
+                    </Fragment>
+                }
+                {
+                    cloudProvidesBrowsersEnabled &&
                     <span key='web' className={testMode === 'web' ? 'control selectable active' : 'control selectable'}>
                         <Icon
                             style={ getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)) }
@@ -257,7 +298,9 @@ export default class Toolbar extends Component<Props> {
                             type="global"
                         />
                     </span>
-        
+                }
+                {
+                    cloudProvidesDevicesEnabled &&
                     <span key='mob' className={testMode === 'mob' ? 'control selectable active' : 'control selectable'}>
                         <Icon
                             style={ getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)) }
@@ -267,6 +310,7 @@ export default class Toolbar extends Component<Props> {
                             type="mobile"
                         />
                     </span>
+                }
                 {
                     (!providersUnabled || !testProvider) && (
                         <span key='resp' className={testMode === 'resp' ? 'control selectable active' : 'control selectable'}>
@@ -283,32 +327,36 @@ export default class Toolbar extends Component<Props> {
                 {
                     cloudProvidesBrowsersAndDevicesEnabled && testMode === 'web' && browsersTree &&
                         <TreeSelect
-                            style={{ width: 370 }}
-                            value={this.props.testTarget}
+                            className="control select"
+                            showSearch
+                            style={{ width: 250 }}
+                            value={saveBrowserTarget(testTarget)}
                             dropdownStyle={{ overflow: 'auto' }}
                             treeData={browsersTree}
                             placeholder="Please select"
-                            // treeDefaultExpandAll
-                            onChange={ (value) => ::this.handleValueChange(Controls.TEST_TARGET, value) }
+                            treeNodeLabelProp="label"
+                            onChange={ (value, label, extra) => this.handleBrowsersTreeValueChange(browsersTree, value, label, extra) }
                         />
                 }
                 {
                     cloudProvidesBrowsersAndDevicesEnabled && testMode === 'mob' && devicesTree &&
                         <TreeSelect
-                            style={{ width: 370 }}
-                            value={this.props.testTarget}
+                            className="control select"
+                            showSearch
+                            style={{ width: 250 }}
+                            value={saveDeviceTarget(testTarget)}
                             dropdownStyle={{ overflow: 'auto' }}
                             treeData={devicesTree}
                             placeholder="Please select"
-                            // treeDefaultExpandAll
-                            onChange={ (value) => ::this.handleValueChange(Controls.TEST_TARGET, value) }
+                            treeNodeLabelProp="label"
+                            onChange={ (value, label, extra) => this.handleDevicesTreeValueChange(devicesTree, value, label, extra) }
                         />
                 }
                 {
                     !cloudProvidesBrowsersAndDevicesEnabled && 
                     <Select
                         className="control select"
-                        value={this.props.testTarget}
+                        value={testTarget}
                         style={{ width: 170 }}
                         onChange={ (value) => ::this.handleValueChange(Controls.TEST_TARGET, value) }
                     >

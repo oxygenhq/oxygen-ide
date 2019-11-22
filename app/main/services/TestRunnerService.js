@@ -95,40 +95,51 @@ export default class TestRunnerService extends ServiceBase {
         };
         options.reopenSession = reopenSession || false;
         const cloudProviderSvc = this.getService('CloudProvidersService');
-        if (cloudProviderSvc) {
+
+        if (cloudProviderSvc && testProvider && testProvider.id) {
             const provider = cloudProviderSvc.getProvider(testProvider.id);
+
             if (provider) {
-                provider.updateCapabilities(testTarget, caps);
-                provider.updateOptions(testTarget, options);
+                const providerCaps = provider.updateCapabilities(testTarget, caps, testName);
+
+                for(var value in providerCaps){
+                    caps[value] = providerCaps[value];
+                }
+
+                const provideroptions = provider.updateOptions(testTarget, options);
+                
+                for(var value in provideroptions){
+                    options[value] = provideroptions[value];
+                }
             }
         }
         // add provider specific options, if cloud provider was selected
         if (testProvider && testProvider.id) {
             switch (testProvider.id) {
             case 'sauceLabs':
-                options.seleniumUrl = testProvider.url;
-                caps.name = testName || null;
-                caps.username = testProvider.username;
-                caps.accessKey = testProvider.accessKey;
-                caps.extendedDebugging = testProvider.extendedDebugging || false;
-                caps.capturePerformance = testProvider.capturePerformance || false;
+                // options.seleniumUrl = testProvider.url;
+                // caps.name = testName || null;
+                // caps.username = testProvider.username;
+                // caps.accessKey = testProvider.accessKey;
+                // caps.extendedDebugging = testProvider.extendedDebugging || false;
+                // caps.capturePerformance = testProvider.capturePerformance || false;
             case 'testingBot':
                 options.seleniumUrl = testProvider.url;
                 caps.name = testName || null;
                 caps.key = testProvider.key;
                 caps.secret = testProvider.secret;
             case 'lambdaTest':
-                options.seleniumUrl = testProvider.url;
-                options.wdioOpts = {
-                    user: testProvider.user,
-                    key: testProvider.key
-                };
-                caps.name = testName || null;
-                caps.build = testProvider.build || null;
-                caps.console = testProvider.captureConsole || false;
-                caps.network = testProvider.captureNetwork || false;
-                caps.visual = testProvider.takeScreenshots || false;
-                caps.video = testProvider.videoRecording || false;
+                // options.seleniumUrl = testProvider.url;
+                // options.wdioOpts = {
+                //     user: testProvider.user,
+                //     key: testProvider.key
+                // };
+                // caps.name = testName || null;
+                // caps.build = testProvider.build || null;
+                // caps.console = testProvider.captureConsole || false;
+                // caps.network = testProvider.captureNetwork || false;
+                // caps.visual = testProvider.takeScreenshots || false;
+                // caps.video = testProvider.videoRecording || false;
             }
         }
                 

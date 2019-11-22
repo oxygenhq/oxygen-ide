@@ -2,6 +2,7 @@ import * as Providers from './providers';
 import ServiceBase from '../ServiceBase';
 import BrowserInfo from './model/BrowserInfo';
 import DeviceInfo from './model/DeviceInfo';
+import { creteBrowsersTree, creteDevicesTree } from '../../helpers/cloudProviders';
 
 const devicesNames = ['android', 'ipad', 'iphone'];
 const browsersNames = ['internet explorer', 'MicrosoftEdge', 'firefox', 'chrome', 'safari'];
@@ -12,6 +13,16 @@ export default class CloudProvidersService extends ServiceBase {
         this.providers = {};
     }
 
+    getProvider(name) {
+        if (!this.providers || typeof(this.providers) !== 'object') {
+            return null;
+        }
+        if (this.providers.hasOwnProperty(name)) {
+            return this.providers[name];
+        }
+        return null;
+    }
+
     start() {
         // initialize each enabled provider
         const { cloudProviders } = this.settings || {};
@@ -19,21 +30,23 @@ export default class CloudProvidersService extends ServiceBase {
             console.warn('No cloud providers defined');
             return;
         }
-        for (let providerName in cloudProviders) {
+        for (var providerName in cloudProviders) {
             const providerSettings = cloudProviders[providerName];
             if (!Providers.hasOwnProperty(providerName)) {
                 continue;
             }
+
             const provider = this.providers[providerName] = new Providers[providerName](providerSettings);
+
             provider.start();
         }
     }
 
     stop() {
-        for (let providerName in this.providers) {
+        for (var providerName in this.providers) {
             const provider = this.providers[providerName];
             provider.stop();
-            delete providers[providerName];
+            delete this.providers[providerName];
         }
     }
 
@@ -43,291 +56,6 @@ export default class CloudProvidersService extends ServiceBase {
         }
         const provider = this.providers[providerName];
         provider.updateSettings(settings);
-    }
-
-    getUniqueOsVersions(browsers){
-        const result = [];
-
-        if(browsers && Array.isArray(browsers) && browsers.length > 0){
-            browsers.map((item) => {
-                if(result.includes(item._osVersion)){
-                    // ignore
-                } else {
-                    result.push(item._osVersion);
-                }
-            });
-        }
-
-        if(result && Array.isArray(result) && result.length > 1){
-            return result.sort((a, b) => a.localeCompare(b, 'en-US', {numeric : true}));
-        }
-
-        return result;
-    }
-
-    fillByOSVersion(browsers, key){
-        let result = [];
-
-        if(browsers && Array.isArray(browsers) && browsers.length > 0){
-            const uniqueOsVersions = this.getUniqueOsVersions(browsers);
-
-            if(uniqueOsVersions && Array.isArray(uniqueOsVersions) && uniqueOsVersions.length > 0){
-                uniqueOsVersions.map((item) => {    
-                    const saveItem = item || 'Unknown';
-                    const newKey = key+'-'+saveItem;
-
-                    result.push({
-                        title: saveItem,
-                        value: newKey,
-                        key: newKey
-                    });
-                });
-            }
-        }
-
-        return result;
-    }
-
-    getUniqueOsName(browsers){
-        const result = [];
-
-        if(browsers && Array.isArray(browsers) && browsers.length > 0){
-            browsers.map((item) => {
-                if(result.includes(item._osName)){
-                    // ignore
-                } else {
-                    result.push(item._osName);
-                }
-            });
-        }
-
-        if(result && Array.isArray(result) && result.length > 1){
-            return result.sort((a, b) => a.localeCompare(b, 'en-US', {numeric : true}));
-        }
-
-        return result;
-    }
-
-    fillByOSName(browsers, key){
-        let result = [];
-        
-        if(browsers && Array.isArray(browsers) && browsers.length > 0){
-            const uniqueOsNames = this.getUniqueOsName(browsers);
-                        
-            if(uniqueOsNames && Array.isArray(uniqueOsNames) && uniqueOsNames.length > 0){
-                uniqueOsNames.map((item) => {
-    
-                    const newKey = key+'-'+item;
-
-                    const browsersWithOsName = browsers.filter((browser) => browser._osName === item);
-
-                    result.push({
-                        title: item,
-                        value: newKey,
-                        key: newKey,
-                        children: this.fillByOSVersion(browsersWithOsName, newKey)
-                    });
-                });
-            }
-        }
-
-        return result;
-    }
-
-    getUniqueVersions(browsers){
-        const result = [];
-
-        if(browsers && Array.isArray(browsers) && browsers.length > 0){
-            browsers.map((item) => {
-                if(result.includes(item._version)){
-                    // ignore
-                } else {
-                    result.push(item._version);
-                }
-            });
-        }
-
-        if(result && Array.isArray(result) && result.length > 1){
-            return result.sort((a, b) => a.localeCompare(b, 'en-US', {numeric : true}));
-        }
-
-        return result;
-    }
-
-    fillByBrowserName(browsers, apiName, key){
-        let result = [];
-        let items = [];
-
-        if(browsers && Array.isArray(browsers) && browsers.length > 0){
-            browsers.map((item) => {
-                if(item && item._apiName && item._apiName === apiName){
-                    items.push(item);
-                }
-            });
-        }
-
-        if(items && Array.isArray(items) && items.length > 0){
-            const uniqueVersions = this.getUniqueVersions(items);
-
-            if(uniqueVersions && Array.isArray(uniqueVersions) && uniqueVersions.length > 0){
-                uniqueVersions.map((item) => {    
-                    const newKey = key+'-'+item;
-
-                    const browsersWithVersion = items.filter((browser) => browser._version === item);
-
-                    result.push({
-                        title: item,
-                        value: newKey,
-                        key: newKey,
-                        children: this.fillByOSName(browsersWithVersion, newKey)
-                    });
-                });
-            }
-        }
-
-        return result;
-    }
-
-    getUniqueApiNames(browsers){
-        const result = [];
-
-        if(browsers && Array.isArray(browsers) && browsers.length > 0){
-            browsers.map((item) => {
-                if(result.includes(item._apiName)){
-                    // ignore
-                } else {
-                    result.push(item._apiName);
-                }
-            });
-        }
-
-        if(result && Array.isArray(result) && result.length > 1){
-            return result.sort((a, b) => a.localeCompare(b, 'en-US', {numeric : true}));
-        }
-
-        return result;
-    }
-
-    creteBrowsersTree(browsers){
-        let result = [];
-
-        if(browsers && Array.isArray(browsers) && browsers.length > 0){
-            const uniqueApiNames = this.getUniqueApiNames(browsers);
-
-            if(uniqueApiNames && Array.isArray(uniqueApiNames) && uniqueApiNames.length > 0){
-                result = uniqueApiNames.map((item) => {
-                    return {
-                        title: item,
-                        value: item,
-                        key: item,
-                        children: this.fillByBrowserName(browsers, item, item)
-                    };
-                });
-            }
-        }
-
-        return result;
-    }
-
-    fillByVersion(devices, key){
-        let result = [];
-        
-
-        if(devices && Array.isArray(devices) && devices.length > 0){
-            const uniqueVersions = this.getUniqueVersions(devices);
-
-            if(uniqueVersions && Array.isArray(uniqueVersions) && uniqueVersions.length > 0){
-                uniqueVersions.map((item) => {
-    
-                    const newKey = key+'-'+item;
-
-                    result.push({
-                        title: item,
-                        value: newKey,
-                        key: newKey
-                    });
-                });
-            }
-        }
-
-        return result;
-    }
-
-    getUniqueNames(devices){
-        const result = [];
-
-        if(devices && Array.isArray(devices) && devices.length > 0){
-            devices.map((item) => {
-                if(result.includes(item.name)){
-                    // ignore
-                } else {
-                    result.push(item.name);
-                }
-            });
-        }
-
-        if(result && Array.isArray(result) && result.length > 1){
-            return result.sort((a, b) => a.localeCompare(b, 'en-US', {numeric : true}));
-        }
-
-        return result;
-    }
-
-    fillByDevicesName(devices, apiName, key){
-        let result = [];
-        let items = [];
-
-        if(devices && Array.isArray(devices) && devices.length > 0){
-            devices.map((item) => {
-                if(item && item._apiName && item._apiName === apiName){
-                    items.push(item);
-                }
-            });
-        }
-
-        if(items && Array.isArray(items) && items.length > 0){
-            const uniqueNames = this.getUniqueNames(items);
-            
-            if(uniqueNames && Array.isArray(uniqueNames) && uniqueNames.length > 0){
-                uniqueNames.map((item) => {
-    
-                    const newKey = key+'-'+item;
-
-                    const devicesWithVersion = items.filter((device) => device._name === item);
-
-                    result.push({
-                        title: item,
-                        value: newKey,
-                        key: newKey,
-                        children: this.fillByVersion(devicesWithVersion, newKey)
-                    });
-                });
-            }
-        }
-
-        return result;
-    }
-
-    creteDevicesTree(devices){
-        let result = [];
-        
-        if(devices && Array.isArray(devices) && devices.length > 0){
-            
-            const uniqueApiNames = this.getUniqueApiNames(devices);
-
-            if(uniqueApiNames){
-                result = uniqueApiNames.map((item) => {
-                    return {
-                        title: item,
-                        value: item,
-                        key: item,
-                        children: this.fillByDevicesName(devices, item, item)
-                    };
-                });
-            }
-        }
-
-        return result;
     }
 
     sortToBrowsersAndDevice(browsersAndDevices, providerName){
@@ -445,16 +173,16 @@ export default class CloudProvidersService extends ServiceBase {
         return {
             browsers,
             devices,
-            browsersTree: this.creteBrowsersTree(browsers),
-            devicesTree: this.creteDevicesTree(devices),
+            browsersTree: creteBrowsersTree(browsers),
+            devicesTree: creteDevicesTree(devices),
             origin: browsersAndDevices
         };
     }
 
     async getBrowsersAndDevices(providerName, userName = null, key = null) {
 
-        if (Providers.hasOwnProperty(providerName)) {
-            const provider = Providers[providerName];
+        if (this.providers.hasOwnProperty(providerName)) {
+            const provider = this.providers[providerName];
 
             if(provider && provider.getBrowsersAndDevices){
                 const browsersAndDevices = await provider.getBrowsersAndDevices(userName, key);

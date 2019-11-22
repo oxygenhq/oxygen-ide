@@ -3,19 +3,19 @@ export default class CloudProviderBase {
         this.settings = settings;
     }
     start() {
-        throw Error('Not implemented');
+        throw Error('"start" Not implemented');
     }
     stop() {
-        throw Error('Not implemented');
+        throw Error('"stop" Not implemented');
     }
     updateSettings(settings) {
         this.settings = settings;
     }
     // getBrowsersAndDevices();
-    updateCapabilities(target, caps) {
-        throw Error('Not implemented');
+    updateCapabilities(target, caps, testName) {
+        throw Error('"updateCapabilities" Not implemented');
     }
     updateOptions(target, options) {
-        throw Error('Not implemented');
+        throw Error('"updateOptions" Not implemented');
     }
 }

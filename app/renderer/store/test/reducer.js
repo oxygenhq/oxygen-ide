@@ -153,31 +153,31 @@ export default (state = defaultState, action) => {
             return state;
         }
 
-        let newTestProvider = state.runtimeSettings.testProvider;
+        // let newTestProvider = state.runtimeSettings.testProvider;
 
-        // determine new testTarget value, depending on the selected test mode
-        let newTestTarget = null;
-        if (value === 'web') {
-            newTestTarget = state.browsers.length > 0 ? state.browsers[0].id : null;
-        }
-        else if (value === 'mob') {
-            newTestTarget = state.devices.length > 0 ? state.devices[0].id : null;
+        // // determine new testTarget value, depending on the selected test mode
+        // let newTestTarget = null;
+        // if (value === 'web') {
+        //     newTestTarget = state.browsers.length > 0 ? state.browsers[0].id : null;
+        // }
+        // else if (value === 'mob') {
+        //     newTestTarget = state.devices.length > 0 ? state.devices[0].id : null;
 
-            // if(newTestTarget === null){
-            //     message.error('No connected devices or emulators found. Mobile device needs to be connected to the computer in order to run mobile tests.');
-            // }
-        }
-        else if (value === 'resp') {
-            newTestProvider = '';
-            newTestTarget = state.emulators.length > 0 ? state.emulators[0] : null;
-        }
+        //     // if(newTestTarget === null){
+        //     //     message.error('No connected devices or emulators found. Mobile device needs to be connected to the computer in order to run mobile tests.');
+        //     // }
+        // }
+        // else if (value === 'resp') {
+        //     newTestProvider = '';
+        //     newTestTarget = state.emulators.length > 0 ? state.emulators[0] : null;
+        // }
+
         return {
             ...state,
             runtimeSettings: {
                 ...state.runtimeSettings,
                 testMode: value,
-                testTarget: newTestTarget,
-                testProvider: newTestProvider
+                testTarget: null,
             },
         };
 
@@ -308,7 +308,9 @@ export default (state = defaultState, action) => {
             ...state,
             runtimeSettings: {
                 ...state.runtimeSettings,
-                testProvider: value
+                testProvider: value,
+                testTarget: null,
+                testMode: null,
             },
         };
 
