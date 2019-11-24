@@ -78,7 +78,9 @@ export function* openFile({ payload }) {
                 repoRoot = yield call(services.mainIpc.call, 'ElectronService', 'orgRequire', [file.path]);
                 console.log('#82', repoRoot);
                 try {
-                    repoRoot = JSON.parse(repoRoot.replace(/'/g, '"'));
+                    if(typeof repoRoot === 'string'){
+                        repoRoot = JSON.parse(repoRoot.replace(/'/g, '"'));
+                    }
                 }
                 catch (e) {
                     console.error(e);
