@@ -1562,18 +1562,25 @@ export function* setCloudProvidersBrowsersAndDevices(){
     const { cloudProviders } = settings || {};
 
     if(cloudProviders){
-        if(cloudProviders.lambdaTest && cloudProviders.lambdaTest.user && cloudProviders.lambdaTest.key){
+        if(cloudProviders.lambdaTest && cloudProviders.lambdaTest.inUse && cloudProviders.lambdaTest.user && cloudProviders.lambdaTest.key){
             const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['lambdaTest', cloudProviders.lambdaTest.user, cloudProviders.lambdaTest.key]);
             if(browsersAndDevices){
                 yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'lambdaTest'));
             }
     
         }
-        if(cloudProviders.sauceLabs){
+        if(cloudProviders.sauceLabs && cloudProviders.sauceLabs.inUse){
             const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
     
             if(browsersAndDevices){
                 yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'sauceLabs'));
+            }
+        }
+        if(cloudProviders.testingBot && cloudProviders.testingBot.inUse){
+            const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['testingBot']);
+    
+            if(browsersAndDevices){
+                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'testingBot'));
             }
         }
     }

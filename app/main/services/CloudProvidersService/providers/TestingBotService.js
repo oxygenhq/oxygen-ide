@@ -1,7 +1,7 @@
 import CloudProviderBase from '../CloudProviderBase';
 import fetch from 'node-fetch';
 
-export default class SauceLabsProvider extends CloudProviderBase {
+export default class TestingBotProvider extends CloudProviderBase {
     constructor(settings) {
         super(settings);
         this.isRunning = false;
@@ -22,13 +22,35 @@ export default class SauceLabsProvider extends CloudProviderBase {
         return this.isRunning;
     }
 
-    getBrowsersAndDevices() {
+    getDevices(){
         return new Promise((resolve, reject) => {
-            return fetch('https://saucelabs.com/rest/v1/info/platforms/webdriver')
+            return fetch('https://api.testingbot.com/v1/devices')
                 .then(response =>  resolve(response.json()))
                 .catch(err => reject(err));
         });
     }
+
+    getBrowsers(){
+        return new Promise((resolve, reject) => {
+            return fetch('https://api.testingbot.com/v1/browsers')
+                .then(response =>  resolve(response.json()))
+                .catch(err => reject(err));
+        });
+    }
+    
+    async getBrowsersAndDevices() {
+        let devices = [];
+        let browsers = [];
+
+        devices = await this.getDevices();
+        browsers = await this.getBrowsers();
+
+        return {
+            devices: devices,
+            browsers: browsers
+        };
+    }
+    
     updateCapabilities(target, caps = {}, testName) {
         if (!target) {
             throw new Error('"target" must not be null');
@@ -71,10 +93,8 @@ export default class SauceLabsProvider extends CloudProviderBase {
             }
         }
         caps.name = testName || null;
-        caps.username = this.settings.username;
-        caps.accessKey = this.settings.accessKey;
-        caps.extendedDebugging = this.settings.extendedDebugging || false;
-        caps.capturePerformance = this.settings.capturePerformance || false;
+        caps.key = this.settings.key;
+        caps.secret = this.settings.secret;
 
         return caps;
     }

@@ -62,6 +62,7 @@ export default class CloudProvidersService extends ServiceBase {
 
         let browsers = [];
         let devices = [];
+        
 
         if(browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0 && providerName){
             browsersAndDevices.map((item) => {
@@ -168,6 +169,49 @@ export default class CloudProvidersService extends ServiceBase {
                     }
                 }
             });
+        } else if (
+            providerName === 'testingBot' && 
+            browsersAndDevices && 
+            browsersAndDevices.devices && 
+            browsersAndDevices.browsers
+        ){
+            if(Array.isArray(browsersAndDevices.devices) && browsersAndDevices.devices.length > 0){
+                browsersAndDevices.devices.map((item) => {
+                    let version = '';
+                    let osVersion = '';
+
+                    if(item && item.test_environment && item.test_environment.version){
+                        version = item.test_environment.version;
+                    }
+
+                    devices.push(new DeviceInfo({
+                        apiName: item.platform_name,
+                        id: item.model_number,
+                        name: item.name,
+                        version: version,
+                        osName: item.platform_name,
+                        osVersion: osVersion
+                    }));
+                });
+            }
+            if(Array.isArray(browsersAndDevices.browsers) && browsersAndDevices.browsers.length > 0){
+                browsersAndDevices.browsers.map((item) => {
+                    let deviceName = '';
+
+                    if(item && item.deviceName){
+                        deviceName = item.deviceName;
+                    }
+
+                    browsers.push(new BrowserInfo({
+                        apiName: item.name,
+                        name: item.name,
+                        version: item.version,
+                        osName: item.platform,
+                        osVersion: deviceName
+                    }));
+                });
+            }
+
         }
 
         return {
@@ -186,12 +230,17 @@ export default class CloudProvidersService extends ServiceBase {
 
             if(provider && provider.getBrowsersAndDevices){
                 const browsersAndDevices = await provider.getBrowsersAndDevices(userName, key);
+                
+                
                 if(browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0){
                     // sauceLabs
                     return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                 } else if(browsersAndDevices && browsersAndDevices.platforms && Array.isArray(browsersAndDevices.platforms) && browsersAndDevices.platforms.length > 0){
                     // lambdaTest
                     return this.sortToBrowsersAndDevice(browsersAndDevices.platforms, providerName);
+                } else if(providerName === 'testingBot'){
+                    // testingBot
+                    return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                 } else {
                     throw new Error('browsersAndDevices does not exist.', browsersAndDevices);
                 }
@@ -199,7 +248,8 @@ export default class CloudProvidersService extends ServiceBase {
             } else {
                 throw new Error('provider.getBrowsersAndDevices does not exist.');
             }
+        } else {
+            throw new Error('Provider does not exist.');
         }
-        throw new Error('Provider does not exist.');
     }
 }
