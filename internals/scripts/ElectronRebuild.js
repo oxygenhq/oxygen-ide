@@ -24,7 +24,9 @@ if (Object.keys(dependencies || {}).length > 0 && fs.existsSync(nodeModulesPath)
 
     // a workaround for using local oxygen dependency
     // remove fsevents on non OS X OSes, because electron-rebuild will fail when re-building it
-    rimraf.sync(path.join(nodeModulesPath, 'oxygen-cli', 'node_modules', 'fsevents'));
+    if (process.platform !== 'darwin') {
+        rimraf.sync(path.join(nodeModulesPath, 'oxygen-cli', 'node_modules', 'fsevents'));
+    }
 
     execSync(cmd, {
         cwd: path.join(__dirname, '..', '..', 'app')
