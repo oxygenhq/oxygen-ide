@@ -6,10 +6,9 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
-import { putAndTake } from '../../helpers/saga';
+import { all, put, select, takeLatest, call } from 'redux-saga/effects';
 
-import { success, failure, successOrFailure } from '../../helpers/redux';
+import { success, failure } from '../../helpers/redux';
 import * as testActions from './actions';
 import * as wbActions from '../workbench/actions';
 import * as editorActions from '../editor/actions';
@@ -17,6 +16,8 @@ import * as tabActions from '../tabs/actions';
 import * as loggerActions from '../logger/actions';
 import ActionTypes from '../types';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
+import ServicesSingleton from '../../services';
+const services = ServicesSingleton();
 /**
  * Test Sagas
  */
@@ -53,20 +54,39 @@ function* handleTestRunnerServiceEvent(event) {
     else if (event.type === 'TEST_ENDED') {
         yield put(testActions.onTestEnded());
 
+        const { active } = yield select(state => state.logger);
+
+        if(active && active === 'variables'){
+            yield put(loggerActions.setActiveLogger('general'));
+        }
+
         if(event && event.result && event.result.summary){
             const { summary } = event.result;
             if(summary && summary._status && summary._status ==='passed'){
                 yield put(editorActions.resetActiveLines());
             }
             
-            yield call(services.mainIpc.call, 'AnalyticsService', 'playStop', [summary]);
+            
+            yield all([
+                call(services.mainIpc.call, 'AnalyticsService', 'playStop', [summary]),
+                call(services.mainIpc.call, 'DeviceDiscoveryService', 'start', [])
+            ]);
         }
     }
     else if (event.type === 'LINE_UPDATE') {
         yield put(testActions.onLineUpdate(event.time, event.file, event.line, event.primary));
     }
     else if (event.type === 'BREAKPOINT') {
-        yield put(testActions.onBreakpoint(event.file, event.line));
+
+        console.log('event', event);
+
+        let variables = null;
+
+        if(event && event.variables){
+            variables = event.variables;
+        }
+
+        yield put(testActions.onBreakpoint(event.file, event.line, variables));
     }
 }
 
@@ -159,8 +179,10 @@ export function* startTest({ payload }) {
         yield put(loggerActions.resetGeneralLogs());
         // call TestRunner service to start the test
         
+        
+        yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'stop', []);
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', []);
-        const TestRunnerServiceResult = yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
+        yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
         yield put({
             type: success(ActionTypes.TEST_START),
             payload: null,

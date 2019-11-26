@@ -16,7 +16,7 @@ describe('Store: logger', () => {
     describe('Actions - addLog', () => {
         let state = null;
         beforeAll(() => {
-            let newState = store.dispatch(actions.addLog('Message', 'INFO','general'));
+            store.dispatch(actions.addLog('Message', 'INFO','general'));
             state = store.getState().logger;      
         });  
         describe('state.logger', () => {

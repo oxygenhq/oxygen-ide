@@ -6,15 +6,14 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
+import { all, put, select, takeLatest, call } from 'redux-saga/effects';
 import { putAndTake } from '../../helpers/saga';
-
 import * as fsActions from '../fs/actions';
 import * as editorActions from './actions';
-
-import { success, failure, successOrFailure } from '../../helpers/redux';
-
+import { success } from '../../helpers/redux';
 import ActionTypes from '../types';
+import ServicesSingleton from '../../services';
+const services = ServicesSingleton();
 
 /**
  * Editor Sagas
@@ -44,14 +43,13 @@ export function* openFile({ payload }) {
         return;
     }
     // if file is not cached in the editor, let's fetch its content and add it to the editor
-    const { response, error } = yield putAndTake(
+    const { error } = yield putAndTake(
         fsActions.fetchFileContent(path)
     );
     if (error) {
         yield put(editorActions._openFile_Failure(path, error));
         return;
     }
-    const fileCache = yield select(state => state.fs.files);
     
     // const file = fileCache[path];
     // if (!file || !file.hasOwnProperty('content')) {

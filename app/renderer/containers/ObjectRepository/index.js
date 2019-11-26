@@ -8,7 +8,7 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import ObjectRepository from './ObjectRepository';
+import ObjectRepository from './ObjectRepository.jsx';
 import * as orActions from '../../store/obj-repo/actions';
 import { findObject } from '../../helpers/objrepo';
 import { 

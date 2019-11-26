@@ -9,5 +9,5 @@
 // @flow
 export type DeviceInfo = {
     id: string,
-    name: string,
+    name: string
 };

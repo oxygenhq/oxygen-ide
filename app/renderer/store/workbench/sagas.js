@@ -7,11 +7,10 @@
  * (at your option) any later version.
  */
 import uuidv4 from'uuid/v4';
-import { all, put, select, takeLatest, take, call, fork } from 'redux-saga/effects';
+import { all, put, select, takeLatest, call } from 'redux-saga/effects';
 import { putAndTake } from '../../helpers/saga';
 import pathHelper from 'path';
 import { 
-    copyObjectInRepoRoot,
     createElementInRepoRoot,
     createContainerInRepoRoot,
     renameElementOrContaimerInRepoRoot,
@@ -45,7 +44,7 @@ import * as settingsActions from '../settings/actions';
 import { reportError, setUserIdToSentry } from '../sentry/actions';
 import * as orActions from '../obj-repo/actions';
 
-import { success, failure, successOrFailure } from '../../helpers/redux';
+import { success } from '../../helpers/redux';
 
 import ActionTypes from '../types';
 import { MAIN_MENU_EVENT, MAIN_SERVICE_EVENT } from '../../services/MainIpc';
@@ -135,11 +134,13 @@ export function* handleMainMenuEvents({ payload }) {
         yield editorSubjects['EDITOR.TRIGGER'].next({ trigger: 'replace' });
     }
     else if (cmd === Const.MENU_CMD_HELP_CHECK_UPDATES) {
-        yield services.mainIpc.call('UpdateService', 'start', [true]).then(() => {});
+        /* eslint-disable */
+        yield services.mainIpc.call('UpdateService', 'start', [true]);
+        /* eslint-enable */
     }
     else if (cmd === Const.MENU_CMD_CLEAR_ALL) {
-        const clearRsult = yield services.mainIpc.call('ElectronService', 'clearSettings');
-        const closeWatcherIfExistRsult = yield services.mainIpc.call('FileService', 'closeWatcherIfExist');
+        yield services.mainIpc.call('ElectronService', 'clearSettings');
+        yield services.mainIpc.call('FileService', 'closeWatcherIfExist');
         yield clearAll();
         yield initialize();
     }
@@ -233,22 +234,22 @@ export function* clearAll() {
 
 export function* deactivate() {
     // stop Selenium server
-    let SeleniumServiceStopResult = yield call(services.mainIpc.call, 'SeleniumService', 'stop');
+    yield call(services.mainIpc.call, 'SeleniumService', 'stop');
 }
 
 export function* initialize() {
     // start check for update
-    services.mainIpc.call('UpdateService', 'start', [false]).then(() => {});
+    services.mainIpc.call('UpdateService', 'start', [false]);
     // start Selenium server
-    services.mainIpc.call('SeleniumService', 'start').then(() => {});
+    services.mainIpc.call('SeleniumService', 'start');
     // start Android and iOS device watcher
-    services.mainIpc.call('DeviceDiscoveryService', 'start').then(() => {}).catch((e) => console.error(e.message));
+    services.mainIpc.call('DeviceDiscoveryService', 'start').catch((e) => console.error(e.message));
 
     // get app settings from the store
     let appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');
 
     if(appSettings && appSettings.cache){
-        const fromCache = yield putAndTake(wbActions.restoreFromCache(appSettings.cache));
+        yield putAndTake(wbActions.restoreFromCache(appSettings.cache));
 
         try{
             yield call(services.javaService.checkJavaVersion);
@@ -539,7 +540,6 @@ export function* openFakeFile(){
 export function* openFile({ payload }) {
     const { path, force } = payload;
 
-    let files = yield select(state => state.fs.files);
     let file = yield select(state => state.fs.files[path]);
     
     if (!file) {
@@ -702,7 +702,7 @@ export function* removeObjectOrFolder({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { path, name } = payload;
     
-    const { start, end, repoRoot, parent } = objrepo;
+    const { start, end, repoRoot } = objrepo;
     let repoRootCopy = { ...repoRoot };
 
     const result = deleteObjectOrFolder(repoRootCopy, path, name);
@@ -713,7 +713,7 @@ export function* removeObjectOrFolder({ payload }) {
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
     if(objrepo && objrepo.path){
-        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+        yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
 
@@ -721,7 +721,7 @@ export function* removeArrayObjectLocator({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { path, idx } = payload;
 
-    const { start, end, repoRoot, parent } = objrepo;
+    const { start, end, repoRoot } = objrepo;
     let repoRootCopy = { ...repoRoot };
 
     const result = deleteArrayObjectLocator(repoRootCopy, path, idx);
@@ -731,14 +731,14 @@ export function* removeArrayObjectLocator({ payload }) {
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
     if(objrepo && objrepo.path){
-        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+        yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
 export function* updateLocator({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { path, newName, oldName } = payload;
     
-    const { start, end, repoRoot, parent } = objrepo;
+    const { start, end, repoRoot } = objrepo;
     let repoRootCopy = { ...repoRoot };
     
 
@@ -749,7 +749,7 @@ export function* updateLocator({ payload }) {
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
     if(objrepo && objrepo.path){
-        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+        yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
 
@@ -757,7 +757,7 @@ export function* moveLocator({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { path, name, direction, index } = payload;
     
-    const { start, end, repoRoot, parent } = objrepo;
+    const { start, end, repoRoot } = objrepo;
     let repoRootCopy = { ...repoRoot };
 
     const result = moveLocatorInRepoRoot(repoRootCopy, path, name, direction, index);
@@ -767,14 +767,14 @@ export function* moveLocator({ payload }) {
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
     if(objrepo && objrepo.path){
-        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+        yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
 
 export function* moveArrayObjectLocator({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { path, index, direction } = payload;
-    const { start, end, repoRoot, parent } = objrepo;
+    const { start, end, repoRoot } = objrepo;
     let repoRootCopy = { ...repoRoot };
 
     const result = moveArrayObjectLocatorInRepoRoot(repoRootCopy, path, index, direction);
@@ -784,7 +784,7 @@ export function* moveArrayObjectLocator({ payload }) {
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
     if(objrepo && objrepo.path){
-        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+        yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
 
@@ -792,7 +792,7 @@ export function* addLocator({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { path, name } = payload;
     
-    const { start, end, repoRoot, parent } = objrepo;
+    const { start, end, repoRoot } = objrepo;
     
     let repoRootCopy = { ...repoRoot };
     const result = addLocatorInRepoRoot(repoRootCopy, path, name);
@@ -802,7 +802,7 @@ export function* addLocator({ payload }) {
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
     if(objrepo && objrepo.path){
-        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+        yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
 
@@ -810,7 +810,7 @@ export function* addArrayObjectLocator({ payload }) {
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { path, name } = payload;
     
-    const { start, end, repoRoot, parent } = objrepo;
+    const { start, end, repoRoot } = objrepo;
     
     let repoRootCopy = { ...repoRoot };
     const result = addArrayObjectLocatorInRepoRoot(repoRootCopy, path, name);
@@ -820,14 +820,14 @@ export function* addArrayObjectLocator({ payload }) {
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
     if(objrepo && objrepo.path){
-        const result = yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
+        yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
 
 
 export function* deleteLocator({ payload }) {    
     const objrepo = (yield select(state => state.objrepo)) || null;
-    const { start, end, repoRoot, parent, path } = objrepo;
+    const { start, end, repoRoot, path } = objrepo;
     const { obj } = payload;
     
     if (path && obj) {
@@ -848,7 +848,7 @@ export function* deleteLocator({ payload }) {
 
 export function* updateLocatorValue({ payload }) {    
     const objrepo = (yield select(state => state.objrepo)) || null;
-    const { start, end, repoRoot, parent, path } = objrepo;
+    const { start, end, repoRoot, path } = objrepo;
     
     if (path && payload.path && payload.newValue) {
 
@@ -868,7 +868,7 @@ export function* updateLocatorValue({ payload }) {
 
 export function* updateArrayObjecLocatorValue ({ payload }) {    
     const objrepo = (yield select(state => state.objrepo)) || null;
-    const { start, end, repoRoot, parent, path } = objrepo;
+    const { start, end, repoRoot, path } = objrepo;
     
     if (path && payload.path && payload.newValue) {
 
@@ -910,10 +910,6 @@ export function* deleteFile({ payload }) {
 }
 
 export function* closeFile({ payload }) {
-    const filesState = yield select(state => state.fs.files);
-    const editorState = yield select(state => state.editor);
-    const tabsState = yield select(state => state.tabs);
-
     const { path, force = false, name = null, showDeleteTitle = false } = payload;
     const file = yield select(state => state.fs.files[path]);
     // prompt user if file has been modified and unsaved
@@ -970,7 +966,7 @@ export function* closeAllFiles({ payload }) {
     if (!openFiles || Object.keys(openFiles).length == 0) {
         return;     // no open files in editor to close
     }
-    for (let filePath of Object.keys(openFiles)) {
+    for (var filePath of Object.keys(openFiles)) {
         yield putAndTake(wbActions.closeFile(filePath, force));
     }
 }
@@ -995,7 +991,7 @@ export function* showDialog({ payload }) {
     else if (dialog === 'OPEN_FILE') {
         const paths = yield call(services.mainIpc.call, 'ElectronService', 'showOpenFileDialog', []);
         if (paths && Array.isArray(paths) && paths.length > 0) {
-            for (let path of paths) {
+            for (var path of paths) {
                 yield put(wbActions.openFile(path));
             }
         }
@@ -1197,7 +1193,7 @@ export function* handleFileRename({ payload }) {
 }
 
 export function* handleFileDelete({ payload }) {
-    const { path, showDeleteTitle } = payload;
+    const { path } = payload;
 
     const files = yield select(state => state.fs.files);
     const objrepoPath = yield select(state => state.objrepo.path);
@@ -1358,10 +1354,10 @@ export function* showRemoveObjectElementOrContainerDialog({ type }) {
 
 export function* showNewFileDialog({ payload }) {
     
-    const activeNode = (yield select(state => state.fs.tree.activeNode)) || null;
+    // const activeNode = (yield select(state => state.fs.tree.activeNode)) || null;
     const rootPath = (yield select(state => state.fs.rootPath)) || null;
-    const files = yield select(state => state.fs.files);
-    const treeActiveFile = activeNode && files.hasOwnProperty(activeNode) ? files[activeNode] : null;
+    // const files = yield select(state => state.fs.files);
+    // const treeActiveFile = activeNode && files.hasOwnProperty(activeNode) ? files[activeNode] : null;
 
     // if (treeActiveFile) {
     //     // in case the file is currently selected in the tree, create a new file in the same directory as the selected file
@@ -1568,7 +1564,7 @@ function getUnsavedFiles(files, tabs) {
         return;
     }
     const unsavedFiles = [];
-    for (let filePath of Object.keys(files)) {
+    for (var filePath of Object.keys(files)) {
         const file = files[filePath];
         if (file && file.modified) {
             if(
@@ -1606,7 +1602,7 @@ const getValueByKey = key => {
 };
 export function* orAddToRoot({payload}){    
     const objrepo = (yield select(state => state.objrepo)) || null;
-    const { start, end, repoRoot, parent, path } = objrepo;
+    const { start, end, repoRoot, path } = objrepo;
     
     let safeStart;
     let safeEnd;

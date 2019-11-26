@@ -43,6 +43,7 @@ export default class MainIpcService {
         let _this = this;
         const id = uniqid(); //(new Date()).getTime();
 
+        /* eslint-disable */
         let promise = new Promise((resolve, reject) => {
             try {
                 ipcRenderer.send('MAIN_SERVICE_CALL', {
@@ -61,6 +62,7 @@ export default class MainIpcService {
 
             _this.requests[id] = { resolve, reject };
         });
+        /* eslint-enable */
         
         return promise;
     }

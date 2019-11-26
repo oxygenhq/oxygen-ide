@@ -8,14 +8,12 @@
  */
 // @flow
 /* eslint-disable react/no-unused-state */
-/* eslint-disable ident */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { message } from 'antd';
 import difference from 'lodash.difference';
 import { type LogEntry } from '../types/LogEntry';
-import ScrollContainer from './ScrollContainer';
+import ScrollContainer from './ScrollContainer.jsx';
 import { AutoSizer, Grid } from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import os from 'os';
@@ -45,9 +43,49 @@ export default class LogViewer extends PureComponent<Props> {
 
     componentDidMount() {
         document.addEventListener('mousedown', this.handleClickOutside);
+        const { logs } = this.props;        
+        const lines = [];
+        let newState = {};
+        let maxWidth = 1;
+  
+        if(logs && logs.map){
+            logs.map((log) => {
+                const messageSplit = log.message.split('\n');
+
+                if(messageSplit && messageSplit.map){
+                    messageSplit.map((item, i) => {
+          
+                        if(
+                            item &&
+                            item.length &&
+                            maxWidth < item.length
+                        ) {
+                            maxWidth = item.length;
+                        }
+
+                        lines.push({
+                            message: item,
+                            timestamp: log.timestamp+''+i
+                        });
+                    });
+                } else {
+                    lines.push({
+                        message: log.message,
+                        timestamp: log.timestamp
+                    });
+                }
+            });
+
+            newState.lines = lines;
+            newState.maxWidth = maxWidth;
+        }
+
+        this.setState(
+            newState
+        );
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const diff = difference(nextProps.logs, this.props.logs); 
         const lengthDiff = !(nextProps.logs.length === this.props.logs.length);
         let newState = {};
@@ -79,8 +117,8 @@ export default class LogViewer extends PureComponent<Props> {
               
                             if(
                                 item &&
-                item.length &&
-                maxWidth < item.length
+                                item.length &&
+                                maxWidth < item.length
                             ) {
                                 maxWidth = item.length;
                             }
@@ -179,7 +217,7 @@ export default class LogViewer extends PureComponent<Props> {
   }
 
   render() {
-      const { height, logs, category } = this.props;
+      const { height } = this.props;
       const { refreshScroll, selected, copyValue, lines, maxWidth } = this.state;
     
       const getRowHeight = ({index}) => {

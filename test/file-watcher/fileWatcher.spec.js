@@ -74,7 +74,6 @@ describe('File watcher', () => {
             store.dispatch(fsActions.setTreeRootPath(rootPath));
             const fsStateBefore = store.getState().fs;
             store.dispatch(fsActions.addFileOrFolder(folder));
-            const fsState = store.getState().fs; 
             store.dispatch(fsActions._delete_Success(removedFoldenPath));
             const fsStateAfter = store.getState().fs; 
 
@@ -84,7 +83,6 @@ describe('File watcher', () => {
             store.dispatch(fsActions.setTreeRootPath(rootPath));
             const fsStateBefore = store.getState().fs;
             store.dispatch(fsActions.addFileOrFolder(folder));
-            const fsState = store.getState().fs; 
             store.dispatch(fsActions._delete_Success(removedFoldenPath));
             store.dispatch(fsActions._delete_Success(removedFoldenPath));
             const fsStateAfter = store.getState().fs; 
@@ -95,7 +93,6 @@ describe('File watcher', () => {
             store.dispatch(fsActions.setTreeRootPath(rootPath));
             const fsStateBefore = store.getState().fs;
             store.dispatch(fsActions.addFileOrFolder(file));
-            const fsState = store.getState().fs; 
             store.dispatch(fsActions._delete_Success(removedFilePath));
             const fsStateAfter = store.getState().fs; 
 
@@ -105,7 +102,6 @@ describe('File watcher', () => {
             store.dispatch(fsActions.setTreeRootPath(rootPath));
             const fsStateBefore = store.getState().fs;
             store.dispatch(fsActions.addFileOrFolder(file));
-            const fsState = store.getState().fs; 
             store.dispatch(fsActions._delete_Success(removedFilePath));
             store.dispatch(fsActions._delete_Success(removedFilePath));
             const fsStateAfter = store.getState().fs; 
@@ -116,7 +112,6 @@ describe('File watcher', () => {
             store.dispatch(fsActions.setTreeRootPath(rootPath));
             store.dispatch(fsActions.addFileOrFolder(file));
             store.dispatch(fsActions.addFileOrFolder(folder));
-            const fsState = store.getState().fs; 
             const fsStateBefore = store.getState().fs;
             store.dispatch(fsActions._delete_Success());
             const fsStateAfter = store.getState().fs; 
@@ -135,7 +130,7 @@ describe('File watcher', () => {
         });
         it('Add folder to exist folder', () => {
             store.dispatch(fsActions.setTreeRootPath(rootPath));
-            let newState = store.dispatch(fsActions.addFileOrFolder(folder));
+            store.dispatch(fsActions.addFileOrFolder(folder));
             const name = 'deepFolder';
             const deepFolder = { 
                 ...folder, 
@@ -234,7 +229,7 @@ describe('File watcher', () => {
         });
         it('Remove file to exist folder', () => {
             store.dispatch(fsActions.setTreeRootPath(rootPath));
-            let newState = store.dispatch(fsActions.addFileOrFolder(folder));
+            store.dispatch(fsActions.addFileOrFolder(folder));
             const name = 'deepFile.js';
             const deepFile = { 
                 ...folder, 
@@ -250,7 +245,7 @@ describe('File watcher', () => {
         });
         it('Remove file to exist folder twice', () => {
             store.dispatch(fsActions.setTreeRootPath(rootPath));
-            let newState = store.dispatch(fsActions.addFileOrFolder(folder));
+            store.dispatch(fsActions.addFileOrFolder(folder));
             const name = 'deepFile.js';
             const deepFile = { 
                 ...folder, 
@@ -268,7 +263,7 @@ describe('File watcher', () => {
         it('Remove folder witch have childs', () => {
             store.dispatch(fsActions.setTreeRootPath(rootPath));
             const fsStateBefore = store.getState().fs;
-            let newState = store.dispatch(fsActions.addFileOrFolder(folder));
+            store.dispatch(fsActions.addFileOrFolder(folder));
             const name = 'deepFolder';
             const deepFolder = { 
                 ...folder, 
@@ -284,7 +279,7 @@ describe('File watcher', () => {
         it('Remove folder witch have childs twice', () => {
             store.dispatch(fsActions.setTreeRootPath(rootPath));
             const fsStateBefore = store.getState().fs;
-            let newState = store.dispatch(fsActions.addFileOrFolder(folder));
+            store.dispatch(fsActions.addFileOrFolder(folder));
             const name = 'deepFolder';
             const deepFolder = { 
                 ...folder, 

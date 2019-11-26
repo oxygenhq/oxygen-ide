@@ -65,25 +65,11 @@ LocatorBuilders.prototype.buildAll = function(el) {
                 // and fe will be null. in such case just assume the CSS is correct.
                 if (el == fe || fe === null) {
                     locator = locator.replace(/\r\n|\r|\n/g, '\\n');
-
-                    // do not add css2 if it equals to css
-                    var ignore = false;
-                    if (finderName === 'css2') {
-                        for (var loc = 0; loc < locators.length; loc++) {
-                            if (locators[loc][0] === locator) {
-                                ignore = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!ignore) {
-                        locators.push([ locator, finderName ]);
-                    }
+                    locators.push([ locator, finderName ]);
                 }
             }
         } catch (e) {
-            console.error('ox: locator exception: ' + e.message);
+            ox_error('locator exception: ' + e.message);
         }
     }
     return locators;
@@ -147,51 +133,38 @@ LocatorBuilders.prototype.xpathHtmlElement = function(name) {
 };
 
 LocatorBuilders.prototype.relativeXPathFromParent = function(current) {
-    var index = this.getNodeNbr(current);
+    var index = this.getNodeIndex(current);
     var currentPath = '/' + this.xpathHtmlElement(current.nodeName.toLowerCase());
-    if (index > 0) {
+    if (index !== null) {
         currentPath += '[' + (index + 1) + ']';
     }
     return currentPath;
 };
 
-LocatorBuilders.prototype.getNodeNbr = function(current) {
+LocatorBuilders.prototype.getNodeIndex = function(current) {
     var childNodes = current.parentNode.childNodes;
-    var total = 0;
-    var index = -1;
-    for (var i = 0; i < childNodes.length; i++) {
-        var child = childNodes[i];
-        if (child.nodeName == current.nodeName) {
-            if (child == current) {
-                index = total;
-            }
-            total++;
-        }
-    }
-    return index;
-};
 
-LocatorBuilders.prototype.getCSSSubPath = function(e) {
-    var css_attributes = ['id', 'name', 'class', 'type', 'alt', 'title', 'value'];
-    for (var i = 0; i < css_attributes.length; i++) {
-        var attr = css_attributes[i];
-        var value = e.getAttribute(attr);
-        if (value) {
-            value = value.trim();
-            if (attr == 'id') {
-                return '#' + value;
-            }
-            if (attr == 'class') {
-                return e.nodeName.toLowerCase() + '.' + value.replace(/\s+/g, '.').replace('..', '.');
-            }
-            return e.nodeName.toLowerCase() + '[' + attr + '="' + value + '"]';
+    // get siblings which have same node type
+    var siblings = [];
+    for (let i = 0; i < childNodes.length; i++) {
+        var child = childNodes[i];
+        if (child.nodeName === current.nodeName) {
+            siblings.push(child);
         }
     }
-    if (this.getNodeNbr(e)) {
-        return e.nodeName.toLowerCase() + ':nth-of-type(' + this.getNodeNbr(e) + ')';
-    } else {
-        return e.nodeName.toLowerCase();
+
+    // if no identical siblings
+    if (siblings.length <= 1) {
+        return null;
     }
+
+    // find the position of our node within its siblings
+    for (let i = 0; i < siblings.length; i++) {
+        if (siblings[i] == current) {
+            return i;
+        }
+    }
+    return null;
 };
 
 LocatorBuilders.prototype.preciseXPath = function(xpath, e){
@@ -214,18 +187,6 @@ LocatorBuilders.prototype.preciseXPath = function(xpath, e){
 LocatorBuilders.add('id', function(e) {
     if (e.id && this.findElement('id=' + e.id, true)) {
         return 'id=' + e.id;
-    }
-    return null;
-});
-
-LocatorBuilders.add('link', function(e) {
-    if (e.nodeName == 'A') {
-        var text = e.textContent;
-        if (!text.match(/^\s*$/)) {
-            text = applyTextTransformation(e, text);
-            var loc = 'link=' + text.replace(/\xA0/g, ' ').replace(/^\s*(.*?)\s*$/, '$1');
-            return this.findElement(loc, true) ? loc : null;
-        }
     }
     return null;
 });
@@ -368,7 +329,7 @@ LocatorBuilders.add('xpath:position', function(e, opt_contextNode) {
             if (currentPath === '/html') {
                 return '/' + path;
             }
-            path = currentPath + path; 
+            path = currentPath + path;
         } else {
             path = currentPath + path;
             var locator = '/' + path;
@@ -386,25 +347,29 @@ LocatorBuilders.add('xpath:position', function(e, opt_contextNode) {
     return null;
 });
 
-LocatorBuilders.add('css', function(e) {
-    var current = e;
-    var sub_path = this.getCSSSubPath(e);
-    while (this.findElement('css=' + sub_path) != e && current.nodeName.toLowerCase() != 'html') {
-        // for situations when element was removed from dom after interacting with it
-        if (current.parentNode == null) {
-            break;
+LocatorBuilders.add('link', function(e) {
+    if (e.nodeName == 'A') {
+        var text = e.textContent;
+        if (!text.match(/^\s*$/)) {
+            text = applyTextTransformation(e, text);
+            var loc = 'link=' + text.replace(/\xA0/g, ' ').replace(/^\s*(.*?)\s*$/, '$1');
+            return this.findElement(loc, true) ? loc : null;
         }
-        sub_path = this.getCSSSubPath(current.parentNode) + ' > ' + sub_path;
-        current = current.parentNode;
     }
-    return this.findElement('css=' + sub_path, true) ? 'css=' + sub_path : null;
+    return null;
 });
 
-LocatorBuilders.add('css2', function(e) {
+LocatorBuilders.add('css', function(e) {
+    // do not calculate css for frames
+    if (e.nodeName === 'IFRAME' || e.nodeName === 'FRAME') {
+        return null;
+    }
+
     try {
         var loc = 'css=' + cssFinder(e);
         return this.findElement(loc, true) ? loc : null;
-    } catch (e) {   // might fail during frame locator generation
+    } catch (e) {
+        ox_error('error calculating CSS locator', e);
         return null;
     }
 });

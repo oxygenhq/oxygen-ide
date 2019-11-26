@@ -11,7 +11,7 @@ export type LogEntry = {
     timestamp: number,
     severity: LogSeverity,
     message: string,
-    extra: ?Object,
+    extra: ?Object
 };
 
 export type LogSeverity = 'INFO' | 'ERROR' | 'WARN';

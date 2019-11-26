@@ -223,21 +223,21 @@ export default (cmdHandler, settings) => {
     return template;
 };
 
-function _isEnabled(ctrlId, settings) {
-    const state = settings && settings.hasOwnProperty(ctrlId) ? settings[ctrlId] : null;
-    if (state && state.hasOwnProperty('enabled')) {
-        return state.enabled;
-    }
-    return true;
-}
+// function _isEnabled(ctrlId, settings) {
+//     const state = settings && settings.hasOwnProperty(ctrlId) ? settings[ctrlId] : null;
+//     if (state && state.hasOwnProperty('enabled')) {
+//         return state.enabled;
+//     }
+//     return true;
+// }
 
-function _isVisible(ctrlId, settings) {
-    const state = settings && settings.hasOwnProperty(ctrlId) ? settings[ctrlId] : null;
-    if (state && state.hasOwnProperty('visible')) {
-        return state.visible;
-    }
-    return true;
-}
+// function _isVisible(ctrlId, settings) {
+//     const state = settings && settings.hasOwnProperty(ctrlId) ? settings[ctrlId] : null;
+//     if (state && state.hasOwnProperty('visible')) {
+//         return state.visible;
+//     }
+//     return true;
+// }
 
 function _isSelected(ctrlId, settings) {
     const state = settings && settings.hasOwnProperty(ctrlId) ? settings[ctrlId] : null;

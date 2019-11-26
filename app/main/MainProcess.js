@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import electron, { app } from 'electron';
+import electron from 'electron';
 import ServiceDispatcher from './services/ServiceDispatcher';
 
 /* eslint-disable class-methods-use-this */

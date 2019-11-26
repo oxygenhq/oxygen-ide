@@ -28,13 +28,13 @@ export default class MenuService extends ServiceBase {
     constructor(mainWindow) {
         super(mainWindow);
         // initialize Main Menu
-        const template = menuTemplate(::this._handleMenuCommand, DEFAULT_MENU_STATE);
+        const template = menuTemplate(this._handleMenuCommand, DEFAULT_MENU_STATE);
         const menu = Menu.buildFromTemplate(template);
         Menu.setApplicationMenu(menu);
     }
 
     popup(menuItems, options) {
-        const template = menuTemplateFromArray(::this._handleMenuCommand, menuItems);
+        const template = menuTemplateFromArray(this._handleMenuCommand, menuItems);
         const menu = Menu.buildFromTemplate(template);
         menu.popup({
             ...(options || {}),
@@ -43,7 +43,7 @@ export default class MenuService extends ServiceBase {
     }
 
     update(settings = DEFAULT_MENU_STATE) {
-        const template = menuTemplate(::this._handleMenuCommand, settings);
+        const template = menuTemplate(this._handleMenuCommand, settings);
         const menu = Menu.buildFromTemplate(template);
         Menu.setApplicationMenu(menu);
         /*let prepareRecent = uniq(
@@ -57,7 +57,7 @@ export default class MenuService extends ServiceBase {
         }*/
     }
 
-    async _handleMenuCommand(cmd, ...args) {
+    _handleMenuCommand = (cmd, ...args) => {
         const focusedWindow = BrowserWindow.getFocusedWindow();
         let notify = true;
 

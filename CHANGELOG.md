@@ -1,6 +1,27 @@
 # CHANGELOG
 
-## v1.11.0 (2019-10-23)
+## v1.12.1 (2019-11-xx)
+
+#### :tada: New Feature
+* Support for inspecting variables in debugging mode.
+
+#### :beetle: Bug Fix
+* "Do not show this message again" checkbox not working in recording dialog.
+* Newly created files not showing in the file tree under some circumstances.
+* A number of Object Repository UI issues.
+
+#### :house: Internal
+* Update bundled ChromeDriver 78.
+* Bump oxygen-cli from v0.51.0 to v0.52.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+
+#### :studio_microphone: Chrome Extension (v0.70.0)
+* Fix XPath construction when nodes have identical siblings.
+* Fix CSS locator generation.
+* Lower link locator precedence since it fails when element is out of the viewport.
+* Fix recording when running in simulated mobile mode.
+* Do not record changes on readonly input elements.
+
+## v1.11.0 (2019-10-28)
 
 #### :tada: New Feature
 * Add `build` property to LambdaTest provider settings.

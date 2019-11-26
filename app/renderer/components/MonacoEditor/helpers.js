@@ -104,8 +104,9 @@ export function breakpointMarkersToLineNumbers(editor) {
     return bpMarkers.map(bpMarker => getMarkerLine(bpMarker));
 }
 
-export function updateActiveLineMarker(editor, line, fontSize=null) {    
+export function updateActiveLineMarker(editor, inputLine, fontSize=null) {
     try{
+        let line = inputLine;
         // try to convert string value of line to number if possible (line support to be integer)
         if (line && !Number.isInteger(line) && typeof line === 'string' && !isNaN(line)) {
             try { line = parseInt(line); }

@@ -8,7 +8,7 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import Tabs from './Tabs';
+import Tabs from './Tabs.jsx';
 import * as actions from '../../store/tabs/actions';
 
 const mapStoreToProps = (state) => {

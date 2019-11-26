@@ -8,7 +8,7 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import Workbench from './Workbench';
+import Workbench from './Workbench.jsx';
 import * as wbActions from '../../store/workbench/actions';
 import * as testActions from '../../store/test/actions';
 import * as settingsActions from '../../store/settings/actions';
@@ -18,7 +18,6 @@ import { startDownloadChromeDriver, showDownloadChromeDriverError } from '../../
 
 const mapStoreToProps = (state) => {
     const activeNode = state.fs.tree.activeNode;
-    const editorActiveFile = state.editor.activeFile;
     const rootPath = state.fs.rootPath || null;
 
     const { activeFile, activeFileName } = state.editor;

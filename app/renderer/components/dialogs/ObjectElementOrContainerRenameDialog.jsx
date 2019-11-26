@@ -7,11 +7,8 @@
  * (at your option) any later version.
  */
 import React, { PureComponent } from 'react';
-import { Form, Input, Select, Modal, message } from 'antd';
-import { capitalizeFirst } from '../../helpers/general';
-import FormItem from 'antd/lib/form/FormItem';
+import { Input, Modal, message } from 'antd';
 
-const { Option } = Select;
 const DEFAULT_STATE = {
     name: '',
     type: null,
@@ -21,8 +18,9 @@ type Props = {
   visible: boolean,
   type?: string,
   path?: string,
+  parent: Object | undefined,
   onSubmit: () => void,
-  onCancel: () => void,
+  onCancel: () => void
 };
 
 export default class ObjectElementOrContainerRenameDialog extends PureComponent<Props> {
@@ -123,7 +121,6 @@ export default class ObjectElementOrContainerRenameDialog extends PureComponent<
         const {
             visible,
             type,
-            onSubmit,
             onCancel,
         } = this.props;
 

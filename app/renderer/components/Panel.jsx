@@ -12,7 +12,7 @@ import type { Element } from 'react';
 import styled from '@emotion/styled';
 
 import FlexColumn from './core/FlexColumn';
-import ScrollContainer from './ScrollContainer';
+import ScrollContainer from './ScrollContainer.jsx';
 import '../css/panel.scss';
 
 type Props = {
@@ -23,6 +23,9 @@ type Props = {
   scrollVerticalOnly?: boolean,
   noBodyPadding?: boolean,
   children?: Element,
+  afterHeader: Element,
+  noBodyBorders: boolean | undefined,
+  className: string | undefined
 };
 
 /* eslint-disable react/no-did-update-set-state */

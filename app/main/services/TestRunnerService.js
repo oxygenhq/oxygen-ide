@@ -20,7 +20,6 @@ const EVENT_TEST_STARTED = 'TEST_STARTED';
 const EVENT_TEST_ENDED = 'TEST_ENDED';
 
 // Severities
-const SEVERITY_FATAL = 'FATAL';
 const SEVERITY_ERROR = 'ERROR';
 const SEVERITY_INFO = 'INFO';
 
@@ -104,11 +103,13 @@ export default class TestRunnerService extends ServiceBase {
                 caps.accessKey = testProvider.accessKey;
                 caps.extendedDebugging = testProvider.extendedDebugging || false;
                 caps.capturePerformance = testProvider.capturePerformance || false;
-            case 'testingBot':
+                break;
+            case 'testingBot': 
                 options.seleniumUrl = testProvider.url;
                 caps.name = testName || null;
                 caps.key = testProvider.key;
                 caps.secret = testProvider.secret;
+                break;
             case 'lambdaTest':
                 options.seleniumUrl = testProvider.url;
                 options.wdioOpts = {
@@ -388,12 +389,14 @@ export default class TestRunnerService extends ServiceBase {
             // alway open the tab (make it active) in which breakpoint occured
             primary: true,
         });
+
         // notify GUI that we hit a breakpoint
         this.notify({
             type: EVENT_BREAKPOINT,
             time,
             file: editorFile,
             line: editorLine,
+                variables: variables
         });
     }
 
@@ -422,11 +425,11 @@ export default class TestRunnerService extends ServiceBase {
             return null;
         }
         let _breakpoints = [];
-        for (let filePath of Object.keys(breakpoints)) {
+        for (var filePath of Object.keys(breakpoints)) {
             if (!Array.isArray(breakpoints[filePath])) {
                 continue;
             }
-            for (let line of breakpoints[filePath]) {
+            for (var line of breakpoints[filePath]) {
                 _breakpoints.push({ file: filePath, line: line });
             }
         }

@@ -9,10 +9,9 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { createHashHistory } from 'history';
-import { routerMiddleware, routerActions } from 'react-router-redux';
+import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
 import { Subject } from 'rxjs';
-import rootActionCreator from './actions';
 import rootReducer from './reducers';
 import createActionToSubjectMiddleware from './middleware/createActionToSubjectMiddleware';
 import rootSaga from './sagas';
@@ -20,7 +19,6 @@ import { UNIVERSAL_ERROR, SET_USER_ID_TO_SENTRY } from '../store/sentry/types';
 
 
 import ServicesSingleton from '../services';
-import { dialog } from 'electron';
 const services = ServicesSingleton();
 
 
@@ -124,7 +122,7 @@ const configureStore = (initialState?: counterStateType) => {
         delete state.recorder;
         delete state.wb;
 
-        const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [state] );
+        await services.mainIpc.call( 'ElectronService', 'updateCache', [state] );
 
         return state;
     }

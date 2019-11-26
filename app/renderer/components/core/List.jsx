@@ -9,14 +9,13 @@
 // @flow
 
 import React, { PureComponent, Fragment } from 'react';
-import { Input, Button, Icon } from 'antd';
+import { Button, Icon } from 'antd';
 import styled from '@emotion/styled';
 
 import FlexColumn from './FlexColumn';
 import FlexRow from './FlexRow';
 
 import '../../css/list.scss';
-import { throws } from 'assert';
 
 /**
  * A container dispalying its children in a column
@@ -25,7 +24,11 @@ import { throws } from 'assert';
 type ListProps = {
     // data source - a list of items
     data?: Array<object>,
-    editable?: boolean,
+    object: Object,
+    deleteLocator: Function,
+    startEdit: Function,
+    editing: boolean,
+    editable?: boolean
 };
 
 export default class List extends PureComponent<ListProps> {
@@ -164,18 +167,15 @@ type ListItemProps = {
     // data source - a list of items
     data?: object,
     editable?: boolean,
-};
-type ListItemState = {
-    // indicates if the list item is currently under editing
-    editing: boolean,
+    controls: Element
 };
 class ListItem extends PureComponent<ListItemProps> {
+    static Container = styled(FlexRow)(props => ({
+    }));
+
     state = {
         editing: false,
     };
-
-    static Container = styled(FlexRow)(props => ({
-    }));
 
     componentDidMount() {
         if (this.props.editable) {

@@ -8,20 +8,20 @@
  */
 // @flow
 import React, { Component, Fragment } from 'react';
-import { Modal, Layout, Icon, Row, Col, Tooltip, message, notification } from 'antd';
+import {Layout, Icon, Row, Col, message, notification } from 'antd';
 /* eslint-disable react/no-did-update-set-state */
 import updateModals from '../../components/updateModals';
 // Dialogs
-import JavaDialog from '../../components/dialogs/JavaDialog';
-import XCodeDialog from '../../components/dialogs/XCodeDialog';
-import FileRenameDialog from '../../components/dialogs/FileRenameDialog';
-import FileCreateDialog from '../../components/dialogs/FileCreateDialog';
-import ObjectElementCreateDialog from '../../components/dialogs/ObjectElementCreateDialog';
-import ObjectElementOrContainerRenameDialog from '../../components/dialogs/ObjectElementOrContainerRenameDialog';
-import ObjectElementOrContainerRemoveDialog from '../../components/dialogs/ObjectElementOrContainerRemoveDialog';
-import ObjectContainerCreateDialog from '../../components/dialogs/ObjectContainerCreateDialog';
-import UpdateDialog from '../../components/dialogs/UpdateDialog';
-import SettingsDialog from '../../components/dialogs/SettingsDialog';
+import JavaDialog from '../../components/dialogs/JavaDialog.jsx';
+import XCodeDialog from '../../components/dialogs/XCodeDialog.jsx';
+import FileRenameDialog from '../../components/dialogs/FileRenameDialog.jsx';
+import FileCreateDialog from '../../components/dialogs/FileCreateDialog.jsx';
+import ObjectElementCreateDialog from '../../components/dialogs/ObjectElementCreateDialog.jsx';
+import ObjectElementOrContainerRenameDialog from '../../components/dialogs/ObjectElementOrContainerRenameDialog.jsx';
+import ObjectElementOrContainerRemoveDialog from '../../components/dialogs/ObjectElementOrContainerRemoveDialog.jsx';
+import ObjectContainerCreateDialog from '../../components/dialogs/ObjectContainerCreateDialog.jsx';
+import UpdateDialog from '../../components/dialogs/UpdateDialog.jsx';
+import SettingsDialog from '../../components/dialogs/SettingsDialog.jsx';
 import NeedInstallExtension from '../../components/dialogs/NeedInstallExtension';
 import ChromeDriverDialog from '../../components/dialogs/ChromeDriverDialog';
 import ChromeDriverDownloadingDialog from '../../components/dialogs/ChromeDriverDownloadingDialog';
@@ -33,10 +33,9 @@ import TextEditor from '../TextEditor';
 import Tabs from '../Tabs';
 import FileExplorer from '../FileExplorer';
 import Logger from '../Logger';
-import Toolbar from '../../components/Toolbar';
-import Navbar from '../../components/Navbar';
-import Sidebar from '../../components/Sidebar';
-import Landing from '../../components/Landing';
+import Toolbar from '../../components/Toolbar/index.jsx';
+import Navbar from '../../components/Navbar.jsx';
+import Sidebar from '../../components/Sidebar.jsx';
 import Initializing from '../../components/Initializing';
 import Settings from '../Settings';
 import ObjectRepository from '../ObjectRepository';
@@ -49,7 +48,65 @@ import '../../css/workbench.scss';
 const { Header } = Layout;
 
 type Props = {
-  settings: Object,
+  settings: object,
+  initialize: Function,
+  startRecorderWatcher: Function,
+  deactivate: Function,
+  isRecording: boolean,
+  stopRecorder: Function,
+  zoomIn: Function,
+  zoomOut: Function,
+  onTabChange: Function,
+  closeFile: Function,
+  onContentUpdate: Function,
+  updateBreakpoints: Function,
+  setSidebarSize: Function,
+  setSidebarVisible: Function,
+  editorActiveFile: object,
+  createNewRealFile: Function,
+  startTest: Function,
+  stopTest: Function,
+  continueTest: Function,
+  setTestMode: Function,
+  showDialog: Function,
+  saveCurrentFile: Function,
+  showNewFileDialog: Function,
+  openFakeFile: Function,
+  startRecorder: Function,
+  setTestTarget: Function,
+  setStepDelay: Function,
+  setTestProvider: Function,
+  test: object,
+  openFile: Function,
+  deleteFile: Function,
+  move: Function,
+  hideDialog: Function,
+  setLoggerVisible: Function,
+  createFolder: Function,
+  createFile: Function,
+  createObjectElement: Function,
+  renameObjectElementOrContainer: Function,
+  removeObjectElementOrContainer: Function,
+  createObjectContainer: Function,
+  renameFile: Function,
+  updateRunSettings: Function,
+  updateCloudProvidersSettings: Function,
+  startDownloadChromeDriver: Function,
+  showDownloadChromeDriverError: Function,
+  dialog: Object,
+  javaError: Object | undefined,
+  xCodeError: Object | undefined,
+  initialized: boolean,
+  changeShowRecorderMessageValue: Function,
+  canRecord: boolean,
+  cleanJavaError: Function,
+  cleanXCodeError: Function,
+  objrepoPath: string | null,
+  editorActiveFilePossibleRepoPath: string | null,
+  objrepoName: string | null,
+  isChromeExtensionEnabled: boolean,
+  waitChromeExtension: boolean,
+  stopWaitChromeExtension: Function
 };
 
 // set global message position
@@ -58,68 +115,66 @@ message.config({
 });
 
 export default class Workbench extends Component<Props> {
-  props: Props;
+    constructor(props: Props) {
+        super(props: Props);
 
-  state = {
-      showUpdatesDialog: false,
-      showNoUpdatesDialog: false,
-      toolbarControls: {
-          'CTRL_TEST_CONTINUE': {
-              visible: false,
-          },
-          'CTRL_TEST_STOP': {
-              visible: false,
-          }
-      },
-  }
+        this.on = false;
 
-  constructor(props) {
-      super(props);
+        this.handleTabChange = this.handleTabChange.bind(this);
+        this.handleTabClose = this.handleTabClose.bind(this);
+        this.state = {
+            showUpdatesDialog: false,
+            showNoUpdatesDialog: false,
+            toolbarControls: {
+                'CTRL_TEST_CONTINUE': {
+                    visible: false,
+                },
+                'CTRL_TEST_STOP': {
+                    visible: false,
+                }
+            },
+        };
+    }
 
-      this.on = false;
+    componentDidMount() {
+        // start IDE initialization process
+        this.props.initialize();
+        this.props.startRecorderWatcher();
+    }
 
-      this.handleTabChange = this.handleTabChange.bind(this);
-      this.handleTabClose = this.handleTabClose.bind(this);
-  }
+    componentDidUpdate(){
+        if(!this.elem){
+            this.elem = document.getElementById('editors-container-wrap');
+  
+            if(this.elem && this.elem.addEventListener){
+                this.elem.addEventListener('keydown', this.keydownCallback);
+                this.elem.addEventListener('keyup', this.keyupCallback);
+            }
+        }
+    }
 
-  componentDidMount() {
-      // start IDE initialization process
-      this.props.initialize();
-      this.props.startRecorderWatcher();
-  }
+    componentWillUnmount(){
+        // stop IDE process
+        if(this.props.deactivate){
+            this.props.deactivate();
+        } else {
+            alert('no deactivate');
+        }
+        const { isRecording } = this.props;
+        if (isRecording) {
+            if(this.props.stopRecorder){
+                this.props.stopRecorder();
+            } else {
+                alert('no stopRecorder');
+            }  
+        }
+        
+        if(this.elem && this.elem.removeEventListener){
+            this.elem.removeEventListener('keydown', this.keydownCallback);
+            this.elem.removeEventListener('keyup', this.keyupCallback);
+        }
+    }
 
-  componentWillUnmount(){
-      // stop IDE process
-      if(this.props.deactivate){
-          this.props.deactivate();
-      } else {
-          alert('no deactivate');
-      }
-      const { isRecording } = this.props;
-      if (isRecording) {
-          if(this.props.stopRecorder){
-              this.props.stopRecorder();
-          } else {
-              alert('no stopRecorder');
-          }  
-      }
-    
-      if(this.elem && this.elem.removeEventListener){
-          this.elem.removeEventListener('keydown', this.keydownCallback);
-          this.elem.removeEventListener('keyup', this.keyupCallback);
-      }
-  }
-
-  componentDidUpdate(){
-      if(!this.elem){
-          this.elem = document.getElementById('editors-container-wrap');
-
-          if(this.elem && this.elem.addEventListener){
-              this.elem.addEventListener('keydown', this.keydownCallback);
-              this.elem.addEventListener('keyup', this.keyupCallback);
-          }
-      }
-  }
 
   keydownCallback = (e) => {
       if(e.key === 'Control'){
@@ -242,8 +297,6 @@ export default class Workbench extends Component<Props> {
           this.props.showNewFileDialog();
       }
       else if (ctrlId === Controls.NEW_FILE) {
-          const { settings } = this.props;
-
           if(this.props.openFakeFile){
               this.props.openFakeFile();
           } else {
@@ -473,12 +526,11 @@ export default class Workbench extends Component<Props> {
 
       // logger state
       const loggerVisible = settings.logger.visible;
-      const showLanding = settings.showLanding;
       const showRecorderMessage = settings.showRecorderMessage;
 
       // convert providers dictionary to an array - add only providers marked as 'in use'
       const providers = [];
-      for (let providerKey of Object.keys(cloudProviders)) {
+      for (var providerKey of Object.keys(cloudProviders)) {
           const provider = cloudProviders[providerKey];
           if (provider.inUse) {
               providers.push({

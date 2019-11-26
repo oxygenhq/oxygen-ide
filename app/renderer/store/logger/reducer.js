@@ -75,7 +75,7 @@ export default (state = defaultState, action) => {
 
 function cloneLogs(logs) {
     let clone = {};
-    for (let key of Object.keys(logs)) {
+    for (var key of Object.keys(logs)) {
         clone[key] = [
             ...logs[key]
         ];

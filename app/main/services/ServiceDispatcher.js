@@ -17,7 +17,7 @@ export default class ServiceDispatcher {
 
     start() {
         // instanciate all available services
-        for (let name in Services) {
+        for (var name in Services) {
             let Service = Services[name];
             let service = new Service(this.mainWindow);
             this.servicesHash[name] = service;
@@ -29,7 +29,7 @@ export default class ServiceDispatcher {
 
     async dispose() {
         // dispose all services
-        for (let serviceKey of Object.keys(this.servicesHash)) {
+        for (var serviceKey of Object.keys(this.servicesHash)) {
             const service = this.servicesHash[serviceKey];
             try {
                 await service.dispose();

@@ -7,11 +7,20 @@
  * (at your option) any later version.
  */
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { initializeScroll } from './common';
 
+type Props = {
+    refreshScroll: boolean,
+    refreshScrollBottom: boolean | undefined,
+    disableVertical: boolean | undefined,
+    disableHorizontal: boolean | undefined,
+    classes: string | array,
+    style: object,
+    children: Function
+};
+
 /* eslint-disable import/prefer-default-export */
-export default class ScrollContainer extends Component {
+export default class ScrollContainer extends Component<Props> {
     componentDidMount() {
         if (!this.scroller) {
             const {
@@ -24,7 +33,7 @@ export default class ScrollContainer extends Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.refreshScroll !== this.props.refreshScroll && this.scroller && this.scrollWrap) {
             this.scrollWrap.scrollTop = 0;
         }
@@ -56,16 +65,3 @@ export default class ScrollContainer extends Component {
         );
     }
 }
-
-ScrollContainer.propTypes = {
-    refreshScroll: PropTypes.bool,
-    refreshScrollBottom: PropTypes.bool,
-    disableVertical: PropTypes.bool,
-    disableHorizontal: PropTypes.bool,
-    classes: PropTypes.oneOfType([
-        PropTypes.string,
-        PropTypes.array,
-    ]),
-    style: PropTypes.object,
-    children: PropTypes.func.isRequired,
-};

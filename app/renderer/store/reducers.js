@@ -33,8 +33,7 @@ const rootReducer = combineReducers({
     dialog,
     wb,
     recorder,
-    objrepo,
-    recorder
+    objrepo
 });
 
 export default rootReducer;

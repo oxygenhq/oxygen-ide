@@ -16,7 +16,7 @@
   "dependencies": {
     "@sentry/electron": "^0.17.3",
     "appium-ios-driver": "4.4.0",
-    "chokidar": "3.2.1",
+    "chokidar": "3.2.3",
     "decache": "^4.5.1",
     "lodash.debounce": "^4.0.8",
     "lodash.difference": "^4.5.0",
@@ -25,6 +25,6 @@
     "lodash.uniq": "^4.5.0",
     "lodash.uniqwith": "^4.5.0",
     "monaco-editor": "0.14.3",
-    "oxygen-cli": "1.0.0-beta.3"
+    "oxygen-cli": "oxygenhq/oxygen#cucumber"
   }
 }

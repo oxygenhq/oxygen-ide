@@ -12,10 +12,9 @@
 // import cloneDeep from 'lodash/cloneDeep';
 // import uniqBy from 'lodash/uniqBy';
 import React, { Component, Fragment } from 'react';
-import { message, Icon } from 'antd';
+import { Icon } from 'antd';
 
-import MonacoEditor from '../../components/MonacoEditor';
-import ideTheme from './theme.json';
+import MonacoEditor from '../../components/MonacoEditor/index.jsx';
 import '../../css/editor.scss';
 
 import SupportedExtensions from '../../helpers/file-extensions';
@@ -25,11 +24,12 @@ import Landing from '../../components/Landing';
 
 type Props = {
   editorReadOnly: boolean,
+  activeFileName: string | null,
   fontSize: number,
   activeFile: null | object,
   openFiles: null | {[key: string]: object},
   onBreakpointsUpdate: (Array<any>) => void,
-  onContentUpdate: (string, string) => void,
+  onContentUpdate: (string, string) => void
 };
 
 const DEFAULT_EDITOR_LANGUAGE = 'javascript';

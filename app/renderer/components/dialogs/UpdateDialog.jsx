@@ -14,103 +14,108 @@ type Props = {
   visible: boolean,
   version?: string,
   url?: string,
+  name?: string,
+  path: string | undefined,
+  type: string | undefined,
   onSubmit: () => void,
-  onCancel: () => void,
+  onCancel: () => void
 };
 
 export default class UpdateDialog extends PureComponent<Props> {
-  props: Props;
+    constructor(props){
+        super(props);
+        this.state = {
+            visible: this.props.visible ? this.props.visible : false,
+            name: this.props.name ? this.props.name : null,
+        };
+    }
 
-  state = {
-      visible: this.props.visible ? this.props.visible : false,
-      name: this.props.name ? this.props.name : null,
-  }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-      if (nextProps.visible == false) {
-          return ({
-              visible: false,
-          });
-      }
-      else if (nextProps.visible != prevState.visible) {
-          return({
-              visible: nextProps.visible,
-              name: nextProps.name ? nextProps.name : null,
-          });
-      }
-      return null;
-  }
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.visible == false) {
+            return ({
+                visible: false,
+            });
+        }
+        else if (nextProps.visible != prevState.visible) {
+            return({
+                visible: nextProps.visible,
+                name: nextProps.name ? nextProps.name : null,
+            });
+        }
+        return null;
+    }
 
-  onChangeName(e) {
-      this.setState({
-          name: e.target.value,
-      });
-  }
-  handleOk() {
-      const { name } = this.state;
-      const { path, type } = this.props;
-      if (!name || name.length == 0) {
-          return;
-      }
-      this.props.onSubmit(path, type, name);
-  }
+    onChangeName(e) {
+        this.setState({
+            name: e.target.value,
+        });
+    }
 
-  render() {
-      const {
-          version,
-          url,
-          onSubmit,
-          onCancel,
-      } = this.props;
+    handleOk() {
+        const { name } = this.state;
+        const { path, type } = this.props;
+        if (!name || name.length == 0) {
+            return;
+        }
+        this.props.onSubmit(path, type, name);
+    }
 
-      const {
-          visible
-      } = this.state;
+    render() {
+        const {
+            version,
+            url,
+            onCancel,
+        } = this.props;
 
-      return (
-          <div>
-              {version ? (
-                  <Modal
-                      title="Update"
-                      width={400}
-                      visible={visible}
-                      onCancel={onCancel}
-                      footer={[
-                          <Button
-                              key="download"
-                              type="primary"
-                              onClick={() => {
-                                  electron.shell.openExternal(url);
-                                  this.props.onCancel();
-                              }
-                              }
-                          >Download</Button>,
-                          <Button
-                              key="later"
-                              type="default"
-                              onClick={onCancel}
-                          >Remind Me Later</Button>
-                      ]}
-                  >
-                      <p>New version is available: {version}</p>
-                  </Modal>
-              ) : (
-                  <Modal
-                      title="Update"
-                      width={400}
-                      visible={visible}
-                      onCancel={onCancel}
-                      footer={
-                          <Button
-                              type="primary"
-                              onClick={onCancel}
-                          >OK</Button>
-                      }
-                  >
-                      <p>No update available.</p>
-                  </Modal>
-              )}
-          </div>
-      );
-  }
+        const {
+            visible
+        } = this.state;
+
+        return (
+            <div>
+                {version ? (
+                    <Modal
+                        title="Update"
+                        width={400}
+                        visible={visible}
+                        onCancel={onCancel}
+                        footer={[
+                            <Button
+                                key="download"
+                                type="primary"
+                                onClick={() => {
+                                    electron.shell.openExternal(url);
+                                    this.props.onCancel();
+                                }
+                                }
+                            >Download</Button>,
+                            <Button
+                                key="later"
+                                type="default"
+                                onClick={onCancel}
+                            >Remind Me Later</Button>
+                        ]}
+                    >
+                        <p>New version is available: {version}</p>
+                    </Modal>
+                ) : (
+                    <Modal
+                        title="Update"
+                        width={400}
+                        visible={visible}
+                        onCancel={onCancel}
+                        footer={
+                            <Button
+                                type="primary"
+                                onClick={onCancel}
+                            >OK</Button>
+                        }
+                    >
+                        <p>No update available.</p>
+                    </Modal>
+                )}
+            </div>
+        );
+    }
 }

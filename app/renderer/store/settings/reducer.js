@@ -6,7 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { remote } from 'electron';
 import * as types from './types';
 
 const FONT_SIZE_MIN = 12;
@@ -129,7 +128,7 @@ export default (state = defaultState, action) => {
         };
     }
 
-    // SHOW LANDING
+    // SHOW RECORDER MESSAGE VALUE
     case types.SHOW_RECORDER_MESSAGE_VALUE: {
         return { 
             ...state,
@@ -211,7 +210,8 @@ export default (state = defaultState, action) => {
     case types.SETTINGS_MERGE:
         return {
             ...state,
-            ...settings
+            ...settings,
+            showRecorderMessage: state.showRecorderMessage
         };
     // LAST_SESSION_SET_ROOT_FOLDER
     case types.LAST_SESSION_SET_ROOT_FOLDER:

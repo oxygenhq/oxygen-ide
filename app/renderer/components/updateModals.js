@@ -10,7 +10,7 @@ import React from 'react';
 import electron from 'electron';
 import { Modal, Button } from 'antd';
 
-export default function () {
+export default function updateModals() {
     const { showNoUpdatesDialog, showUpdatesDialog, url, version } = this.state;
   
     return (

@@ -138,7 +138,7 @@ export default class RecorderService extends ServiceBase {
                 stepsArray.push(stp);
             }
     
-            const notifyResult = this.notify({
+            this.notify({
                 type: RECORDER_EVENT,
                 stepsArray
             });
