@@ -25,6 +25,6 @@
     "lodash.uniq": "^4.5.0",
     "lodash.uniqwith": "^4.5.0",
     "monaco-editor": "0.14.3",
-    "oxygen-cli": "0.52.2"
+    "oxygen-cli": "0.52.3"
   }
 }
