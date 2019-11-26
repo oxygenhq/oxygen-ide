@@ -211,8 +211,8 @@ export default class TestRunnerService extends ServiceBase {
         if (this.oxRunner) {
             this.isStopping = true;
             try {
-                await this.oxRunner.kill();
-                await this.oxRunner.dispose();
+                this.oxRunner.kill().then(()=>{});
+                this.oxRunner.dispose().then(()=>{});
             }
             catch (e) {
                 // ignore any errors
@@ -238,7 +238,7 @@ export default class TestRunnerService extends ServiceBase {
 
     async dispose() {
         if (this.oxRunner) {
-            await this.oxRunner.dispose();
+            this.oxRunner.dispose().then(()=>{});
             this.oxRunner = null;
             this.mainFilePath = null;
             this.isRunning = false;
