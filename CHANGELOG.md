@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.12.0 (2019-11-xx)
+## v1.12.1 (2019-11-xx)
 
 #### :tada: New Feature
 * Support for inspecting variables in debugging mode.
@@ -8,11 +8,11 @@
 #### :beetle: Bug Fix
 * "Do not show this message again" checkbox not working in recording dialog.
 * Newly created files not showing in the file tree under some circumstances.
-* Object Repository UI not working.
+* A number of Object Repository UI issues.
 
 #### :house: Internal
 * Update bundled ChromeDriver 78.
-* Bump oxygen-cli from v0.51.0 to v0.52.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bump oxygen-cli from v0.51.0 to v0.52.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 
 #### :studio_microphone: Chrome Extension (v0.70.0)
 * Fix XPath construction when nodes have identical siblings.
