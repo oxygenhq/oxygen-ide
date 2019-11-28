@@ -170,9 +170,6 @@ type ListItemProps = {
     controls: Element
 };
 class ListItem extends PureComponent<ListItemProps> {
-    static Container = styled(FlexRow)(props => ({
-    }));
-
     state = {
         editing: false,
     };
@@ -188,6 +185,10 @@ class ListItem extends PureComponent<ListItemProps> {
             document.removeEventListener('click', ::this.handleClickOutside, true);
         }
     }
+    
+    static Container = styled(FlexRow)(props => ({
+    }));
+
 
     handleUpdate() {
         this.toggleEdit();
