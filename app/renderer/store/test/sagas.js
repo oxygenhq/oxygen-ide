@@ -60,12 +60,21 @@ function* handleTestRunnerServiceEvent(event) {
             yield put(loggerActions.setActiveLogger('general'));
         }
 
-        if(event && event.result && event.result.summary){
-            const { summary } = event.result;
-            if(summary && summary._status && summary._status ==='passed'){
+        if(event && event.result && event.result.status){
+            if( event.result.status ==='passed'){
                 yield put(editorActions.resetActiveLines());
             }
             
+            let duration = 0;
+
+            if(event.result.duration){
+                duration = event.result.duration;
+            }
+            
+            const summary = {
+                _duration: duration,
+                _status: event.result.status
+            };
             
             yield all([
                 call(services.mainIpc.call, 'AnalyticsService', 'playStop', [summary]),

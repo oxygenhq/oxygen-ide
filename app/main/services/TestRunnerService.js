@@ -180,15 +180,17 @@ export default class TestRunnerService extends ServiceBase {
             this.isRunning = false;
             // dispose Oxygen Runner and mark the state as not running, before updating the UI
             await this.dispose();            
-        };
+        }
     }
 
     async stop() {
         if (this.runner) {
             this.isStopping = true;
             try {
-                await this.runner.kill();
-                await this.runner.dispose();
+
+                this.runner.kill().then(()=>{});
+                this.runner.dispose().then(()=>{});
+
             }
             catch (e) {
                 // ignore any errors
@@ -220,7 +222,7 @@ export default class TestRunnerService extends ServiceBase {
 
     async dispose() {
         if (this.runner) {
-            await this.runner.dispose();
+            this.runner.dispose().then(()=>{});
             this.runner = null;
             this.mainFilePath = null;
             this.isRunning = false;
@@ -240,7 +242,7 @@ export default class TestRunnerService extends ServiceBase {
             await runner.init(opts, caps, this.reporter);   
             // run test 
             this._emitLogEvent(SEVERITY_INFO, 'Running test...');
-            const results = await runner.run();
+            await runner.run();
             // dispose runner
             await runner.dispose();
         }
@@ -372,7 +374,7 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _handleBreakpoint(breakpoint) {
-        const { lineNumber, fileName } = breakpoint;
+        const { lineNumber, fileName, variables } = breakpoint;
         // if no fileName is received from the debugger (not suppose to happen), assume we are in the main script file
         const editorFile = fileName ? fileName : this.mainFilePath;
         // if we are in the main script file, adjust line number according to script boilerplate offset
@@ -396,7 +398,7 @@ export default class TestRunnerService extends ServiceBase {
             time,
             file: editorFile,
             line: editorLine,
-                variables: variables
+            variables: variables
         });
     }
 
@@ -405,13 +407,33 @@ export default class TestRunnerService extends ServiceBase {
             return null;
         }
         const parts = location.split(':');
-        if (parts.length != 3) {
-            return null;
+                
+        let fileName;
+        let line;
+        let column;
+
+        if (process.platform === 'win32') {
+            if (parts.length != 4) {
+                return null;
+            }
+
+            fileName = parts[0] + ':' + parts[1];
+            line = parts[2];
+            column = parts[3];
+        } else {
+            if (parts.length != 3) {
+                return null;
+            }
+
+            fileName = parts[0];
+            line = parts[1];
+            column = parts[2];
         }
+
         return {
-            file: parts[0],
-            line: parts[1],
-            column: parts[2]
+            file: fileName,
+            line: parseInt(line),
+            column: parseInt(column)
         };
     }
     /**

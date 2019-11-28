@@ -11,7 +11,8 @@
     "es6": true
   },
   "rules": {
-    "indent": ["error", 4],
+    "template-curly-spacing" : "off",
+    "indent" : "off",
     "quotes": ["error", "single", { "avoidEscape": true }],
     "semi": ["error", "always"],
     "semi-spacing": ["error", {"before": false, "after": true}],
@@ -35,8 +36,8 @@
     "no-use-before-define": "off",
     "no-multi-assign": "off",
     "promise/param-names": "error",
-    "promise/always-return": "error",
-    "promise/catch-or-return": "error",
+    "promise/always-return": "off",
+    "promise/catch-or-return": "off",
     "promise/no-native": "off",
     "react/sort-comp": ["error", {
       "order": ["type-annotations", "static-methods", "lifecycle", "everything-else", "render"]

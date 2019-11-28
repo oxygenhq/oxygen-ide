@@ -25,13 +25,6 @@ type Props = {
 };
 
 export default class ObjectRepositoryNotValidView extends PureComponent<Props> {
-    static Container = styled(FlexColumn)(props => ({
-        height: '100vh',
-        flexShrink: 0,
-        padding: props.floating ? 10 : 0,
-        //borderBottom: props.collapsed ? 'none' : BORDER,
-    }));
-
     constructor(props: Props) {
         super(props: Props);
         this.state = {
@@ -40,6 +33,13 @@ export default class ObjectRepositoryNotValidView extends PureComponent<Props> {
 
         this.inputRef = React.createRef();
     }
+
+    static Container = styled(FlexColumn)(props => ({
+        height: '100vh',
+        flexShrink: 0,
+        padding: props.floating ? 10 : 0,
+        //borderBottom: props.collapsed ? 'none' : BORDER,
+    }));
 
     onSelectNode(path) {
         this.props.setActive(path);
