@@ -129,15 +129,15 @@ export default class Toolbar extends Component<Props> {
     }
 
     handleBrowsersTreeValueChange = (browsersTree, value, label, extra) => {
-        if(extra && extra.triggerNode && extra.triggerNode && extra.triggerNode.props && extra.triggerNode.props.pos && typeof extra.triggerNode.props.pos === 'string'){
-            const target = getBrowsersTarget(browsersTree, extra.triggerNode.props.pos.substr(2));
+        if(value){
+            const target = getBrowsersTarget(browsersTree, value);
             this.handleValueChange(Controls.TEST_TARGET, target);
         }
     }
 
     handleDevicesTreeValueChange = (devicesTree, value, label, extra) => {
-        if(extra && extra.triggerNode && extra.triggerNode && extra.triggerNode.props && extra.triggerNode.props.pos && typeof extra.triggerNode.props.pos === 'string'){
-            const target = getDevicesTarget(devicesTree, extra.triggerNode.props.pos.substr(2));
+        if(value){
+            const target = getDevicesTarget(devicesTree, value);
             this.handleValueChange(Controls.TEST_TARGET, target);
         }
     }
@@ -192,10 +192,6 @@ export default class Toolbar extends Component<Props> {
         const cloudProvidesBrowsersAndDevicesEnabled = currentCloudProvidesBrowsersAndDevices;
         const cloudProvidesBrowsersEnabled = cloudProvidesBrowsersAndDevicesEnabled && browsersTree && Array.isArray(browsersTree) && browsersTree.length > 0;
         const cloudProvidesDevicesEnabled = cloudProvidesBrowsersAndDevicesEnabled && devicesTree && Array.isArray(devicesTree) && devicesTree.length > 0;
-      
-
-        console.log('cloudProvidesBrowsersEnabled', cloudProvidesBrowsersEnabled);
-        console.log('testMode', testMode);
 
         let cloudProviderTestMode = testMode;
         if(cloudProvidesBrowsersEnabled && !cloudProviderTestMode){
@@ -205,7 +201,6 @@ export default class Toolbar extends Component<Props> {
                 cloudProviderTestMode = 'mob';
             }
         }
-        console.log('cloudProviderTestMode', cloudProviderTestMode);
 
         return (
             <div className="appTollbar">

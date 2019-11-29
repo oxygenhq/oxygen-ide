@@ -141,43 +141,44 @@ export default class TestRunnerService extends ServiceBase {
                 // caps.visual = testProvider.takeScreenshots || false;
                 // caps.video = testProvider.videoRecording || false;
             }
+        } else {
+            // prepare module parameters
+            if (testMode === 'resp') {
+                options.mode = 'web';
+                caps.browserName = 'chrome';
+                caps['goog:chromeOptions'] = {
+                    mobileEmulation: {
+                        deviceName: testTarget
+                    }
+                };
+            } else if (testMode === 'mob') {
+                options.mode = 'mob';
+                let deviceName = null;
+                let platformName = 'Android';
+                let platformVersion = null;
+                // in mobile mode, testTarget shall be an object that includes device information (id, osName and osVersion)
+                if (testTarget && typeof testTarget === 'object') {
+                    deviceName = testTarget.name || testTarget.id;
+                    platformName = testTarget.osName;
+                    platformVersion = testTarget.osVersion;
+                }
+                else if (testTarget && typeof testTarget === 'string') {
+                    deviceName = testTarget;
+                }
+                caps.deviceName = deviceName;
+                caps.platformName = platformName;
+                caps.platformVersion = platformVersion;
+            } else if (testMode === 'web') {
+                options.mode = 'web';
+                if (!options.seleniumUrl) {
+                    options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
+                }
+                options.browserName = testTarget;
+                // @FIXME: this option should be exposed in reports settings
+                options.screenshots = 'never';
+            }
         }
                 
-        // prepare module parameters
-        if (testMode === 'resp') {
-            options.mode = 'web';
-            caps.browserName = 'chrome';
-            caps['goog:chromeOptions'] = {
-                mobileEmulation: {
-                    deviceName: testTarget
-                }
-            };
-        } else if (testMode === 'mob') {
-            options.mode = 'mob';
-            let deviceName = null;
-            let platformName = 'Android';
-            let platformVersion = null;
-            // in mobile mode, testTarget shall be an object that includes device information (id, osName and osVersion)
-            if (testTarget && typeof testTarget === 'object') {
-                deviceName = testTarget.name || testTarget.id;
-                platformName = testTarget.osName;
-                platformVersion = testTarget.osVersion;
-            }
-            else if (testTarget && typeof testTarget === 'string') {
-                deviceName = testTarget;
-            }
-            caps.deviceName = deviceName;
-            caps.platformName = platformName;
-            caps.platformVersion = platformVersion;
-        } else if (testMode === 'web') {
-            options.mode = 'web';
-            if (!options.seleniumUrl) {
-                options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
-            }
-            options.browserName = testTarget;
-            // @FIXME: this option should be exposed in reports settings
-            options.screenshots = 'never';
-        }
 
         if (stepDelay) {
             options.delay = stepDelay;
@@ -185,6 +186,11 @@ export default class TestRunnerService extends ServiceBase {
         
         // initialize Oxygen Runner
         try {
+
+            console.log('options', options);
+            console.log('caps', caps);
+
+
             this.reporter = new ReportAggregator(options);            
             await this._launchTest(options, caps);
         } catch (e) {

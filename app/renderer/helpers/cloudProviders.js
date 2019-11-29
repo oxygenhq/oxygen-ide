@@ -23,24 +23,25 @@ const devicesLevels = [
 
 
 
-export const getBrowsersTarget = (tree, pos, level = 0) => {
+export const getBrowsersTarget = (tree, pos, level = 0, prevValue = '') => {
     let result = null;
-
-    console.log('tree', tree);
-
     if(pos.includes(delimeter)){
         const splitResult = pos.split(delimeter);
         const shifted = splitResult.shift();
-        const item = tree[shifted];
+        
+        const value = prevValue && prevValue.length ? prevValue+delimeter+shifted : shifted;
+        const item = tree.find((treeItem) => treeItem.value === value);
 
-        let getTargetResult = getBrowsersTarget(item.children, splitResult.join(delimeter), level+1);
+        let getTargetResult = getBrowsersTarget(item.children, splitResult.join(delimeter), level+1, value);
         const key = browsersLevels[level];
 
         getTargetResult[key] = item.title;
 
         return getTargetResult;
     } else {
-        const item = tree[pos];
+        const value = prevValue && prevValue.length ? prevValue+delimeter+pos : pos;
+
+        const item = tree.find((treeItem) => treeItem.value === value);
         const key = browsersLevels[level];
 
         result = {
@@ -72,22 +73,27 @@ export const saveBrowserTarget = (target) => {
     }
 };
 
-export const getDevicesTarget = (tree, pos, level = 0) => {
+export const getDevicesTarget = (tree, pos, level = 0, prevValue = '') => {
     let result = null;
 
     if(pos.includes(delimeter)){
         const splitResult = pos.split(delimeter);
         const shifted = splitResult.shift();
-        const item = tree[shifted];
 
-        let getTargetResult = getDevicesTarget(item.children, splitResult.join(delimeter), level+1);
+        const value = prevValue && prevValue.length ? prevValue+delimeter+shifted : shifted;
+        
+        const item = tree.find((treeItem) => treeItem.value === value);
+
+        let getTargetResult = getDevicesTarget(item.children, splitResult.join(delimeter), level+1, value);
         const key = devicesLevels[level];
 
         getTargetResult[key] = item.title;
 
         return getTargetResult;
     } else {
-        const item = tree[pos];
+        const value = prevValue && prevValue.length ? prevValue+delimeter+pos : pos;
+
+        const item = tree.find((treeItem) => treeItem.value === value);
         const key = devicesLevels[level];
 
         result = {

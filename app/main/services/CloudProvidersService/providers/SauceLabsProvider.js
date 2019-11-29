@@ -40,6 +40,14 @@ export default class SauceLabsProvider extends CloudProviderBase {
             throw new Error('"settings" must not be null');
         }
 
+        if(!this.settings.username){
+            throw new Error('"username" must not be null');
+        }
+
+        if(!this.settings.accessKey){
+            throw new Error('"accessKey" must not be null');
+        }
+
         if (target && target.browserName) {
             
             if (target.browserName) {

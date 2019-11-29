@@ -487,8 +487,6 @@ export default class Workbench extends Component<Props> {
               });
           }      
       }
-
-      console.log('cloudProvidesBrowsersAndDevices', cloudProvidesBrowsersAndDevices);
           
       if(!initialized){
           return (
