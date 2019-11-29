@@ -26,6 +26,8 @@ const devicesLevels = [
 export const getBrowsersTarget = (tree, pos, level = 0) => {
     let result = null;
 
+    console.log('tree', tree);
+
     if(pos.includes(delimeter)){
         const splitResult = pos.split(delimeter);
         const shifted = splitResult.shift();

@@ -28,7 +28,7 @@ const fillByOSVersion = (browsers, key, label) => {
             uniqueOsVersions.map((item) => {    
                 const saveItem = item || 'Unknown';
                 const newKey = key+'-'+saveItem;
-                const newLabel = label+' '+item;
+                const newLabel = label+' '+saveItem;
 
                 result.push({
                     title: saveItem,
@@ -256,7 +256,6 @@ const fillByDevicesName = (devices, apiName, key, label) => {
                 const newKey = key+'-'+item;
                 const newLabel = label+' '+item;
                 
-
                 const devicesWithVersion = items.filter((device) => device._name === item);
 
                 result.push({

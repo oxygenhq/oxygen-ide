@@ -193,6 +193,20 @@ export default class Toolbar extends Component<Props> {
         const cloudProvidesBrowsersEnabled = cloudProvidesBrowsersAndDevicesEnabled && browsersTree && Array.isArray(browsersTree) && browsersTree.length > 0;
         const cloudProvidesDevicesEnabled = cloudProvidesBrowsersAndDevicesEnabled && devicesTree && Array.isArray(devicesTree) && devicesTree.length > 0;
       
+
+        console.log('cloudProvidesBrowsersEnabled', cloudProvidesBrowsersEnabled);
+        console.log('testMode', testMode);
+
+        let cloudProviderTestMode = testMode;
+        if(cloudProvidesBrowsersEnabled && !cloudProviderTestMode){
+            if(browsersTree && Array.isArray(browsersTree) && browsersTree.length > 0){
+                cloudProviderTestMode = 'web';
+            } else if (devicesTree && Array.isArray(devicesTree) && devicesTree.length > 0){
+                cloudProviderTestMode = 'mob';
+            }
+        }
+        console.log('cloudProviderTestMode', cloudProviderTestMode);
+
         return (
             <div className="appTollbar">
                 { typeof showNoChromeDialog !== 'undefined' && showNoChromeDialog && 
@@ -289,7 +303,7 @@ export default class Toolbar extends Component<Props> {
                 }
                 {
                     cloudProvidesBrowsersEnabled &&
-                    <span key='web' className={testMode === 'web' ? 'control selectable active' : 'control selectable'}>
+                    <span key='web' className={cloudProviderTestMode === 'web' ? 'control selectable active' : 'control selectable'}>
                         <Icon
                             style={ getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)) }
                             onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_WEB) }
@@ -301,7 +315,7 @@ export default class Toolbar extends Component<Props> {
                 }
                 {
                     cloudProvidesDevicesEnabled &&
-                    <span key='mob' className={testMode === 'mob' ? 'control selectable active' : 'control selectable'}>
+                    <span key='mob' className={cloudProviderTestMode === 'mob' ? 'control selectable active' : 'control selectable'}>
                         <Icon
                             style={ getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)) }
                             onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_MOB) }
@@ -325,7 +339,7 @@ export default class Toolbar extends Component<Props> {
                     )
                 }
                 {
-                    cloudProvidesBrowsersAndDevicesEnabled && testMode === 'web' && browsersTree &&
+                    cloudProvidesBrowsersAndDevicesEnabled && cloudProviderTestMode === 'web' && browsersTree &&
                         <TreeSelect
                             className="control select"
                             showSearch
@@ -339,7 +353,7 @@ export default class Toolbar extends Component<Props> {
                         />
                 }
                 {
-                    cloudProvidesBrowsersAndDevicesEnabled && testMode === 'mob' && devicesTree &&
+                    cloudProvidesBrowsersAndDevicesEnabled && cloudProviderTestMode === 'mob' && devicesTree &&
                         <TreeSelect
                             className="control select"
                             showSearch
