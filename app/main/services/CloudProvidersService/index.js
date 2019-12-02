@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import * as Providers from './providers';
 import ServiceBase from '../ServiceBase';
 import BrowserInfo from './model/BrowserInfo';
@@ -51,14 +52,6 @@ export default class CloudProvidersService extends ServiceBase {
     }
 
     updateProviderSettings(providerName, settings) {
-
-        console.log('--- updateProviderSettings ---');
-
-        console.log('providerName', providerName);
-        console.log('settings', settings);
-        
-        console.log('--- updateProviderSettings ---');
-
         if (!this.providers.hasOwnProperty(providerName)) {
             return;
         }
