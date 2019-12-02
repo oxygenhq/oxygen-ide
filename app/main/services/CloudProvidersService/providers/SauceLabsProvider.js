@@ -22,6 +22,10 @@ export default class SauceLabsProvider extends CloudProviderBase {
         return this.isRunning;
     }
 
+    updateSettings(settings){
+        this.settings=settings;
+    }
+    
     getBrowsersAndDevices() {
         return new Promise((resolve, reject) => {
             return fetch('https://saucelabs.com/rest/v1/info/platforms/webdriver')

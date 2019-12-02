@@ -22,6 +22,10 @@ export default class LambdaTestService extends CloudProviderBase {
         return this.isRunning;
     }
 
+    updateSettings(settings){
+        this.settings=settings;
+    }
+
     getBrowsersAndDevices() {
         return new Promise((resolve, reject) => {
             if(this.settings && this.settings.user && this.settings.key){

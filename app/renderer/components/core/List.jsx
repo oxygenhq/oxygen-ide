@@ -162,7 +162,7 @@ export default class List extends PureComponent<ListProps> {
 
 type ListItemProps = {
     // data source - a list of items
-    data?: object,
+    data?: Object,
     editable?: boolean,
 };
 type ListItemState = {

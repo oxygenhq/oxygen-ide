@@ -47,7 +47,7 @@ export default class LogViewer extends PureComponent<Props> {
         document.addEventListener('mousedown', this.handleClickOutside);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const diff = difference(nextProps.logs, this.props.logs); 
         const lengthDiff = !(nextProps.logs.length === this.props.logs.length);
         let newState = {};

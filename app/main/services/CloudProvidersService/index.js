@@ -51,6 +51,14 @@ export default class CloudProvidersService extends ServiceBase {
     }
 
     updateProviderSettings(providerName, settings) {
+
+        console.log('--- updateProviderSettings ---');
+
+        console.log('providerName', providerName);
+        console.log('settings', settings);
+        
+        console.log('--- updateProviderSettings ---');
+
         if (!this.providers.hasOwnProperty(providerName)) {
             return;
         }
@@ -215,11 +223,8 @@ export default class CloudProvidersService extends ServiceBase {
         }
 
         return {
-            browsers,
-            devices,
             browsersTree: creteBrowsersTree(browsers),
-            devicesTree: creteDevicesTree(devices),
-            origin: browsersAndDevices
+            devicesTree: creteDevicesTree(devices)
         };
     }
 

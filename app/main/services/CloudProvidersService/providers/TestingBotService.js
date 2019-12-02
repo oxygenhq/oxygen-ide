@@ -21,6 +21,10 @@ export default class TestingBotProvider extends CloudProviderBase {
     isRunning() {
         return this.isRunning;
     }
+        
+    updateSettings(settings){
+        this.settings=settings;
+    }
 
     getDevices(){
         return new Promise((resolve, reject) => {

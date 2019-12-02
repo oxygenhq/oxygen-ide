@@ -24,7 +24,7 @@ export default class ScrollContainer extends Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.refreshScroll !== this.props.refreshScroll && this.scroller && this.scrollWrap) {
             this.scrollWrap.scrollTop = 0;
         }

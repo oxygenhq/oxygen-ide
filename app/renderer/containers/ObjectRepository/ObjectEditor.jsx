@@ -47,7 +47,7 @@ export default class ObjectEditor extends PureComponent<Props> {
 
   state = DEFAULT_STATE;
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
       let newState = {};
 
       const n = nextProps.object;

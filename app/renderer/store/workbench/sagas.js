@@ -298,34 +298,6 @@ export function* initialize() {
     services.mainIpc.call('CloudProvidersService', 'start').then(() => {});
     yield setCloudProvidersBrowsersAndDevices();
 
-    // // if a folder was open in the last session, load this folder in File Explorer 
-    // if (allSettings && allSettings.lastSession && allSettings.lastSession.rootFolder) {
-    //     const { error } = yield putAndTake(
-    //         wbActions.openFolder(allSettings.lastSession.rootFolder)
-    //     );
-    //     // ignore any errors
-    // }
-    // // if last session includes previously open tabs, reopen tabs for files which still exist 
-    // if (allSettings && allSettings.lastSession && allSettings.lastSession.tabs) {
-    //     for (let tab of allSettings.lastSession.tabs) {            
-    //         yield put(tabActions.addTab(tab.key, tab.title));
-    //         const { error } = yield putAndTake(
-    //             editorActions.openFile(tab.key)
-    //         );
-    //         // if any error occurs during openning tab's file content (e.g. file doesn't not exist), remove this tab
-    //         if (error) {
-    //             console.warn('error', error);
-    //             if(tab && tab.key){
-    //                 yield put(tabActions.removeTab(tab.key));
-    //             }
-    //         }
-    //         else {                
-    //             yield put(testActions.setMainFile(tab.key));
-    //         }
-    //     }
-    // }
-    // indicate successful end of initialization process
-    
     yield put({
         type: success(ActionTypes.WB_INIT),
     });
@@ -1563,6 +1535,7 @@ export function* setCloudProvidersBrowsersAndDevices(){
 
     if(cloudProviders){
         if(cloudProviders.lambdaTest && cloudProviders.lambdaTest.inUse && cloudProviders.lambdaTest.user && cloudProviders.lambdaTest.key){
+            yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['lambdaTest', cloudProviders.lambdaTest]);
             const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['lambdaTest', cloudProviders.lambdaTest.user, cloudProviders.lambdaTest.key]);
             if(browsersAndDevices){
                 yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'lambdaTest'));
@@ -1570,6 +1543,7 @@ export function* setCloudProvidersBrowsersAndDevices(){
     
         }
         if(cloudProviders.sauceLabs && cloudProviders.sauceLabs.inUse){
+            yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['sauceLabs', cloudProviders.sauceLabs]);
             const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
     
             if(browsersAndDevices){
@@ -1577,6 +1551,7 @@ export function* setCloudProvidersBrowsersAndDevices(){
             }
         }
         if(cloudProviders.testingBot && cloudProviders.testingBot.inUse){
+            yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['testingBot', cloudProviders.testingBot]);
             const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['testingBot']);
     
             if(browsersAndDevices){
@@ -1590,7 +1565,6 @@ export function* handleUpdatedCloudProvidersSettings({payload}) {
     const settings = yield select(state => state.settings);
     // persiste settings in the Electron store
     yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
-
     yield setCloudProvidersBrowsersAndDevices();
 }
 

@@ -9,21 +9,19 @@
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { createHashHistory } from 'history';
-import { routerMiddleware, routerActions } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
 import { Subject } from 'rxjs';
-import rootActionCreator from './actions';
 import rootReducer from './reducers';
 import createActionToSubjectMiddleware from './middleware/createActionToSubjectMiddleware';
 import rootSaga from './sagas';
 import { UNIVERSAL_ERROR, SET_USER_ID_TO_SENTRY } from '../store/sentry/types';
+import  * as fsActionTypes from './fs/types';
+import  * as settingsActionTypes from './settings/types';
+import { MAIN_MENU_EVENT, MAIN_SERVICE_EVENT, MAIN_SERVICE_LOG  } from '../services/MainIpc';
 
 
 import ServicesSingleton from '../services';
-import { dialog } from 'electron';
 const services = ServicesSingleton();
-
-
 const history = createHashHistory();
 
 // initialize Rxjs subject for action to subject middleware
@@ -53,10 +51,6 @@ const configureStore = (initialState?: counterStateType) => {
 
     // Thunk Middleware
     middleware.push(thunk);
-
-    // Router Middleware
-    const router = routerMiddleware(history);
-    middleware.push(router);
 
     // Apply redux-logger if we are in debugging mode
     if (process.env.NODE_ENV === 'development') {
@@ -90,11 +84,24 @@ const configureStore = (initialState?: counterStateType) => {
     /* eslint-enable no-underscore-dangle */
 
     const ignoreTypes = [
-        'MAIN_SERVICE_EVENT',
-        'RESET'
+        MAIN_MENU_EVENT,
+        MAIN_SERVICE_EVENT,
+        MAIN_SERVICE_LOG,
+        'RESET',
+        'DIALOG',
+        fsActionTypes.FS_SAVE_FILE,
+        fsActionTypes.FS_SAVE_FILE_AS,
+        fsActionTypes.FS_TREE_UN_WATCH_FOLDER,
+        fsActionTypes.FS_TREE_WATCH_FOLDER,
+        fsActionTypes.FS_MOVE,
+        settingsActionTypes.SET_CLOUD_PROVIDERS_BROWSERS_AND_DEVICES,
+        settingsActionTypes.FIRST_OPEN,
+        settingsActionTypes.TMP_UPDATE_FILE_CONTENT,
+        settingsActionTypes.TMP_REMOVE_FILE,
+        settingsActionTypes.TMP_ADD_FILE
     ]; 
 
-    async function updateCache(cache, action) {
+    async function updateCache(lastState, action) {
         if(action && ignoreTypes.includes(action.type)){
             return;
         }
@@ -106,6 +113,18 @@ const configureStore = (initialState?: counterStateType) => {
         if(action && action.type.startsWith('TEST_')){
             return;
         }
+        
+        if(action && action.type.startsWith('DIALOG_')){
+            return;
+        }        
+
+        if(action && action.type.startsWith('WB_')){
+            return;
+        }
+        
+        if(action && action.type.startsWith('FROM_CACHE_')){
+            return;
+        }
 
         if(action && action.type === 'LOGGER_SET_VISIBLE'){
             // add to save cache
@@ -113,36 +132,25 @@ const configureStore = (initialState?: counterStateType) => {
             return;
         }
 
-        const state = { ...cache };
+        const state = {
+            tree: lastState.tree,
+            editor: lastState.editor,
+            fs: lastState.fs,
+            objrepo: lastState.objrepo,
+            tabs: lastState.tabs,
+            settings: getSettings(lastState)
+        };
 
-        delete state.cache;
-        delete state.settings.cache;
-        delete state.dialog;
-        delete state.logger;
-        delete state.router;
-        delete state.test;
-        delete state.recorder;
-        delete state.wb;
-
-        const result = await services.mainIpc.call( 'ElectronService', 'updateCache', [state] );
-
+        await services.mainIpc.call( 'ElectronService', 'updateCache', [state] );
         return state;
     }
 
     const cache = store => next => action => {
         let result = next(action);
         const state = store.getState();
-        // console.log('str', JSON.stringify(state));
 
         if(state.settings.cacheUsed){
             updateCache(state, action);
-            // const cacheStatePromise = updateCache(state, action);
-            // cacheStatePromise.then((cacheState) => {
-            //   if(typeof cacheState !== 'undefined'){
-            //     console.log('cacheState', cacheState);
-            //     console.log('cacheState stringify', JSON.stringify(cacheState));
-            //   }
-            // })
         }
 
         return result;
@@ -212,5 +220,20 @@ const configureStore = (initialState?: counterStateType) => {
     global.store = store;
     return store;
 };
+
+
+const getSettings = (lastState) => {
+    if(lastState && lastState.settings){
+        
+        /* eslint-disable */
+        const { cache, cloudProvidesBrowsersAndDevices, ...rest } = lastState.settings;
+        /* eslint-anable */
+
+        return rest;
+    } else {
+        return null;
+    }
+}
+
 
 export default { configureStore, history, action$ };

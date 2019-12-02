@@ -49,7 +49,7 @@ export default class FileExplorer extends Component<Props> {
         };
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (this.props.activeNodePath !== nextProps.activeNodePath) {
             if (!nextProps.activeNodePath) {
                 this.setState({

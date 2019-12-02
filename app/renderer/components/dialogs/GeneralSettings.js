@@ -19,7 +19,7 @@ const formItemLayout = {
 };
 
 type Props = {
-    form: Object,
+    form: Object | undefined | null,
     visible: boolean | undefined,
     settings: Object | undefined
 };

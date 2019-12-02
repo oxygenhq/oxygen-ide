@@ -6,7 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { remote } from 'electron';
 import * as types from './types';
 
 const FONT_SIZE_MIN = 12;
@@ -114,14 +113,6 @@ export default (state = defaultState, action) => {
     const { value, target, settings, zoom, cache, uuid, providers, browsersAndDevices, testProvider } = payload;
     switch (action.type) {
     
-    // // FIRST OPEN
-    // case types.FIRST_OPEN: {
-    //   return { 
-    //     ...state,
-    //     first: false
-    //   }
-    // }
-
     // CREATE USER
     case types.CREATE_USER: {
         return { 

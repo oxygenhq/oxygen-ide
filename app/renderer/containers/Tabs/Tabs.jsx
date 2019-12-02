@@ -76,7 +76,7 @@ class Tabs extends Component<Props, void> {
   }
 
   // nextProps, nextState
-  componentWillUpdate(nextProps) {
+  UNSAFE_componentWillUpdate(nextProps) {
       const { sidebarCollapsed, tabs } = this.props;
       if (this.ps) {
           if (nextProps.sidebarCollapsed !== sidebarCollapsed) {

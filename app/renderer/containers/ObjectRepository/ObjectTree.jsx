@@ -26,7 +26,7 @@ export default class ObjectTree extends PureComponent<Props> {
       selectedKeys: [],
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
       if (this.props.active !== nextProps.active) {
           if (!nextProps.active) {
               this.setState({
