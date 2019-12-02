@@ -44,8 +44,16 @@ export const getBrowsersTarget = (tree, pos, level = 0, prevValue = '') => {
         const item = tree.find((treeItem) => treeItem.value === value);
         const key = browsersLevels[level];
 
+        let saveTitle = '';
+
+        if(key === browserName){
+            saveTitle = item.value;
+        } else {
+            saveTitle = item.title;
+        }
+
         result = {
-            [key]: item.title
+            [key]: saveTitle
         };
     }
 
@@ -56,7 +64,7 @@ export const saveBrowserTarget = (target) => {
     if(target && typeof target === 'object' && Object.keys(target).length > 0){
         let result = '';
         if(target[browserName]){
-            result = target[browserName];
+            result = target[browserName].charAt(0).toUpperCase() + target[browserName].slice(1);
         }
         if(target[browserVersion]){
             result += delimeter+target[browserVersion];
