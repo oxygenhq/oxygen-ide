@@ -29,7 +29,7 @@ type Props = {
 };
 
 /* eslint-disable react/no-did-update-set-state */
-export default class Panel extends Component<Props> {
+export default class Panel extends React.Component<Props> {
     props: Props;
 
     static Container = styled(FlexColumn)(props => ({

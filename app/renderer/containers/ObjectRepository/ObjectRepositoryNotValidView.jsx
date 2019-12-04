@@ -24,9 +24,9 @@ type Props = {
     refreshScroll: Function
 };
 
-export default class ObjectRepositoryNotValidView extends PureComponent<Props> {
+export default class ObjectRepositoryNotValidView extends React.PureComponent<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
         this.state = {
             searchResults: []
         };

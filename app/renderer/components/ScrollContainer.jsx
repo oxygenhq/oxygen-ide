@@ -20,7 +20,7 @@ type Props = {
 };
 
 /* eslint-disable import/prefer-default-export */
-export default class ScrollContainer extends Component<Props> {
+export default class ScrollContainer extends React.Component<Props> {
     componentDidMount() {
         if (!this.scroller) {
             const {

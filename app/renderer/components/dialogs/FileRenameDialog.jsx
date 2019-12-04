@@ -6,7 +6,8 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent } from 'react';
+//@flow
+import React from 'react';
 import { Input, Modal } from 'antd';
 import { capitalizeFirst } from '../../helpers/general';
 
@@ -19,7 +20,7 @@ type Props = {
   onCancel: () => void
 };
 
-export default class FileRenameDialog extends PureComponent<Props> {
+export default class FileRenameDialog extends React.PureComponent<Props> {
   props: Props;
 
   state = {

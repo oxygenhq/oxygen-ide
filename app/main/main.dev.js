@@ -35,9 +35,9 @@ try {
     ) {
     // dev mode
     // ignore sentry logging
-        initializeCrashReporterAndSentry();
+    // initializeCrashReporterAndSentry();
     } else {
-        initializeCrashReporterAndSentry();
+    // initializeCrashReporterAndSentry();
     }
 } catch(e){
     console.warn('Cannot initialize CrashReporter and Sentry', e);

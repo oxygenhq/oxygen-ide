@@ -25,7 +25,7 @@ type Props = {
     onCancel: () => void
 };
 
-export default class SettingsDialog extends PureComponent<Props> {
+export default class SettingsDialog extends React.PureComponent<Props> {
     props: Props;
 
     state = {

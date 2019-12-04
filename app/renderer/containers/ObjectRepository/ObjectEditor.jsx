@@ -51,7 +51,7 @@ const DEFAULT_STATE = {
     arrayObjectEditing: false
 };
 
-export default class ObjectEditor extends PureComponent<Props> {
+export default class ObjectEditor extends React.PureComponent<Props> {
     props: Props;
 
     state = DEFAULT_STATE;

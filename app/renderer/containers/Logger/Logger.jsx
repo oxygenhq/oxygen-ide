@@ -27,7 +27,7 @@ type Props = {
 };
 
 /* eslint-disable react/no-did-update-set-state */
-export default class Logger extends PureComponent<Props> {
+export default class Logger extends React.PureComponent<Props> {
     props: Props;
 
     state = {

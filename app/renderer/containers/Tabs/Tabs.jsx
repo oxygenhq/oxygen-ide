@@ -36,7 +36,7 @@ const circle = () => {
     );
 };
 
-class Tabs extends Component<Props, void> {
+class Tabs extends React.Component<Props, void> {
     constructor(props){
         super(props);
         // holds PerfectScrollbar instance

@@ -114,9 +114,9 @@ message.config({
     top: 65
 });
 
-export default class Workbench extends Component<Props> {
+export default class Workbench extends React.Component<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
 
         this.on = false;
 

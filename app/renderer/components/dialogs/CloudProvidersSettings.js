@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { Form, Input, Switch, Checkbox } from 'antd';
 
 const DEFAULT_STATE = {
@@ -17,7 +17,7 @@ type Props = {
     providers: Object | undefined
 };
 
-class CloudProvidersSettings extends PureComponent<Props> {
+class CloudProvidersSettings extends React.PureComponent<Props> {
     props: Props;
   
     state = {
@@ -478,7 +478,7 @@ class CloudProvidersSettings extends PureComponent<Props> {
 
 const EnhancedForm =  Form.create()(CloudProvidersSettings);
 
-export default class GeneralSettingsWrap extends PureComponent<Props> {
+export default class GeneralSettingsWrap extends React.PureComponent<Props> {
     render(){
         return(
             <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} />

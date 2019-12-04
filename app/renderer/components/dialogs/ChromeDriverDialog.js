@@ -9,7 +9,7 @@ type Props = {
     onNoChromeDriverSubmit: Function
 };
 
-export default class ChromeDriverDialog extends PureComponent<Props> {
+export default class ChromeDriverDialog extends React.PureComponent<Props> {
 
     close = () => {
         if(this.props.onCancel){

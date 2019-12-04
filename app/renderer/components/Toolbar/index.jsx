@@ -47,7 +47,7 @@ type Props = {
 
 const { Option } = Select;
 
-export default class Toolbar extends Component<Props> {
+export default class Toolbar extends React.Component<Props> {
     constructor(props){
         super(props);
         this.state = {

@@ -24,9 +24,9 @@ type Props = {
     height: number
 };
 
-export default class LogViewer extends PureComponent<Props> {
+export default class LogViewer extends React.PureComponent<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
 
         this.loggerRef = React.createRef();
         this.buttonRef = React.createRef();
