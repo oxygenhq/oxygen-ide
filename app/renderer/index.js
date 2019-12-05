@@ -16,10 +16,12 @@ import { AppContainer } from 'react-hot-loader';
 import 'antd/dist/antd.css';
 
 import App from './containers/App';
-import { configureStore, history } from './store/configureStore';
+import importConfigureStore from './store/configureStore';
 import { configureServices } from './services';
 // import './helpers/';
 import './app.global.scss';
+
+const { configureStore, history } = importConfigureStore;
 
 // initialize Redux store
 const store = configureStore();

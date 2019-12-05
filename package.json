@@ -163,6 +163,7 @@
     "appium-adb": "^7.13.0",
     "chrome-launcher": "^0.11.2",
     "clean-stack": "^2.2.0",
+    "core-js": "^3.4.7",
     "decompress-zip": "^0.2.2",
     "detect-port": "^1.3.0",
     "devtron": "^1.4.0",

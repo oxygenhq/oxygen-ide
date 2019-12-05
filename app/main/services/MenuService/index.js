@@ -58,7 +58,7 @@ export default class MenuService extends ServiceBase {
         }*/
     }
 
-    _handleMenuCommand(cmd, ...args){
+    _handleMenuCommand = (cmd, ...args) => {
         const focusedWindow = BrowserWindow.getFocusedWindow();
         let notify = true;
 

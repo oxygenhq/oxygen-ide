@@ -21,12 +21,13 @@ type Props = {
 };
 
 export default class FileRenameDialog extends React.PureComponent<Props> {
-  props: Props;
-
-  state = {
-      visible: this.props.visible ? this.props.visible : false,
-      name: this.props.name ? this.props.name : null,
-  }
+    constructor(props: Props){
+        super(props);
+        this.state = {
+            visible: this.props.visible ? this.props.visible : false,
+            name: this.props.name ? this.props.name : null,
+        };
+    }
 
   static getDerivedStateFromProps(nextProps, prevState) {
       if (nextProps.visible == false) {

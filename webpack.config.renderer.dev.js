@@ -98,7 +98,8 @@ export default merge.smart(baseConfig, {
                                   'decoratorsBeforeExport': true
                               }
                             ],
-                            ['transform-imports']
+                            ['transform-imports'],
+                            '@babel/plugin-transform-runtime'
                         ],
                     }
                 }

@@ -154,13 +154,13 @@ export default class MonacoEditor extends React.Component<Props> {
         }
 
         if(typeof updateActiveLine !== 'boolean' && updateFontSize){
-        //update ActiveLine and FontSize
+            //update ActiveLine and FontSize
             helpers.updateActiveLineMarker(this.editor, updateActiveLine, updateFontSize);
         } else if (typeof updateActiveLine !== 'boolean'){
-        //update ActiveLine
+            //update ActiveLine
             helpers.updateActiveLineMarker(this.editor, updateActiveLine, this.props.fontSize);
         } else if (updateFontSize){
-        //update FontSize
+            //update FontSize
             const { activeLine } = this.props;
             helpers.updateActiveLineMarker(this.editor, activeLine, updateFontSize);
         }
