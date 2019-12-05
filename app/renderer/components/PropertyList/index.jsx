@@ -14,7 +14,7 @@ type Props = {
     children?: Element
 };
 
-export default class PropertyList extends PureComponent<Props> {    
+export default class PropertyList extends React.PureComponent<Props> {    
     render() {
         const { children } = this.props;
 
@@ -26,7 +26,7 @@ export default class PropertyList extends PureComponent<Props> {
     }
 }
 
-export class PropertyItem extends PureComponent
+export class PropertyItem extends React.PureComponent
     <{|
         base: string,
         label: string, 
@@ -69,7 +69,7 @@ type FormattedValueProps = {
     value: any
 };
 
-class FormattedValue extends PureComponent<FormattedValueProps> {
+class FormattedValue extends React.PureComponent<FormattedValueProps> {
     render() {
         const { value } = this.props;
         return (
@@ -82,7 +82,7 @@ type EditableNumberProps = {
     value: number
 };
 
-class EditableNumber extends PureComponent<EditableNumberProps> {
+class EditableNumber extends React.PureComponent<EditableNumberProps> {
     render() {
         const { value } = this.props;
 

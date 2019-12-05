@@ -5,7 +5,7 @@ type Props = {
     onClose: Function
 };
 
-export default class ChromeDriverDownloadingSuccessDialog extends PureComponent<Props> {
+export default class ChromeDriverDownloadingSuccessDialog extends React.PureComponent<Props> {
 
     close = () => {
         if(this.props.onClose){

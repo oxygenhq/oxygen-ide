@@ -17,7 +17,7 @@ type Props = {
     children: Array<React.Node> | React.Node
 };
 
-class DraggableTab extends Component<Props> {
+class DraggableTab extends React.Component<Props> {
     render() {
         const {
             connectDragSource, connectDropTarget, isDragging,

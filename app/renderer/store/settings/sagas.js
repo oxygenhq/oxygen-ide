@@ -22,6 +22,7 @@ const services = ServicesSingleton();
 /**
  * Settings Sagas
  */
+
 export default function* root() {
     yield all([
         takeLatest(ActionTypes.LOGGER_SET_VISIBLE, onSetLoggerVisible),
@@ -30,7 +31,7 @@ export default function* root() {
         takeLatest(ActionTypes.TMP_UPDATE_FILE_CONTENT, tmpUpdateFileContent),
         takeLatest(ActionTypes.FIRST_OPEN, firstOpen),
         takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
-        takeLatest(types.TEST_UPDATE_BREAKPOINTS, testUpdateBreakpoints)
+        takeLatest(types.default.TEST_UPDATE_BREAKPOINTS, testUpdateBreakpoints)
     ]);
 }
 

@@ -9,7 +9,7 @@ type Props = {
   hide: Function
 };
 
-export default class WorkingChromeDialog extends Component<Props> {
+export default class WorkingChromeDialog extends React.Component<Props> {
     constructor(props){
         super(props);
 

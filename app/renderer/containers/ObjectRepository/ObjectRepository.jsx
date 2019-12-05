@@ -41,9 +41,9 @@ type Props = {
     removeArrayObjectLocator: Function
 };
 
-export default class ObjectRepository extends PureComponent<Props> {
+export default class ObjectRepository extends React.PureComponent<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
         this.state = {
             searchResults: []
         };

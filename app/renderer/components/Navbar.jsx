@@ -15,7 +15,7 @@ import '../css/navbar.scss';
 
 type Props = {};
 
-export default class Navbar extends Component<Props> {
+export default class Navbar extends React.Component<Props> {
   props: Props;
 
   render() {

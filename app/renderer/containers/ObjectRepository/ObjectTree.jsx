@@ -19,7 +19,7 @@ type Props = {
   searchResults: Array
 };
 
-export default class ObjectTree extends PureComponent<Props> {
+export default class ObjectTree extends React.PureComponent<Props> {
   props: Props;
 
   state = {

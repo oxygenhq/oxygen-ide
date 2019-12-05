@@ -5,7 +5,7 @@ type Props = {
     orAddToRoot: Function
 };
 
-export default class AddToRootRow extends PureComponent<Props> {
+export default class AddToRootRow extends React.PureComponent<Props> {
     constructor(props) {
         super(props);
 

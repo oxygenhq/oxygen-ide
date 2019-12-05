@@ -10,7 +10,7 @@ type Props = {
     height: number
 };
 
-export default class VariablesViewer extends PureComponent<Props> {
+export default class VariablesViewer extends React.PureComponent<Props> {
     constructor(props) {
         super(props);
         

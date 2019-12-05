@@ -76,9 +76,9 @@ const getVisibleTrees = (trees, searchQuery) => {
     return results;
 };
 
-export default class SearchRow extends PureComponent<Props> {
+export default class SearchRow extends React.PureComponent<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
         this.state = {
             searchQuery: '',
             searchResults: []

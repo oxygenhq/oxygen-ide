@@ -57,7 +57,7 @@ const getVisible = (file, activeFile, activeFileName) => {
     return false;
 };
 
-export default class TextEditor extends Component<Props> {
+export default class TextEditor extends React.Component<Props> {
   props: Props;
 
   constructor(props) {

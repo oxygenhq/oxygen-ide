@@ -6,7 +6,7 @@ type Props = {
     onClose: Function
 };
 
-export default class NeedInstallExtension extends PureComponent<Props> {
+export default class NeedInstallExtension extends React.PureComponent<Props> {
   close = () => {
       if(this.props.onClose){
           this.props.onClose();

@@ -144,6 +144,6 @@ export function updateActiveLineMarker(editor, inputLine, fontSize=null) {
 
         editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
     } catch(e){
-        console.error('err', e);
+        console.error('updateActiveLineMarker Error', e);
     }
 }

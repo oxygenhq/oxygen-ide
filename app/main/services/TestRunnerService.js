@@ -24,14 +24,13 @@ const SEVERITY_ERROR = 'ERROR';
 const SEVERITY_INFO = 'INFO';
 
 export default class TestRunnerService extends ServiceBase {
-    isRunning = false;
-    isStopping = false;
-    runner = null;
-    reporter = null;
-    mainFilePath = null;
-
     constructor() {
         super();
+        this.isRunning = false;
+        this.isStopping = false;
+        this.runner = null;
+        this.reporter = null;
+        this.mainFilePath = null;
     }
     
     async start(mainFilePath, breakpoints, runtimeSettings) {

@@ -17,7 +17,7 @@ type Props = {
   history: {}
 };
 
-export default class App extends Component<Props> {
+export default class App extends React.Component<Props> {
     render() {
         return (
             <Provider store={this.props.store}>

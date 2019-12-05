@@ -31,7 +31,7 @@ type ListProps = {
     editable?: boolean
 };
 
-export default class List extends PureComponent<ListProps> {
+export default class List extends React.PureComponent<ListProps> {
     static Container = styled(FlexColumn)(props => ({
         height: '100vh',
         flexShrink: 0,
@@ -169,7 +169,7 @@ type ListItemProps = {
     editable?: boolean,
     controls: Element
 };
-class ListItem extends PureComponent<ListItemProps> {
+class ListItem extends React.PureComponent<ListItemProps> {
     state = {
         editing: false,
     };

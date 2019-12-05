@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { Input, Modal, message } from 'antd';
 
 const DEFAULT_STATE = {
@@ -23,9 +23,9 @@ type Props = {
   onCancel: () => void
 };
 
-export default class ObjectElementCreateDialog extends PureComponent<Props> {
+export default class ObjectElementCreateDialog extends React.PureComponent<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
 
         this.textInput = null;
 

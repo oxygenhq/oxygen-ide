@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import electron from 'electron';
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { Modal, Button } from 'antd';
 
 type Props = {
@@ -21,7 +21,7 @@ type Props = {
   onCancel: () => void
 };
 
-export default class UpdateDialog extends PureComponent<Props> {
+export default class UpdateDialog extends React.PureComponent<Props> {
     constructor(props){
         super(props);
         this.state = {

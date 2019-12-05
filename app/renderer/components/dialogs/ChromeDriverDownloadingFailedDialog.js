@@ -7,7 +7,7 @@ type Props = {
     path: string
 };
 
-export default class ChromeDriverDownloadingFailedDialog extends PureComponent<Props> {
+export default class ChromeDriverDownloadingFailedDialog extends React.PureComponent<Props> {
 
     close = () => {
         if(this.props.onClose){

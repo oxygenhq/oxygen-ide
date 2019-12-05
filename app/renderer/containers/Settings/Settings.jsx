@@ -17,7 +17,7 @@ type Props = {
   refreshScroll: Function
 };
 
-export default class Settings extends PureComponent<Props> {
+export default class Settings extends React.PureComponent<Props> {
   props: Props;
 
   render() {
