@@ -32,9 +32,10 @@ const fillByOSVersion = (browsers, key, label) => {
 
                 result.push({
                     title: saveItem,
+                    orTitle: saveItem,
                     value: newKey,
                     key: newKey,
-                    label: newLabel
+                    label: newLabel.charAt(0).toUpperCase() + newLabel.slice(1)
                 });
             });
         }
@@ -79,9 +80,10 @@ const fillByOSName = (browsers, key, label) => {
 
                 result.push({
                     title: item,
+                    orTitle: item,
                     value: newKey,
                     key: newKey,
-                    label: newLabel,
+                    label: newLabel.charAt(0).toUpperCase() + newLabel.slice(1),
                     children: fillByOSVersion(browsersWithOsName, newKey, newLabel)
                 });
             });
@@ -135,9 +137,10 @@ const fillByBrowserName = (browsers, apiName, key, label) => {
 
                 result.push({
                     title: item,
+                    orTitle: item,
                     value: newKey,
                     key: newKey,
-                    label: newLabel,
+                    label: newLabel.charAt(0).toUpperCase() + newLabel.slice(1),
                     children: fillByOSName(browsersWithVersion, newKey, newLabel)
                 });
             });
@@ -177,9 +180,10 @@ export const creteBrowsersTree = (browsers) => {
             result = uniqueApiNames.map((item) => {
                 return {
                     title: item.charAt(0).toUpperCase() + item.slice(1),
+                    orTitle: item,
                     value: item,
                     key: item,
-                    label: item,
+                    label: item.charAt(0).toUpperCase() + item.slice(1),
                     children: fillByBrowserName(browsers, item, item, item)
                 };
             });
@@ -204,9 +208,10 @@ const fillByVersion = (devices, key, label) => {
 
                 result.push({
                     title: item,
+                    orTitle: item,
                     value: newKey,
                     key: newKey,
-                    label: newLabel
+                    label: newLabel.charAt(0).toUpperCase() + newLabel.slice(1)
                 });
             });
         }
@@ -260,9 +265,10 @@ const fillByDevicesName = (devices, apiName, key, label) => {
 
                 result.push({
                     title: item,
+                    orTitle: item,
                     value: newKey,
                     key: newKey,
-                    label: newLabel,
+                    label: newLabel.charAt(0).toUpperCase() + newLabel.slice(1),
                     children: fillByVersion(devicesWithVersion, newKey, newLabel)
                 });
             });
@@ -283,9 +289,10 @@ export const creteDevicesTree = (devices) => {
             result = uniqueApiNames.map((item) => {
                 return {
                     title: item,
+                    orTitle: item,
                     value: item,
                     key: item,
-                    label: item,
+                    label: item.charAt(0).toUpperCase() + item.slice(1),
                     children: fillByDevicesName(devices, item, item, item)
                 };
             });

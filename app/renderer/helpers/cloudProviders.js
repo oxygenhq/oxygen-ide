@@ -35,7 +35,7 @@ export const getBrowsersTarget = (tree, pos, level = 0, prevValue = '') => {
         let getTargetResult = getBrowsersTarget(item.children, splitResult.join(delimeter), level+1, value);
         const key = browsersLevels[level];
 
-        getTargetResult[key] = item.title;
+        getTargetResult[key] = item.orTitle;
 
         return getTargetResult;
     } else {
@@ -44,16 +44,8 @@ export const getBrowsersTarget = (tree, pos, level = 0, prevValue = '') => {
         const item = tree.find((treeItem) => treeItem.value === value);
         const key = browsersLevels[level];
 
-        let saveTitle = '';
-
-        if(key === browserName){
-            saveTitle = item.value;
-        } else {
-            saveTitle = item.title;
-        }
-
         result = {
-            [key]: saveTitle
+            [key]: item.orTitle
         };
     }
 
@@ -61,10 +53,12 @@ export const getBrowsersTarget = (tree, pos, level = 0, prevValue = '') => {
 };
 
 export const saveBrowserTarget = (target) => {
+    let returnResult;
+
     if(target && typeof target === 'object' && Object.keys(target).length > 0){
         let result = '';
         if(target[browserName]){
-            result = target[browserName].charAt(0).toUpperCase() + target[browserName].slice(1);
+            result = target[browserName];
         }
         if(target[browserVersion]){
             result += delimeter+target[browserVersion];
@@ -75,10 +69,12 @@ export const saveBrowserTarget = (target) => {
         if(target[osVersion]){
             result += delimeter+target[osVersion];
         }
-        return result;
+        returnResult = result;
     } else {
-        return target;
+        returnResult = target;
     }
+
+    return returnResult;
 };
 
 export const getDevicesTarget = (tree, pos, level = 0, prevValue = '') => {
@@ -95,7 +91,7 @@ export const getDevicesTarget = (tree, pos, level = 0, prevValue = '') => {
         let getTargetResult = getDevicesTarget(item.children, splitResult.join(delimeter), level+1, value);
         const key = devicesLevels[level];
 
-        getTargetResult[key] = item.title;
+        getTargetResult[key] = item.orTitle;
 
         return getTargetResult;
     } else {
@@ -105,7 +101,7 @@ export const getDevicesTarget = (tree, pos, level = 0, prevValue = '') => {
         const key = devicesLevels[level];
 
         result = {
-            [key]: item.title
+            [key]: item.orTitle
         };
     }
 
