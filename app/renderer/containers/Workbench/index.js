@@ -43,7 +43,7 @@ const mapStoreToProps = (state) => {
     }
 
     return {
-        initialized: state.wb.initialized,
+        initialized: state.wb && state.wb.initialized,
         javaError: state.wb.javaError,
         xCodeError: state.wb.xCodeError,
         isRecording: state.recorder.isRecording,

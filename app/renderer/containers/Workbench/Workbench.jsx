@@ -515,7 +515,7 @@ export default class Workbench extends React.Component<Props> {
           objrepoName
       } = this.props;
 
-      const { cloudProviders = {} } = settings;
+      const { visualProviders = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null } = settings;
       const { runtimeSettings } = test;
       // sidebars state
       const leftSidebarSize = settings.sidebars.left.size;
@@ -539,7 +539,7 @@ export default class Workbench extends React.Component<Props> {
               });
           }      
       }
-    
+          
       if(!initialized){
           return (
               <Initializing/>
@@ -638,7 +638,8 @@ export default class Workbench extends React.Component<Props> {
             <SettingsDialog 
                 { ...dialog['DIALOG_SETTINGS'] } 
                 settings={ runtimeSettings }
-                providers={ cloudProviders }
+                cloudProviders={ cloudProviders }
+                visualProviders={ visualProviders }
                 onSubmit={ ::this.settingsDialog_onSubmit }
                 onCancel={ ::this.settingsDialog_onCancel } 
             />
@@ -664,6 +665,7 @@ export default class Workbench extends React.Component<Props> {
                   browsers={ test.browsers }
                   emulators={ test.emulators }
                   providers={ providers }
+                  cloudProvidesBrowsersAndDevices={ cloudProvidesBrowsersAndDevices }
                   showRecorderMessage={ showRecorderMessage }
                   changeShowRecorderMessageValue={ changeShowRecorderMessageValue }
                   controlsState={ this.getToolbarControlsState() } 

@@ -178,7 +178,6 @@ export default class ObjectEditor extends React.PureComponent<Props> {
     startEditArrayObject = (index) => {
         try {
             const { object } = this.props;
-    
             const name = object.locator[index];
     
             this.setState({

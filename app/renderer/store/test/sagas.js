@@ -178,7 +178,9 @@ export function* startTest({ payload }) {
     if (runtimeSettings.testTarget && runtimeSettings.testMode === 'mob') {
         const devices = yield select(state => state.test.devices);
         const targetDevice = devices.find(x => x.id === runtimeSettings.testTarget);
-        runtimeSettingsClone.testTarget = targetDevice;
+        if(targetDevice){
+            runtimeSettingsClone.testTarget = targetDevice;
+        }
     }
 
     try {        

@@ -165,7 +165,7 @@ export default class List extends React.PureComponent<ListProps> {
 
 type ListItemProps = {
     // data source - a list of items
-    data?: object,
+    data?: Object,
     editable?: boolean,
     controls: Element
 };

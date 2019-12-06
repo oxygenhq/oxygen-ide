@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import { Form, Input, Switch, Checkbox } from 'antd';
 
 const DEFAULT_STATE = {
@@ -12,26 +12,19 @@ const formItemLayout = {
 };
 
 type Props = {
-    form: Object,
+    form: Object | undefined | null,
     visible: boolean | undefined,
     providers: Object | undefined
 };
 
-class CloudProvidersSettings extends React.PureComponent<Props> {
-    props: Props;
+class CloudProvidersSettings extends PureComponent<Props> {
   
-    state = {
-        ...DEFAULT_STATE,
-    }
-
-    static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.visible == true && nextProps.providers) {
-            return {
-                providers: nextProps.providers || {},
-            };
-        }
-        // else, leave the previous state 
-        return null;
+    constructor(props){
+        super(props);
+        this.state = {
+            ...DEFAULT_STATE,
+            providers: props.providers
+        };
     }
 
     onChangeSauceLabsUrl(value) {
@@ -478,10 +471,10 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
 
 const EnhancedForm =  Form.create()(CloudProvidersSettings);
 
-export default class GeneralSettingsWrap extends React.PureComponent<Props> {
+export default class GeneralSettingsWrap extends PureComponent<Props> {
     render(){
         return(
-            <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} />
+            <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />
         );
     }
 }

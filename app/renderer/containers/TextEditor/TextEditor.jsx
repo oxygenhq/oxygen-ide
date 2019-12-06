@@ -27,7 +27,7 @@ type Props = {
   activeFileName: string | null,
   fontSize: number,
   activeFile: null | object,
-  openFiles: null | {[key: string]: object},
+  openFiles: null | {[key: string]: Object},
   onBreakpointsUpdate: (Array<any>) => void,
   onContentUpdate: (string, string) => void
 };

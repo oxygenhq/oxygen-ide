@@ -19,30 +19,23 @@ const formItemLayout = {
 };
 
 type Props = {
-    form: Object,
+    form: Object | undefined | null,
     visible: boolean | undefined,
     settings: Object | undefined
 };
 
-class GeneralSettings extends React.PureComponent<Props> {
-    props: Props;
 
-    state = {
-        ...DEFAULT_STATE,
-    }
-    
-    static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.visible == true && nextProps.settings) {
-            return {
-                iterations: nextProps.settings.iterations || 1,
-                paramMode: nextProps.settings.paramMode || 'sequential',
-                paramFilePath: nextProps.settings.paramFilePath || null,
-                reopenSession: nextProps.settings.reopenSession || false,
-                useParams: nextProps.settings.paramFilePath != null,
-            };
-        }
-        // else, leave the previous state 
-        return null;
+class GeneralSettings extends PureComponent<Props> {    
+    constructor(props){
+        super(props);
+        this.state = {
+            ...DEFAULT_STATE,
+            iterations: props.settings.iterations || 1,
+            paramMode: props.settings.paramMode || 'sequential',
+            paramFilePath: props.settings.paramFilePath || null,
+            reopenSession: props.settings.reopenSession || false,
+            useParams: props.settings.paramFilePath != null,
+        };
     }
     
     async onBrowseFile() {
@@ -190,10 +183,10 @@ class GeneralSettings extends React.PureComponent<Props> {
 
 const EnhancedForm =  Form.create()(GeneralSettings);
 
-export default class GeneralSettingsWrap extends React.PureComponent<Props> {
+export default class GeneralSettingsWrap extends PureComponent<Props> {
     render(){
         return(
-            <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} />
+            <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />
         );
     }
 }

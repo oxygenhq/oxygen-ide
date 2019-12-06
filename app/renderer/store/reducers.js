@@ -8,7 +8,6 @@
  */
 // @flow
 import { combineReducers } from 'redux';
-import { routerReducer as router } from 'react-router-redux';
 import tree from './tree/reducer';
 import settings from './settings/reducer';
 import editor from './editor/reducer';
@@ -22,7 +21,6 @@ import recorder from './recorder/reducer';
 import objrepo from './obj-repo/reducer';
 
 const rootReducer = combineReducers({
-    router,
     tree,
     settings,
     editor,
