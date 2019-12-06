@@ -462,7 +462,7 @@ export default class Workbench extends Component<Props> {
           objrepoName
       } = this.props;
 
-      const { cloudProviders = {}, cloudProvidesBrowsersAndDevices = null } = settings;
+      const { visualProviders = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null } = settings;
       const { runtimeSettings } = test;
       // sidebars state
       const leftSidebarSize = settings.sidebars.left.size;
@@ -586,7 +586,8 @@ export default class Workbench extends Component<Props> {
             <SettingsDialog 
                 { ...dialog['DIALOG_SETTINGS'] } 
                 settings={ runtimeSettings }
-                providers={ cloudProviders }
+                cloudProviders={ cloudProviders }
+                visualProviders={ visualProviders }
                 onSubmit={ ::this.settingsDialog_onSubmit }
                 onCancel={ ::this.settingsDialog_onCancel } 
             />

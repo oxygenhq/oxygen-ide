@@ -43,6 +43,14 @@ const saveCloudProvidersDestruction = (fieldName, object) => {
 const defaultAppSettings = {
     cache: null,
     files: {},
+    visualProviders: {
+        applitools: {
+            title: 'Applitools',
+            accessKey: null,
+            checkOnEveryAction: false,
+            inUse: false,
+        },
+    },
     cloudProviders: {
         sauceLabs: {
             title: 'Sauce Labs',

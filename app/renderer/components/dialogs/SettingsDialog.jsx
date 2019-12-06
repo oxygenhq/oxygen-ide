@@ -10,6 +10,7 @@ import React, { PureComponent } from 'react';
 import { Tabs, Modal } from 'antd';
 import GeneralSettings from './GeneralSettings';
 import CloudProvidersSettings from './CloudProvidersSettings';
+import VisualTestingSettings from './VisualTestingProvidersSettings';
 const { TabPane } = Tabs;
 
 const DEFAULT_STATE = {
@@ -75,7 +76,8 @@ export default class SettingsDialog extends PureComponent<Props> {
     render() {
         const {
             settings,
-            providers,
+            cloudProviders,
+            visualProviders,
             visible,
             onCancel,
         } = this.props;
@@ -95,15 +97,22 @@ export default class SettingsDialog extends PureComponent<Props> {
                     <TabPane tab="General" key="1">
                         <GeneralSettings
                             ref={node => (this.GeneralSettings = node)}
-                            settings={settings}
-                            visible={visible}
+                            settings={ settings }
+                            visible={ visible }
                         />
                     </TabPane>
                     <TabPane tab="Cloud Providers" key="2">
                         <CloudProvidersSettings
                             ref={node => (this.CloudProvidersSettings = node)}
-                            providers={ providers }
-                            visible={visible}
+                            providers={ cloudProviders }
+                            visible={ visible }
+                        />
+                    </TabPane>
+                    <TabPane tab="Visual Testing" key="3">
+                        <VisualTestingSettings
+                            ref={node => (this.VisualTestingSettings = node)}
+                            providers={ visualProviders }
+                            visible={ visible }
                         />
                     </TabPane>
                 </Tabs>
