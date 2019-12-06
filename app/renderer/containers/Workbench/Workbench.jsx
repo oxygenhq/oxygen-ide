@@ -635,14 +635,16 @@ export default class Workbench extends React.Component<Props> {
                 onSubmit={ ::this.fileRenameDialog_onSubmit }
                 onCancel={ ::this.fileRenameDialog_onCancel } 
             />
-            <SettingsDialog 
-                { ...dialog['DIALOG_SETTINGS'] } 
-                settings={ runtimeSettings }
-                cloudProviders={ cloudProviders }
-                visualProviders={ visualProviders }
-                onSubmit={ ::this.settingsDialog_onSubmit }
-                onCancel={ ::this.settingsDialog_onCancel } 
-            />
+            { dialog.DIALOG_SETTINGS && dialog.DIALOG_SETTINGS.visible &&
+                <SettingsDialog 
+                    { ...dialog['DIALOG_SETTINGS'] } 
+                    settings={ runtimeSettings }
+                    cloudProviders={ cloudProviders }
+                    visualProviders={ visualProviders }
+                    onSubmit={ ::this.settingsDialog_onSubmit }
+                    onCancel={ ::this.settingsDialog_onCancel } 
+                />
+            }
             <UpdateDialog
                 { ...dialog['DIALOG_UPDATE'] }
                 onSubmit={ ::this.updateDialog_onSubmit }
