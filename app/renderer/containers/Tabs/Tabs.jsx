@@ -36,10 +36,7 @@ const circle = () => {
     );
 };
 
-class Tabs extends Component<Props, void> {
-  static defaultProps = {
-      onClose: noop,
-  };
+class Tabs extends React.Component<Props, void> {
 
   // holds PerfectScrollbar instance
   ps = null
@@ -175,14 +172,14 @@ class Tabs extends Component<Props, void> {
                                       { tab.touched &&
                     <Icon
                         className="close-icon"
-                        onClick={() => this.props.onClose(tab.key, tab.title)}
+                        onClick={() => this.props.onClose && this.props.onClose(tab.key, tab.title)}
                         component={circle}
                     />
                                       }
                                       { !tab.touched &&
                     <Icon
                         className="close-icon"
-                        onClick={() => this.props.onClose(tab.key, tab.title)}
+                        onClick={() => this.props.onClose && this.props.onClose(tab.key, tab.title)}
                         type={'close'}
                     />
                                       }

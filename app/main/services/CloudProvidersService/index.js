@@ -33,11 +33,11 @@ export default class CloudProvidersService extends ServiceBase {
         }
         for (var providerName in cloudProviders) {
             const providerSettings = cloudProviders[providerName];
-            if (!Providers.hasOwnProperty(providerName)) {
+            if (!Providers.default.hasOwnProperty(providerName)) {
                 continue;
             }
 
-            const provider = this.providers[providerName] = new Providers[providerName](providerSettings);
+            const provider = this.providers[providerName] = new Providers.default[providerName](providerSettings);
 
             provider.start();
         }

@@ -17,7 +17,7 @@ type Props = {
     providers: Object | undefined
 };
 
-class CloudProvidersSettings extends PureComponent<Props> {
+class CloudProvidersSettings extends React.PureComponent<Props> {
   
     constructor(props){
         super(props);
@@ -471,7 +471,7 @@ class CloudProvidersSettings extends PureComponent<Props> {
 
 const EnhancedForm =  Form.create()(CloudProvidersSettings);
 
-export default class GeneralSettingsWrap extends PureComponent<Props> {
+export default class GeneralSettingsWrap extends React.PureComponent<Props> {
     render(){
         return(
             <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />

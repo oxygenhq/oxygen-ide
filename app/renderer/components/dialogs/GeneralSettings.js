@@ -25,7 +25,7 @@ type Props = {
 };
 
 
-class GeneralSettings extends PureComponent<Props> {    
+class GeneralSettings extends React.PureComponent<Props> {    
     constructor(props){
         super(props);
         this.state = {
@@ -183,7 +183,7 @@ class GeneralSettings extends PureComponent<Props> {
 
 const EnhancedForm =  Form.create()(GeneralSettings);
 
-export default class GeneralSettingsWrap extends PureComponent<Props> {
+export default class GeneralSettingsWrap extends React.PureComponent<Props> {
     render(){
         return(
             <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />

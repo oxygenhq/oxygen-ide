@@ -17,7 +17,7 @@ type Props = {
     providers: Object | undefined
 };
 
-class VisualTestingProvidersSettings extends PureComponent<Props> {
+class VisualTestingProvidersSettings extends React.PureComponent<Props> {
   
     constructor(props){
         super(props);
@@ -129,7 +129,7 @@ class VisualTestingProvidersSettings extends PureComponent<Props> {
 
 const EnhancedForm =  Form.create()(VisualTestingProvidersSettings);
 
-export default class GeneralSettingsWrap extends PureComponent<Props> {
+export default class GeneralSettingsWrap extends React.PureComponent<Props> {
     render(){
         return(
             <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />
