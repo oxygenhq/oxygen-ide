@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { Modal } from 'antd';
 
 const DEFAULT_STATE = {
@@ -18,13 +18,14 @@ type Props = {
   visible: boolean,
   type?: string,
   path?: string,
+  parent: Object | undefined,
   onSubmit: () => void,
-  onCancel: () => void,
+  onCancel: () => void
 };
 
-export default class ObjectElementOrContainerRemoveDialog extends PureComponent<Props> {
+export default class ObjectElementOrContainerRemoveDialog extends React.PureComponent<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
 
 
         let name = '';
@@ -72,16 +73,12 @@ export default class ObjectElementOrContainerRemoveDialog extends PureComponent<
             visible,
             type,
             parent,
-            onSubmit,
             onCancel
         } = this.props;
 
         if (!type) {
             return null;
         }
-        const {
-            name
-        } = this.state;
 
         let typeString = '';
 
@@ -107,7 +104,7 @@ export default class ObjectElementOrContainerRemoveDialog extends PureComponent<
                 onOk={this.handleOk.bind(this)}
                 onCancel={onCancel}
             >
-                <p>Are you sure, you want to delete '{parentName}' {typeString}?</p>
+                <p>Are you sure, you want to delete &apos;{parentName}&apos; {typeString}?</p>
             </Modal>
         );
     }

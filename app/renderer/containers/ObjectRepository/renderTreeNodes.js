@@ -33,12 +33,13 @@ function handleContextMenuEvent(e, node, menuName) {
 }
 
 function renderTreeNodes(nodes, searchResults) {
-    const { active } = this.props;
 
     if (!nodes || !nodes.length || nodes.length == 0) {
         return null;
     }
+    /*eslint-disable */
     handleContextMenuEvent = handleContextMenuEvent.bind(this);
+    /*eslint-enable */
     return nodes.map(element => {
         const resolveClassName = element.name === '.emptyfile'
             ? 'hidden-node' : element.type;
@@ -109,6 +110,6 @@ function renderTreeNodes(nodes, searchResults) {
             />
         );
     });
-};
+}
 
 export default renderTreeNodes;

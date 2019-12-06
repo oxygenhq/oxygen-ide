@@ -11,7 +11,9 @@ export const SEVERITY_ERROR = 'ERROR';
 export const SEVERITY_FATAL = 'ERROR';
 export const SEVERITY_INFO = 'INFO';
 export const SEVERITY_DEBUG = 'DEBUG';
+export const SEVERITY_FATAL = 'FATAL';
 export const EVENT_LOG_ENTRY = 'LOG_ENTRY';
+
 
 export default class ServiceBase {
     static get SEVERITY_FATAL() { return SEVERITY_FATAL; }
@@ -58,7 +60,8 @@ export default class ServiceBase {
     logDebug(message, extra = null) {
         this.log(message, SEVERITY_DEBUG, extra);
     }
-    notify(event, message = null, severity = SEVERITY_INFO) {
+    notify(inputEvent, message = null, severity = SEVERITY_INFO) {
+        let event = inputEvent;
         if (typeof(event) == 'string') {
             event = {
                 type: event,
@@ -67,13 +70,13 @@ export default class ServiceBase {
             };
         }
 
-        for (let o of this.observers) {
+        for (var o of this.observers) {
             o(event);
         }
     }
     // dispose method must be implemented by inheriting class
     async dispose() {
-        for (let observer of this.observers) {
+        for (var observer of this.observers) {
             this.unsubscribe(observer);
         }
     }

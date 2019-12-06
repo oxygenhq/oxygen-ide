@@ -8,15 +8,24 @@
  */
 // @flow
 import React, { PureComponent, Fragment } from 'react';
-import { Button } from 'antd';
-import List from '../../components/core/List';
-import Panel from '../../components/Panel';
+import List from '../../components/core/List.jsx';
+import Panel from '../../components/Panel.jsx';
 import LocatorsChanger from './LocatorsChanger';
-import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
-import difference from 'lodash.difference';
 
 type Props = {
-  object: null | object,
+    object: null | object,
+    addLocator: Function,
+    active: boolean,
+    addArrayObjectLocator: Function,
+    removeObjectOrFolder: Function,
+    removeArrayObjectLocator: Function,
+    updateLocator: Function,
+    moveLocator: Function,
+    moveArrayObjectLocator: Function,
+    updateLocatorValue: Function,
+    updateArrayObjecLocatorValue: Function,
+    deleteLocator: Function,
+    refreshScroll: Function
 };
 
 const EmptyList = () => {
@@ -42,185 +51,181 @@ const DEFAULT_STATE = {
     arrayObjectEditing: false
 };
 
-export default class ObjectEditor extends PureComponent<Props> {
-  props: Props;
+export default class ObjectEditor extends React.PureComponent<Props> {
+    props: Props;
 
-  state = DEFAULT_STATE;
+    state = DEFAULT_STATE;
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-      let newState = {};
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        let newState = {};
 
-      const n = nextProps.object;
-      const t = this.props.object;
+        const n = nextProps.object;
+        const t = this.props.object;
 
-      const same = n.name === t.name && n.path === t.path && n.type === t.type;
+        const same = n.name === t.name && n.path === t.path && n.type === t.type;
+        
+        if(!same){
+            newState = {...DEFAULT_STATE};
+        }
+
+        if (this.props.active !== nextProps.active) {
+            if (!nextProps.object) {
+                newState.object = null;
+            }
+            else {
+                newState.object = nextProps.object;
+            }
+        }
+        this.setState({...newState});
+    }
+
+    addLocator = (name) => {
+        const { object } = this.props;
+        const { path } = object;
+
+        if(this.props.addLocator){
+            this.props.addLocator(path, name);
+        }
+    }
+
+    addArrayObjectLocator = (name) => {
+        const { object } = this.props;
+        const { path } = object;
+
+        if(this.props.addArrayObjectLocator){
+            this.props.addArrayObjectLocator(path, name);
+        }
+    }
+
+    select = (selectedName, index) => {
+        const { selectedLocatorName } = this.state;
+        let newSelectedLocatorName;
+        let newSelectedLocatorIndex;
+
+        if(selectedName === selectedLocatorName){
+            newSelectedLocatorName = null;
+            newSelectedLocatorIndex = null;
+        } else {
+            newSelectedLocatorName = selectedName;
+            newSelectedLocatorIndex = index;
+        }
+
+        this.setState({
+            selectedLocatorName: newSelectedLocatorName,
+            selectedLocatorIndex: newSelectedLocatorIndex
+        });
+    }
+
+    selectArrayObject = (name, index) => {
+        const { selectedArrayObjectLocatorIndex } = this.state;
+
+        let newSelectedArrayObjectLocatorIndex;
+        let newSelectedArrayObjectLocatorName;
+
+        if(index === selectedArrayObjectLocatorIndex){
+            newSelectedArrayObjectLocatorIndex = null;
+            newSelectedArrayObjectLocatorName = null;
+        } else {
+            newSelectedArrayObjectLocatorIndex = index;
+            newSelectedArrayObjectLocatorName = name;
+        }
+
+        this.setState({
+            selectedArrayObjectLocatorName: newSelectedArrayObjectLocatorName,
+            selectedArrayObjectLocatorIndex: newSelectedArrayObjectLocatorIndex
+        });
+    }
+
+
+    remove = (name) => {
+        const { object } = this.props;
+        const { path } = object;
+
+        if(this.props.removeObjectOrFolder){
+            this.props.removeObjectOrFolder(path, name);
+        
+            this.setState({
+                selectedLocatorName: null,
+                selectedLocatorIndex: null
+            });      
+        }
+    }
+
+    removeArrayObjectLocator = (id) => {
+
+        const { object } = this.props;
+        const { path } = object;
+
+        if(this.props.removeArrayObjectLocator){
+            this.props.removeArrayObjectLocator(path, id);
+        
+            this.setState({
+                selectedArrayObjectLocatorName: null,
+                selectedArrayObjectLocatorIndex: null
+            });      
+        }
+    }
+
+    startEdit = (name, path = null) => {
+        this.setState({
+            editStr: name,
+            originStr: name,
+            originPath: path,
+            editing: true
+        });
+    }
+
+    startEditArrayObject = (index) => {
+        try {
+            const { object } = this.props;
+            const name = object.locator[index];
     
-      if(!same){
-          newState = {...DEFAULT_STATE};
-      }
+            this.setState({
+                arrayObjectEditStr: name,
+                arrayObjectOriginStr: name,
+                arrayObjectOriginIndex: index,
+                arrayObjectEditing: true
+            });
 
-      if (this.props.active !== nextProps.active) {
-          if (!nextProps.object) {
-              newState.object = null;
-          }
-          else {
-              newState.object = nextProps.object;
-          }
-      }
-      this.setState({...newState});
-  }
+        } catch(error) {
+            console.warn('startEditArrayObject error', error);
+        }
+    }
 
-  addLocator = (name) => {
-      const { object } = this.props;
-      const { path } = object;
+    finishEdit = (name) => {
+        const { originStr } = this.state;
+        const { object } = this.props;
+        const { path } = object;
 
-      if(this.props.addLocator){
-          this.props.addLocator(path, name);
-      }
-  }
+        this.setState({
+            editStr: null,
+            editing: false,
+            originStr: null,
+            selectedLocatorIndex: null,
+            selectedLocatorName: null
+        },
+        () => {
+            if(this.props.updateLocator){
+                this.props.updateLocator(path, name, originStr);
+            }
+        });
+    }
 
-  addArrayObjectLocator = (name) => {
-      const { object } = this.props;
-      const { path } = object;
-
-      if(this.props.addArrayObjectLocator){
-          this.props.addArrayObjectLocator(path, name);
-      }
-  }
-
-  select = (selectedName, index) => {
-      const { selectedLocatorName } = this.state;
-      const { object } = this.props;
-      const { path } = object;
-      let newSelectedLocatorName;
-      let newSelectedLocatorIndex;
-
-      if(selectedName === selectedLocatorName){
-          newSelectedLocatorName = null;
-          newSelectedLocatorIndex = null;
-      } else {
-          newSelectedLocatorName = selectedName;
-          newSelectedLocatorIndex = index;
-      }
-
-      this.setState({
-          selectedLocatorName: newSelectedLocatorName,
-          selectedLocatorIndex: index
-      });
-  }
-
-  selectArrayObject = (name, index) => {
-      const { selectedArrayObjectLocatorIndex } = this.state;
-      const { object } = this.props;
-
-      let newSelectedArrayObjectLocatorIndex;
-      let newSelectedArrayObjectLocatorName;
-
-      if(index === selectedArrayObjectLocatorIndex){
-          newSelectedArrayObjectLocatorIndex = null;
-          newSelectedArrayObjectLocatorName = null;
-      } else {
-          newSelectedArrayObjectLocatorIndex = index;
-          newSelectedArrayObjectLocatorName = name;
-      }
-
-      this.setState({
-          selectedArrayObjectLocatorName: newSelectedArrayObjectLocatorName,
-          selectedArrayObjectLocatorIndex: newSelectedArrayObjectLocatorIndex
-      });
-  }
-
-
-  remove = (name) => {
-      const { object } = this.props;
-      const { path } = object;
-
-      if(this.props.removeObjectOrFolder){
-          this.props.removeObjectOrFolder(path, name);
-      
-          this.setState({
-              selectedLocatorName: null,
-              selectedLocatorIndex: null
-          });      
-      }
-  }
-
-  removeArrayObjectLocator = (id) => {
-
-      const { object } = this.props;
-      const { path } = object;
-
-      if(this.props.removeArrayObjectLocator){
-          this.props.removeArrayObjectLocator(path, id);
-      
-          this.setState({
-              selectedArrayObjectLocatorName: null,
-              selectedArrayObjectLocatorIndex: null
-          });      
-      }
-  }
-
-  startEdit = (name, path = null) => {
-      this.setState({
-          editStr: name,
-          originStr: name,
-          originPath: path,
-          editing: true
-      });
-  }
-
-  startEditArrayObject = (index) => {
-      try {
-          const { object } = this.props;
-  
-          const name = object.locator[index];
-  
-          this.setState({
-              arrayObjectEditStr: name,
-              arrayObjectOriginStr: name,
-              arrayObjectOriginIndex: index,
-              arrayObjectEditing: true
-          });
-
-      } catch(error) {
-          console.warn('startEditArrayObject error', error);
-      }
-  }
-
-  finishEdit = (name) => {
-      const { originStr } = this.state;
-      const { object } = this.props;
-      const { path } = object;
-
-      this.setState({
-          editStr: null,
-          editing: false,
-          originStr: null,
-          selectedLocatorIndex: null,
-          selectedLocatorName: null
-      },
-      () => {
-          if(this.props.updateLocator){
-              this.props.updateLocator(path, name, originStr);
-          }
-      });
-  }
-
-  moveLocator = (name, direction) => {
-      const { selectedLocatorIndex } = this.state;
-      const { object } = this.props;
-      const { path } = object;
-    
-      this.setState({
-          selectedLocatorName: null,
-          selectedLocatorIndex: null
-      },
-      () => {
-          if(this.props.moveLocator){
-              this.props.moveLocator(path, name, direction, selectedLocatorIndex);
-          }
-      });    
-  }
+    moveLocator = (name, direction) => {
+        const { selectedLocatorIndex } = this.state;
+        const { object } = this.props;
+        const { path } = object;
+        
+        this.setState({
+            selectedLocatorName: null,
+            selectedLocatorIndex: null
+        },
+        () => {
+            if(this.props.moveLocator){
+                this.props.moveLocator(path, name, direction, selectedLocatorIndex);
+            }
+        });    
+    }
 
   moveArrayObjectLocator = (index, direction) => {
       const { object } = this.props;
@@ -306,7 +311,6 @@ export default class ObjectEditor extends PureComponent<Props> {
       const { 
           selectedLocatorName,
           selectedLocatorIndex,
-          selectedArrayObjectLocatorName,   
           selectedArrayObjectLocatorIndex
       } = this.state;
 

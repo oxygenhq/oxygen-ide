@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import * as ActionTypes from './types';
-import { success, failure } from '../../helpers/redux';
+import { success } from '../../helpers/redux';
 
 const defaultState = {
     canRecord: false,

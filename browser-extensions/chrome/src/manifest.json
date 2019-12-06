@@ -1,6 +1,6 @@
 {
   "name": "Oxygen",
-  "version": "0.69.0",
+  "version": "0.70.0",
   "description": "Script recorder for Oxygen Framework.",
   "manifest_version": 2,
   "permissions": [

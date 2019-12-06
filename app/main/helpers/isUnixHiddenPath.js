@@ -15,5 +15,7 @@ export default function(path) {
     if (process.platform === 'win32') {
         return false;
     }
+    /*eslint-disable */
     return (/(^|\/)\.[^\/\.]/g).test(path);
-};
+    /*eslint-enable */
+}

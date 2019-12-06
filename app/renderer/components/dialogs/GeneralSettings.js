@@ -24,10 +24,9 @@ type Props = {
     settings: Object | undefined
 };
 
+
 class GeneralSettings extends PureComponent<Props> {    
     constructor(props){
-
-
         super(props);
         this.state = {
             ...DEFAULT_STATE,

@@ -1,7 +1,11 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Modal, Button } from 'antd';
 
-export default class ChromeDriverDownloadingSuccessDialog extends PureComponent {
+type Props = {
+    onClose: Function
+};
+
+export default class ChromeDriverDownloadingSuccessDialog extends React.PureComponent<Props> {
 
     close = () => {
         if(this.props.onClose){

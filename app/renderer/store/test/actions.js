@@ -8,6 +8,97 @@
  */
 import * as ActionTypes from './types';
 
+const convertVariablesForTree = (variables, objectId = null) => {
+
+    if (!variables) {
+        return [];
+    }
+
+    let result = [];
+
+    if(objectId && variables && variables.child && Array.isArray(variables.child) && variables.child.length > 0){
+        variables.child.map(item => {
+            if(
+                item &&
+                item.objectId &&
+                item.objectId === objectId &&
+                item.objectIdResponse &&
+                item.objectIdResponse.result &&
+                Array.isArray(item.objectIdResponse.result) &&
+                item.objectIdResponse.result.length > 0
+            ){
+                item.objectIdResponse.result.map((variable) => {
+                    if(
+                        variable &&
+                        variable.name &&
+                        variable.value &&
+                        variable.value.type
+                    ){
+
+                        const element = {
+                            name: variable.name,
+                            type: variable.value.type,
+                            id: variable.value.objectId || null,
+                            children: convertVariablesForTree(item, variable.value.objectId || null),
+                        };
+
+                        if(variable && variable.value && typeof variable.value.value !== 'undefined'){
+                            element.value = variable.value.value;
+                        }
+
+                        result.push(element);
+                    }
+                });
+            }
+        });
+    }
+  
+    if(variables && Array.isArray(variables) && variables.length > 0){
+        variables.map(callFrame => {
+            if(callFrame && Array.isArray(callFrame) && callFrame.length > 0){
+                callFrame.map(scope => {
+                    if(scope && Array.isArray(scope) && scope.length > 0){
+                        scope.map(item => {
+                            if(
+                                item && 
+                                item.objectId && 
+                                item.objectIdResponse && 
+                                item.objectIdResponse.result && 
+                                Array.isArray(item.objectIdResponse.result) &&
+                                item.objectIdResponse.result.length > 0
+                            ){
+                                item.objectIdResponse.result.map((variable) => {
+                                    if(
+                                        variable &&
+                                        variable.name &&
+                                        variable.value &&
+                                        variable.value.type
+                                    ){
+                                        const element = {
+                                            name: variable.name,
+                                            type: variable.value.type,
+                                            id: variable.value.objectId || null,
+                                            children: convertVariablesForTree(item, variable.value.objectId || item.objectId || null),
+                                        };
+                                        
+                                        if(variable && variable.value && typeof variable.value.value !== 'undefined'){
+                                            element.value = variable.value.value;
+                                        }
+
+                                        result.push(element);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    return result;
+};
+
 export const startTest = () => ({
     type: ActionTypes.TEST_START,
     payload: null,
@@ -28,9 +119,9 @@ export const onTestEnded = () => ({
     payload: null,
 });
 
-export const onBreakpoint = (file, line) => ({
+export const onBreakpoint = (file, line, variables) => ({
     type: ActionTypes.TEST_EVENT_BREAKPOINT,
-    payload: { file, line },
+    payload: { file, line, variables: convertVariablesForTree(variables) },
 });
 
 export const onLineUpdate = (time, file, line, primary) => ({

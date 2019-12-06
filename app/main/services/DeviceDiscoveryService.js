@@ -9,17 +9,12 @@
 import ADB from 'appium-adb';
 import { instrumentsUtils } from 'appium-ios-driver';
 import ServiceBase from './ServiceBase';
-import cp from 'child_process';
-// import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron';
 
 const DEVICE_CONNECTED = 'DEVICE_CONNECTED';
 const DEVICE_DISCONNECTED = 'DEVICE_DISCONNECTED';
 const XCODE_ERROR = 'XCODE_ERROR';
 const DEVICE_MONITOR_INTERVAL = 10000;
-
-let isError = function(e){
-    return e && e.stack && e.message;
-};
 
 const DEVICE_INFO = {
     os: {
@@ -48,7 +43,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
 
     async start() {
         await this._updateDeviceList();
-        
+
         const self = this;
         this.devListInterval = setInterval(function() {
             // do not update devices if previous update call is not finished yet
@@ -91,7 +86,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
             }
         }
         this.updatingDeviceList = false;    
-    };
+    }
 
     async stop() {
         if (this.devListInterval) {
@@ -139,10 +134,10 @@ export default class DeviceDiscoveryService extends ServiceBase {
             if (e.message && e.message.startsWith("Could not find 'adb")) {
                 this.adbPresent = false;
             } else {
-                // Sentry.captureException(e);
+                Sentry.captureException(e);
             }
         }
-    };
+    }
 
     async _getAndroidDeviceInfo(uuid) {
         const adb = await ADB.createADB();
@@ -220,10 +215,10 @@ export default class DeviceDiscoveryService extends ServiceBase {
                     });
                 }
             } else {
-                // Sentry.captureException(e);
+                Sentry.captureException(e);
             }
         }
-    };
+    }
     
     _emitDeviceConnected(device) {
         this.notify({
@@ -240,7 +235,6 @@ export default class DeviceDiscoveryService extends ServiceBase {
     }
 
     _delay(timeout, f) {
-        var self = this;
         return new Promise(function(resolve) {
             setTimeout(resolve.bind(null, f), timeout);
         });

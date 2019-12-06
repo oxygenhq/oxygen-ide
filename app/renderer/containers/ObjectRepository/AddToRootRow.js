@@ -1,7 +1,11 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { PureComponent } from 'react';
 import { Button, Menu, Dropdown, Icon, Modal, Input } from 'antd';
 
-export default class AddToRootRow extends PureComponent {
+type Props = {
+    orAddToRoot: Function
+};
+
+export default class AddToRootRow extends React.PureComponent<Props> {
     constructor(props) {
         super(props);
 

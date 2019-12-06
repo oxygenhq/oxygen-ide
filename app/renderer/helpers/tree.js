@@ -38,7 +38,7 @@ export function clearDublicatesInChildArray(element) {
 }
 
 export function wrap(rawNodes) {
-    if (!rawNodes || typeof rawNodes !== 'array') {
+    if (!rawNodes || !Array.isArray(rawNodes)) {
         return rawNodes;
     }
     return rawNodes.map(rawNode => ({
@@ -57,7 +57,7 @@ export function mergeChildren(prevChildren, nextChildren) {
         return null;
     }
     let merged = [];
-    for (let newChild of nextChildren) {
+    for (var newChild of nextChildren) {
         // check if the node existed in previous children state
         const oldChild = prevChildren.find(x => x.path === newChild.path);
         if (oldChild != null) {
@@ -70,13 +70,14 @@ export function mergeChildren(prevChildren, nextChildren) {
     return merged;
 }
 
-export function findTreeNode(root, nodePath) {
+export function findTreeNode(root, inputNodePath) {
+    let nodePath = inputNodePath;
     if (!root || !root.length) {
         return null;
     }
     // make sure path ends with '/' (path separator)
     nodePath = nodePath.endsWith(path.sep) ? nodePath : nodePath + path.sep;
-    for (let elm of root) {
+    for (var elm of root) {
         const elmPath = elm.path.endsWith(path.sep) ? elm.path : elm.path + path.sep;
         if (nodePath === elmPath) {
             return elm;
@@ -84,7 +85,7 @@ export function findTreeNode(root, nodePath) {
         else if (nodePath !== elmPath && nodePath.startsWith(elmPath)) {
             return findTreeNode(elm.children, nodePath);
         }
-    };
+    }
     return null;
 }
 

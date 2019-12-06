@@ -17,7 +17,9 @@ const getVisibleTrees = (trees, searchQuery) => {
         let nameMatch = {};
 
         if(includeInName){
+            /*eslint-disable */
             const { children, ...data } = t;
+            /*eslint-enable */
             nameMatch = data;
         }
 
@@ -74,9 +76,9 @@ const getVisibleTrees = (trees, searchQuery) => {
     return results;
 };
 
-export default class SearchRow extends PureComponent<Props> {
+export default class SearchRow extends React.PureComponent<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
         this.state = {
             searchQuery: '',
             searchResults: []

@@ -8,7 +8,7 @@
  */
 
 import { connect } from 'react-redux';
-import ObjectRepositoryNotValidView from './ObjectRepositoryNotValidView';
+import ObjectRepositoryNotValidView from './ObjectRepositoryNotValidView.jsx';
 import { bindActionCreators } from 'redux';
 import * as orActions from '../../store/obj-repo/actions';
 import { findObject } from '../../helpers/objrepo';

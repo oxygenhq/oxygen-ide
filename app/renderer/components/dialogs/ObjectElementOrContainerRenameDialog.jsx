@@ -6,12 +6,9 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent } from 'react';
-import { Form, Input, Select, Modal, message } from 'antd';
-import { capitalizeFirst } from '../../helpers/general';
-import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
+import { Input, Modal, message } from 'antd';
 
-const { Option } = Select;
 const DEFAULT_STATE = {
     name: '',
     type: null,
@@ -21,14 +18,15 @@ type Props = {
   visible: boolean,
   type?: string,
   path?: string,
+  parent: Object | undefined,
   onSubmit: () => void,
-  onCancel: () => void,
+  onCancel: () => void
 };
 
-export default class ObjectElementOrContainerRenameDialog extends PureComponent<Props> {
+export default class ObjectElementOrContainerRenameDialog extends React.PureComponent<Props> {
     constructor(props: Props) {
 
-        super(props: Props);
+        super(props);
 
         this.textInput = null;
 
@@ -123,7 +121,6 @@ export default class ObjectElementOrContainerRenameDialog extends PureComponent<
         const {
             visible,
             type,
-            onSubmit,
             onCancel,
         } = this.props;
 

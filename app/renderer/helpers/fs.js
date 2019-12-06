@@ -25,9 +25,8 @@ export function updateFilesAfterRename(files, oldPath, renamedFile) {
     let newFileList = [];
     // normalize both old and new paths (make sure we add '/')
     let oldPathNorm = normalize(oldPath);
-    let newPathNorm = normalize(newPath);
 
-    for (let fPath of Object.keys(files)) {
+    for (var fPath of Object.keys(files)) {
         const file = files[fPath];
         // in case current folder was renamed
         if (file.path === oldPath) {
@@ -61,7 +60,7 @@ export function replaceChildrenPath(children, oldPath, newPath) {
         return children;
     }
     let newChildren = [];
-    for (let child of children) {
+    for (var child of children) {
         newChildren.push({
             ...child,
             parentPath: replacePath(child.parentPath, oldPath, newPath),
@@ -71,7 +70,9 @@ export function replaceChildrenPath(children, oldPath, newPath) {
     return newChildren;
 }
 
-export function replacePath(path, oldPath, newPath) {
+export function replacePath(path, inputOldPath, inputNewPath) {
+    let oldPath = inputOldPath;
+    let newPath = inputNewPath;
     // normalize all paths
     oldPath = normalize(oldPath);
     newPath = normalize(newPath);

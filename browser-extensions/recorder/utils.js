@@ -9,7 +9,13 @@
 
 var ox_log = function (msg) {
     if (window.ox_debug) {
-        console.log(msg);
+        console.log('ox: ' + msg);
+    }
+};
+
+var ox_error = function (msg, e) {
+    if (window.ox_debug) {
+        console.error('ox: ' + msg, e);
     }
 };
 

@@ -27,7 +27,6 @@ class CloudProvidersSettings extends PureComponent<Props> {
         };
     }
 
-
     onChangeSauceLabsUrl(value) {
         const { providers = {} } = this.state || {};
         const { sauceLabs = {} } = providers;
@@ -339,7 +338,6 @@ class CloudProvidersSettings extends PureComponent<Props> {
             testingBot = {},
             lambdaTest = {}
         } = providers;
-        
 
         return(
             <Form>

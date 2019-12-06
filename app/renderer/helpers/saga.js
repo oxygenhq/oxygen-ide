@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import { put, take } from 'redux-saga/effects';
-import { success, failure, successOrFailure, actionCreator } from './redux';
+import { successOrFailure } from './redux';
 
 export function* putAndTake(requestAction) {
     yield put(requestAction);

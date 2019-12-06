@@ -6,7 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-/* eslint global-require: 0, flowtype-errors/show-errors: 0 */
 
 /**
  * This module executes inside of electron's main process. You can start
@@ -18,7 +17,6 @@
  *
  * @flow
  */
-
 import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
 
 import Logger from './Logger';
@@ -37,9 +35,9 @@ try {
     ) {
     // dev mode
     // ignore sentry logging
-        initializeCrashReporterAndSentry();
+    // initializeCrashReporterAndSentry();
     } else {
-        initializeCrashReporterAndSentry();
+    // initializeCrashReporterAndSentry();
     }
 } catch(e){
     console.warn('Cannot initialize CrashReporter and Sentry', e);
@@ -85,18 +83,18 @@ if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true')
     require('module').globalPaths.push(p);
 }
 
-const installExtensions = async () => {
-    const installer = require('electron-devtools-installer');
-    const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-    const extensions = [
-        'REACT_DEVELOPER_TOOLS',
-        'REDUX_DEVTOOLS'
-    ];
+// const installExtensions = async () => {
+//     const installer = require('electron-devtools-installer');
+//     const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+//     const extensions = [
+//         'REACT_DEVELOPER_TOOLS',
+//         'REDUX_DEVTOOLS'
+//     ];
 
-    return Promise
-        .all(extensions.map(name => installer.default(installer[name], forceDownload)))
-        .catch(console.log);
-};
+//     return Promise
+//         .all(extensions.map(name => installer.default(installer[name], forceDownload)))
+//         .catch(console.log);
+// };
 
 
 /**
@@ -163,8 +161,10 @@ app.on('ready', async () => {
 
 function disposeMainAndQuit() {
     if (mainProc) {
-    // dispose main process and all its services
+        // dispose main process and all its services
+        /*eslint-disable */
         mainProc.dispose().then(() => app.exit());
+        /*eslint-enable */
         // make sure we set mainProc to null to prevent duplicated calls to this function
         mainProc = null;
     }

@@ -1,11 +1,8 @@
-import React, { PureComponent, Fragment } from 'react';
-import { Modal, Button, Spin, Icon } from 'antd';
+import React, { PureComponent } from 'react';
+import { Modal, Icon } from 'antd';
 
-export default class ChromeDriverDownloadingDialog extends PureComponent {
+export default class ChromeDriverDownloadingDialog extends React.PureComponent {
     render() {
-
-        const { chromeVersion } = this.props;
-
         return (
             <Modal
                 className="hide-x-button"

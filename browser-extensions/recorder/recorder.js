@@ -69,7 +69,7 @@ Recorder.prototype.parseEventKey = function(eventKey) {
 };
 
 Recorder.prototype.attach = function() {
-    ox_log('ox: attaching to ' + window.__hash);
+    ox_log('attaching to ' + window.__hash);
 
     this.locatorBuilders = new LocatorBuilders(window);
     var self = this;
@@ -191,7 +191,7 @@ Recorder.prototype.initializeFrameHorrors = function() {
                 case 'assertText':
                     var txt = getText(el);
                     if (!txt) {
-                        ox_log('ox: error: selected element doesn\'t have text');
+                        ox_log('error: selected element doesn\'t have text');
                         return;
                     }
                     self.record(msg.cmd, self.findLocators(el), txt);
@@ -199,7 +199,7 @@ Recorder.prototype.initializeFrameHorrors = function() {
                 case 'waitForValue':
                 case 'assertValue':
                     if (!el.getAttribute('value')) {
-                        ox_log('ox: error: selected element doesn\'t have value attribute');
+                        ox_log('error: selected element doesn\'t have value attribute');
                         return;
                     }
                     self.record(msg.cmd, self.findLocators(el), el.value);
@@ -263,19 +263,19 @@ Recorder.prototype.recordSendCommand = function (lastWindow) {
     if (lastWindow) {
         var isTop = window.parent == window;
         var isSameOriginFrame = !isTop && window.frameElement != null;
-        ox_log('ox: testing for window transition prev:new ' + lastWindow.hash + ' : ' + window.__hash);
+        ox_log('testing for window transition prev:new ' + lastWindow.hash + ' : ' + window.__hash);
         if (lastWindow.hash != window.__hash) {
             if (isTop) {                                    // new top window
-                ox_log('ox: new window');
+                ox_log('new window');
                 var winLocator = window.document.title === '' ? '' : 'title=' + window.document.title;
                 cmds.push(Recorder.cmdPrepare('selectWindow', winLocator, null));
             } else if (lastWindow.sameGroup) {              // same window, new frame
-                ox_log('ox: new frame. same window');
+                ox_log('new frame. same window');
                 if (window.__frameLocators) {
                     cmds.push(Recorder.cmdPrepare('selectFrame', window.__frameLocators, null));
                 }
             } else {                                        // new window, new frame
-                ox_log('ox: new frame. new window');
+                ox_log('new frame. new window');
                 var winLocator = null;
                 try {
                     winLocator = window.top.document.title === '' ? '' : 'title=' + window.parent.document.title;
@@ -285,7 +285,7 @@ Recorder.prototype.recordSendCommand = function (lastWindow) {
                 if (winLocator) {
                     cmds.push(Recorder.cmdPrepare('selectWindow', winLocator, null));
                 } else {
-                    console.error('ox: cannot get window title - frame and top window are of different origins');
+                    ox_log('cannot get window title - frame and top window are of different origins');
                 }
                 if (window.__frameLocators) {
                     cmds.push(Recorder.cmdPrepare('selectFrame', window.__frameLocators, null));
@@ -329,7 +329,7 @@ Recorder.prototype.recordSendCommand = function (lastWindow) {
     }
 
     var data = JSON.stringify(cmds, function (k, v) { return (v === null || v === undefined) ? undefined : v; });
-    ox_log('ox: ' + data);
+    ox_log('' + data);
 
     window.postMessage(JSON.stringify({cmd: 'RECORDER_COMMAND', data: data }), '*');
 };
@@ -358,10 +358,10 @@ Recorder.guid = function() {
 
 Recorder.inputTypes = ['text', 'password', 'file', 'datetime', 'datetime-local', 'date', 'month', 'time', 'week', 'number', 'range', 'email', 'url', 'search', 'tel', 'color'];
 Recorder.addEventHandler('change', function (ev) {
-    ox_log('ox: change ev');
+    ox_log('change ev');
     var target = ev.target;
-
-    if (target.tagName) {
+    
+    if (target.tagName && !target.readOnly) {
         var tagName = target.tagName.toLowerCase();
         var type = target.type;
         if ('input' == tagName && Recorder.inputTypes.indexOf(type) >= 0 ||
@@ -384,15 +384,15 @@ Recorder.addEventHandler('change', function (ev) {
                 if (this.activeElementValue == option) {    // value did not change
                     return;
                 }
-                ox_log('ox: selectedIndex=' + target.selectedIndex);
+                ox_log('selectedIndex=' + target.selectedIndex);
                 this.record('select', this.findLocators(target), this.getOptionLocator(option));
             } else {
-                ox_log('ox: change selection on select-multiple');
+                ox_log('change selection on select-multiple');
                 var options = target.options;
                 for (var i = 0; i < options.length; i++) {
-                    ox_log('ox: option=' + i + ', ' + options[i].selected);
+                    ox_log('option=' + i + ', ' + options[i].selected);
                     if (options[i]._wasSelected === null || options[i]._wasSelected === undefined) {
-                        ox_log('ox: _wasSelected was not recorded');
+                        ox_log('_wasSelected was not recorded');
                     }
                     if (options[i]._wasSelected != options[i].selected) {
                         var value = this.getOptionLocator(options[i]);
@@ -411,7 +411,7 @@ Recorder.addEventHandler('change', function (ev) {
 
 
 Recorder.addEventHandler('focus', function (ev) {
-    ox_log('ox: focus ev');
+    ox_log('focus ev');
     var target = ev.target;
 
     if (this.__keysBuf) {
@@ -422,7 +422,7 @@ Recorder.addEventHandler('focus', function (ev) {
     if (target.nodeName) {
         var tagName = target.nodeName.toLowerCase();
         if ('select' == tagName && target.multiple) {
-            ox_log('ox: focus ev remembering selections');
+            ox_log('focus ev remembering selections');
             var options = target.options;
             for (var i = 0; i < options.length; i++) {
                 if (options[i]._wasSelected === null || options[i]._wasSelected === undefined) {
@@ -436,8 +436,14 @@ Recorder.addEventHandler('focus', function (ev) {
     }
 }, true);
 
-Recorder.addEventHandler('mousedown', function (ev) {
-    ox_log('ox: mousedown ev');
+// PointerEvent supported on Chrome 55+. allows us to record in responsive mode.
+// https://developers.google.com/web/updates/2016/10/pointer-events
+let inputType = window.PointerEvent ? 'pointer' : 'mouse';
+let inputDown = inputType + 'down';
+let inputUp = inputType + 'up';
+
+Recorder.addEventHandler(inputDown, function (ev) {
+    ox_log(inputDown + ' ev');
     var target = ev.target;
     this.__mouseDownTarget = {
         el: target,
@@ -449,7 +455,7 @@ Recorder.addEventHandler('mousedown', function (ev) {
         if ('option' == tagName) {
             var parent = target.parentNode;
             if (parent.multiple) {
-                ox_log('ox: mousedown ev remembering selections');
+                ox_log(inputDown + ' ev remembering selections');
                 var options = parent.options;
                 for (var i = 0; i < options.length; i++) {
                     options[i]._wasSelected = options[i].selected;
@@ -459,16 +465,16 @@ Recorder.addEventHandler('mousedown', function (ev) {
     }
 }, true);
 
-Recorder.addEventHandler('mouseup', function (ev) {
-    ox_log('ox: mouseup ev');
+Recorder.addEventHandler(inputUp, function (ev) {
+    ox_log(inputUp + ' ev');
     if (ev.button !== 0) {
         return;
     }
     var target = ev.target;
 
-    // click event won't be produced if mouseUp happened on different element than mouseDown
-    // this could happen when original element gets modified during mouseDown.
-    // hence we process mouseup events instead of click
+    // click event won't be produced if mouseUp happened on different element than mouseDown/pointerDown
+    // this could happen when original element gets modified during mouseDown/pointerDown
+    // hence we process mouseup/pointerup events instead of click
     var downTarget = this.__mouseDownTarget;
     if (downTarget && downTarget.el !== target) {
         // make sure user just tried to click and not drag-and-drop something
@@ -531,7 +537,7 @@ Recorder.addEventHandler('contextmenu', function(ev){
 // record keystrokes for situations when "change" event is not produced
 // e.g. site handles keyup itself and prevents input's value changes
 Recorder.addEventHandler('keyup', function (ev) {
-    ox_log('ox: keyup ev');
+    ox_log('keyup ev');
     var key = ev.key;
     var keycode = ev.keyCode;
 

@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { all, put, select, takeLatest, take, call } from 'redux-saga/effects';
+import { all, put, select, takeLatest, call } from 'redux-saga/effects';
 import { default as pathNode } from 'path';
 import ActionTypes from '../types';
 import * as fsActions from './actions';
@@ -14,7 +14,7 @@ import * as settingsActions from './../settings/actions';
 import * as objRepActions from '../obj-repo/actions';
 import * as workbenchActions from './../workbench/actions';
 import { reportError } from '../sentry/actions';
-import { success, failure, successOrFailure } from '../../helpers/redux';
+import { success, failure } from '../../helpers/redux';
 import { putAndTake } from '../../helpers/saga';
 import fileSubjects from '../../store/fs/subjects';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
@@ -53,7 +53,7 @@ export default function* root() {
 
 export function* maybeNeedAddWatcherToFolder({ payload }){
     const fs = yield select(state => state.fs);
-    const { files, rootPath } = fs;
+    const { rootPath } = fs;
 
     if(rootPath && payload && payload.path && rootPath !== payload.path){      
         yield call(services.mainIpc.call, 'FileService', 'addFolderToWatchers', [payload.path]);
@@ -158,7 +158,10 @@ export function* handleServiceEvents({ payload }) {
 
     if (service === 'FileService' && event === 'ObjectRepoWatcher' ) {
         if(path && content){
-            const [qwe, ...cont] = content.split('{');
+            const [...cont] = content.split('{');
+            
+            cont.shift();
+
             const conte = '{'+cont.join('{');
     
             const conten = conte.split('};')[0] + '}';
@@ -226,7 +229,7 @@ export function* treeLoadNodeChildren({ payload }) {
 export function* treeOpenFolder({ payload }) {
     const { path } = payload;
     try {
-        yield _fetchFolderContent(path);
+        yield _fetchFolderContent(path, false);
     }
     catch (e) {
         yield put(fsActions._treeOpenFolder_Failure(path, e.message));
@@ -234,6 +237,16 @@ export function* treeOpenFolder({ payload }) {
     }
     const folder = yield select(state => state.fs.files[path]);  
     yield put(fsActions._treeOpenFolder_Success(path, folder.children));
+
+    const rootPath = yield select(state => state.fs.rootPath); 
+
+    if(rootPath === path){
+        //root dir
+        yield watchOnFiles(path);
+    }  else {
+        //nor root dir
+        yield watchOnSubFiles(path);
+    }
 }
 
 export function* fromCache({ payload }) {
@@ -411,11 +424,17 @@ export function* initializeSuccess() {
 }
 
 
-export function* _fetchFolderContent(path) {
+export function* _fetchFolderContent(path, addWatcher = true) {
     try {
         let folder = yield call(services.mainIpc.call, 'FileService', 'getFolderContent', [path]);
-        if (folder && path) {
+        yield put({
+            type: success(ActionTypes.FS_FETCH_FOLDER_CONTENT),
+            payload: { path, response: folder },
+        });
+        
+        if (path && addWatcher) {
             const rootPath = yield select(state => state.fs.rootPath); 
+
             if(rootPath === path){
                 //root dir
                 yield watchOnFiles(path);
@@ -424,11 +443,6 @@ export function* _fetchFolderContent(path) {
                 yield watchOnSubFiles(path);
             }
         }
-        yield put({
-            type: success(ActionTypes.FS_FETCH_FOLDER_CONTENT),
-            payload: { path, response: folder },
-        });
-        return folder;
     }
     catch (err) {
         /* istanbul ignore next */
@@ -506,12 +520,11 @@ export function* saveFileContent({ payload }) {
         yield put(reportError(err));
 
         let saveCode = 'Unknown code';
-
         if(err && err.code){
             saveCode = err.code;
         }
 
-        yield call(services.mainIpc.call, 'ElectronService', 'showErrorBox', ['Save File Failed', err.code]);
+        yield call(services.mainIpc.call, 'ElectronService', 'showErrorBox', ['Save File Failed', saveCode]);
         yield put(fsActions._saveFile_Failure(path, err));
     }
 }
@@ -524,7 +537,7 @@ export function* saveFileContentAs({ payload }) {
             return;
         }
         yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  content]);
-        const { response, error } = yield putAndTake(fsActions.fetchFileInfo(path));
+        const { response } = yield putAndTake(fsActions.fetchFileInfo(path));
         yield put(fsActions._saveFileAs_Success(path, content, response));
     }
     catch (err) {

@@ -38,6 +38,7 @@ module.exports = function(grunt) {
         defaultTasks.push('chmod:geckodriver');
         defaultTasks.push('chmod:oxygendarwin');
     } else if (process.platform === 'win32') {
+        //ignore
     }
     defaultTasks.push('rebrand');
     defaultTasks.push('sentry-browser');
@@ -69,6 +70,7 @@ module.exports = function(grunt) {
     try {
         var cwd = process.cwd();
         process.chdir('app');
+        cp.execSync('npm i @wdio/cli@5.16.9');
         var out = cp.execSync('npm ls --prod=true --parseable');
         var prodDepsUnfiltered = out.toString().split(/\r?\n/);
         var si = __dirname.length + 1 + 'app'.length + 1 + 'node_modules'.length + 1;
@@ -79,6 +81,7 @@ module.exports = function(grunt) {
             }
             prodDeps.push(dep + '/**');
         }
+        cp.execSync('npm uninstall @wdio/cli');
         process.chdir(cwd);
     } catch (e) {
         grunt.fail.fatal('Unable to get production dependencies list', e);
@@ -137,6 +140,7 @@ module.exports = function(grunt) {
                             '!appium-ios-driver/instruments-iwd/iwd4/**',
                             '!appium-ios-driver/instruments-iwd/iwd5/**',
                             '!appium-ios-driver/instruments-iwd/iwd6/**',
+                            '!intl/locale-data/jsonp/**',
                             '!chromedriver/**',
                             '!geckodriver/**']),
                         dest: OUTDIR + RESOURCES + '/app/node_modules' 
@@ -152,6 +156,8 @@ module.exports = function(grunt) {
                             'renderer/index.js',
                             'main/main.prod.*',
                             'main/config.json',
+                            'main/services/backslash.js',
+                            'main/services/require.js',
                             'package.json'],
                         dest: OUTDIR + RESOURCES + '/app' 
                     }

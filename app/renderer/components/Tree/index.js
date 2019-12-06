@@ -6,8 +6,8 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import Tree from './Tree';
-import TreeNode from './TreeNode';
+import Tree from './Tree.jsx';
+import TreeNode from './TreeNode.jsx';
 
 Tree.TreeNode = TreeNode;
 

@@ -7,18 +7,17 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { PureComponent, Fragment } from 'react';
-import Panel from '../../components/Panel';
-import ScrollContainer from '../../components/ScrollContainer';
-import PropertyList, { PropertyItem } from '../../components/PropertyList';
+import React, { PureComponent } from 'react';
+import Panel from '../../components/Panel.jsx';
+import ScrollContainer from '../../components/ScrollContainer.jsx';
+import PropertyList, { PropertyItem } from '../../components/PropertyList/index.jsx';
 
 type Props = {
   runtimeSettings: null | object,
+  refreshScroll: Function
 };
 
-const DEFAULT_EDITOR_LANGUAGE = 'javascript';
-
-export default class Settings extends PureComponent<Props> {
+export default class Settings extends React.PureComponent<Props> {
   props: Props;
 
   render() {

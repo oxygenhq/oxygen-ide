@@ -9,14 +9,13 @@
 // @flow
 
 import React, { PureComponent, Fragment } from 'react';
-import { Input, Button, Icon } from 'antd';
+import { Button, Icon } from 'antd';
 import styled from '@emotion/styled';
 
 import FlexColumn from './FlexColumn';
 import FlexRow from './FlexRow';
 
 import '../../css/list.scss';
-import { throws } from 'assert';
 
 /**
  * A container dispalying its children in a column
@@ -25,10 +24,14 @@ import { throws } from 'assert';
 type ListProps = {
     // data source - a list of items
     data?: Array<object>,
-    editable?: boolean,
+    object: Object,
+    deleteLocator: Function,
+    startEdit: Function,
+    editing: boolean,
+    editable?: boolean
 };
 
-export default class List extends PureComponent<ListProps> {
+export default class List extends React.PureComponent<ListProps> {
     static Container = styled(FlexColumn)(props => ({
         height: '100vh',
         flexShrink: 0,
@@ -164,18 +167,12 @@ type ListItemProps = {
     // data source - a list of items
     data?: Object,
     editable?: boolean,
+    controls: Element
 };
-type ListItemState = {
-    // indicates if the list item is currently under editing
-    editing: boolean,
-};
-class ListItem extends PureComponent<ListItemProps> {
+class ListItem extends React.PureComponent<ListItemProps> {
     state = {
         editing: false,
     };
-
-    static Container = styled(FlexRow)(props => ({
-    }));
 
     componentDidMount() {
         if (this.props.editable) {
@@ -188,6 +185,10 @@ class ListItem extends PureComponent<ListItemProps> {
             document.removeEventListener('click', ::this.handleClickOutside, true);
         }
     }
+    
+    static Container = styled(FlexRow)(props => ({
+    }));
+
 
     handleUpdate() {
         this.toggleEdit();

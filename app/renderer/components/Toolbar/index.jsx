@@ -11,13 +11,6 @@
 import { Spin, Icon, Select, Input, message, TreeSelect } from 'antd';
 import React, { Component, Fragment } from 'react';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/lib/fa';
-import {
-    MdUndo,
-    MdRedo,
-    MdContentCut,
-    MdContentPaste,
-} from 'react-icons/lib/md';
-
 import '../../css/toolbar.scss';
 
 import * as Controls from './controls';
@@ -32,6 +25,7 @@ type ControlState = {
     visible?: boolean,
     enabled?: boolean
 };
+
 type Props = {
     stepDelay: number,
     testMode: string | null,
@@ -42,12 +36,18 @@ type Props = {
     providers: Array<CloudProvider>,
     controlsState: { [string]: ControlState },
     onValueChange: (string, string) => void,
-    onButtonClick: (string) => void
+    onButtonClick: (string) => void,
+    changeShowRecorderMessageValue: Function,
+    testProvider: string | null,
+    canRecord: boolean,
+    testRunning: boolean,
+    waitChromeExtension: boolean,
+    showRecorderMessage: boolean | null
 };
 
 const { Option } = Select;
 
-export default class Toolbar extends Component<Props> {
+export default class Toolbar extends React.Component<Props> {
     constructor(props){
         super(props);
         this.state = {
@@ -201,7 +201,6 @@ export default class Toolbar extends Component<Props> {
                 cloudProviderTestMode = 'mob';
             }
         }
-
         return (
             <div className="appTollbar">
                 { typeof showNoChromeDialog !== 'undefined' && showNoChromeDialog && 
@@ -444,6 +443,24 @@ export default class Toolbar extends Component<Props> {
                     </button>
                 )}
 
+                { (Array.isArray(providers) && providers.length > 0) && (
+                    <Select
+                        className="control select"
+                        value={ testProvider || '' }
+                        style={{ width: 120 }}
+                        onChange={ (value) => ::this.handleValueChange(Controls.TEST_PROVIDER, value) }
+                    >
+                        <Option key='' value=''>-- Local --</Option>
+                        {
+                            testMode === 'web' && providers.map((provider) => (
+                                <Option key={ provider.id } value={ provider.id }>
+                                    { provider.title }
+                                </Option>
+                            ))
+                        }
+                    </Select>
+                )}
+
                 <div className="separator" />
 
                 <label className="control label" htmlFor="stepDelay">Delay</label>
@@ -459,7 +476,6 @@ export default class Toolbar extends Component<Props> {
                 />
 
                 <div className="separator" />
-
                 { (waitChromeExtension || testRunning) &&
                     <span
                         style={ getOpacity(false) }
@@ -472,8 +488,9 @@ export default class Toolbar extends Component<Props> {
                     </span>
                 }
 
-                { !(waitChromeExtension || testRunning) && !canRecord && 
-                <span
+                { 
+                    !(waitChromeExtension || testRunning) && !canRecord && 
+                    <span
                         className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable not-work active' : 'control selectable not-work' }
                         title="Record"
                     >
@@ -484,7 +501,8 @@ export default class Toolbar extends Component<Props> {
                     </span>
                 }
 
-                { !(waitChromeExtension || testRunning) && canRecord &&
+                { 
+                    !(waitChromeExtension || testRunning) && canRecord &&
                     <span
                         className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active green-bg' : 'control selectable' }
                         title="Record"

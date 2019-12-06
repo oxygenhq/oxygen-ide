@@ -24,7 +24,7 @@ type Props = {
 };
 
 /* eslint-disable react/no-did-update-set-state */
-export default class Sidebar extends Component<Props> {
+export default class Sidebar extends React.Component<Props> {
   props: Props;
 
   state = {

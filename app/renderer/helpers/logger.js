@@ -15,10 +15,10 @@ export default function loggerSetup() {
     // prefix messages so we know they came from renderer process
     global.log = {};
     const prefix = (args) => { args[0] = '[R] ' + args[0]; };
-    log.info = (...args) => { prefix(args); return _log.info.apply(log, args); };
-    log.warn = (...args) => { prefix(args); return _log.warn.apply(log, args); };
-    log.error = (...args) => { prefix(args); return _log.error.apply(log, args); };
-    log.debug = (...args) => { prefix(args); return _log.debug.apply(log, args); };
+    global.log.info = (...args) => { prefix(args); return _log.info.apply(global.log, args); };
+    global.log.warn = (...args) => { prefix(args); return _log.warn.apply(global.log, args); };
+    global.log.error = (...args) => { prefix(args); return _log.error.apply(global.log, args); };
+    global.log.debug = (...args) => { prefix(args); return _log.debug.apply(global.log, args); };
 
     process.on('uncaughtException', error => {
         // ignore Monaco Editor error related to jsonMode.js
@@ -26,10 +26,10 @@ export default function loggerSetup() {
             console.warn(`Ignoring error: ${error.name}: ${error.message}`);
             return;
         }
-        log.error('Unhandled Error.', util.inspect(error));
+        global.log.error('Unhandled Error.', util.inspect(error));
     });
 
     process.on('unhandledRejection', error => {
-        log.warn('Unhandled Promise Rejection.', util.inspect(error));
+        global.log.warn('Unhandled Promise Rejection.', util.inspect(error));
     });
 }

@@ -20,7 +20,7 @@ export default merge.smart(baseConfig, {
 
     target: 'electron-renderer',
 
-    entry: './app/renderer/index',
+    entry: ['core-js/stable', 'regenerator-runtime/runtime', './app/renderer/index'],
 
     output: {
         path: path.join(__dirname, 'app/dist'),

@@ -1,7 +1,15 @@
 import React, { PureComponent, Fragment } from 'react';
 import { Modal, Button } from 'antd';
 
-export default class ChromeDriverDialog extends PureComponent {
+type Props = {
+    onCancel: Function,
+    chromeDriverVersion: string,
+    chromeVersion: string,
+    onSubmit: Function,
+    onNoChromeDriverSubmit: Function
+};
+
+export default class ChromeDriverDialog extends React.PureComponent<Props> {
 
     close = () => {
         if(this.props.onCancel){
@@ -10,7 +18,7 @@ export default class ChromeDriverDialog extends PureComponent {
     }
 
     download = () => {
-        const { onSubmit, chromeDriverVersion, onNoChromeDriverSubmit } = this.props;
+        const { chromeDriverVersion, onNoChromeDriverSubmit } = this.props;
 
         if(chromeDriverVersion){
             this.props.onSubmit(chromeDriverVersion);

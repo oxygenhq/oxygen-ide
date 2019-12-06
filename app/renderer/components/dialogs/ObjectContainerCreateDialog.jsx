@@ -6,12 +6,9 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent } from 'react';
-import { Form, Input, Select, Modal, message } from 'antd';
-import { capitalizeFirst } from '../../helpers/general';
-import FormItem from 'antd/lib/form/FormItem';
+import React from 'react';
+import { Input, Modal, message } from 'antd';
 
-const { Option } = Select;
 const DEFAULT_STATE = {
     name: '',
     type: null,
@@ -22,12 +19,12 @@ type Props = {
   type?: string,
   path?: string,
   onSubmit: () => void,
-  onCancel: () => void,
+  onCancel: () => void
 };
 
-export default class ObjectContainerCreateDialog extends PureComponent<Props> {
+export default class ObjectContainerCreateDialog extends React.PureComponent<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
 
         this.textInput = null;
 
@@ -94,7 +91,6 @@ export default class ObjectContainerCreateDialog extends PureComponent<Props> {
       const {
           visible,
           type,
-          onSubmit,
           onCancel,
       } = this.props;
 

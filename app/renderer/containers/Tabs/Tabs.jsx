@@ -14,16 +14,18 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { Icon, Tooltip, Modal, Button } from 'antd';
 import debounce from 'lodash.debounce';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
-import DraggableTab from './DraggableTab';
+import DraggableTab from './DraggableTab.jsx';
 import '../../css/tabs.scss';
 
-function noop() {}
-
 type Props = {
-  active: null | string,
-  tabs: Array,
-  onChange: (string) => void,
-  onClose: (string) => void
+    sidebarCollapsed: boolean | undefined,
+    active: null | string,
+    tabs: Array,
+    onChange: (string) => void,
+    onClose: (string) => void,
+    changeTabOrder: Function,
+    recorder: Object,
+    activeTitle: string | null
 };
 
 const circle = () => {

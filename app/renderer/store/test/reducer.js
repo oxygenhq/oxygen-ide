@@ -11,7 +11,7 @@ import { message } from 'antd';
 
 import * as ActionTypes from './types';
 import * as Const from '../../../const';
-import { success, failure } from '../../helpers/redux';
+import { failure } from '../../helpers/redux';
 
 const defaultState = {
     isRunning: false,         // indicates if a test is currently running
@@ -43,6 +43,7 @@ const defaultState = {
     ],
     devices: [],
     emulators: Const.CHROME_EMULATED_DEVICES,
+    variables: null
 };
 
 if (process.platform === 'win32') {
@@ -61,7 +62,7 @@ if (process.platform === 'darwin') {
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { value, settings, device, breakpoints, path, error, cache, fileName } = payload;
+    const { value, settings, device, breakpoints, path, error, cache, fileName, variables } = payload;
     let _newDevices = [];
     let _newBreakpoints = {};
 
@@ -89,13 +90,6 @@ export default (state = defaultState, action) => {
             isPaused: false,
         };
 
-    // TEST_STOP
-    case ActionTypes.TEST_STOP:
-        return {
-            ...state,
-            isRunning: false,
-            isPaused: false,
-        };
     // TEST_CONTINUE
     case ActionTypes.TEST_CONTINUE:
         return {
@@ -109,6 +103,7 @@ export default (state = defaultState, action) => {
             ...state,
             isRunning: false,
             isPaused: false,
+            variables: null
         };
     // TEST_EVENT_BREAKPOINT
     case ActionTypes.TEST_EVENT_BREAKPOINT:
@@ -116,6 +111,7 @@ export default (state = defaultState, action) => {
             ...state,
             isRunning: true,
             isPaused: true,
+            variables: variables
         };
     // TEST_STOP
     case ActionTypes.TEST_STOP:
@@ -123,6 +119,7 @@ export default (state = defaultState, action) => {
             ...state,
             isRunning: false,
             isPaused: false,
+            variables: null
         };
     // TEST_SET_MAIN
     case ActionTypes.TEST_SET_MAIN:

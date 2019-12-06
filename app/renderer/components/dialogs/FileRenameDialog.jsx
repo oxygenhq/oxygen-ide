@@ -6,11 +6,10 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent } from 'react';
-import { Input, Select, Modal } from 'antd';
+//@flow
+import React from 'react';
+import { Input, Modal } from 'antd';
 import { capitalizeFirst } from '../../helpers/general';
-
-const { Option } = Select;
 
 type Props = {
   visible: boolean,
@@ -18,16 +17,17 @@ type Props = {
   type?: string,
   path?: string,
   onSubmit: () => void,
-  onCancel: () => void,
+  onCancel: () => void
 };
 
-export default class FileRenameDialog extends PureComponent<Props> {
-  props: Props;
-
-  state = {
-      visible: this.props.visible ? this.props.visible : false,
-      name: this.props.name ? this.props.name : null,
-  }
+export default class FileRenameDialog extends React.PureComponent<Props> {
+    constructor(props: Props){
+        super(props);
+        this.state = {
+            visible: this.props.visible ? this.props.visible : false,
+            name: this.props.name ? this.props.name : null,
+        };
+    }
 
   static getDerivedStateFromProps(nextProps, prevState) {
       if (nextProps.visible == false) {
@@ -62,7 +62,6 @@ export default class FileRenameDialog extends PureComponent<Props> {
       const {
           type,
           path,
-          onSubmit,
           onCancel,
       } = this.props;
 

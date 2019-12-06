@@ -25,17 +25,16 @@ const selSettings = cfg.selenium;
 // Events
 const ON_SELENIUM_STARTED = 'SELENIUM_STARTED';
 const ON_SELENIUM_STOPPED = 'SELENIUM_STOPPED';
-const ON_SELENIUM_LOG_ENTRY = 'ON_SELENIUM_LOG_ENTRY';
-const ON_CHROME_DRIVER_ERROR = 'ON_CHROME_DRIVER_ERROR';
 
 const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.googleapis.com';
 
 export default class SeleniumService extends ServiceBase {
-    seleniumProc = null;
-    availablePort = null;
 
     constructor() {
         super();
+
+        this.seleniumProc = null;
+        this.availablePort = null;
 
         this.downloadChromeDriver = this.downloadChromeDriver.bind(this);
     }
@@ -214,12 +213,12 @@ export default class SeleniumService extends ServiceBase {
     _handleProcessEvents() {
         const proc = this.seleniumProc;
         if (!proc) {
-            log.error('Selenium process was not started.');
+            global.log.error('Selenium process was not started.');
             return;
         }
         // on 'error'
         proc.on('error', (e) => {
-            log.error('Cannot start Selenium process.', e);
+            global.log.error('Cannot start Selenium process.', e);
             // logGeneral.add('ERROR', 'Unable to find Java.
             // Make sure Java is installed and has been added to the PATH environment variable.');
             this._emitLogEvent(e.toString(), ServiceBase.SEVERITY_ERROR);
@@ -310,7 +309,7 @@ export default class SeleniumService extends ServiceBase {
     getChromeDriverVersion(chromeVersion) {
         return new Promise((resolve, reject) => {
             // try getting the version from a local version map file
-            for (let version of versions) {
+            for (var version of versions) {
                 if (version.chromeMin >= chromeVersion && version.chromeMax <= chromeVersion) {
                     resolve(version.driverVersion);
                     return;
@@ -332,7 +331,7 @@ export default class SeleniumService extends ServiceBase {
         });
     }
 
-    getChromeDriverDownloadUrl = (driverVersion) => {
+    getChromeDriverDownloadUrl(driverVersion){
         var zipFilename;
         switch (process.platform) {
         case 'win32':
@@ -406,6 +405,7 @@ export default class SeleniumService extends ServiceBase {
                         }
                     })
                     .then(buffer => {
+                        /*eslint-disable */
                         if(buffer instanceof Error){
                             resolve(buffer);
                         } else {
@@ -418,6 +418,7 @@ export default class SeleniumService extends ServiceBase {
                                 resolve(zipPath);
                             });
                         }
+                        /*eslint-enable */
                     }).catch(err => {
                         console.log('fetchChromeDriver fetch error', err);
                         resolve(err);
@@ -437,7 +438,7 @@ export default class SeleniumService extends ServiceBase {
                 var unzip = new DecompressZip(zipPath);
     
                 unzip.on('error', (err) => {
-                    console.log('unzip error', error);
+                    console.log('unzip error', err);
                     resolve(err);
                 });
     
@@ -482,6 +483,7 @@ export default class SeleniumService extends ServiceBase {
     }
     
     async downloadChromeDriver(driverVersion){
+        /*eslint-disable */
         return new Promise(async (resolve, reject) => {
 
             try{
@@ -555,5 +557,6 @@ export default class SeleniumService extends ServiceBase {
                 resolve(error);
             }
         });
+        /*eslint-enable */
     }
 }

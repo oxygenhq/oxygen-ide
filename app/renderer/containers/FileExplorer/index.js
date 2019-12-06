@@ -23,8 +23,7 @@ const mapStoreToProps = (state) => {
         treeData: uniq(state.fs.tree.data),
         activeNodePath: state.fs.tree.activeNode,
         expandedKeys: state.fs.tree.expandedKeys,
-        refreshScroll: state.fs.refreshScroll,
-        forceUpdate: Symbol()
+        refreshScroll: state.fs.refreshScroll
     };
 };
 

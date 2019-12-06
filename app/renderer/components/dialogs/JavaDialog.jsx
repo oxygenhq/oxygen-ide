@@ -1,8 +1,14 @@
-import React, { PureComponent } from 'react';
+//@flow
+import React from 'react';
 import { Modal, Button } from 'antd';
 import electron from 'electron';
 
-export default class JavaDialog extends PureComponent {
+type Props = {
+    javaError: Object | undefined,
+    clean: Function
+};
+
+export default class JavaDialog extends React.PureComponent<Props> {
   clean = () => {
       if(this.props.clean){
           this.props.clean();

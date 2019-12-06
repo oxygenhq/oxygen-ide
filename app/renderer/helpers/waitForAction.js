@@ -7,9 +7,11 @@
  * (at your option) any later version.
  */
 export default function waitForAction(type, action$) {
+    /* eslint-disable */
     return new Promise((resolve, reject) => {
         let subscription = action$.pipe(filter(action => action.type === type)).subscription(action => {
             resolve(action);
         });
     });
+    /* eslint-enable */
 }

@@ -7,10 +7,12 @@
   "extends": ["eslint:recommended", "plugin:react/recommended"],
   "env": {
     "browser": true,
-    "node": true
+    "node": true,
+    "es6": true
   },
   "rules": {
-    "indent": ["error", 4],
+    "template-curly-spacing" : "off",
+    "indent" : "off",
     "quotes": ["error", "single", { "avoidEscape": true }],
     "semi": ["error", "always"],
     "semi-spacing": ["error", {"before": false, "after": true}],
@@ -34,8 +36,8 @@
     "no-use-before-define": "off",
     "no-multi-assign": "off",
     "promise/param-names": "error",
-    "promise/always-return": "error",
-    "promise/catch-or-return": "error",
+    "promise/always-return": "off",
+    "promise/catch-or-return": "off",
     "promise/no-native": "off",
     "react/sort-comp": ["error", {
       "order": ["type-annotations", "static-methods", "lifecycle", "everything-else", "render"]
@@ -52,5 +54,14 @@
     "react"
   ],
   "settings": {
+    "react": {
+      "createClass": "createReactClass", // Regex for Component Factory to use,
+      // default to "createReactClass"
+      "pragma": "React",  // Pragma to use, default to "React"
+      "version": "detect" // React version. "detect" automatically picks the version you have installed.
+      // You can also use `16.0`, `16.3`, etc, if you want to override the detected value.
+      // default to latest and warns if missing
+      // It will default to "detect" in the future
+    }
   }
 }

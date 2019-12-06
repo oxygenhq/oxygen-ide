@@ -13,7 +13,7 @@ import styled from '@emotion/styled';
 
 type Props = {
   /** Flexbox's shrink property. Set to `0`, to disable shrinking. */
-  shrink?: number,
+  shrink?: number
 };
 
 /**

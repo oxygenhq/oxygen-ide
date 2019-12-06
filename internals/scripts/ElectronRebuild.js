@@ -12,7 +12,7 @@ const nodeModulesPath =
 
 if (Object.keys(dependencies || {}).length > 0 && fs.existsSync(nodeModulesPath)) {
     const electronRebuildCmd =
-  '../node_modules/.bin/electron-rebuild --parallel --force --types prod,dev,optional --module-dir .';
+  '../node_modules/.bin/electron-rebuild --parallel --force --types prod,optional --module-dir .';
 
     const cmd = process.platform === 'win32'
         ? electronRebuildCmd.replace(/\//g, '\\')
@@ -21,6 +21,12 @@ if (Object.keys(dependencies || {}).length > 0 && fs.existsSync(nodeModulesPath)
     // cleanup everything in fibers and deasync bin folders. see relevant entry in Confluence for more details.
     rimraf.sync(path.join(nodeModulesPath, 'fibers', 'bin'));
     rimraf.sync(path.join(nodeModulesPath, 'deasync', 'bin'));
+
+    // a workaround for using local oxygen dependency
+    // remove fsevents on non OS X OSes, because electron-rebuild will fail when re-building it
+    if (process.platform !== 'darwin') {
+        rimraf.sync(path.join(nodeModulesPath, 'oxygen-cli', 'node_modules', 'fsevents'));
+    }
 
     execSync(cmd, {
         cwd: path.join(__dirname, '..', '..', 'app')

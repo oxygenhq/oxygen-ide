@@ -16,7 +16,7 @@ export default merge.smart(baseConfig, {
 
     target: 'electron-main',
 
-    entry: './app/main/main.dev',
+    entry: ['core-js/stable', 'regenerator-runtime/runtime',  './app/main/main.dev'],
 
     output: {
         path: __dirname,

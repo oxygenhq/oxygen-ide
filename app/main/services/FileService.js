@@ -81,10 +81,12 @@ const processChange = (eventPath, folderPath, type) => {
 };
 
 export default class FileService extends ServiceBase {
-    watcherOn = false;
-    folderPath = '';
-    subFolders = [];
-
+    constructor(mainWindow) {
+        super(mainWindow);
+        this.watcherOn = false;
+        this.folderPath = '';
+        this.subFolders = [];
+    }
 
     async dispose() {
         await this.closeWatcherIfExist();

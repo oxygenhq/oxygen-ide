@@ -21,19 +21,17 @@ const EVENT_TEST_STARTED = 'TEST_STARTED';
 const EVENT_TEST_ENDED = 'TEST_ENDED';
 
 // Severities
-const SEVERITY_FATAL = 'FATAL';
 const SEVERITY_ERROR = 'ERROR';
 const SEVERITY_INFO = 'INFO';
 
 export default class TestRunnerService extends ServiceBase {
-    isRunning = false;
-    isStopping = false;
-    runner = null;
-    reporter = null;
-    mainFilePath = null;
-
     constructor() {
         super();
+        this.isRunning = false;
+        this.isStopping = false;
+        this.runner = null;
+        this.reporter = null;
+        this.mainFilePath = null;
     }
     
     async start(mainFilePath, breakpoints, runtimeSettings) {
@@ -113,35 +111,8 @@ export default class TestRunnerService extends ServiceBase {
                 }
             }
         }
-        // add provider specific options, if cloud provider was selected
-        if (testProvider && testProvider.id) {
-            switch (testProvider.id) {
-            case 'sauceLabs':
-                // options.seleniumUrl = testProvider.url;
-                // caps.name = testName || null;
-                // caps.username = testProvider.username;
-                // caps.accessKey = testProvider.accessKey;
-                // caps.extendedDebugging = testProvider.extendedDebugging || false;
-                // caps.capturePerformance = testProvider.capturePerformance || false;
-            case 'testingBot':
-                // options.seleniumUrl = testProvider.url;
-                // caps.name = testName || null;
-                // caps.key = testProvider.key;
-                // caps.secret = testProvider.secret;
-            case 'lambdaTest':
-                // options.seleniumUrl = testProvider.url;
-                // options.wdioOpts = {
-                //     user: testProvider.user,
-                //     key: testProvider.key
-                // };
-                // caps.name = testName || null;
-                // caps.build = testProvider.build || null;
-                // caps.console = testProvider.captureConsole || false;
-                // caps.network = testProvider.captureNetwork || false;
-                // caps.visual = testProvider.takeScreenshots || false;
-                // caps.video = testProvider.videoRecording || false;
-            }
-        } else {
+        // add local run options, if no cloud provider was selected
+        if (!testProvider || !testProvider.id) {
             // prepare module parameters
             if (testMode === 'resp') {
                 options.mode = 'web';
@@ -204,15 +175,17 @@ export default class TestRunnerService extends ServiceBase {
             this.isRunning = false;
             // dispose Oxygen Runner and mark the state as not running, before updating the UI
             await this.dispose();            
-        };
+        }
     }
 
     async stop() {
         if (this.runner) {
             this.isStopping = true;
             try {
-                await this.runner.kill();
-                await this.runner.dispose();
+
+                this.runner.kill().then(()=>{});
+                this.runner.dispose().then(()=>{});
+
             }
             catch (e) {
                 // ignore any errors
@@ -244,7 +217,7 @@ export default class TestRunnerService extends ServiceBase {
 
     async dispose() {
         if (this.runner) {
-            await this.runner.dispose();
+            this.runner.dispose().then(()=>{});
             this.runner = null;
             this.mainFilePath = null;
             this.isRunning = false;
@@ -264,7 +237,7 @@ export default class TestRunnerService extends ServiceBase {
             await runner.init(opts, caps, this.reporter);   
             // run test 
             this._emitLogEvent(SEVERITY_INFO, 'Running test...');
-            const results = await runner.run();
+            await runner.run();
             // dispose runner
             await runner.dispose();
         }
@@ -396,7 +369,7 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _handleBreakpoint(breakpoint) {
-        const { lineNumber, fileName } = breakpoint;
+        const { lineNumber, fileName, variables } = breakpoint;
         // if no fileName is received from the debugger (not suppose to happen), assume we are in the main script file
         const editorFile = fileName ? fileName : this.mainFilePath;
         // if we are in the main script file, adjust line number according to script boilerplate offset
@@ -413,12 +386,14 @@ export default class TestRunnerService extends ServiceBase {
             // alway open the tab (make it active) in which breakpoint occured
             primary: true,
         });
+
         // notify GUI that we hit a breakpoint
         this.notify({
             type: EVENT_BREAKPOINT,
             time,
             file: editorFile,
             line: editorLine,
+            variables: variables
         });
     }
 
@@ -427,13 +402,33 @@ export default class TestRunnerService extends ServiceBase {
             return null;
         }
         const parts = location.split(':');
-        if (parts.length != 3) {
-            return null;
+                
+        let fileName;
+        let line;
+        let column;
+
+        if (process.platform === 'win32') {
+            if (parts.length != 4) {
+                return null;
+            }
+
+            fileName = parts[0] + ':' + parts[1];
+            line = parts[2];
+            column = parts[3];
+        } else {
+            if (parts.length != 3) {
+                return null;
+            }
+
+            fileName = parts[0];
+            line = parts[1];
+            column = parts[2];
         }
+
         return {
-            file: parts[0],
-            line: parts[1],
-            column: parts[2]
+            file: fileName,
+            line: parseInt(line),
+            column: parseInt(column)
         };
     }
     /**
@@ -447,11 +442,11 @@ export default class TestRunnerService extends ServiceBase {
             return null;
         }
         let _breakpoints = [];
-        for (let filePath of Object.keys(breakpoints)) {
+        for (var filePath of Object.keys(breakpoints)) {
             if (!Array.isArray(breakpoints[filePath])) {
                 continue;
             }
-            for (let line of breakpoints[filePath]) {
+            for (var line of breakpoints[filePath]) {
                 _breakpoints.push({ file: filePath, line: line });
             }
         }

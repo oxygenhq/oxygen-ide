@@ -8,7 +8,6 @@
  * (at your option) any later version.
  */
 import * as types from './types';
-import subjects from './subjects';
 
 const DEFAULT_STATE = {
     activeFile: null,
@@ -25,7 +24,7 @@ const DEFAULT_OPEN_FILE_STATE = {
 };
 
 export default (state = DEFAULT_STATE, action) => {
-    const { file, name, path, newPath, line, time , cache, doUnknown } = action.payload || {};
+    const { name, path, newPath, line, time , cache, doUnknown } = action.payload || {};
     let _openFilesClone, _newActiveFile, _newActiveFileName;
 
     switch (action.type) {
@@ -116,7 +115,7 @@ export default (state = DEFAULT_STATE, action) => {
     // CLOSE_FILE
     case types.EDITOR_CLOSE_FILE: {   
         _openFilesClone = {};
-        for (let filePath of Object.keys(state.openFiles)) {
+        for (var filePath of Object.keys(state.openFiles)) {
             if(path === 'unknown'){
                 if ((filePath !== path+name) && (filePath !== name)) {
                     _openFilesClone[filePath] = state.openFiles[filePath];

@@ -155,9 +155,8 @@ export default class UpdateService extends ServiceBase {
                         console.log('err response', response);
                         const errMsg = response && response.message ? response.message : (response && response.Error ? response.Error : '');
                         console.info(`Failure checking for updates: ${errMsg}`);
-                        log.error(`Failure checking for updates: ${errMsg}`);
+                        global.log.error(`Failure checking for updates: ${errMsg}`);
                         return 'err';
-                        resolve('err');
                     }
                 }
             });

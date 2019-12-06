@@ -129,7 +129,7 @@ export default (state = defaultState, action) => {
         };
     }
 
-    // SHOW LANDING
+    // SHOW RECORDER MESSAGE VALUE
     case types.SHOW_RECORDER_MESSAGE_VALUE: {
         return { 
             ...state,
@@ -211,7 +211,8 @@ export default (state = defaultState, action) => {
     case types.SETTINGS_MERGE:
         return {
             ...state,
-            ...settings
+            ...settings,
+            showRecorderMessage: state.showRecorderMessage
         };
     // LAST_SESSION_SET_ROOT_FOLDER
     case types.LAST_SESSION_SET_ROOT_FOLDER:
