@@ -226,23 +226,29 @@ export default class CloudProvidersService extends ServiceBase {
         if (this.providers.hasOwnProperty(providerName)) {
             const provider = this.providers[providerName];
 
-            if(provider && provider.getBrowsersAndDevices){
-                const browsersAndDevices = await provider.getBrowsersAndDevices(userName, key);
+            if (provider && provider.getBrowsersAndDevices) {
+                try {
+                    const browsersAndDevices = await provider.getBrowsersAndDevices(userName, key);
                 
                 
-                if(browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0){
-                    // sauceLabs
-                    return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
-                } else if(browsersAndDevices && browsersAndDevices.platforms && Array.isArray(browsersAndDevices.platforms) && browsersAndDevices.platforms.length > 0){
-                    // lambdaTest
-                    return this.sortToBrowsersAndDevice(browsersAndDevices.platforms, providerName);
-                } else if(providerName === 'testingBot'){
-                    // testingBot
-                    return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
-                } else {
-                    throw new Error('browsersAndDevices does not exist.', browsersAndDevices);
+                    if (browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0) {
+                        // sauceLabs
+                        return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
+                    } else if(browsersAndDevices && browsersAndDevices.platforms && Array.isArray(browsersAndDevices.platforms) && browsersAndDevices.platforms.length > 0){
+                        // lambdaTest
+                        return this.sortToBrowsersAndDevice(browsersAndDevices.platforms, providerName);
+                    } else if(providerName === 'testingBot'){
+                        // testingBot
+                        return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
+                    } else {
+                        throw new Error('browsersAndDevices does not exist.', browsersAndDevices);
+                    }
+    
                 }
-
+                catch (e) {
+                    console.warn(`Failed to retrieve devices and browsers data from provider: ${providerName}`);
+                    return [];
+                }                
             } else {
                 throw new Error('provider.getBrowsersAndDevices does not exist.');
             }

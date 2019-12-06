@@ -26,22 +26,25 @@ export default class LambdaTestService extends CloudProviderBase {
         this.settings=settings;
     }
 
-    getBrowsersAndDevices() {
-        return new Promise((resolve, reject) => {
-            if(this.settings && this.settings.user && this.settings.key){
-                let headers = new fetch.Headers();
-    
-                headers.set('Authorization', 'Basic ' + Buffer.from(this.settings.user + ':' + this.settings.key).toString('base64'));
-                return fetch('https://api.lambdatest.com/automation/api/v1/platforms',{
-                    method:'GET',
-                    headers: headers,
-                })
-                    .then(response => resolve(response.json()))
-                    .catch(err => reject(err));
-            } else {
-                reject(new Error('Invalid Credentials'));
+    async getBrowsersAndDevices() {
+        if (this.settings && this.settings.user && this.settings.key) {
+            const headers = new fetch.Headers();
+
+            headers.set('Authorization', 'Basic ' + Buffer.from(this.settings.user + ':' + this.settings.key).toString('base64'));
+            const response = await fetch('https://api.lambdatest.com/automation/api/v1/platforms',
+            {
+                method:'GET',
+                headers: headers,
+            });
+            if (response) {
+                return response.json();
             }
-        });
+            // not suppose to happen
+            return null;
+        } 
+        else {
+            throw new Error('LambdaTestService: invalid credentials');
+        }
     }
 
     
