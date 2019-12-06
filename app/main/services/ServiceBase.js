@@ -11,7 +11,6 @@ export const SEVERITY_ERROR = 'ERROR';
 export const SEVERITY_FATAL = 'ERROR';
 export const SEVERITY_INFO = 'INFO';
 export const SEVERITY_DEBUG = 'DEBUG';
-export const SEVERITY_FATAL = 'FATAL';
 export const EVENT_LOG_ENTRY = 'LOG_ENTRY';
 
 
