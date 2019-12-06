@@ -443,24 +443,6 @@ export default class Toolbar extends React.Component<Props> {
                     </button>
                 )}
 
-                { (Array.isArray(providers) && providers.length > 0) && (
-                    <Select
-                        className="control select"
-                        value={ testProvider || '' }
-                        style={{ width: 120 }}
-                        onChange={ (value) => ::this.handleValueChange(Controls.TEST_PROVIDER, value) }
-                    >
-                        <Option key='' value=''>-- Local --</Option>
-                        {
-                            testMode === 'web' && providers.map((provider) => (
-                                <Option key={ provider.id } value={ provider.id }>
-                                    { provider.title }
-                                </Option>
-                            ))
-                        }
-                    </Select>
-                )}
-
                 <div className="separator" />
 
                 <label className="control label" htmlFor="stepDelay">Delay</label>
