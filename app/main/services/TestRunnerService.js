@@ -35,7 +35,6 @@ export default class TestRunnerService extends ServiceBase {
     }
     
     async start(mainFilePath, breakpoints, runtimeSettings) {
-        console.log('breakpoints', breakpoints);
         if (this.runner) {
             throw Error('Previous test is still running. Stop the previous test before calling "start" method.');
         }
@@ -157,11 +156,6 @@ export default class TestRunnerService extends ServiceBase {
         
         // initialize Oxygen Runner
         try {
-
-            console.log('options', options);
-            console.log('caps', caps);
-
-
             this.reporter = new ReportAggregator(options);            
             await this._launchTest(options, caps);
         } catch (e) {
@@ -341,7 +335,6 @@ export default class TestRunnerService extends ServiceBase {
 
         // @params breakpoint
         this.runner.on('breakpoint', (breakpoint) => {
-            console.log('this.runner.on breakpoint', breakpoint);
             this._handleBreakpoint(breakpoint);            
         });
 
