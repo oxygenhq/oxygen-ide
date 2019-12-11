@@ -99,5 +99,10 @@ module.exports = {
       ],
       'presets': ['react']
     }
-  }
+  },
+  'ignore': [/app\/node_modules/],
+  'overrides': [{
+    'test': /underscore.js/,
+    'sourceType': 'script',
+  }],
 };
