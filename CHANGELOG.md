@@ -1,9 +1,9 @@
 # CHANGELOG
 
-## v1.12.1 (2019-11-xx)
+## v1.12.1 (2019-11-27)
 
 #### :tada: New Feature
-* Support for inspecting variables in debugging mode.
+* Support for variables inspection in debugging mode.
 
 #### :beetle: Bug Fix
 * "Do not show this message again" checkbox not working in recording dialog.

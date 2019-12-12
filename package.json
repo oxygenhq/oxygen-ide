@@ -1,7 +1,7 @@
 {
   "name": "oxygenide",
   "productName": "Oxygen IDE",
-  "version": "1.11.0",
+  "version": "1.12.1",
   "description": "IDE for Oxygen automation framework.",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
@@ -66,6 +66,11 @@
     "testURL": "file:/",
     "verbose": true,
     "useStderr": true
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
@@ -133,6 +138,7 @@
     "grunt-contrib-compress": "^1.5.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-stripcomments": "^0.7.2",
+    "husky": "3.1.0",
     "jest": "^24.9.0",
     "mini-css-extract-plugin": "^0.8.0",
     "modclean": "^2.1.2",
