@@ -100,9 +100,19 @@ module.exports = {
       'presets': ['react']
     }
   },
-  'ignore': [/app\/node_modules/],
+  'ignore': [/node_modules/, /app\/node_modules/, /oxygen-cli/, /oxygen-node/],
   'overrides': [{
-    'test': /underscore.js/,
+    'test': [/underscore.js/, /websocket.js/, /worker.js/, /WorkerProcess.js/],
     'sourceType': 'script',
+  },{
+    'exclude': /oxygen-cli/
+  },{
+    'exclude': /oxygen-node/
+  },{
+    'exclude': /app\/node_modules\/oxygen-cli/
+  },{
+    'exclude': /worker.js/
+  },{
+    'exclude': /WorkerProcess.js/
   }],
 };
