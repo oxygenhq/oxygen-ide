@@ -1,5 +1,5 @@
 //@flow
-import React, { PureComponent } from 'react';
+import React from 'react';
 import Tree from '../components/Tree';
 import renderVariablesTreeNodes from './renderVariablesTreeNodes';
 import ScrollContainer from './ScrollContainer.jsx';

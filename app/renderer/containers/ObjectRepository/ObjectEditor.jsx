@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import List from '../../components/core/List.jsx';
 import Panel from '../../components/Panel.jsx';
 import LocatorsChanger from './LocatorsChanger';

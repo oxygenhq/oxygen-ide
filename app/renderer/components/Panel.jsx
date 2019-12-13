@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import type { Element } from 'react';
 import styled from '@emotion/styled';
 

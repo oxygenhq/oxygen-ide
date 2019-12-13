@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { Form, Input, Switch, Checkbox } from 'antd';
 
 const DEFAULT_STATE = {

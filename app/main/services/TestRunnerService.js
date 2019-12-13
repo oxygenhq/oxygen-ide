@@ -11,7 +11,6 @@ import path from 'path';
 import moment from 'moment';
 import detectPort from 'detect-port';
 import ServiceBase from './ServiceBase';
-import * as CloudProviders from './CloudProvidersService/providers';
 
 // Events
 const EVENT_LOG_ENTRY = 'LOG_ENTRY';
@@ -105,8 +104,8 @@ export default class TestRunnerService extends ServiceBase {
 
                 const provideroptions = provider.updateOptions(testTarget, options);
                 
-                for(var value in provideroptions){
-                    options[value] = provideroptions[value];
+                for(var value1 in provideroptions){
+                    options[value1] = provideroptions[value1];
                 }
             }
         }

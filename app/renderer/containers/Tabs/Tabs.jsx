@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import PerfectScrollbar from 'perfect-scrollbar';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
@@ -37,13 +37,9 @@ const circle = () => {
 };
 
 class Tabs extends React.Component<Props, void> {
-
-  // holds PerfectScrollbar instance
-  ps = null
-
-  state = {
-      closeTabAsk: false
-  }
+    state = {
+        closeTabAsk: false
+    }
 
   componentDidMount() {
       if(this.tabsRef){
@@ -86,6 +82,9 @@ class Tabs extends React.Component<Props, void> {
           }
       }
   }
+
+  // holds PerfectScrollbar instance
+  ps = null
 
   changeTabOrder = (dragIndex, hoverIndex) => {
       this.props.changeTabOrder(dragIndex, hoverIndex);

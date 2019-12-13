@@ -8,7 +8,7 @@
  */
 // @flow
 /* eslint-disable react/no-unused-state */
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { message } from 'antd';
 import difference from 'lodash.difference';

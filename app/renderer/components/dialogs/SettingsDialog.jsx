@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { Tabs, Modal } from 'antd';
 import GeneralSettings from './GeneralSettings';
 import CloudProvidersSettings from './CloudProvidersSettings';
@@ -22,6 +22,8 @@ type Props = {
     settings: Object | undefined,
     providers: Object | undefined,
     visible: boolean | undefined,
+    cloudProviders: Object | undefined,
+    visualProviders: Object | undefined,
     onSubmit: () => void,
     onCancel: () => void
 };

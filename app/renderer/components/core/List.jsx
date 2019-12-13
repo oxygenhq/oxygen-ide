@@ -8,7 +8,7 @@
  */
 // @flow
 
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Button, Icon } from 'antd';
 import styled from '@emotion/styled';
 

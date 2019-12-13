@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { Component } from 'react';
+import React from 'react';
 import { initializeScroll } from './common';
 
 type Props = {

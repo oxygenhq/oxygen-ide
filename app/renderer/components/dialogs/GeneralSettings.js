@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Form, Input, Select, InputNumber, Switch } from 'antd';
 const { Option } = Select;
 import ServicesSingleton from '../../services';

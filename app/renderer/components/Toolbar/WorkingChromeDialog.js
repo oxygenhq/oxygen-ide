@@ -1,5 +1,5 @@
 //@flow
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Modal, Button, Checkbox } from 'antd';
 import electron from 'electron';
 

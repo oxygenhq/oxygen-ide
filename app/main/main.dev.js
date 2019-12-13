@@ -21,7 +21,7 @@ import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
 
 import Logger from './Logger';
 import MainProcess from './MainProcess';
-// import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron';
 import fs from 'fs';
 import path from 'path';
 
@@ -37,7 +37,7 @@ try {
     // ignore sentry logging
     // initializeCrashReporterAndSentry();
     } else {
-    // initializeCrashReporterAndSentry();
+        initializeCrashReporterAndSentry();
     }
 } catch(e){
     console.warn('Cannot initialize CrashReporter and Sentry', e);
@@ -201,7 +201,7 @@ function initializeCrashReporterAndSentry() {
             uploadToServer: true
         });
         // initialize Sentry
-        // Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
+        Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
     }
 }
 

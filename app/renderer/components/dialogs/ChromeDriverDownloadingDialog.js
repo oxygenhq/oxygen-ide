@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { Modal, Icon } from 'antd';
 
 export default class ChromeDriverDownloadingDialog extends React.PureComponent {

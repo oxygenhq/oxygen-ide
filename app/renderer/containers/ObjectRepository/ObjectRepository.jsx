@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import styled from '@emotion/styled';
 import { Icon } from 'antd';
 

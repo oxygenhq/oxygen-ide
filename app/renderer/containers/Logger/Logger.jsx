@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { Icon, Tabs } from 'antd';
 import LogViewer from '../../components/LogViewer.jsx';
 import VariablesViewer from '../../components/VariablesViewer';

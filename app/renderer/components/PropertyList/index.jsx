@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent } from 'react';
+import React from 'react';
 import type { Element } from 'react';
 import '../../css/property-list.scss';
 

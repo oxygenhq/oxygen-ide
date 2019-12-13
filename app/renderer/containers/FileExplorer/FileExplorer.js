@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import { Tooltip } from 'antd';
 import path from 'path';
 import Tree from '../../components/Tree';

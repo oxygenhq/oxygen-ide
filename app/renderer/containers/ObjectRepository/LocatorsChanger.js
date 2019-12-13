@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Input, Button, Icon } from 'antd';
 import '../../css/locators-changer.scss';
 

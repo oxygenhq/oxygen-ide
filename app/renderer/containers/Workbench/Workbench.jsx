@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import {Layout, Icon, Row, Col, message, notification } from 'antd';
 /* eslint-disable react/no-did-update-set-state */
 import updateModals from '../../components/updateModals';

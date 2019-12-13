@@ -173,7 +173,7 @@ export function updateActiveLineMarker(editor, inputLine, fontSize=null) {
                     item.options.linesDecorationsClassName &&
                     typeof item.options.linesDecorationsClassName === 'string'
                 ){
-                    return item.options.linesDecorationsClassName.startsWith('currentLineDecoratorStyle')   
+                    return item.options.linesDecorationsClassName.startsWith('currentLineDecoratorStyle');  
                 } else {
                     return false;
                 }

@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { PureComponent } from 'react';
+import React from 'react';
 import Tree from '../../components/Tree';
 
 import renderTreeNodes from './renderTreeNodes';

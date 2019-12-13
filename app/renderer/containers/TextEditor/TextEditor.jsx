@@ -11,7 +11,7 @@
 // import uniqid from 'uniqid';
 // import cloneDeep from 'lodash/cloneDeep';
 // import uniqBy from 'lodash/uniqBy';
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Icon } from 'antd';
 
 import MonacoEditor from '../../components/MonacoEditor/index.jsx';

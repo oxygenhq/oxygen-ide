@@ -8,8 +8,8 @@
  */
 // @flow
 /* eslint-disable react/no-unused-state */
-import { Spin, Icon, Select, Input, message, TreeSelect } from 'antd';
-import React, { Component, Fragment } from 'react';
+import { Icon, Select, Input, TreeSelect } from 'antd';
+import React, { Fragment } from 'react';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/lib/fa';
 import '../../css/toolbar.scss';
 
@@ -42,7 +42,9 @@ type Props = {
     canRecord: boolean,
     testRunning: boolean,
     waitChromeExtension: boolean,
-    showRecorderMessage: boolean | null
+    showRecorderMessage: boolean | null,
+    isChromeExtensionEnabled: boolean | null,
+    cloudProvidesBrowsersAndDevices: object | null
 };
 
 const { Option } = Select;
@@ -152,7 +154,6 @@ export default class Toolbar extends React.Component<Props> {
             providers = [],
             testProvider = null,
             stepDelay,
-            isChromeExtensionEnabled,
             canRecord,
             testRunning,
             waitChromeExtension,
@@ -228,11 +229,12 @@ export default class Toolbar extends React.Component<Props> {
                 { this._isVisible(Controls.NEW_FOLDER) && (
                     <Icon
                         className="control button"
-                        style={ getOpacity(this._isEnabled(Controls.NEW_FOLDER)) }
                         onClick={ () => ::this.handleClickEvent(Controls.NEW_FOLDER) }
                         type="folder-add"
                         title="New Folder"
-                        style={ {'fontSize': '25px'} }
+                        style={ {
+                            ...getOpacity(this._isEnabled(Controls.NEW_FOLDER)), 
+                            'fontSize': '25px'} }
                     />
                 )}
 
@@ -276,9 +278,11 @@ export default class Toolbar extends React.Component<Props> {
                     <Fragment>
                         <span key='web' className={testMode === 'web' ? 'control selectable active' : 'control selectable'}>
                             <Icon
-                                style={ getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)) }
                                 onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_WEB) }
-                                style={{ marginRight: 0 }}
+                                style={{ 
+                                    ...getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)),
+                                    marginRight: 0 
+                                }}
                                 title="Web Mode"
                                 type="global"
                             />
@@ -286,9 +290,11 @@ export default class Toolbar extends React.Component<Props> {
             
                         <span key='mob' className={testMode === 'mob' ? 'control selectable active' : 'control selectable'}>
                             <Icon
-                                style={ getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)) }
                                 onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_MOB) }
-                                style={{ marginRight: 0 }}
+                                style={{ 
+                                    ...getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)),
+                                    marginRight: 0 
+                                }}
                                 title="Mobile Mode"
                                 type="mobile"
                             />
@@ -299,9 +305,11 @@ export default class Toolbar extends React.Component<Props> {
                     cloudProvidesBrowsersEnabled &&
                     <span key='web' className={cloudProviderTestMode === 'web' ? 'control selectable active' : 'control selectable'}>
                         <Icon
-                            style={ getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)) }
                             onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_WEB) }
-                            style={{ marginRight: 0 }}
+                            style={{ 
+                                ...getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)),
+                                marginRight: 0 
+                            }}
                             title="Web Mode"
                             type="global"
                         />
@@ -311,9 +319,11 @@ export default class Toolbar extends React.Component<Props> {
                     cloudProvidesDevicesEnabled &&
                     <span key='mob' className={cloudProviderTestMode === 'mob' ? 'control selectable active' : 'control selectable'}>
                         <Icon
-                            style={ getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)) }
                             onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_MOB) }
-                            style={{ marginRight: 0 }}
+                            style={{ 
+                                ...getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)),
+                                marginRight: 0 
+                            }}
                             title="Mobile Mode"
                             type="mobile"
                         />
@@ -323,9 +333,11 @@ export default class Toolbar extends React.Component<Props> {
                     (!providersUnabled || !testProvider) && (
                         <span key='resp' className={testMode === 'resp' ? 'control selectable active' : 'control selectable'}>
                             <Icon
-                                style={ getOpacity(this._isEnabled(Controls.TEST_MODE_RESP)) }
                                 onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_RESP) }
-                                style={{ marginRight: 0 }}
+                                style={{ 
+                                    ...getOpacity(this._isEnabled(Controls.TEST_MODE_RESP)),
+                                    marginRight: 0
+                                }}
                                 title="Responsive Mode"
                                 type="scan"
                             />

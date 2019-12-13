@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { Button, Menu, Dropdown, Icon, Modal, Input } from 'antd';
 
 type Props = {

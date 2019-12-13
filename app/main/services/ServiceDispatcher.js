@@ -14,7 +14,7 @@ export default class ServiceDispatcher {
     constructor(mainWindow, settings = null) {
         global.services = this.servicesHash = {};
         this.mainWindow = mainWindow;
-        this.settings = appSettings.get('appSettings');;
+        this.settings = appSettings.get('appSettings');
     }
 
     start() {
