@@ -191,12 +191,12 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     updateBreakpoints(breakpoints, filePath) {        
-
+        /*
         console.log('--- updateBreakpoints ---');
         console.log('breakpoints', breakpoints);
         console.log('filePath', filePath);
         console.log('--- updateBreakpoints ---');
-
+        */
         if (this.runner && breakpoints && filePath) {
             this.runner.updateBreakpoints(breakpoints, filePath);
         }
@@ -405,6 +405,9 @@ export default class TestRunnerService extends ServiceBase {
             }
 
             fileName = parts[0] + ':' + parts[1];
+            // on Windows, file path might include Linux '/' path delimeter
+            // make sure to replace it with a proper Windows path delimiter ('\')
+            fileName = fileName.replace(/\//g, '\\');
             line = parts[2];
             column = parts[3];
         } else {
