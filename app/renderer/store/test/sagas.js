@@ -249,15 +249,13 @@ export function* continueTest({ payload }) {
 }
 
 export function* handleOnLineUpdate ({ payload }) {
-    const { file, line, primary, time } = payload || {};
-    // check if this is the primary file and if yes, make sure to make its tab active
-    if (primary) {
-        const openFiles = yield select(state => state.editor.openFiles);
-        // check if we have this file open in one of the editors
-        if (openFiles[file]) {
-            yield put(tabActions.setActiveTab(file));
-            yield put(editorActions.setActiveFile(file));
-        }
+    const { file, line, time } = payload || {};
+ 
+    const openFiles = yield select(state => state.editor.openFiles);
+    // check if we have this file open in one of the editors
+    if (openFiles[file]) {
+        yield put(tabActions.setActiveTab(file));
+        yield put(editorActions.setActiveFile(file));
     }
     yield put(editorActions.setActiveLine(time, file, line));
 }
