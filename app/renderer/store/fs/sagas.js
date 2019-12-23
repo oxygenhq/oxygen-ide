@@ -601,11 +601,12 @@ export function* createFolder({ payload }) {
     }
     try {
         // call main service that will create a new folder
-        const newPath = yield call(services.mainIpc.call, 'FileService', 'createFolder', [ path, name ]);
-        // refresh File Explorer tree to show a new folder under its parent folder
-        yield put(fsActions.treeLoadNodeChildren(path, true));
-        // report success
-        yield put(fsActions._createFolder_Success(path, name, newPath));
+        yield call(services.mainIpc.call, 'FileService', 'createFolder', [ path, name ]);
+
+        // // refresh File Explorer tree to show a new folder under its parent folder
+        // yield put(fsActions.treeLoadNodeChildren(path, true));
+        // // report success
+        // yield put(fsActions._createFolder_Success(path, name, newPath));
     }
     catch (err) {
         yield put(reportError(err));
