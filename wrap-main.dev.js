@@ -1,5 +1,5 @@
 require('@babel/register')({
-    'extends': './babel.config.js',
+    'extends': './.babelrc',
     'ignore': ['node_modules', 'app/node_modules']
     // 'presets': ['./node_modules/@babel/preset-env'], 'retainLines': true
 });

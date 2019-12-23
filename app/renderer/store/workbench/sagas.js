@@ -344,10 +344,10 @@ export function* openFolder({ payload }) {
         return;
     }
     // store new root folder in the App Settings
-    yield put(settingsActions.setLastSessionRootFolder(path));
-    const settings = yield select(state => state.settings);
+    // yield put(settingsActions.setLastSessionRootFolder(path));
+    // const settings = yield select(state => state.settings);
     // persiste settings in the Electron store
-    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
+    // yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
     // report success
     yield put(wbActions._openFile_Success(path));
 }

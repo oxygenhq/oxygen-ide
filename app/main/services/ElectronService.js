@@ -204,7 +204,8 @@ export default class ElectronService extends ServiceBase {
     }
 
     getSettings() {
-        return appSettings.get('appSettings');
+        const settings = appSettings.get('appSettings');
+        return settings;
     }
 
     updateSettings(settings) {

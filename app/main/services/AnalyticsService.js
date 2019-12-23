@@ -12,7 +12,7 @@ import ServiceBase from './ServiceBase';
 import moment from 'moment';
 import { version }  from '../../../package.json';
 import os from 'os';
-import osLocale from 'os-locale';
+// import osLocale from 'os-locale';
 import uuidv4 from'uuid/v4';
 // import * as Sentry from '@sentry/electron';
 
@@ -67,8 +67,14 @@ export default class AnalyticsService extends ServiceBase {
         let city = 'unknown';
         let continent_name = 'unknown';
         let continent_code = 'unknown';
-        const language = await osLocale();
+        let language = 'unknown';
 
+        // try{
+        //     language = await osLocale();
+        // } catch(e){
+        //     console.warn('osLocale e', e);
+        //     // Sentry.captureException(e);
+        // }
         try{
             const { net } = require('electron');
             const request = net.request('https://api.ipdata.co/?api-key=143415c75d2d5036d29cc48ecb1c742bfef9ab3f25af45fbd0939367');
