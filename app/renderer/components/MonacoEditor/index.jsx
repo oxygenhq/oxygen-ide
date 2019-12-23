@@ -88,9 +88,13 @@ export default class MonacoEditor extends React.Component<Props> {
     }
 
     componentDidMount() {
-        amdRequire(['vs/editor/editor.main'], () => {
-            this.initMonaco();
-        });
+        try{
+            amdRequire(['vs/editor/editor.main'], () => {
+                this.initMonaco();
+            });
+        } catch(e){
+            console.log('monaco editor e', e);
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {    
