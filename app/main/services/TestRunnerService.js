@@ -366,7 +366,7 @@ export default class TestRunnerService extends ServiceBase {
         const editorFile = fileName ? fileName : this.mainFilePath;
         // if we are in the main script file, adjust line number according to script boilerplate offset
         // if we are in the secondary file (loaded via `require`) add 1 since BP indices are 0-based.
-        let editorLine = lineNumber;
+        let editorLine = lineNumber + 1;
         
         const time = moment.utc().valueOf();
         // make sure to mark breakpoint line with current line mark
