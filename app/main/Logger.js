@@ -193,7 +193,11 @@ export default class Logger {
         });
 
         process.on('unhandledRejection', error => {
-            global.log.warn('Unhandled Promise Rejection.', error);
+            if(error && error.code && error.code === 'ENOMEM'){
+                // ignore
+            } else {
+                global.log.warn('[MAIN] Unhandled Promise Rejection.', error);
+            }
         });
     }
 }

@@ -33,9 +33,9 @@ try {
         process.env.NODE_ENV && 
         process.env.NODE_ENV === 'development'
     ) {
-    // dev mode
-    // ignore sentry logging
-    // initializeCrashReporterAndSentry();
+        // dev mode
+        // ignore sentry logging
+        initializeCrashReporterAndSentry();
     } else {
         initializeCrashReporterAndSentry();
     }

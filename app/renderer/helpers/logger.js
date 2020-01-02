@@ -30,6 +30,10 @@ export default function loggerSetup() {
     });
 
     process.on('unhandledRejection', error => {
-        global.log.warn('Unhandled Promise Rejection.', util.inspect(error));
+        if(error && error.code && error.code === 'ENOMEM'){
+            // ignore
+        } else {
+            global.log.warn('[RENDERER] Unhandled Promise Rejection.', util.inspect(error));
+        }
     });
 }
