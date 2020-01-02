@@ -40,7 +40,11 @@ export default class AnalyticsService extends ServiceBase {
         if(this.uuid){
             return this.uuid;
         } else {
-            this.uuid = uuidv4();
+            try{
+                this.uuid = uuidv4();
+            } catch(e){
+                console.log('uuidv4 e', e);
+            }
             return this.uuid;
         }
     }
@@ -58,7 +62,11 @@ export default class AnalyticsService extends ServiceBase {
         if(uuid){
             this.uuid = uuid;
         } else {
-            this.uuid = uuidv4();
+            try{
+                this.uuid = uuidv4();
+            } catch(e){
+                console.log('createUser e', e);
+            }
         }
 
         let region = 'unknown';
@@ -67,7 +75,15 @@ export default class AnalyticsService extends ServiceBase {
         let city = 'unknown';
         let continent_name = 'unknown';
         let continent_code = 'unknown';
-        const language = await osLocale();
+        let language = 'unknown';
+        try {
+            const locale = await osLocale.sync();
+            if(locale){
+                language = locale;
+            }
+        } catch(e){
+            console.log('osLocale e', e);
+        }
 
         try{
             const { net } = require('electron');
@@ -126,6 +142,9 @@ export default class AnalyticsService extends ServiceBase {
                 response.on('end', () => {
                     // console.log('No more data in response.')
                 });
+            });
+            request.on('error', (err) => {
+                console.log('ipdata request error', err);
             });
             request.end();
         } catch(e){
