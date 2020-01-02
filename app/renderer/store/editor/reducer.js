@@ -24,7 +24,7 @@ const DEFAULT_OPEN_FILE_STATE = {
 };
 
 export default (state = DEFAULT_STATE, action) => {
-    const { name, path, newPath, line, time , cache, doUnknown } = action.payload || {};
+    const { name, path, newPath, line, time, cache, doUnknown, fromIndex, toIndex } = action.payload || {};
     let _openFilesClone, _newActiveFile, _newActiveFileName;
 
     switch (action.type) {
@@ -217,6 +217,23 @@ export default (state = DEFAULT_STATE, action) => {
         }
 
         return result;
+    }
+
+    case 'TABS_CHANGE_ORDER': {
+        const _newList= {};
+        const keys = Object.keys(state.openFiles);
+        const firstItem = keys[fromIndex];
+        
+        keys[fromIndex] = keys[toIndex];
+        keys[toIndex] = firstItem;
+        keys.forEach(function(key) {
+            _newList[key] = state.openFiles[key];
+        });
+
+        return {
+            ...state,
+            openFiles: _newList,
+        };
     }
 
     case 'FROM_CACHE': 
