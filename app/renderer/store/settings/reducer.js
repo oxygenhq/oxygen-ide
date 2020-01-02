@@ -118,7 +118,7 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { value, target, settings, zoom, cache, uuid, providers, browsersAndDevices, testProvider } = payload;
+    const { value, target, settings, zoom, cache, uuid, providers, browsersAndDevices, testProvider, visualProviders } = payload;
     switch (action.type) {
     
     // CREATE USER
@@ -309,6 +309,15 @@ export default (state = defaultState, action) => {
         return {
             ...state,
             cloudProviders: providers
+        };
+
+    case types.UPDATE_VISUAL_PROVIDERS_SETTINGS: 
+        if (!visualProviders || typeof visualProviders !== 'object') {
+            return state;
+        }
+        return {
+            ...state,
+            visualProviders: visualProviders
         };
 
     case types.SET_CLOUD_PROVIDERS_BROWSERS_AND_DEVICES : 

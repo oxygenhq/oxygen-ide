@@ -98,6 +98,7 @@ export default function* root() {
         takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
         takeLatest(success(ActionTypes.FS_DELETE), handleFileDelete),
         takeLatest(ActionTypes.UPDATE_CLOUD_PROVIDERS_SETTINGS, handleUpdatedCloudProvidersSettings),
+        takeLatest(ActionTypes.UPDATE_VISUAL_PROVIDERS_SETTINGS, handleVisualTestingSettings),
         takeLatest(ActionTypes.TEST_UPDATE_RUN_SETTINGS, handleUpdatedRunSettings),      
         takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
@@ -298,6 +299,9 @@ export function* initialize() {
     //start CloudProvidersService
     services.mainIpc.call('CloudProvidersService', 'start').then(() => {});
     yield setCloudProvidersBrowsersAndDevices();
+    //start VisualTestingProvidersService
+    services.mainIpc.call('VisualTestingProvidersService', 'start').then(() => {});
+    yield setVisualTestingProviders();
 
     yield put({
         type: success(ActionTypes.WB_INIT),
@@ -1557,11 +1561,33 @@ export function* setCloudProvidersBrowsersAndDevices(){
     }
 }
 
+export function* setVisualTestingProviders(){
+    const settings = yield select(state => state.settings);
+    
+    const { visualProviders } = settings || {};
+
+    if(visualProviders){
+        if(visualProviders.applitools){
+            yield call(services.mainIpc.call, 'VisualTestingProvidersService', 'updateProviderSettings', ['applitools', visualProviders.applitools]);
+        }
+    }
+}
+
 export function* handleUpdatedCloudProvidersSettings({payload}) {
     const settings = yield select(state => state.settings);
     // persiste settings in the Electron store
     yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
     yield setCloudProvidersBrowsersAndDevices();
+}
+
+export function* handleVisualTestingSettings({payload}) {
+    const settings = yield select(state => state.settings);
+    // persiste settings in the Electron store
+    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
+
+    if(settings && settings.visualProviders && settings.visualProviders.applitools){
+        yield call(services.mainIpc.call, 'VisualTestingProvidersService', 'updateProviderSettings', ['applitools', settings.visualProviders.applitools]);
+    }
 }
 
 export function* handleUpdatedRunSettings(payload) {

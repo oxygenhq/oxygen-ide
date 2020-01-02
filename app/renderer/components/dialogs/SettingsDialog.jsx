@@ -56,17 +56,22 @@ export default class SettingsDialog extends React.PureComponent<Props> {
   
     async handleOk() {
         let generalSettingsResult = null;
-        let generalCloudProvidersResult = null;
+        let cloudProvidersResult = null;
+        let visualTestingSettings = null;
         
         if(this.GeneralSettings && this.GeneralSettings.formWrap && this.GeneralSettings.formWrap.validateFormFields){
             generalSettingsResult = await this.GeneralSettings.formWrap.validateFormFields();
         }
         
         if(this.CloudProvidersSettings && this.CloudProvidersSettings.formWrap && this.CloudProvidersSettings.formWrap.validateFormFields){
-            generalCloudProvidersResult = await this.CloudProvidersSettings.formWrap.validateFormFields();
+            cloudProvidersResult = await this.CloudProvidersSettings.formWrap.validateFormFields();
+        }
+        
+        if(this.VisualTestingSettings && this.VisualTestingSettings.formWrap && this.VisualTestingSettings.formWrap.validateFormFields){
+            visualTestingSettings = await this.VisualTestingSettings.formWrap.validateFormFields();
         }
 
-        this.props.onSubmit(generalSettingsResult, generalCloudProvidersResult);
+        this.props.onSubmit(generalSettingsResult, cloudProvidersResult, visualTestingSettings);
     }
 
     onTabChange = (key) => {

@@ -109,6 +109,20 @@ export default class TestRunnerService extends ServiceBase {
                 }
             }
         }
+
+        const visualTestingProvidersServiceSvc = this.getService('VisualTestingProvidersService');
+        if(visualTestingProvidersServiceSvc){
+            const applitoolsProvider = visualTestingProvidersServiceSvc.getProvider('applitools');
+            if (applitoolsProvider) {
+                const applitoolsproviderCaps = applitoolsProvider.updateOptions(options);
+                if(applitoolsproviderCaps){
+                    for(var value2 in applitoolsproviderCaps){
+                        options[value2] = applitoolsproviderCaps[value2];
+                    }
+                }
+            }
+        }
+
         // add local run options, if no cloud provider was selected
         if (!testProvider || !testProvider.id) {
             // prepare module parameters
@@ -145,6 +159,7 @@ export default class TestRunnerService extends ServiceBase {
                 options.browserName = testTarget;
                 // @FIXME: this option should be exposed in reports settings
                 options.screenshots = 'never';
+                caps.browserName = 'chrome';
             }
         }
                 

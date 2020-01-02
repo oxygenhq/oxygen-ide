@@ -128,6 +128,11 @@ export const setLastSessionRootFolder = value => ({
     payload: { value },
 });
 
+export const updateVisualTestingSettings = visualProviders => ({
+    type: types.UPDATE_VISUAL_PROVIDERS_SETTINGS,
+    payload: { visualProviders }
+});
+
 export const updateCloudProvidersSettings = providers => ({
     type: types.UPDATE_CLOUD_PROVIDERS_SETTINGS,
     payload: { providers }

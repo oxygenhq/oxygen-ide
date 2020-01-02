@@ -91,6 +91,7 @@ type Props = {
   renameFile: Function,
   updateRunSettings: Function,
   updateCloudProvidersSettings: Function,
+  updateVisualTestingSettings: Function,
   startDownloadChromeDriver: Function,
   showDownloadChromeDriverError: Function,
   dialog: Object,
@@ -461,7 +462,7 @@ export default class Workbench extends React.Component<Props> {
       this.props.hideDialog('DIALOG_UPDATE');
   }
   // Settings
-  settingsDialog_onSubmit(settings, providers) {
+  settingsDialog_onSubmit(settings, providers, visualTesting) {
       this.props.hideDialog('DIALOG_SETTINGS');
 
       if(settings){
@@ -470,6 +471,10 @@ export default class Workbench extends React.Component<Props> {
 
       if(providers){
         this.props.updateCloudProvidersSettings(providers);    
+      }
+
+      if(visualTesting){
+        this.props.updateVisualTestingSettings(visualTesting);
       }
   }
   settingsDialog_onCancel() {
