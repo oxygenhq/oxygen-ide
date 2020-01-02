@@ -11,7 +11,7 @@
     "dev": "cross-env START_HOT=1 node -r @babel/register ./internals/scripts/CheckPortInUse.js && cross-env process.env._TESTING=1 START_HOT=1 npm run start-renderer-dev",
     "flow": "flow",
     "flow-typed": "rimraf flow-typed/npm && flow-typed update --ignoreDeps dev || (exit 0)",
-    "lint": "cross-env NODE_ENV=development eslint --cache **/*.js **/*.jsx",
+    "lint": "cross-env NODE_ENV=development eslint **/*.js **/*.jsx",
     "package": "npm install && npm run build && grunt",
     "postinstall": "node -r @babel/register internals/scripts/CheckNativeDep.js && npm run flow-typed && npm run build-dll && node node_modules/fbjs-scripts/node/check-dev-engines.js package.json && cd app && npm install",
     "prestart": "npm run build",
