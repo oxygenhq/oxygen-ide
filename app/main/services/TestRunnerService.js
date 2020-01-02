@@ -62,6 +62,7 @@ export default class TestRunnerService extends ServiceBase {
             seleniumPort,
             stepDelay,
             testName,
+            rootPath
         } = testConfig;
 
         let testsuite = null;
@@ -166,6 +167,10 @@ export default class TestRunnerService extends ServiceBase {
 
         if (stepDelay) {
             options.delay = stepDelay;
+        }
+
+        if(rootPath){
+            options.rootPath = rootPath;
         }
         
         // initialize Oxygen Runner

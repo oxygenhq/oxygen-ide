@@ -183,6 +183,11 @@ export function* startTest({ payload }) {
         }
     }
 
+    const rootPath = yield select(state => state.fs.rootPath);
+    if(rootPath && typeof rootPath === 'string'){
+        runtimeSettingsClone.rootPath = rootPath;
+    }
+
     try {        
         // reset active line cursor in all editors
         yield put(editorActions.resetActiveLines());
