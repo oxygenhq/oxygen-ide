@@ -31,7 +31,7 @@ export default class ApplitoolsService extends VisualTestingProviderBase {
             throw new Error('"settings" must not be null');
         }
 
-        if(this.settings.accessKey){
+        if(this.settings.accessKey && this.settings.inUse){
             options.applitoolsOpts = {
                 key: this.settings.accessKey,
                 checkOnEveryAction: false
