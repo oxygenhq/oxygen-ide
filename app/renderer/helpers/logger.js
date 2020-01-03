@@ -26,6 +26,12 @@ export default function loggerSetup() {
             console.warn(`Ignoring error: ${error.name}: ${error.message}`);
             return;
         }
+
+        // ignore Monaco Editor error related to doResolve
+        if(error && error.message && typeof error.message === 'string' && error.message.includes('doResolve')){
+            return;
+        }
+
         global.log.error('Unhandled Error.', util.inspect(error));
     });
 

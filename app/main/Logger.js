@@ -189,6 +189,11 @@ export default class Logger {
 
     _catchTheUncaught() {
         process.on('uncaughtException', error => {
+            // ignore Monaco Editor error related to doResolve
+            if(error && error.message && typeof error.message === 'string' && error.message.includes('doResolve')){
+                return;
+            }
+
             global.log.warn('Unhandled Error.', error);
         });
 
