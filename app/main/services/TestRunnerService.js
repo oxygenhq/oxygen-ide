@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 import { Runners, ReportAggregator, util as oxutil } from 'oxygen-cli';
+import * as cliutil from './cli-util';
 import path from 'path';
 import moment from 'moment';
 import detectPort from 'detect-port';
@@ -62,7 +63,8 @@ export default class TestRunnerService extends ServiceBase {
             seleniumPort,
             stepDelay,
             testName,
-            rootPath
+            rootPath,
+            oxConfigFile
         } = testConfig;
 
         let testsuite = null;
@@ -83,7 +85,7 @@ export default class TestRunnerService extends ServiceBase {
         testsuite.cases[0].breakpoints = casesBreakpoints;
         // prepare launch options and capabilities
         const options = {};
-        const caps = {};
+        let caps = {};
         options.suites = [testsuite];
         options.debugPortIde = dbgPort;
         options.require = {
@@ -115,10 +117,10 @@ export default class TestRunnerService extends ServiceBase {
         if(visualTestingProvidersServiceSvc){
             const applitoolsProvider = visualTestingProvidersServiceSvc.getProvider('applitools');
             if (applitoolsProvider) {
-                const applitoolsproviderCaps = applitoolsProvider.updateOptions(options);
-                if(applitoolsproviderCaps){
-                    for(var value2 in applitoolsproviderCaps){
-                        options[value2] = applitoolsproviderCaps[value2];
+                const applitoolsproviderOptions = applitoolsProvider.updateOptions(options);
+                if(applitoolsproviderOptions){
+                    for(var value2 in applitoolsproviderOptions){
+                        options[value2] = applitoolsproviderOptions[value2];
                     }
                 }
             }
@@ -163,8 +165,7 @@ export default class TestRunnerService extends ServiceBase {
                 caps.browserName = 'chrome';
             }
         }
-                
-
+            
         if (stepDelay) {
             options.delay = stepDelay;
         }
@@ -172,9 +173,63 @@ export default class TestRunnerService extends ServiceBase {
         if(rootPath){
             options.rootPath = rootPath;
         }
+
+        if(oxConfigFile){
+            const targetFile = cliutil.processTargetPath(oxConfigFile);
+            const argv = {};
+
+            // console.log('TestRunner : targetFile', targetFile);
+
+            if(targetFile){
+                const config = await cliutil.getConfigurations(targetFile, argv);
+
+                if(config && config.suites){
+                    delete config.suites;
+                }
+
+                // console.log('TestRunner : config', config);
+
+                const oxConfigOptions = await cliutil.generateTestOptions(config, argv);
+                
+                // console.log('TestRunner : options', oxConfigOptions);
+
+                if(oxConfigOptions){
+                    const data = await cliutil.prepareTestData(oxConfigOptions);
+                    
+                    console.log('====');
+                    console.log('origin options', options);
+                    console.log('\n');
+                    console.log('origin caps', caps);
+                    console.log('\n');
+                    console.log('TestRunner : data', data);
+                    console.log('\n');
+                    console.log('====');
+                    
+                    if(data){
+                        if(data.options){
+                            for(var oxConfigOption in data.options){
+                                options[oxConfigOption] = data.options[oxConfigOption];
+                            }
+                        }
+
+                        if(data.caps && Array.isArray(data.caps) && data.caps.length > 0){
+                            const firstCap = data.caps[0];
+                            caps = firstCap;
+                        }
+                    }
+                }
+            }
+        }
         
         // initialize Oxygen Runner
         try {
+
+            console.log('~~~~');
+            console.log('final options', options);
+            console.log('\n');
+            console.log('final caps', caps);
+            console.log('~~~~');
+
             this.reporter = new ReportAggregator(options);            
             await this._launchTest(options, caps);
         } catch (e) {
@@ -246,6 +301,13 @@ export default class TestRunnerService extends ServiceBase {
         this._hookToOxygenEvents();
         try {
             this._emitLogEvent(SEVERITY_INFO, 'Initializing...');
+
+            
+            console.log('==== Test Runner Service ====');
+            console.log('this._config ak opts', opts);
+            console.log('caps ak caps', caps);
+            console.log('====  Test Runner Service  ====');
+
             // initialize runner
             await runner.init(opts, caps, this.reporter);   
             // run test 

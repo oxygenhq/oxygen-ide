@@ -188,6 +188,53 @@ export function* startTest({ payload }) {
         runtimeSettingsClone.rootPath = rootPath;
     }
 
+    
+    const fsTree = yield select(state => state.fs.tree);
+
+    if(fsTree && fsTree.data && Array.isArray(fsTree.data) && fsTree.data.length > 0){
+        
+        const OXYGEN_CONFIG_FILE_NAME = 'oxygen.conf';
+        const OXYGEN_ENV_FILE_NAME = 'oxygen.env';
+        const OXYGEN_PAGE_OBJECT_FILE_NAME = 'oxygen.po';
+
+        let oxConfigFile = null;
+        let oxEnvFile = null;
+        let oxPageObjectFile = null;
+
+        fsTree.data.map((item) => {
+            if(
+                item && 
+                item.type && 
+                item.type === 'file' && 
+                ['.js', '.json'].includes(item.ext) && 
+                item.path && 
+                typeof item.path === 'string' && 
+                item.name && 
+                typeof item.name === 'string'
+            ){
+                if(item.name.startsWith(OXYGEN_CONFIG_FILE_NAME)){
+                    oxConfigFile = item.path;
+                }
+                if(item.name.startsWith(OXYGEN_ENV_FILE_NAME)){
+                    oxEnvFile = item.path;
+                }
+                if(item.name.startsWith(OXYGEN_PAGE_OBJECT_FILE_NAME)){
+                    oxPageObjectFile = item.path;
+                }
+            }
+        });
+
+        if(oxConfigFile){
+            runtimeSettingsClone.oxConfigFile = oxConfigFile;
+        }
+        if(oxEnvFile){
+            runtimeSettingsClone.oxEnvFile = oxEnvFile;
+        }
+        if(oxConfigFile){
+            runtimeSettingsClone.oxPageObjectFile = oxPageObjectFile;
+        }
+    }
+
     try {        
         // reset active line cursor in all editors
         yield put(editorActions.resetActiveLines());
