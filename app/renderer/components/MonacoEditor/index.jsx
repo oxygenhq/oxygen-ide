@@ -29,10 +29,14 @@ function uriFromPath(_path) {
     }
     return encodeURI(`file://${pathName}`);
 }
-amdRequire.config({
-    ignoreDuplicateModules: 'vs/editor/editor.main',
-    baseUrl: uriFromPath(path.join(__dirname, '../node_modules/monaco-editor/min'))
-});
+try {
+    amdRequire.config({
+        ignoreDuplicateModules: 'vs/editor/editor.main',
+        baseUrl: uriFromPath(path.join(__dirname, '../node_modules/monaco-editor/min'))
+    });
+} catch(e){
+    console.log('amdRequire config e', e);
+}
 
 function noop() {}
 
