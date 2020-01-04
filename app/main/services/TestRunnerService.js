@@ -250,10 +250,8 @@ export default class TestRunnerService extends ServiceBase {
         if (this.runner) {
             this.isStopping = true;
             try {
-
-                this.runner.kill().then(()=>{});
-                this.runner.dispose().then(()=>{});
-
+                this.runner.kill('CANCELED').then(()=>{});
+                this.runner.dispose('CANCELED').then(()=>{});
             }
             catch (e) {
                 // ignore any errors
