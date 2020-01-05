@@ -436,10 +436,6 @@ export default class TestRunnerService extends ServiceBase {
             if (src && src !== 'system') {
                 this._emitLogEvent(level ? level.toUpperCase() : SEVERITY_INFO, msg);
             }
-            
-            if(level && level === 'error'){
-                this._emitLogEvent(level ? level.toUpperCase() : SEVERITY_INFO, msg);
-            }
         });
     }
 
