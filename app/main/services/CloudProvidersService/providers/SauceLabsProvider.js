@@ -82,11 +82,13 @@ export default class SauceLabsProvider extends CloudProviderBase {
                 caps.osVersion = target.osVersion;
             }
         }
-        caps.name = testName || null;
-        caps.username = this.settings.username;
-        caps.accessKey = this.settings.accessKey;
-        caps.extendedDebugging = this.settings.extendedDebugging || false;
-        caps.capturePerformance = this.settings.capturePerformance || false;
+        caps['sauce:options'] = {
+            name: testName || null,
+            username: this.settings.username,
+            accessKey: this.settings.accessKey,
+            extendedDebugging: this.settings.extendedDebugging || false,
+            capturePerformance: this.settings.capturePerformance || false
+        };
 
         return caps;
     }

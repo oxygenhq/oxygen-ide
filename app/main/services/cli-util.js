@@ -46,7 +46,6 @@ export async function loadEnvironmentVariables(config, argv) {
             env = JSON.parse(env.replace(/'/g, '"'));
         }
 
-        console.log('env', env);
         if (env && typeof env === 'object' && Object.prototype.hasOwnProperty.call(env, envName)) {
             return env[envName];
         }
@@ -128,40 +127,14 @@ export function processTargetPath(inputTargetPath) {
 }
 
 export async function getConfigurations(target, argv) {
-    // process command line arguments
     const startupOpts = {
         name: argv.name || null,
         cwd: target.cwd,
         target: target,
-        browserName : argv.b || argv.browser || 'chrome',
-        seleniumUrl : argv.s || argv.server || 'http://localhost:4444/wd/hub',
-        host: argv.host || 'localhost',
-        port: argv.port || 4723,
-        reopenSession: argv.reopen ? argv.reopen === 'true' : false,
-        iterations : argv.i ? parseInt(argv.i) : (argv.iter ? parseInt(argv.iter) : null),
-        debugPort: argv.dbgport || null,
-        delay: argv.delay || null,
-        collectDeviceLogs: false,
-        collectAppiumLogs: false,
-        collectBrowserLogs: false,
         reporting: {
-            reporters: ['html']
-        },
-        parameters : {
-            file: argv.p || argv.param || null,
-            mode: argv.pm || 'seq'
+            reporters: []
         },
     };
-    // set reporters if set by user through comnand line (--rf switch)
-    if (argv.rf && typeof argv.rf === 'string' && argv.rf.length > 0) {
-        const reporters = argv.rf.split(',');
-        startupOpts.reporting.reporters = reporters;
-    }
-    // set a list of modules to be loaded, if set by user through comnand line (--modules switch)
-    if (argv.modules && typeof argv.modules === 'string' && argv.modules.length > 0) {
-        const modules = argv.modules.split(',');
-        startupOpts.modules = modules;
-    }
     // if the target is oxygen config file, merge its content with the default options
     let moreOpts = {};
     if (target.name === OXYGEN_CONFIG_FILE_NAME && (target.extension === '.js' || target.extension === '.json')) {
@@ -171,11 +144,10 @@ export async function getConfigurations(target, argv) {
         } else if(typeof moreOpts === 'string') {
             moreOpts = JSON.parse(moreOpts.replace(/'/g, '"'));
         }
-        console.log('moreOpts', moreOpts);
     } 
 
     // determine test name
-    let name = startupOpts.name || moreOpts.name || null;
+    let name = moreOpts.name || null;
     if (!name) {
         name = target.name !== OXYGEN_CONFIG_FILE_NAME ? target.name : target.baseName;
     }
