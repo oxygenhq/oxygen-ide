@@ -1,3 +1,5 @@
+/* eslint-disable promise/always-return */
+/* eslint-disable promise/catch-or-return */
 /*
  * Copyright (C) 2015-present CloudBeat Limited
  *
