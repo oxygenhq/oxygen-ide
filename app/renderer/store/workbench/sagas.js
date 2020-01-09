@@ -1106,7 +1106,10 @@ export function* saveCurrentFile({ payload }) {
 
         // prompt user with "Save As" dialog before saving the file
         if (prompt) {
-            const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, activeFile]);
+            const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, activeFile, [ 
+                { name: 'JavaScript file', extensions:['js'] },
+                { name: 'All Files', extensions: ['*'] } 
+            ] ]);
             if (!saveAsPath) {
                 return; // Save As dialog was canceled by user
             }
