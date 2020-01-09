@@ -13,7 +13,7 @@ import moment from 'moment';
 import util from 'util';
 import path from 'path';
 import fs from 'fs';
-// import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron';
 
 /*
 Following is a description of how log.* and console.* commands work and what effect do they have on 
@@ -55,8 +55,13 @@ export default class Logger {
                 fs.mkdirSync(logsPath);
             }
             this.logFilePath = path.resolve(logsPath, 'oxygenide.log');
-            // Sentry.captureException(err);
+
+            if(Sentry && Sentry.captureException){
+                Sentry.captureException(err);
+            }
         }
+        
+        console.log('Log File Path : ', this.logFilePath);
 
         var transFile = new (winston.transports.File)({
             filename: this.logFilePath,
