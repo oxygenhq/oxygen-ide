@@ -352,6 +352,12 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _emitLineUpdate(time, file, line, primary) {
+
+        console.log('--- debug _emitLineUpdate ---');
+        console.log('line', line);
+        console.log('file', file);
+        console.log('--- debug ---');
+
         this.notify({
             type: EVENT_LINE_UPDATE,
             time,
@@ -415,6 +421,12 @@ export default class TestRunnerService extends ServiceBase {
         let editorLine = lineNumber + 1;
         
         const time = moment.utc().valueOf();
+        
+        console.log('--- debug _handleBreakpoint ---');
+        console.log('line', editorLine);
+        console.log('file', editorFile);
+        console.log('--- debug ---');
+
         // make sure to mark breakpoint line with current line mark
         this.notify({
             type: EVENT_LINE_UPDATE,
