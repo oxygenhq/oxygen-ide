@@ -221,19 +221,36 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     async stop() {
-        if (this.runner) {
-            this.isStopping = true;
-            try {
-                this.runner.kill('CANCELED').then(()=>{});
-                this.runner.dispose('CANCELED').then(()=>{});
+        if(this.finished){
+            // ignore
+        } else {
+            this.notify({
+                type: EVENT_LOG_ENTRY,
+                severity: SEVERITY_INFO,
+                message: 'Test finished with status --> CANCELED'
+            });
+    
+            if(this.reporter && this.reporter.removeListener){
+                this.reporter.removeListener('runner:start',() => {});
+                this.reporter.removeListener('runner:end',() => {});
+                this.reporter.removeListener('step:start',() => {});
+                this.reporter.removeListener('test-error',() => {});
+                this.reporter.removeListener('log',() => {});
             }
-            catch (e) {
-                // ignore any errors
-            }            
-            this.runner = null;
-            this.isRunning = false;
-            this.mainFilePath = null;
-            this._emitLogEvent(SEVERITY_INFO, 'Test finished with status --> CANCELED');
+    
+            if (this.runner) {
+                this.isStopping = true;
+                this.isRunning = false;
+                try {
+                    this.runner.kill('CANCELED').then(()=>{});
+                    this.runner.dispose('CANCELED').then(()=>{});
+                    this.runner = null;
+                    this.mainFilePath = null;
+                }
+                catch (e) {
+                    // ignore any errors
+                }        
+            }
         }
     }
 
@@ -312,12 +329,14 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _emitTestStarted() {
+        this.finished = false;
         this.notify({
             type: EVENT_TEST_STARTED,
         });
     }
 
-    _emitTestEnded(result, error, noLog = false) { 
+    _emitTestEnded(result, error, noLog = false) {
+        this.finished = true;
         if (!noLog) {
             const status = result && result.status ? result.status.toUpperCase() : 'FAILED';
             if (error) {
@@ -344,27 +363,30 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _emitLogEvent(severity, message) {
-        this.notify({
-            type: EVENT_LOG_ENTRY,
-            severity: severity,
-            message: message,
-        });
+        if(this.runner && this.isRunning){
+            this.notify({
+                type: EVENT_LOG_ENTRY,
+                severity: severity,
+                message: message,
+            });
+        }
     }
 
     _emitLineUpdate(time, file, line, primary) {
-
-        console.log('--- debug _emitLineUpdate ---');
-        console.log('line', line);
-        console.log('file', file);
-        console.log('--- debug ---');
-
-        this.notify({
-            type: EVENT_LINE_UPDATE,
-            time,
-            file,
-            line,
-            primary,
-        });
+        if(this.runner && this.isRunning){
+            console.log('--- debug _emitLineUpdate ---');
+            console.log('line', line);
+            console.log('file', file);
+            console.log('--- debug ---');
+    
+            this.notify({
+                type: EVENT_LINE_UPDATE,
+                time,
+                file,
+                line,
+                primary,
+            });
+        }
     }
 
     _hookToOxygenEvents() {        
