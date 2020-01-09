@@ -147,6 +147,9 @@ export default class CloudProvidersService extends ServiceBase {
                                 } else if(item.platform.startsWith('macOS ')){
                                     osName = 'macOS';
                                     osVersion = item.platform.split('macOS ')[1];
+                                } else if(item.platform.startsWith('MacOS ')){
+                                    osName = 'macOS';
+                                    osVersion = item.platform.split('MacOS ')[1];
                                 } else if(item.platform.startsWith('OS X ')){
                                     osName = 'OS X';
                                     osVersion = item.platform.split('OS X ')[1];
