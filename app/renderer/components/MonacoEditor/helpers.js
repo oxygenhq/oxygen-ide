@@ -40,7 +40,7 @@ export function  getAllMarkers(editor) {
 /**
    * @returns {Array} of decorators
 */
-export function  getBreakpointMarkers(editor) {
+export function getBreakpointMarkers(editor) {
     return editor.getModel().getAllDecorations().filter( marker => isBreakpointMarker(marker));
 }
 
@@ -134,6 +134,89 @@ export function decoratorsToFlat (decorators) {
 export function breakpointMarkersToLineNumbers(editor) {
     const bpMarkers = getBreakpointMarkers(editor);
     return bpMarkers.map(bpMarker => getMarkerLine(bpMarker));
+}
+
+function addHalfOpacity(marker, editor){
+    const allMarkers = getAllMarkers(editor);
+        
+    const decoratorsToRemove = [
+        ...allMarkers.filter((item) => {
+            if(
+                item &&
+                item.range &&
+                item.range.endLineNumber && 
+                item.range.endLineNumber === marker.range.endLineNumber &&
+                item.options &&
+                item.options.linesDecorationsClassName &&
+                typeof item.options.linesDecorationsClassName === 'string' &&
+                item.options.linesDecorationsClassName.indexOf('breakpointStyle') > -1
+            ){
+                return true;
+            } else {
+                return false;
+            }
+        })
+    ];
+
+    const newDecorators = [{
+        range: new monaco.Range(marker.range.startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
+        options: {
+            isWholeLine: true,
+            className: marker.options.className,
+            linesDecorationsClassName: marker.options.linesDecorationsClassName+' halfOpacity',
+            stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
+        }
+    }];
+    
+    editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
+}
+
+function removeHalfOpacity(marker, editor){
+    const allMarkers = getAllMarkers(editor);
+        
+    const decoratorsToRemove = [
+        ...allMarkers.filter((item) => {
+            if(
+                item &&
+                item.range &&
+                item.range.endLineNumber && 
+                item.range.endLineNumber === marker.range.endLineNumber &&
+                item.options &&
+                item.options.linesDecorationsClassName &&
+                typeof item.options.linesDecorationsClassName === 'string' &&
+                item.options.linesDecorationsClassName.indexOf('breakpointStyle') > -1
+            ){
+                return true;
+            } else {
+                return false;
+            }
+        })
+    ];
+
+    const newLinesDecorationsClassName = marker.options.linesDecorationsClassName.replace(' halfOpacity', '');
+
+    const newDecorators = [{
+        range: new monaco.Range(marker.range.startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
+        options: {
+            isWholeLine: true,
+            className: marker.options.className,
+            linesDecorationsClassName: newLinesDecorationsClassName,
+            stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
+        }
+    }];
+    
+    editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
+}
+
+
+export function makeBreakpointsHalfOpacity(editor) {
+    const bpMarkers = getBreakpointMarkers(editor);
+    return bpMarkers.map(bpMarker => addHalfOpacity(bpMarker, editor));
+}
+
+export function makeBreakpointsFullOpacity(editor) {
+    const bpMarkers = getBreakpointMarkers(editor);
+    return bpMarkers.map(bpMarker => removeHalfOpacity(bpMarker, editor));
 }
 
 export function updateActiveLineMarker(editor, inputLine, fontSize=null) {

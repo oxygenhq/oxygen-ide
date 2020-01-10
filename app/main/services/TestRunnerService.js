@@ -254,7 +254,7 @@ export default class TestRunnerService extends ServiceBase {
         }
     }
 
-    updateBreakpoints(breakpoints, filePath) {        
+    async updateBreakpoints(breakpoints, filePath) {        
         /*
         console.log('--- updateBreakpoints ---');
         console.log('breakpoints', breakpoints);
@@ -262,7 +262,14 @@ export default class TestRunnerService extends ServiceBase {
         console.log('--- updateBreakpoints ---');
         */
         if (this.runner && breakpoints && filePath) {
-            this.runner.updateBreakpoints(breakpoints, filePath);
+            const start = new Date();
+            const result = await this.runner.updateBreakpoints(breakpoints, filePath);
+            const end = new Date();
+            const duration = (end - start);
+            console.log('updateBreakpoints takes ' + duration + ' ms ');
+            return result;
+        } else {
+            return null;
         }
     }
 

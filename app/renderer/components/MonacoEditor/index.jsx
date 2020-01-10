@@ -69,6 +69,7 @@ type Props = {
     language: string,
     theme: string,
     options: object,
+    waitUpdateBreakpoints: boolean,
     editorDidMount: Function,
     editorWillMount: Function,
     onValueChange: Function,
@@ -137,6 +138,16 @@ export default class MonacoEditor extends React.Component<Props> {
 
         if (prevProps.editorReadOnly !== this.props.editorReadOnly && this.editor) {
             this.editor.updateOptions({ readOnly: this.props.editorReadOnly });
+        }
+        
+        if (prevProps.waitUpdateBreakpoints !== this.props.waitUpdateBreakpoints && this.editor) {
+            this.editor.updateOptions({ readOnly: this.props.waitUpdateBreakpoints });
+
+            if(this.props.waitUpdateBreakpoints){
+                helpers.makeBreakpointsHalfOpacity(this.editor);
+            } else {
+                helpers.makeBreakpointsFullOpacity(this.editor);
+            }
         }
         
         if (prevProps.activeLine !== this.props.activeLine) {
@@ -224,7 +235,9 @@ export default class MonacoEditor extends React.Component<Props> {
             editorReadOnly:
             diffProps.editorReadOnly !== this.props.editorReadOnly,
             fontSize:
-            diffProps.fontSize !== this.props.fontSize
+            diffProps.fontSize !== this.props.fontSize,
+            waitUpdateBreakpoints:
+            diffProps.waitUpdateBreakpoints !== this.props.waitUpdateBreakpoints
         };
     }
 
@@ -352,28 +365,34 @@ export default class MonacoEditor extends React.Component<Props> {
                 editor.focus();
 
                 const marker = helpers.getBreakpointMarker(editor, ln);
+                const { waitUpdateBreakpoints } = this.props;
 
-                // if user clicks on line-number panel, handle it as adding or removing a breakpoint at this line
-                if (editor.getModel().getLineContent(ln).trim().length > 0) {
-                    if (!marker) {
-                        if (helpers.addBreakpointMarker(editor, ln, this.props.fontSize)) {
-                            this.addLnToLnArray(ln);
-                            this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
-                        }
-                    }
-                    else {
-                        if (helpers.removeBreakpointMarker(editor, ln)) {
-                            this.removeLnfromLnArray(ln);
-                            this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
-                        }
-                    }
+                if(waitUpdateBreakpoints){
+                    //ignored
+                    console.warn('Breakpoint cannot be added before previous breackpoint adding finished');
                 } else {
-                    if(!marker){
-                        console.warn('Breakpoint cannot be added at the empty line.');
+                    // if user clicks on line-number panel, handle it as adding or removing a breakpoint at this line
+                    if (editor.getModel().getLineContent(ln).trim().length > 0) {
+                        if (!marker) {
+                            if (helpers.addBreakpointMarker(editor, ln, this.props.fontSize)) {
+                                this.addLnToLnArray(ln);
+                                this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+                            }
+                        }
+                        else {
+                            if (helpers.removeBreakpointMarker(editor, ln)) {
+                                this.removeLnfromLnArray(ln);
+                                this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+                            }
+                        }
                     } else {
-                        if (helpers.removeBreakpointMarker(editor, ln)) {
-                            this.removeLnfromLnArray(ln);
-                            this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+                        if(!marker){
+                            console.warn('Breakpoint cannot be added at the empty line.');
+                        } else {
+                            if (helpers.removeBreakpointMarker(editor, ln)) {
+                                this.removeLnfromLnArray(ln);
+                                this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+                            }
                         }
                     }
                 }

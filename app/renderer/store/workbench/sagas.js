@@ -239,6 +239,7 @@ export function* deactivate() {
 }
 
 export function* initialize() {
+    yield put(testActions.waitUpdateBreakpoints(false));
     // start check for update
     services.mainIpc.call('UpdateService', 'start', [false]);
     // start Selenium server

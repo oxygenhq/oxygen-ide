@@ -11,6 +11,7 @@ import * as ActionTypes from './types';
 import * as types from '../types';
 import * as tabActions from '../tabs/actions';
 import * as editorActions from '../editor/actions';
+import * as testActions from '../test/actions';
 import * as settingsActions from './actions';
 import { reportError } from '../sentry/actions';
 import * as Const from '../../../const';
@@ -66,7 +67,16 @@ export function* testUpdateBreakpoints({ payload }){
         // right now run test
         if(testBreakpoints && testBreakpoints[path]){
             // the file where breackpoints changed in files, where test runs
-            yield call(services.mainIpc.call, 'TestRunnerService', 'updateBreakpoints', [ breakpoints, path ]);
+
+            yield put(testActions.waitUpdateBreakpoints(true));
+            const start = new Date();
+            const result = yield call(services.mainIpc.call, 'TestRunnerService', 'updateBreakpoints', [ breakpoints, path ]);
+            const end = new Date();
+            const duration = (end - start);
+            console.log('TestRunnerService updateBreakpoints takes ' + duration + ' ms ');
+            console.log('TestRunnerService updateBreakpoints result', result);
+            yield put(testActions.waitUpdateBreakpoints(false));
+            
         }
     }
 }

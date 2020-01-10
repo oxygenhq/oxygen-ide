@@ -179,6 +179,11 @@ export const updateBreakpoints = (filePath, breakpoints, fileName) => ({
     payload: { path: filePath, breakpoints, fileName },
 });
 
+export const waitUpdateBreakpoints = (value) => ({
+    type: ActionTypes.WAIT_TEST_UPDATE_BREAKPOINTS,
+    payload: { value: value },
+});
+
 export const removeBreakpoints = (path) => ({
     type: ActionTypes.TEST_REMOVE_BREAKPOINTS,
     payload: { path },

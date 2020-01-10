@@ -23,6 +23,7 @@ import fileSubjects from '../../store/fs/subjects';
 import Landing from '../../components/Landing';
 
 type Props = {
+  waitUpdateBreakpoints: boolean,
   editorReadOnly: boolean,
   activeFileName: string | null,
   fontSize: number,
@@ -129,7 +130,8 @@ export default class TextEditor extends React.Component<Props> {
             openFiles, 
             editorReadOnly, 
             fontSize,
-            activeFileName
+            activeFileName,
+            waitUpdateBreakpoints
         } = this.props;
         const self = this;
 
@@ -160,6 +162,7 @@ export default class TextEditor extends React.Component<Props> {
                             editorReadOnly={editorReadOnly}
                             fontSize={fontSize}
                             breakpoints={file.breakpoints || []}
+                            waitUpdateBreakpoints={waitUpdateBreakpoints || false}
                             onBreakpointsUpdate={(bps) => this.props.onBreakpointsUpdate(file.path, bps, file.name)}
                             onValueChange={(bps) => ::this.handleValueChange(file.path, bps, file.name)}
                             onSelectionChange={(bps) => ::this.handleSelectionChange(file.path, bps)}

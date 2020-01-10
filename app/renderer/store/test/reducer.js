@@ -19,6 +19,7 @@ const defaultState = {
     isSeleniumReady: false,   // indicates if built-in Selenium server has been successfully started
     isAppiumReady: false,     // indicates if built-in Appium server has been successfully started
     breakpoints: {},          // holds all user-defined breakpoints per file, shall include file name and line number
+    waitUpdateBreakpoints: false,
     mainFile: null,           // main test (script) file to be executed 
     runtimeSettings: {
         testMode: 'web',
@@ -258,7 +259,15 @@ export default (state = defaultState, action) => {
                 },
             };
         }
-    
+
+    // TEST_UPDATE_BREAKPOINTS
+    case ActionTypes.WAIT_TEST_UPDATE_BREAKPOINTS: {
+        return {
+            ...state,
+            waitUpdateBreakpoints: value
+        };
+    }
+
     // TEST_MOVE_BREAKPOINTS_FROM_TMP_FILE_TO_REAL_FILE
     case ActionTypes.TEST_MOVE_BREAKPOINTS_FROM_TMP_FILE_TO_REAL_FILE:{
         const { tmpFilePath, tmpfileName, realFilePath } = payload;

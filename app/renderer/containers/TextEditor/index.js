@@ -74,6 +74,7 @@ const mapStoreToProps = (state) => {
         activeFileName: state.editor.activeFileName,
         fontSize: state.settings.fontSize,
         openFiles: openFiles, //state.editor.openFiles,
+        waitUpdateBreakpoints: state.test.waitUpdateBreakpoints,
     };
 };
   

@@ -243,6 +243,7 @@ export function* startTest({ payload }) {
         // call TestRunner service to start the test
         
         
+        yield put(testActions.waitUpdateBreakpoints(false));
         yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'stop', []);
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', []);
         yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
