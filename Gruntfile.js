@@ -42,6 +42,8 @@ module.exports = function(grunt) {
     }
     defaultTasks.push('rebrand');
     defaultTasks.push('sentry-browser');
+    defaultTasks.push('package');
+    
 
     if (process.platform === 'linux') {
         defaultTasks.push('compress:linux');
@@ -55,6 +57,8 @@ module.exports = function(grunt) {
 
     grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'comments:chrome-ext']);
     grunt.registerTask('sentry-browser', ['copy:sentry-browser']);
+    grunt.registerTask('package', ['copy:package']);
+    
 
     const OUTDIR = 'dist/temp';
     const RESOURCES = process.platform === 'darwin' ? '/Electron.app/Contents/Resources' : '/resources';
@@ -194,6 +198,16 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: SENTRY_BROWSER_SRC, src: ['**'], 
                         dest: SENTRY_BROWSER_DIST
+                    }
+                ]
+            },
+            'package': {
+                files: [
+                    { 
+                        expand: true, 
+                        cwd: '',
+                        src: ['package.json'], 
+                        dest: OUTDIR + RESOURCES
                     }
                 ]
             }

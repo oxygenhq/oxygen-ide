@@ -24,6 +24,11 @@ import MainProcess from './MainProcess';
 import * as Sentry from '@sentry/electron';
 import fs from 'fs';
 import path from 'path';
+import packageJson from '../../package.json';
+
+if(packageJson && packageJson.version){
+    console.log('version : ', packageJson.version);
+}
 
 try {
     if (
@@ -200,8 +205,18 @@ function initializeCrashReporterAndSentry() {
             submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f',
             uploadToServer: true
         });
+
+        const DSN = 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893';
+        const sentryConfig = {
+            dsn: DSN
+        };
+
+        if(packageJson && packageJson.version){
+            sentryConfig.release = packageJson.version;
+        }
+
         // initialize Sentry
-        Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
+        Sentry.init(sentryConfig);
     }
 }
 
