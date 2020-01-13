@@ -250,6 +250,7 @@ export default class CloudProvidersService extends ServiceBase {
                 }
                 catch (e) {
                     console.warn(`Failed to retrieve devices and browsers data from provider: ${providerName}`);
+                    console.warn('Reson : ', e);
                     return [];
                 }                
             } else {
