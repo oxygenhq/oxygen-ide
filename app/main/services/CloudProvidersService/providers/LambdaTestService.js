@@ -1,5 +1,5 @@
 import CloudProviderBase from '../CloudProviderBase';
-import fetch from 'node-fetch';
+const fetch = require('node-fetch');
 
 export default class LambdaTestService extends CloudProviderBase {
     constructor(settings) {
