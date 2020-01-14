@@ -10,7 +10,7 @@ import electron from 'electron';
 import appSettings from 'electron-settings';
 import { spawn  } from 'child_process';
 import ServiceBase from './ServiceBase';
-var decache = require('decache');
+import { moduleRequire } from 'oxygen-cli';
 var path = require('path');
 
 const { dialog } = electron;
@@ -97,43 +97,13 @@ export default class ElectronService extends ServiceBase {
     }
 
     async orgRequire(moduleName) {
-        if(process.env.NODE_ENV === 'development'){
-            try{
-                decache(moduleName);
-                return require(moduleName);
-            } catch(e){
-                console.log('require e', e);
-            }
-        } else {
-            try{
-                let newModuleName = await this.replaceBackslash(moduleName);
-                
-                if(newModuleName){
-                    newModuleName = newModuleName.slice(0, -1);
-                    decache(newModuleName);
-
-                    try{
-                        const requireResult = await this.require(newModuleName);
-                        return requireResult;
-                    } catch(e){
-                        console.log('orgRequire require e', e);
-                    }
-                }
-            } catch(e){
-                console.log('orgRequire e', e);
-            }
+        try{
+            const result = moduleRequire(moduleName);
+            console.log('orgRequire moduleRequire result', result);
+            return result;
+        } catch(e){
+            console.log('orgRequire moduleRequire e', e);
         }
-        //      }
-        // } else  {
-        //     try{
-        //         decache(moduleName);
-        //         return require(moduleName);
-        //     } catch(e){
-        //         console.log('e', e);
-        //     }
-        // }
-        
-
     }
 
     addFile(key, name, content = ''){
