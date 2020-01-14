@@ -31,7 +31,19 @@ export default class LambdaTestService extends CloudProviderBase {
             const headers = new fetch.Headers();
 
             headers.set('Authorization', 'Basic ' + Buffer.from(this.settings.user + ':' + this.settings.key).toString('base64'));
-            const response = await fetch('https://api.lambdatest.com/automation/api/v1/platforms',
+            
+            let fetchFn;
+
+            if(typeof fetch === 'function'){
+                fetchFn = fetch;
+            } else if(fetch && fetch.default && typeof fetch.default === 'function'){
+                fetchFn = fetch.default;
+            } else {
+                console.log('fetchFn not found');
+                throw new Error('LambdaTestService: fetchFn not found');
+            }
+
+            const response = await fetchFn('https://api.lambdatest.com/automation/api/v1/platforms',
             {
                 method:'GET',
                 headers: headers,
