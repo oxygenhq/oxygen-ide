@@ -27,7 +27,7 @@ import path from 'path';
 import packageJson from '../../package.json';
 
 if(packageJson && packageJson.version){
-    console.log('version : ', packageJson.version);
+    console.log('Version : ', packageJson.version);
 }
 
 try {
