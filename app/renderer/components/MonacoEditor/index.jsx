@@ -9,7 +9,9 @@
 //import * as monaco from 'monaco-editor';
 import React from 'react';
 import path from 'path';
-
+import { loadWASM } from 'onigasm';
+import { Registry } from 'monaco-textmate';
+import { wireTmGrammars } from 'monaco-editor-textmate';
 import oxygenIntellisense from './intellisense';
 import { language as jsTokenizer } from './tokenizers/javascript'; 
 import * as helpers from './helpers';
@@ -287,7 +289,26 @@ export default class MonacoEditor extends React.Component<Props> {
         }
     }
 
-    initMonaco() {
+    async liftOff() {
+        await loadWASM(path.join(__dirname, '../node_modules/onigasm/lib/onigasm.wasm')); // See https://www.npmjs.com/package/onigasm#light-it-up
+    
+        const registry = new Registry({
+            getGrammarDefinition: async (scopeName) => {
+                return {
+                    format: 'plist',
+                    content: await (await fetch('./components/MonacoEditor/cucumber/feature.tmLanguage')).text()
+                };
+            }
+        });
+    
+        // map of monaco "language id's" to TextMate scopeNames
+        const grammars = new Map();
+        grammars.set('feature', 'feature.feature');
+    
+        await wireTmGrammars(monaco, registry, grammars);
+    }
+
+    async initMonaco() {
         const value = this.props.value !== null ? this.props.value : this.props.defaultValue;
         const { language, theme, fontSize } = this.props;
 
@@ -295,16 +316,39 @@ export default class MonacoEditor extends React.Component<Props> {
 
         if(
             fontSize &&
-        parseInt(fontSize) &&
-        fontSize >= FONT_SIZE_MIN && 
-        fontSize <= FONT_SIZE_MAX
+            parseInt(fontSize) &&
+            fontSize >= FONT_SIZE_MIN && 
+            fontSize <= FONT_SIZE_MAX
         ) {
             saveFontSize = fontSize;
         }
 
         if (this.editorContainer) {
-        // Before initializing monaco editor
+            // Before initializing monaco editor
             this.editorWillMount();
+            
+            if(language && typeof language === 'string' && language === 'feature'){
+                monaco.languages.register({ 
+                    id: 'feature',
+                    aliases: [
+                        'Gherkin',
+                        'feature'
+                    ],
+                    extensions: [
+                        '.feature'
+                    ]
+                });
+    
+                await this.liftOff();
+    
+                monaco.languages.onLanguage('feature', () => {    
+                    monaco.languages.setLanguageConfiguration('feature', {
+                        comments: {
+                            lineComment: '#'
+                        }
+                    });
+                });
+            }
 
             // workaround for not being able to override or extend existing tokenziers
             // https://github.com/Microsoft/monaco-editor/issues/252

@@ -24,6 +24,10 @@
     "lodash.uniq": "^4.5.0",
     "lodash.uniqwith": "^4.5.0",
     "monaco-editor": "0.18.1",
-    "oxygen-cli": "1.0.0-beta.40"
+    "monaco-editor-textmate": "^2.2.1",
+    "monaco-textmate": "^3.0.1",
+    "onigasm": "^2.2.4",
+    "oxygen-cli": "1.0.0-beta.40",
+    "typescript": "^3.7.4"
   }
 }

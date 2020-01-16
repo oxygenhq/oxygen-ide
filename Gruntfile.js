@@ -43,6 +43,7 @@ module.exports = function(grunt) {
     defaultTasks.push('rebrand');
     defaultTasks.push('sentry-browser');
     defaultTasks.push('package');
+    defaultTasks.push('feature');
     
 
     if (process.platform === 'linux') {
@@ -58,6 +59,7 @@ module.exports = function(grunt) {
     grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'comments:chrome-ext']);
     grunt.registerTask('sentry-browser', ['copy:sentry-browser']);
     grunt.registerTask('package', ['copy:package']);
+    grunt.registerTask('feature', ['copy:feature']);    
     
 
     const OUTDIR = 'dist/temp';
@@ -210,7 +212,17 @@ module.exports = function(grunt) {
                         dest: OUTDIR + RESOURCES
                     }
                 ]
-            }
+            },
+            'feature': {
+                files: [
+                    { 
+                        expand: true, 
+                        cwd: 'app',
+                        src: ['renderer/components/MonacoEditor/cucumber/feature.tmLanguage'], 
+                        dest: OUTDIR + RESOURCES + '/app'
+                    }
+                ]
+            },
         },
         chmod: {
             options: {
