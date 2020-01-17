@@ -10,8 +10,7 @@ export default class CloudProviderBase {
     }
     updateSettings(settings) {
         this.settings = settings;
-    }
-    // getBrowsersAndDevices();
+    }    
     updateCapabilities(target, caps, testName) {
         throw Error('"updateCapabilities" Not implemented');
     }

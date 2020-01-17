@@ -1532,36 +1532,61 @@ export function* getOrFetchFileInfo(path) {
     return { response, error };
 }
 
-export function* setCloudProvidersBrowsersAndDevices(){
-    const settings = yield select(state => state.settings);
-    
-    const { cloudProviders } = settings || {};
+function fetchCloudBrowsersAndDevicesError(msg){
+    notification['error']({
+        message: msg,
+        description: 'Unauthorized access, check your user name or access key'
+    });
+}
 
-    if(cloudProviders){
-        if(cloudProviders.lambdaTest && cloudProviders.lambdaTest.inUse && cloudProviders.lambdaTest.user && cloudProviders.lambdaTest.key){
-            yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['lambdaTest', cloudProviders.lambdaTest]);
-            const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['lambdaTest', cloudProviders.lambdaTest.user, cloudProviders.lambdaTest.key]);
-            if(browsersAndDevices){
-                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'lambdaTest'));
-            }
+export function* setCloudProvidersBrowsersAndDevices(){
+    try {
+        const settings = yield select(state => state.settings);
+        
+        const { cloudProviders } = settings || {};
     
-        }
-        if(cloudProviders.sauceLabs && cloudProviders.sauceLabs.inUse){
-            yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['sauceLabs', cloudProviders.sauceLabs]);
-            const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
-    
-            if(browsersAndDevices){
-                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'sauceLabs'));
+        if(cloudProviders){
+            if(cloudProviders.lambdaTest && cloudProviders.lambdaTest.inUse && cloudProviders.lambdaTest.user && cloudProviders.lambdaTest.key){
+                yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['lambdaTest', cloudProviders.lambdaTest]);
+                const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['lambdaTest', cloudProviders.lambdaTest.user, cloudProviders.lambdaTest.key]);
+                
+                if(typeof browsersAndDevicesResult === 'string'){
+                    fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
+                } else {
+                    if(browsersAndDevicesResult){
+                        yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'lambdaTest'));
+                    }
+                }
+
+        
+            }
+            if(cloudProviders.sauceLabs && cloudProviders.sauceLabs.inUse){
+                yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['sauceLabs', cloudProviders.sauceLabs]);
+                const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
+        
+                if(typeof browsersAndDevicesResult === 'string'){
+                    fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
+                } else {
+                    if(browsersAndDevicesResult){
+                        yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'sauceLabs'));
+                    }
+                }
+            }
+            if(cloudProviders.testingBot && cloudProviders.testingBot.inUse){
+                yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['testingBot', cloudProviders.testingBot]);
+                const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['testingBot']);
+        
+                if(typeof browsersAndDevicesResult === 'string'){
+                    fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
+                } else {
+                    if(browsersAndDevicesResult){
+                        yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'testingBot'));
+                    }
+                }
             }
         }
-        if(cloudProviders.testingBot && cloudProviders.testingBot.inUse){
-            yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['testingBot', cloudProviders.testingBot]);
-            const browsersAndDevices = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['testingBot']);
-    
-            if(browsersAndDevices){
-                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevices, 'testingBot'));
-            }
-        }
+    } catch(e){
+        console.log('e', e);
     }
 }
 
