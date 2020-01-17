@@ -82,11 +82,11 @@ export default class LambdaTestService extends CloudProviderBase {
             }
 
             if (target.osName) {
-                caps.osName = target.osName;
+                caps.platform = target.osName;
             }
             
             if (target.osVersion) {
-                caps.osVersion = target.osVersion;
+                caps.platform += ' '+target.osVersion;
             }
         }
         caps.name = testName || null;
@@ -94,13 +94,15 @@ export default class LambdaTestService extends CloudProviderBase {
         caps.accessKey = this.settings.accessKey;
         caps.extendedDebugging = this.settings.extendedDebugging || false;
         caps.capturePerformance = this.settings.capturePerformance || false;
-        
-        caps.name = testName || null;
         caps.build = this.settings.build || null;
         caps.console = this.settings.captureConsole || false;
         caps.network = this.settings.captureNetwork || false;
         caps.visual = this.settings.takeScreenshots || false;
         caps.video = this.settings.videoRecording || false;
+
+        caps['lamda:options'] = {
+            name: testName || null
+        };
 
         return caps;
     }
