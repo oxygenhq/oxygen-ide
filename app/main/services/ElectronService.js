@@ -272,4 +272,9 @@ export default class ElectronService extends ServiceBase {
     shellOpenExternal(url, options = null) {
         electron.shell.openExternal(url, options);
     }
+
+    getLogFilePath() {
+        const result = global.log.getLogFilePath();
+        return result;
+    }
 }

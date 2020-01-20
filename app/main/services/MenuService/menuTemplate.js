@@ -216,6 +216,10 @@ export default (cmdHandler, settings) => {
             {
                 label: 'Check for Updates...',
                 click() { cmdHandler(Const.MENU_CMD_HELP_CHECK_UPDATES); }
+            },
+            {
+                label: 'Open Log file',
+                click() { cmdHandler(Const.MENU_CMD_OPEL_LOG_FILE); }
             }
         ]
     });

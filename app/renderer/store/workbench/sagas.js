@@ -139,6 +139,16 @@ export function* handleMainMenuEvents({ payload }) {
         yield services.mainIpc.call('UpdateService', 'start', [true]);
         /* eslint-enable */
     }
+    else if (cmd === Const.MENU_CMD_OPEL_LOG_FILE) {
+        try {
+            const filePath = yield call(services.mainIpc.call, 'ElectronService', 'getLogFilePath', []);
+            if(filePath && typeof filePath === 'string'){
+                yield put(wbActions.openFile(filePath));
+            }
+        } catch(e){
+            console.log('MENU_CMD_OPEL_LOG_FILE e'. e);
+        }
+    }
     else if (cmd === Const.MENU_CMD_CLEAR_ALL) {
         yield services.mainIpc.call('ElectronService', 'clearSettings');
         yield services.mainIpc.call('FileService', 'closeWatcherIfExist');
