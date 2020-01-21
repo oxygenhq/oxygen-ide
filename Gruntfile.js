@@ -40,10 +40,10 @@ module.exports = function(grunt) {
     } else if (process.platform === 'win32') {
         //ignore
     }
-    defaultTasks.push('rebrand');
     defaultTasks.push('sentry-browser');
     defaultTasks.push('package');
     defaultTasks.push('feature');
+    defaultTasks.push('rebrand');
     
 
     if (process.platform === 'linux') {
