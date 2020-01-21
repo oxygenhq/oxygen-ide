@@ -72,11 +72,13 @@ type Props = {
     theme: string,
     options: object,
     waitUpdateBreakpoints: boolean,
+    featureLanguageLoaded: boolean,
     editorDidMount: Function,
     editorWillMount: Function,
     onValueChange: Function,
     onSelectionChange: Function,
-    onBreakpointsUpdate: Function
+    onBreakpointsUpdate: Function,
+    setFatureLanguageLoaded: Function
 };
 
 export default class MonacoEditor extends React.Component<Props> {
@@ -290,27 +292,31 @@ export default class MonacoEditor extends React.Component<Props> {
     }
 
     async liftOff() {
-        await loadWASM(path.join(__dirname, '../node_modules/onigasm/lib/onigasm.wasm')); // See https://www.npmjs.com/package/onigasm#light-it-up
-    
-        const registry = new Registry({
-            getGrammarDefinition: async (scopeName) => {
-                return {
-                    format: 'plist',
-                    content: await (await fetch('./components/MonacoEditor/cucumber/feature.tmLanguage')).text()
-                };
-            }
-        });
-    
-        // map of monaco "language id's" to TextMate scopeNames
-        const grammars = new Map();
-        grammars.set('feature', 'feature.feature');
-    
-        await wireTmGrammars(monaco, registry, grammars);
+        const { featureLanguageLoaded, setFatureLanguageLoaded } = this.props;
+        if(!featureLanguageLoaded){
+            await loadWASM(path.join(__dirname, '../node_modules/onigasm/lib/onigasm.wasm')); // See https://www.npmjs.com/package/onigasm#light-it-up
+        
+            const registry = new Registry({
+                getGrammarDefinition: async (scopeName) => {
+                    return {
+                        format: 'plist',
+                        content: await (await fetch('./components/MonacoEditor/cucumber/feature.tmLanguage')).text()
+                    };
+                }
+            });
+        
+            // map of monaco "language id's" to TextMate scopeNames
+            const grammars = new Map();
+            grammars.set('feature', 'feature.feature');
+        
+            await wireTmGrammars(monaco, registry, grammars);
+            setFatureLanguageLoaded();
+        }
     }
 
     async initMonaco() {
         const value = this.props.value !== null ? this.props.value : this.props.defaultValue;
-        const { language, theme, fontSize } = this.props;
+        const { language, theme, fontSize, featureLanguageLoaded } = this.props;
 
         let saveFontSize = DEFAULT_FONT_SIZE;
 
@@ -327,7 +333,7 @@ export default class MonacoEditor extends React.Component<Props> {
             // Before initializing monaco editor
             this.editorWillMount();
             
-            if(language && typeof language === 'string' && language === 'feature'){
+            if(language && typeof language === 'string' && language === 'feature' && !featureLanguageLoaded){
                 monaco.languages.register({ 
                     id: 'feature',
                     aliases: [

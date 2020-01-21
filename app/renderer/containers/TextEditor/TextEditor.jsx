@@ -71,6 +71,9 @@ export default class TextEditor extends React.Component<Props> {
         // keeps references to all open editors
         this.editors = {};
         this.lastTrigger = null;
+        this.state = {
+            featureLanguageLoaded: false
+        };
     }
 
     componentWillUnmount() {
@@ -80,6 +83,10 @@ export default class TextEditor extends React.Component<Props> {
         if (this.subscriptions['FILE.RENAMED']) {
             this.subscriptions['FILE.RENAMED'].unsubscribe();
         }
+    }
+
+    setFatureLanguageLoaded = () => {
+        this.setState({ featureLanguageLoaded: true });
     }
 
     onEditorCallTrigger(payload = {}) {
@@ -133,6 +140,9 @@ export default class TextEditor extends React.Component<Props> {
             activeFileName,
             waitUpdateBreakpoints
         } = this.props;
+        const {
+            featureLanguageLoaded
+        } = this.state;
         const self = this;
 
         if(activeFile === 'welcome'){
@@ -163,9 +173,11 @@ export default class TextEditor extends React.Component<Props> {
                             fontSize={fontSize}
                             breakpoints={file.breakpoints || []}
                             waitUpdateBreakpoints={waitUpdateBreakpoints || false}
+                            featureLanguageLoaded={featureLanguageLoaded}
                             onBreakpointsUpdate={(bps) => this.props.onBreakpointsUpdate(file.path, bps, file.name)}
                             onValueChange={(bps) => ::this.handleValueChange(file.path, bps, file.name)}
                             onSelectionChange={(bps) => ::this.handleSelectionChange(file.path, bps)}
+                            setFatureLanguageLoaded={this.setFatureLanguageLoaded}
                         />
                     );
                 })}
