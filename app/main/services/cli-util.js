@@ -126,7 +126,7 @@ export function processTargetPath(inputTargetPath) {
     };
 }
 
-export async function getConfigurations(target, argv) {
+export async function getConfigurations(target, argv, mainFilePath) {
     const startupOpts = {
         name: argv.name || null,
         cwd: target.cwd,
@@ -143,6 +143,10 @@ export async function getConfigurations(target, argv) {
             //ignore
         } else if(typeof moreOpts === 'string') {
             moreOpts = JSON.parse(moreOpts.replace(/'/g, '"'));
+        }
+        
+        if(mainFilePath && typeof mainFilePath === 'string' && mainFilePath.endsWith('.feature') && moreOpts && moreOpts.specs){
+            moreOpts.specs = [mainFilePath];
         }
     } 
 

@@ -169,6 +169,11 @@ export function* startTest({ payload }) {
     const runtimeSettingsClone = {
         ...runtimeSettings
     };
+
+    if(file && file.ext && file.ext === '.feature'){
+        runtimeSettingsClone.framework = 'cucumber';
+    }
+
     // add test provider information
     if (runtimeSettings.testProvider) {
         const cloudProviders = yield select(state => state.settings.cloudProviders);
@@ -188,7 +193,6 @@ export function* startTest({ payload }) {
         runtimeSettingsClone.rootPath = rootPath;
     }
 
-    
     const fsTree = yield select(state => state.fs.tree);
 
     if(fsTree && fsTree.data && Array.isArray(fsTree.data) && fsTree.data.length > 0){

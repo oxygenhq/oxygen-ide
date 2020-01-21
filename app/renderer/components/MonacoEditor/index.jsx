@@ -400,6 +400,7 @@ export default class MonacoEditor extends React.Component<Props> {
      * Watching click events
      */
     hookToEditorEvents = () => {
+        const { language } = this.props;
         const editor = this.editor;
 
         editor.onDidChangeModelContent(onDidChangeModelContent.bind(this));
@@ -408,7 +409,7 @@ export default class MonacoEditor extends React.Component<Props> {
         editor.onMouseDown((e) => {
             const { target: { element, position } } = e;
 
-            if (element.className === 'line-numbers') {
+            if (element.className === 'line-numbers' && language !== 'feature') {
                 // select the entire line if the user clicks on line number panel
                 const ln = position.lineNumber;
                 editor.setSelection(new monaco.Selection(1, 2, 1, 2));

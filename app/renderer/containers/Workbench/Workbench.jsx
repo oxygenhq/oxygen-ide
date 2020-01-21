@@ -343,9 +343,9 @@ export default class Workbench extends React.Component<Props> {
           [Controls.TEST_RUN]: {
               visible: !test.isRunning,
               enabled: !isRecording && 
-                 !!editorActiveFile && 
-                 editorActiveFile.ext && 
-                 editorActiveFile.ext === '.js' 
+                !!editorActiveFile && 
+                editorActiveFile.ext && 
+                ['.js', '.feature'].includes(editorActiveFile.ext)
           },
           [Controls.TEST_STOP]: {
               visible: test.isRunning,

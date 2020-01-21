@@ -176,7 +176,7 @@ export default class TestRunnerService extends ServiceBase {
             // console.log('TestRunner : targetFile', targetFile);
 
             if(targetFile){
-                const config = await cliutil.getConfigurations(targetFile, argv);
+                const config = await cliutil.getConfigurations(targetFile, argv, this.mainFilePath);
 
                 if(config && config.suites){
                     delete config.suites;
@@ -415,9 +415,11 @@ export default class TestRunnerService extends ServiceBase {
         });
 
         // @params breakpoint
-        this.runner.on('breakpoint', (breakpoint) => {
-            this._handleBreakpoint(breakpoint);            
-        });
+        if(this.runner && this.runner.on){
+            this.runner.on('breakpoint', (breakpoint) => {
+                this._handleBreakpoint(breakpoint);
+            });
+        }
 
         this.reporter.on('test-error', (err) => {
             let message = null;
