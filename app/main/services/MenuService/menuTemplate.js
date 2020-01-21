@@ -174,7 +174,7 @@ export default (cmdHandler, settings) => {
             {
                 label: 'DevTools',
                 accelerator: 'CommandOrControl+Shift+I',
-                visible: process.env.NODE_ENV !== 'production',
+                // visible: process.env.NODE_ENV !== 'production',
                 click() { cmdHandler(Const.MENU_CMD_VIEW_DEVTOOLS); }
             }
         ]
