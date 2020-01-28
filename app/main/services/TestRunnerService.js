@@ -383,10 +383,10 @@ export default class TestRunnerService extends ServiceBase {
 
     _emitLineUpdate(time, file, line, primary) {
         if(this.runner && this.isRunning){
-            console.log('--- debug _emitLineUpdate ---');
-            console.log('line', line);
-            console.log('file', file);
-            console.log('--- debug ---');
+            // console.log('--- debug _emitLineUpdate ---');
+            // console.log('line', line);
+            // console.log('file', file);
+            // console.log('--- debug ---');
     
             this.notify({
                 type: EVENT_LINE_UPDATE,
