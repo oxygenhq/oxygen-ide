@@ -98,6 +98,7 @@ export default function* root() {
         takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
         takeLatest(success(ActionTypes.FS_DELETE), handleFileDelete),
         takeLatest(ActionTypes.UPDATE_CLOUD_PROVIDERS_SETTINGS, handleUpdatedCloudProvidersSettings),
+        takeLatest(ActionTypes.UPDATE_VISUAL_PROVIDERS_SETTINGS, handleVisualTestingSettings),
         takeLatest(ActionTypes.TEST_UPDATE_RUN_SETTINGS, handleUpdatedRunSettings),      
         takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
@@ -137,6 +138,16 @@ export function* handleMainMenuEvents({ payload }) {
         /* eslint-disable */
         yield services.mainIpc.call('UpdateService', 'start', [true]);
         /* eslint-enable */
+    }
+    else if (cmd === Const.MENU_CMD_OPEL_LOG_FILE) {
+        try {
+            const filePath = yield call(services.mainIpc.call, 'ElectronService', 'getLogFilePath', []);
+            if(filePath && typeof filePath === 'string'){
+                yield put(wbActions.openFile(filePath));
+            }
+        } catch(e){
+            console.log('MENU_CMD_OPEL_LOG_FILE e'. e);
+        }
     }
     else if (cmd === Const.MENU_CMD_CLEAR_ALL) {
         yield services.mainIpc.call('ElectronService', 'clearSettings');
@@ -238,6 +249,7 @@ export function* deactivate() {
 }
 
 export function* initialize() {
+    yield put(testActions.waitUpdateBreakpoints(false));
     // start check for update
     services.mainIpc.call('UpdateService', 'start', [false]);
     // start Selenium server
@@ -294,34 +306,14 @@ export function* initialize() {
     // retrieve and save merged settings back to Electron store
     const allSettings = yield select(state => state.settings);
     yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [allSettings]);
-    // // if a folder was open in the last session, load this folder in File Explorer 
-    // if (allSettings && allSettings.lastSession && allSettings.lastSession.rootFolder) {
-    //     const { error } = yield putAndTake(
-    //         wbActions.openFolder(allSettings.lastSession.rootFolder)
-    //     );
-    //     // ignore any errors
-    // }
-    // // if last session includes previously open tabs, reopen tabs for files which still exist 
-    // if (allSettings && allSettings.lastSession && allSettings.lastSession.tabs) {
-    //     for (let tab of allSettings.lastSession.tabs) {            
-    //         yield put(tabActions.addTab(tab.key, tab.title));
-    //         const { error } = yield putAndTake(
-    //             editorActions.openFile(tab.key)
-    //         );
-    //         // if any error occurs during openning tab's file content (e.g. file doesn't not exist), remove this tab
-    //         if (error) {
-    //             console.warn('error', error);
-    //             if(tab && tab.key){
-    //                 yield put(tabActions.removeTab(tab.key));
-    //             }
-    //         }
-    //         else {                
-    //             yield put(testActions.setMainFile(tab.key));
-    //         }
-    //     }
-    // }
-    // indicate successful end of initialization process
-    
+
+    //start CloudProvidersService
+    services.mainIpc.call('CloudProvidersService', 'start').then(() => {});
+    yield setCloudProvidersBrowsersAndDevices();
+    //start VisualTestingProvidersService
+    services.mainIpc.call('VisualTestingProvidersService', 'start').then(() => {});
+    yield setVisualTestingProviders();
+
     yield put({
         type: success(ActionTypes.WB_INIT),
     });
@@ -367,10 +359,10 @@ export function* openFolder({ payload }) {
         return;
     }
     // store new root folder in the App Settings
-    yield put(settingsActions.setLastSessionRootFolder(path));
-    const settings = yield select(state => state.settings);
+    // yield put(settingsActions.setLastSessionRootFolder(path));
+    // const settings = yield select(state => state.settings);
     // persiste settings in the Electron store
-    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
+    // yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
     // report success
     yield put(wbActions._openFile_Success(path));
 }
@@ -1125,7 +1117,10 @@ export function* saveCurrentFile({ payload }) {
 
         // prompt user with "Save As" dialog before saving the file
         if (prompt) {
-            const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, activeFile]);
+            const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, activeFile, [ 
+                { name: 'JavaScript file', extensions:['js'] },
+                { name: 'All Files', extensions: ['*'] } 
+            ] ]);
             if (!saveAsPath) {
                 return; // Save As dialog was canceled by user
             }
@@ -1547,10 +1542,91 @@ export function* getOrFetchFileInfo(path) {
     return { response, error };
 }
 
-export function* handleUpdatedCloudProvidersSettings(payload) {
+function fetchCloudBrowsersAndDevicesError(msg){
+    notification['error']({
+        message: msg,
+        description: 'Unauthorized access, check your user name or access key'
+    });
+}
+
+export function* setCloudProvidersBrowsersAndDevices(){
+    try {
+        const settings = yield select(state => state.settings);
+        
+        const { cloudProviders } = settings || {};
+    
+        if(cloudProviders){
+            if(cloudProviders.lambdaTest && cloudProviders.lambdaTest.inUse && cloudProviders.lambdaTest.user && cloudProviders.lambdaTest.key){
+                yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['lambdaTest', cloudProviders.lambdaTest]);
+                const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['lambdaTest', cloudProviders.lambdaTest.user, cloudProviders.lambdaTest.key]);
+                
+                if(typeof browsersAndDevicesResult === 'string'){
+                    fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
+                } else {
+                    if(browsersAndDevicesResult){
+                        yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'lambdaTest'));
+                    }
+                }
+
+        
+            }
+            if(cloudProviders.sauceLabs && cloudProviders.sauceLabs.inUse){
+                yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['sauceLabs', cloudProviders.sauceLabs]);
+                const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
+        
+                if(typeof browsersAndDevicesResult === 'string'){
+                    fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
+                } else {
+                    if(browsersAndDevicesResult){
+                        yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'sauceLabs'));
+                    }
+                }
+            }
+            if(cloudProviders.testingBot && cloudProviders.testingBot.inUse){
+                yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['testingBot', cloudProviders.testingBot]);
+                const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['testingBot']);
+        
+                if(typeof browsersAndDevicesResult === 'string'){
+                    fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
+                } else {
+                    if(browsersAndDevicesResult){
+                        yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'testingBot'));
+                    }
+                }
+            }
+        }
+    } catch(e){
+        console.log('e', e);
+    }
+}
+
+export function* setVisualTestingProviders(){
+    const settings = yield select(state => state.settings);
+    
+    const { visualProviders } = settings || {};
+
+    if(visualProviders){
+        if(visualProviders.applitools){
+            yield call(services.mainIpc.call, 'VisualTestingProvidersService', 'updateProviderSettings', ['applitools', visualProviders.applitools]);
+        }
+    }
+}
+
+export function* handleUpdatedCloudProvidersSettings({payload}) {
     const settings = yield select(state => state.settings);
     // persiste settings in the Electron store
     yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
+    yield setCloudProvidersBrowsersAndDevices();
+}
+
+export function* handleVisualTestingSettings({payload}) {
+    const settings = yield select(state => state.settings);
+    // persiste settings in the Electron store
+    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
+
+    if(settings && settings.visualProviders && settings.visualProviders.applitools){
+        yield call(services.mainIpc.call, 'VisualTestingProvidersService', 'updateProviderSettings', ['applitools', settings.visualProviders.applitools]);
+    }
 }
 
 export function* handleUpdatedRunSettings(payload) {

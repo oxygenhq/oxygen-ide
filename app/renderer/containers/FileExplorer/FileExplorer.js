@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import { Tooltip } from 'antd';
 import path from 'path';
 import Tree from '../../components/Tree';
@@ -29,9 +29,9 @@ type Props = {
   rootPath: string | null
 };
 
-export default class FileExplorer extends Component<Props> {
+export default class FileExplorer extends React.Component<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
         this.wrap = React.createRef();
         // keeps path hash of nodes which children loading is in progress
         this.loadingNodes = {};

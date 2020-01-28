@@ -9,7 +9,7 @@
     "email": "ndimer@cloudbeat.io"
   },
   "scripts": {
-    "electron-rebuild": "node -r babel-register ../internals/scripts/ElectronRebuild.js",
+    "electron-rebuild": "cd ../ && node -r @babel/register ./internals/scripts/ElectronRebuild.js",
     "postinstall": "npm run electron-rebuild"
   },
   "license": "GPL-3.0",
@@ -17,14 +17,17 @@
     "@sentry/electron": "^0.17.3",
     "appium-ios-driver": "4.4.0",
     "chokidar": "3.2.3",
-    "decache": "^4.5.1",
     "lodash.debounce": "^4.0.8",
     "lodash.difference": "^4.5.0",
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "4.6.2",
     "lodash.uniq": "^4.5.0",
     "lodash.uniqwith": "^4.5.0",
-    "monaco-editor": "0.14.3",
-    "oxygen-cli": "1.0.0-beta.12"
+    "monaco-editor": "0.18.1",
+    "monaco-editor-textmate": "^2.2.1",
+    "monaco-textmate": "^3.0.1",
+    "onigasm": "^2.2.4",
+    "oxygen-cli": "1.0.0-beta.43",
+    "typescript": "^3.7.4"
   }
 }

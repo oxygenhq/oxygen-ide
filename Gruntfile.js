@@ -40,8 +40,11 @@ module.exports = function(grunt) {
     } else if (process.platform === 'win32') {
         //ignore
     }
-    defaultTasks.push('rebrand');
     defaultTasks.push('sentry-browser');
+    defaultTasks.push('package');
+    defaultTasks.push('feature');
+    defaultTasks.push('rebrand');
+    
 
     if (process.platform === 'linux') {
         defaultTasks.push('compress:linux');
@@ -55,6 +58,9 @@ module.exports = function(grunt) {
 
     grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'comments:chrome-ext']);
     grunt.registerTask('sentry-browser', ['copy:sentry-browser']);
+    grunt.registerTask('package', ['copy:package']);
+    grunt.registerTask('feature', ['copy:feature']);    
+    
 
     const OUTDIR = 'dist/temp';
     const RESOURCES = process.platform === 'darwin' ? '/Electron.app/Contents/Resources' : '/resources';
@@ -70,7 +76,6 @@ module.exports = function(grunt) {
     try {
         var cwd = process.cwd();
         process.chdir('app');
-        cp.execSync('npm i @wdio/cli@5.16.9');
         var out = cp.execSync('npm ls --prod=true --parseable');
         var prodDepsUnfiltered = out.toString().split(/\r?\n/);
         var si = __dirname.length + 1 + 'app'.length + 1 + 'node_modules'.length + 1;
@@ -81,7 +86,6 @@ module.exports = function(grunt) {
             }
             prodDeps.push(dep + '/**');
         }
-        cp.execSync('npm uninstall @wdio/cli');
         process.chdir(cwd);
     } catch (e) {
         grunt.fail.fatal('Unable to get production dependencies list', e);
@@ -129,8 +133,8 @@ module.exports = function(grunt) {
                     { 
                         expand: true, 
                         cwd: 'app/node_modules', src: prodDeps.concat(['!fibers/src/**',
-                            '!oxygen-cli/lib/reporters/pdf/**',
-                            '!oxygen-cli/lib/reporters/html/**',
+                            '!oxygen-cli/build/ox_reporters/pdf/**',
+                            '!oxygen-cli/build/ox_reporters/html/**',
                             '!**/obj/**',
                             '!monaco-editor/dev/**',
                             '!monaco-editor/esm/**',
@@ -140,7 +144,9 @@ module.exports = function(grunt) {
                             '!appium-ios-driver/instruments-iwd/iwd4/**',
                             '!appium-ios-driver/instruments-iwd/iwd5/**',
                             '!appium-ios-driver/instruments-iwd/iwd6/**',
-                            '!intl/locale-data/jsonp/**']),
+                            '!intl/locale-data/jsonp/**',
+                            '!chromedriver/**',
+                            '!geckodriver/**']),
                         dest: OUTDIR + RESOURCES + '/app/node_modules' 
                     },
                     { 
@@ -196,7 +202,27 @@ module.exports = function(grunt) {
                         dest: SENTRY_BROWSER_DIST
                     }
                 ]
-            }
+            },
+            'package': {
+                files: [
+                    { 
+                        expand: true, 
+                        cwd: '',
+                        src: ['package.json'], 
+                        dest: OUTDIR + RESOURCES
+                    }
+                ]
+            },
+            'feature': {
+                files: [
+                    { 
+                        expand: true, 
+                        cwd: 'app',
+                        src: ['renderer/components/MonacoEditor/cucumber/feature.tmLanguage'], 
+                        dest: OUTDIR + RESOURCES + '/app'
+                    }
+                ]
+            },
         },
         chmod: {
             options: {

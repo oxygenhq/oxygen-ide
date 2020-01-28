@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Modal, Button } from 'antd';
 import electron from 'electron';
 
@@ -7,7 +7,7 @@ type Props = {
     path: string
 };
 
-export default class ChromeDriverDownloadingFailedDialog extends PureComponent<Props> {
+export default class ChromeDriverDownloadingFailedDialog extends React.PureComponent<Props> {
 
     close = () => {
         if(this.props.onClose){

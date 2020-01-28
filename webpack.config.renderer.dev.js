@@ -53,19 +53,53 @@ export default merge.smart(baseConfig, {
     module: {
         rules: [
             {
-                test: /\.jsx?$/,
-                exclude: /node_modules/,
+                test: /\.(js|jsx)?$/,
+                exclude: [/node_modules/, /app\/node_modules/],
                 use: {
                     loader: 'babel-loader',
                     options: {
                         cacheDirectory: true,
+                        presets: [
+                            ['@babel/preset-env',{
+                                'targets': {
+                                  'node': '8.10'
+                                },
+                                // Allow importing core-js in entrypoint and use browserlist to select polyfills
+                                'useBuiltIns': 'entry',
+                                // Set the corejs version we are using to avoid warnings in console
+                                // This will need to change once we upgrade to corejs@3
+                                'corejs': 3,
+                                // Transform modules based on env support
+                                'modules': 'cjs',
+                                // Exclude transforms that make all code slower
+                                'exclude': ['transform-typeof-symbol']
+                            }],
+                            '@babel/preset-react',
+                            '@babel/preset-flow',
+                        ],
                         plugins: [
                             // Here, we include babel plugins that are only required for the
                             // renderer process. The 'transform-*' plugins must be included
                             // before react-hot-loader/babel
+                            '@babel/transform-modules-commonjs',
+                            '@babel/plugin-syntax-dynamic-import',
+                            '@babel/plugin-syntax-import-meta',
+                            ['@babel/plugin-proposal-class-properties', { 'loose': true }],
+                            '@babel/plugin-syntax-class-properties',
                             'transform-class-properties',
-                            'transform-es2015-classes',
-                            'react-hot-loader/babel'
+                            '@babel/plugin-transform-classes',
+                            'react-hot-loader/babel',
+                            '@babel/plugin-proposal-function-bind',
+                            ['import', { 'libraryName': 'antd', 'libraryDirectory': 'es', 'style': 'css' }],
+                            'add-module-exports',
+                            [
+                              '@babel/plugin-proposal-decorators',
+                              {
+                                  'decoratorsBeforeExport': true
+                              }
+                            ],
+                            ['transform-imports'],
+                            '@babel/plugin-transform-runtime'
                         ],
                     }
                 }

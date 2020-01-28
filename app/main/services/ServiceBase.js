@@ -8,9 +8,9 @@
  */
 export const SEVERITY_WARN = 'WARN';
 export const SEVERITY_ERROR = 'ERROR';
+export const SEVERITY_FATAL = 'ERROR';
 export const SEVERITY_INFO = 'INFO';
 export const SEVERITY_DEBUG = 'DEBUG';
-export const SEVERITY_FATAL = 'FATAL';
 export const EVENT_LOG_ENTRY = 'LOG_ENTRY';
 
 
@@ -19,9 +19,19 @@ export default class ServiceBase {
     static get SEVERITY_ERROR() { return SEVERITY_ERROR; }
     static get SEVERITY_INFO() { return SEVERITY_INFO; }
 
-    constructor(mainWindow) {
+    constructor(mainWindow, settings = null) {
         this.observers = [];
         this.mainWindow = mainWindow;
+        this.settings = settings;
+    }
+    getService(name) {
+        if (!global.services || typeof(global.services) !== 'object') {
+            return null;
+        }
+        if (global.services.hasOwnProperty(name)) {
+            return global.services[name];
+        }
+        return null;
     }
     subscribe(observer) { 
         this.observers.push(observer);

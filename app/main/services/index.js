@@ -16,6 +16,9 @@ import MenuService from './MenuService';
 import DeviceDiscoveryService from './DeviceDiscoveryService';
 import RecorderService from './RecorderService';
 import UpdateService from './UpdateService';
+import CloudProvidersService from './CloudProvidersService';
+import VisualTestingProvidersService from './VisualTestingService';
+
 
 export default {
     AppiumService,
@@ -27,5 +30,7 @@ export default {
     MenuService,
     DeviceDiscoveryService,
     RecorderService,
-    UpdateService
+    UpdateService,
+    CloudProvidersService,
+    VisualTestingProvidersService
 };

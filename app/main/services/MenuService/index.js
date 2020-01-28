@@ -6,7 +6,8 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import electron, { BrowserWindow } from 'electron';
+
+import electron from 'electron';
 import ServiceBase from '../ServiceBase';
 import menuTemplate from './menuTemplate';
 import menuTemplateFromArray from './menuTemplateFromArray';
@@ -15,7 +16,7 @@ import * as Const from '../../../const';
 import pkgInfo from '../../../../package.json';
 import pkgNativeInfo from '../../../package.json';
 
-const { Menu } = electron;
+const { Menu, BrowserWindow } = electron;
 const MAIN_MENU_CMD = 'MAIN_MENU_CMD';
 
 const DEFAULT_MENU_STATE = {

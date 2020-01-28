@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
 import Workbench from './Workbench';
@@ -17,7 +17,7 @@ type Props = {
   history: {}
 };
 
-export default class App extends Component<Props> {
+export default class App extends React.Component<Props> {
     render() {
         return (
             <Provider store={this.props.store}>

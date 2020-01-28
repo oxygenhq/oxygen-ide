@@ -8,7 +8,7 @@
  */
 // @flow
 
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Button, Icon } from 'antd';
 import styled from '@emotion/styled';
 
@@ -31,7 +31,7 @@ type ListProps = {
     editable?: boolean
 };
 
-export default class List extends PureComponent<ListProps> {
+export default class List extends React.PureComponent<ListProps> {
     static Container = styled(FlexColumn)(props => ({
         height: '100vh',
         flexShrink: 0,
@@ -165,14 +165,11 @@ export default class List extends PureComponent<ListProps> {
 
 type ListItemProps = {
     // data source - a list of items
-    data?: object,
+    data?: Object,
     editable?: boolean,
     controls: Element
 };
-class ListItem extends PureComponent<ListItemProps> {
-    static Container = styled(FlexRow)(props => ({
-    }));
-
+class ListItem extends React.PureComponent<ListItemProps> {
     state = {
         editing: false,
     };
@@ -188,6 +185,10 @@ class ListItem extends PureComponent<ListItemProps> {
             document.removeEventListener('click', ::this.handleClickOutside, true);
         }
     }
+    
+    static Container = styled(FlexRow)(props => ({
+    }));
+
 
     handleUpdate() {
         this.toggleEdit();

@@ -1,11 +1,12 @@
-import React, { PureComponent, Fragment } from 'react';
+//@flow
+import React from 'react';
 import { Modal, Button } from 'antd';
 
 type Props = {
     clean: Function
 };
 
-export default class XCodeDialog extends PureComponent<Props> {
+export default class XCodeDialog extends React.PureComponent<Props> {
   close = () => {
       if(this.props.clean){
           this.props.clean();
@@ -20,13 +21,13 @@ export default class XCodeDialog extends PureComponent<Props> {
               visible={true}
               onCancel={this.close}
               footer={(
-                  <Fragment>
+                  <React.Fragment>
                       <Button
                           onClick={this.close}
                       >
               Ok
                       </Button>
-                  </Fragment>
+                  </React.Fragment>
               )}
           >
               <div>

@@ -8,18 +8,20 @@
  */
 import Services from './index';
 import { webContents, ipcMain } from 'electron';
+import appSettings from 'electron-settings';
 
 export default class ServiceDispatcher {
-    constructor(mainWindow) {
-        this.servicesHash = {};
+    constructor(mainWindow, settings = null) {
+        global.services = this.servicesHash = {};
         this.mainWindow = mainWindow;
+        this.settings = appSettings.get('appSettings');
     }
 
     start() {
         // instanciate all available services
         for (var name in Services) {
             let Service = Services[name];
-            let service = new Service(this.mainWindow);
+            let service = new Service(this.mainWindow, this.settings);
             this.servicesHash[name] = service;
             // subscribe to service events
             service.subscribe(this._handleServiceEvent.bind(this, name));

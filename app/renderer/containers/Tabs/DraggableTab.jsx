@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { Component } from 'react';
+import React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { cardSource, cardTarget } from '../../components/dndHelper';
 
@@ -17,7 +17,7 @@ type Props = {
     children: Array<React.Node> | React.Node
 };
 
-class DraggableTab extends Component<Props> {
+class DraggableTab extends React.Component<Props> {
     render() {
         const {
             connectDragSource, connectDropTarget, isDragging,

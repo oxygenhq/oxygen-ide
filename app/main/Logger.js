@@ -7,7 +7,9 @@
  * (at your option) any later version.
  */
 import { app, dialog } from 'electron';
-import winston from 'winston';
+let winston = require('winston');
+let DailyRotateFile = require('winston-daily-rotate-file');
+winston.transports.DailyRotateFile = DailyRotateFile;
 import { default as cleanStack } from 'clean-stack';
 import moment from 'moment';
 import util from 'util';
@@ -41,10 +43,25 @@ Render process:
 - console.* methods including console.error and console.warn *DO NOT* write to logs yet (this will probably change)
 */
 
+const format = winston.format((info, ops) => {
+    const result = moment().format('YYYY-MM-DD HH:mm:ss') + ' '
+        + (info.message ? info.message : '')
+        + (info.meta && Object.keys(info.meta).length ? '\n\t' + util.inspect(info.meta) : '');
+
+    return {
+        message: result,
+        level: info.level.toUpperCase()
+    };
+});    
+
 export default class Logger {
     constructor(levelConsole, levelFile) {
+
+        this.logFileName = 'oxygenide-%DATE%.log';
+        
         try {
-            this.logFilePath = path.resolve(app.getPath('logs'), 'oxygenide.log');
+            this.logsPath = app.getPath('logs');
+            this.logFilePath = path.resolve(app.getPath('logs'), this.logFileName);
         } catch (err) {
             // getPath('logs') fails on linux
             const logsPath = path.join(app.getPath('userData'), 'logs');
@@ -54,61 +71,99 @@ export default class Logger {
             if (!fs.existsSync(logsPath)) {
                 fs.mkdirSync(logsPath);
             }
-            this.logFilePath = path.resolve(logsPath, 'oxygenide.log');
-            Sentry.captureException(err);
-        }
+            this.logsPath = logsPath;
+            this.logFilePath = path.resolve(logsPath, this.logFileName);
 
-        var transFile = new (winston.transports.File)({
-            filename: this.logFilePath,
-            maxSize: 1024*1024*3,
-            maxFiles: 10,
-            prepend: true,
-            colorize: false,
-            prettyPrint: true,
-            json: false,
-            level: levelFile,
-            zippedArchive: false,
-            timestamp: () => moment().format('YYYY-MM-DD HH:mm:ss'),
-            formatter:  function(options) {
-                return options.timestamp() + ' '
-                    + options.level.toUpperCase() + ' '
-                    + (options.message ? options.message : '')
-                    + (options.meta && Object.keys(options.meta).length ? '\n\t' + util.inspect(options.meta) : '');
+            if(Sentry && Sentry.captureException){
+                Sentry.captureException(err);
             }
+        }
+        
+        const currentLogFileName = this.getLogFileName();
+        console.log('Logs folder :', this.logsPath);
+        console.log('Current log file :', currentLogFileName);
+        
+        const transport = new (winston.transports.DailyRotateFile)({
+            filename: this.logFilePath,
+            date_format: null,
+            zippedArchive: false,
+            maxSize: '20m',
+            maxFiles: '14d',
+            format: winston.format.combine(
+                format(),
+                winston.format.simple(),
+            )
+        });
+        
+        transport.on('rotate', function(oldFilename, newFilename) {
+            // do something if need
         });
 
         var transConsole = new (winston.transports.Console)({
-            colorize: true,
             level: levelConsole,
             json: false,
             prettyPrint: true,
             timestamp: () => moment().format('HH:mm:ss'),
-            formatter: function(options) {
-                return options.timestamp() + ' '
-                    + winston.config.colorize(options.level, options.level.toUpperCase()) + ' '
-                    + (options.message ? options.message : '')
-                    + (options.meta && Object.keys(options.meta).length ? '\n\t' + util.inspect(options.meta) : '');
-            }
+            format: winston.format.combine(
+                winston.format.colorize(),
+                format(),
+                winston.format.simple()
+            )
         });
 
-        var _log = new (winston.Logger)({
-            transports: [transFile, transConsole]
+        var _log = winston.createLogger({
+            transports: [transport, transConsole]
         });
 
         this._overrideLog(_log);
-        this._overrideConsole();
+        this._overrideConsole(_log);
         this._catchTheUncaught();
+        const lastLogFilePath = this.getLogFilePath();
+        console.log('Logs file location :', lastLogFilePath);
     }
 
-    _overrideConsole() {
+    getLogFilePath(){
+        const currentLogFileName = this.getLogFileName();
+        const lastLogFilePath = path.resolve(this.logsPath, currentLogFileName);
+        return lastLogFilePath;
+    }
+
+    getLogFileName(){
+        const dateFormat = 'YYYY-MM-DD';
+        const dateStr = moment().local().format(dateFormat);
+        return this.logFileName.replace(/%DATE%/g, dateStr);
+    }
+
+    _overrideConsole(_log) {
         const formatArgs = (args) => {
-            return [util.format.apply(util.format, Array.prototype.slice.call(args))];
+            const result = [util.format.apply(util.format, Array.prototype.slice.call(args))];   
+            return result;
         };
-        console.log = (...args) => global.log.info.apply(global.log, formatArgs(args));
-        console.info = (...args) => global.log.info.apply(global.log, formatArgs(args));
-        console.warn = (...args) => global.log.info.apply(global.log, formatArgs(args));
-        console.error = (...args) => global.log.error.apply(global.log, formatArgs(args));
-        console.debug = (...args) => global.log.debug.apply(global.log, formatArgs(args));
+
+        console.log = function(){
+            const log = _log.info.bind(_log);
+            return log.apply(_log, formatArgs(arguments));
+        };
+
+        console.info = function(){
+            const log = _log.info.bind(_log);
+            return log.apply(_log, formatArgs(arguments));
+        };
+
+        console.warn = function(){
+            const log = _log.warn.bind(_log);
+            return log.apply(log, formatArgs(arguments));
+        };
+        
+        console.error = function(){
+            const log = _log.error.bind(_log);
+            return log.apply(log, formatArgs(arguments));
+        };
+
+        console.debug = function(){
+            const log = _log.debug.bind(_log);
+            return log.apply(log, formatArgs(arguments));
+        };
     }
 
     _overrideLog(_log) {
@@ -161,15 +216,18 @@ export default class Logger {
 
         this.info = (...args) => {
             prepError(args);
-            return _log.info.apply(this, args);
+            const log = _log.info.bind(_log);
+            return log.apply(log, args);
         };
         this.debug = (...args) => {
             prepError(args);
-            return _log.debug.apply(this, args);
+            const log = _log.debug.bind(_log);
+            return log.apply(log, args);
         };
         this.error = (...args) => {
             prepError(args);
-            const ret = _log.error.apply(this, args);
+            const log = _log.error.bind(_log);
+            const ret = _log.apply(log, args);
             // do not show errors to the user about deprecated Buffer()
             if (args[0] && args[0].includes('DeprecationWarning: Buffer() is deprecated')) {
                 return ret;
@@ -179,7 +237,8 @@ export default class Logger {
         };
         this.warn = (...args) => {
             prepError(args);
-            const ret = _log.warn.apply(this, args);
+            const log = _log.warn.bind(_log);
+            const ret = log.apply(log, args);
             if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
                 showDialog(args[0], args.length === 2 ? args[1] : '', 'warning');
             }
@@ -189,11 +248,16 @@ export default class Logger {
 
     _catchTheUncaught() {
         process.on('uncaughtException', error => {
-            global.log.warn('Unhandled Error.', error);
+            // ignore Monaco Editor error related to doResolve
+            if(error && error.message && typeof error.message === 'string' && error.message.includes('doResolve')){
+                return;
+            }
+
+            console.warn('Unhandled Error.', error);
         });
 
         process.on('unhandledRejection', error => {
-            global.log.warn('Unhandled Promise Rejection.', error);
+            console.warn('Unhandled Promise Rejection.', error);
         });
     }
 }

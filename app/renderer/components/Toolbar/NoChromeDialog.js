@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Modal, Button } from 'antd';
 import electron from 'electron';
 
-export default class NoChromeDialog extends Component<Props> {
+export default class NoChromeDialog extends React.Component<Props> {
     constructor(props){
         super(props);
     }

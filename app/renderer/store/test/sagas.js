@@ -60,12 +60,21 @@ function* handleTestRunnerServiceEvent(event) {
             yield put(loggerActions.setActiveLogger('general'));
         }
 
-        if(event && event.result && event.result.summary){
-            const { summary } = event.result;
-            if(summary && summary._status && summary._status ==='passed'){
+        if(event && event.result && event.result.status){
+            if( event.result.status ==='passed'){
                 yield put(editorActions.resetActiveLines());
             }
             
+            let duration = 0;
+
+            if(event.result.duration){
+                duration = event.result.duration;
+            }
+            
+            const summary = {
+                _duration: duration,
+                _status: event.result.status
+            };
             
             yield all([
                 call(services.mainIpc.call, 'AnalyticsService', 'playStop', [summary]),
@@ -160,6 +169,11 @@ export function* startTest({ payload }) {
     const runtimeSettingsClone = {
         ...runtimeSettings
     };
+
+    if(file && file.ext && file.ext === '.feature'){
+        runtimeSettingsClone.framework = 'cucumber';
+    }
+
     // add test provider information
     if (runtimeSettings.testProvider) {
         const cloudProviders = yield select(state => state.settings.cloudProviders);
@@ -169,7 +183,60 @@ export function* startTest({ payload }) {
     if (runtimeSettings.testTarget && runtimeSettings.testMode === 'mob') {
         const devices = yield select(state => state.test.devices);
         const targetDevice = devices.find(x => x.id === runtimeSettings.testTarget);
-        runtimeSettingsClone.testTarget = targetDevice;
+        if(targetDevice){
+            runtimeSettingsClone.testTarget = targetDevice;
+        }
+    }
+
+    const rootPath = yield select(state => state.fs.rootPath);
+    if(rootPath && typeof rootPath === 'string'){
+        runtimeSettingsClone.rootPath = rootPath;
+    }
+
+    const fsTree = yield select(state => state.fs.tree);
+
+    if(fsTree && fsTree.data && Array.isArray(fsTree.data) && fsTree.data.length > 0){
+        
+        const OXYGEN_CONFIG_FILE_NAME = 'oxygen.conf';
+        const OXYGEN_ENV_FILE_NAME = 'oxygen.env';
+        const OXYGEN_PAGE_OBJECT_FILE_NAME = 'oxygen.po';
+
+        let oxConfigFile = null;
+        let oxEnvFile = null;
+        let oxPageObjectFile = null;
+
+        fsTree.data.map((item) => {
+            if(
+                item && 
+                item.type && 
+                item.type === 'file' && 
+                ['.js', '.json'].includes(item.ext) && 
+                item.path && 
+                typeof item.path === 'string' && 
+                item.name && 
+                typeof item.name === 'string'
+            ){
+                if(item.name.startsWith(OXYGEN_CONFIG_FILE_NAME)){
+                    oxConfigFile = item.path;
+                }
+                if(item.name.startsWith(OXYGEN_ENV_FILE_NAME)){
+                    oxEnvFile = item.path;
+                }
+                if(item.name.startsWith(OXYGEN_PAGE_OBJECT_FILE_NAME)){
+                    oxPageObjectFile = item.path;
+                }
+            }
+        });
+
+        if(oxConfigFile){
+            runtimeSettingsClone.oxConfigFile = oxConfigFile;
+        }
+        if(oxEnvFile){
+            runtimeSettingsClone.oxEnvFile = oxEnvFile;
+        }
+        if(oxConfigFile){
+            runtimeSettingsClone.oxPageObjectFile = oxPageObjectFile;
+        }
     }
 
     try {        
@@ -180,6 +247,7 @@ export function* startTest({ payload }) {
         // call TestRunner service to start the test
         
         
+        yield put(testActions.waitUpdateBreakpoints(false));
         yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'stop', []);
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', []);
         yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
@@ -238,15 +306,13 @@ export function* continueTest({ payload }) {
 }
 
 export function* handleOnLineUpdate ({ payload }) {
-    const { file, line, primary, time } = payload || {};
-    // check if this is the primary file and if yes, make sure to make its tab active
-    if (primary) {
-        const openFiles = yield select(state => state.editor.openFiles);
-        // check if we have this file open in one of the editors
-        if (openFiles[file]) {
-            yield put(tabActions.setActiveTab(file));
-            yield put(editorActions.setActiveFile(file));
-        }
+    const { file, line, time } = payload || {};
+ 
+    const openFiles = yield select(state => state.editor.openFiles);
+    // check if we have this file open in one of the editors
+    if (openFiles[file]) {
+        yield put(tabActions.setActiveTab(file));
+        yield put(editorActions.setActiveFile(file));
     }
     yield put(editorActions.setActiveLine(time, file, line));
 }

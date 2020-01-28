@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import List from '../../components/core/List.jsx';
 import Panel from '../../components/Panel.jsx';
 import LocatorsChanger from './LocatorsChanger';
@@ -51,7 +51,7 @@ const DEFAULT_STATE = {
     arrayObjectEditing: false
 };
 
-export default class ObjectEditor extends PureComponent<Props> {
+export default class ObjectEditor extends React.PureComponent<Props> {
     props: Props;
 
     state = DEFAULT_STATE;
@@ -178,7 +178,6 @@ export default class ObjectEditor extends PureComponent<Props> {
     startEditArrayObject = (index) => {
         try {
             const { object } = this.props;
-    
             const name = object.locator[index];
     
             this.setState({

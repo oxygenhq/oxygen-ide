@@ -6,7 +6,8 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent, Fragment } from 'react';
+//@flow
+import React from 'react';
 import uniq from 'lodash.uniq';
 import { Form, Input, Select, Modal, message, Button } from 'antd';
 import { capitalizeFirst } from '../../helpers/general';
@@ -27,9 +28,9 @@ type Props = {
     onCancel: () => void
 };
 
-export default class FileCreateDialog extends PureComponent<Props> {
+export default class FileCreateDialog extends React.PureComponent<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
 
         this.textInput = null;
 
@@ -186,7 +187,7 @@ export default class FileCreateDialog extends PureComponent<Props> {
                     visible={visible}
                     onCancel={onCancel}
                     footer={(
-                        <Fragment>
+                        <React.Fragment>
                             <Button
                                 onClick={onCancel}
                             >
@@ -201,7 +202,7 @@ export default class FileCreateDialog extends PureComponent<Props> {
                             >
                                 Create
                             </Button>
-                        </Fragment>
+                        </React.Fragment>
                     )}
                 >
                     <Input

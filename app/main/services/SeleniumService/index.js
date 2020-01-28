@@ -29,11 +29,12 @@ const ON_SELENIUM_STOPPED = 'SELENIUM_STOPPED';
 const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.googleapis.com';
 
 export default class SeleniumService extends ServiceBase {
-    seleniumProc = null;
-    availablePort = null;
 
     constructor() {
         super();
+
+        this.seleniumProc = null;
+        this.availablePort = null;
 
         this.downloadChromeDriver = this.downloadChromeDriver.bind(this);
     }
@@ -140,7 +141,7 @@ export default class SeleniumService extends ServiceBase {
                 result.error = true;
             }
         } catch (e) {
-            console.log('Failure setting up ChromeDriver', e);
+            console.warn('Failure setting up ChromeDriver', e);
             result.error = true;
         }
 
@@ -330,7 +331,7 @@ export default class SeleniumService extends ServiceBase {
         });
     }
 
-    getChromeDriverDownloadUrl = (driverVersion) => {
+    getChromeDriverDownloadUrl(driverVersion){
         var zipFilename;
         switch (process.platform) {
         case 'win32':

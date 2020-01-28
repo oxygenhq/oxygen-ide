@@ -35,12 +35,24 @@ export default {
 
     module: {
         rules: [{
-            test: /\.jsx?$/,
-            exclude: /node_modules/,
+            test: /\.(js|jsx)?$/,
+            exclude: [/node_modules/, /app\/node_modules/],
             use: {
                 loader: 'babel-loader',
                 options: {
-                    cacheDirectory: true
+                    cacheDirectory: true,
+                    presets: [
+                        '@babel/preset-env',
+                        '@babel/preset-react',
+                        '@babel/preset-flow'
+                    ],
+                    plugins: [
+                        '@babel/transform-modules-commonjs',
+                        ['@babel/plugin-proposal-class-properties', { 'loose': true }],
+                        '@babel/plugin-syntax-class-properties',
+                        '@babel/plugin-transform-runtime',
+                        '@babel/plugin-proposal-function-bind',
+                    ]
                 }
             }
         }]

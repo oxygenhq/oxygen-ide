@@ -9,7 +9,9 @@
 //import * as monaco from 'monaco-editor';
 import React from 'react';
 import path from 'path';
-
+import { loadWASM } from 'onigasm';
+import { Registry } from 'monaco-textmate';
+import { wireTmGrammars } from 'monaco-editor-textmate';
 import oxygenIntellisense from './intellisense';
 import { language as jsTokenizer } from './tokenizers/javascript'; 
 import * as helpers from './helpers';
@@ -29,10 +31,14 @@ function uriFromPath(_path) {
     }
     return encodeURI(`file://${pathName}`);
 }
-amdRequire.config({
-    ignoreDuplicateModules: 'vs/editor/editor.main',
-    baseUrl: uriFromPath(path.join(__dirname, '../node_modules/monaco-editor/min'))
-});
+try {
+    amdRequire.config({
+        ignoreDuplicateModules: 'vs/editor/editor.main',
+        baseUrl: uriFromPath(path.join(__dirname, '../node_modules/monaco-editor/min'))
+    });
+} catch(e){
+    console.log('amdRequire config e', e);
+}
 
 function noop() {}
 
@@ -65,11 +71,14 @@ type Props = {
     language: string,
     theme: string,
     options: object,
+    waitUpdateBreakpoints: boolean,
+    featureLanguageLoaded: boolean,
     editorDidMount: Function,
     editorWillMount: Function,
     onValueChange: Function,
     onSelectionChange: Function,
-    onBreakpointsUpdate: Function
+    onBreakpointsUpdate: Function,
+    setFatureLanguageLoaded: Function
 };
 
 export default class MonacoEditor extends React.Component<Props> {
@@ -88,9 +97,13 @@ export default class MonacoEditor extends React.Component<Props> {
     }
 
     componentDidMount() {
-        amdRequire(['vs/editor/editor.main'], () => {
-            this.initMonaco();
-        });
+        try{
+            amdRequire(['vs/editor/editor.main'], () => {
+                this.initMonaco();
+            });
+        } catch(e){
+            console.log('monaco editor e', e);
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {    
@@ -131,6 +144,16 @@ export default class MonacoEditor extends React.Component<Props> {
             this.editor.updateOptions({ readOnly: this.props.editorReadOnly });
         }
         
+        if (prevProps.waitUpdateBreakpoints !== this.props.waitUpdateBreakpoints && this.editor) {
+            this.editor.updateOptions({ readOnly: this.props.waitUpdateBreakpoints });
+
+            if(this.props.waitUpdateBreakpoints){
+                helpers.makeBreakpointsHalfOpacity(this.editor);
+            } else {
+                helpers.makeBreakpointsFullOpacity(this.editor);
+            }
+        }
+        
         if (prevProps.activeLine !== this.props.activeLine) {
             const { activeLine } = this.props;
             // scroll view into the current active line
@@ -154,13 +177,13 @@ export default class MonacoEditor extends React.Component<Props> {
         }
 
         if(typeof updateActiveLine !== 'boolean' && updateFontSize){
-        //update ActiveLine and FontSize
+            //update ActiveLine and FontSize
             helpers.updateActiveLineMarker(this.editor, updateActiveLine, updateFontSize);
         } else if (typeof updateActiveLine !== 'boolean'){
-        //update ActiveLine
+            //update ActiveLine
             helpers.updateActiveLineMarker(this.editor, updateActiveLine, this.props.fontSize);
         } else if (updateFontSize){
-        //update FontSize
+            //update FontSize
             const { activeLine } = this.props;
             helpers.updateActiveLineMarker(this.editor, activeLine, updateFontSize);
         }
@@ -216,7 +239,9 @@ export default class MonacoEditor extends React.Component<Props> {
             editorReadOnly:
             diffProps.editorReadOnly !== this.props.editorReadOnly,
             fontSize:
-            diffProps.fontSize !== this.props.fontSize
+            diffProps.fontSize !== this.props.fontSize,
+            waitUpdateBreakpoints:
+            diffProps.waitUpdateBreakpoints !== this.props.waitUpdateBreakpoints
         };
     }
 
@@ -266,24 +291,70 @@ export default class MonacoEditor extends React.Component<Props> {
         }
     }
 
-    initMonaco() {
+    async liftOff() {
+        const { featureLanguageLoaded, setFatureLanguageLoaded } = this.props;
+        if(!featureLanguageLoaded){
+            await loadWASM(path.join(__dirname, '../node_modules/onigasm/lib/onigasm.wasm')); // See https://www.npmjs.com/package/onigasm#light-it-up
+        
+            const registry = new Registry({
+                getGrammarDefinition: async (scopeName) => {
+                    return {
+                        format: 'plist',
+                        content: await (await fetch('./components/MonacoEditor/cucumber/feature.tmLanguage')).text()
+                    };
+                }
+            });
+        
+            // map of monaco "language id's" to TextMate scopeNames
+            const grammars = new Map();
+            grammars.set('feature', 'feature.feature');
+        
+            await wireTmGrammars(monaco, registry, grammars);
+            setFatureLanguageLoaded();
+        }
+    }
+
+    async initMonaco() {
         const value = this.props.value !== null ? this.props.value : this.props.defaultValue;
-        const { language, theme, fontSize } = this.props;
+        const { language, theme, fontSize, featureLanguageLoaded } = this.props;
 
         let saveFontSize = DEFAULT_FONT_SIZE;
 
         if(
             fontSize &&
-        parseInt(fontSize) &&
-        fontSize >= FONT_SIZE_MIN && 
-        fontSize <= FONT_SIZE_MAX
+            parseInt(fontSize) &&
+            fontSize >= FONT_SIZE_MIN && 
+            fontSize <= FONT_SIZE_MAX
         ) {
             saveFontSize = fontSize;
         }
 
         if (this.editorContainer) {
-        // Before initializing monaco editor
+            // Before initializing monaco editor
             this.editorWillMount();
+            
+            if(language && typeof language === 'string' && language === 'feature' && !featureLanguageLoaded){
+                monaco.languages.register({ 
+                    id: 'feature',
+                    aliases: [
+                        'Gherkin',
+                        'feature'
+                    ],
+                    extensions: [
+                        '.feature'
+                    ]
+                });
+    
+                await this.liftOff();
+    
+                monaco.languages.onLanguage('feature', () => {    
+                    monaco.languages.setLanguageConfiguration('feature', {
+                        comments: {
+                            lineComment: '#'
+                        }
+                    });
+                });
+            }
 
             // workaround for not being able to override or extend existing tokenziers
             // https://github.com/Microsoft/monaco-editor/issues/252
@@ -329,6 +400,7 @@ export default class MonacoEditor extends React.Component<Props> {
      * Watching click events
      */
     hookToEditorEvents = () => {
+        const { language } = this.props;
         const editor = this.editor;
 
         editor.onDidChangeModelContent(onDidChangeModelContent.bind(this));
@@ -337,35 +409,41 @@ export default class MonacoEditor extends React.Component<Props> {
         editor.onMouseDown((e) => {
             const { target: { element, position } } = e;
 
-            if (element.className === 'line-numbers') {
+            if (element.className === 'line-numbers' && language !== 'feature') {
                 // select the entire line if the user clicks on line number panel
                 const ln = position.lineNumber;
                 editor.setSelection(new monaco.Selection(1, 2, 1, 2));
                 editor.focus();
 
                 const marker = helpers.getBreakpointMarker(editor, ln);
+                const { waitUpdateBreakpoints } = this.props;
 
-                // if user clicks on line-number panel, handle it as adding or removing a breakpoint at this line
-                if (editor.getModel().getLineContent(ln).trim().length > 0) {
-                    if (!marker) {
-                        if (helpers.addBreakpointMarker(editor, ln, this.props.fontSize)) {
-                            this.addLnToLnArray(ln);
-                            this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
-                        }
-                    }
-                    else {
-                        if (helpers.removeBreakpointMarker(editor, ln)) {
-                            this.removeLnfromLnArray(ln);
-                            this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
-                        }
-                    }
+                if(waitUpdateBreakpoints){
+                    //ignored
+                    console.warn('Breakpoint cannot be added before previous breackpoint adding finished');
                 } else {
-                    if(!marker){
-                        console.warn('Breakpoint cannot be added at the empty line.');
+                    // if user clicks on line-number panel, handle it as adding or removing a breakpoint at this line
+                    if (editor.getModel().getLineContent(ln).trim().length > 0) {
+                        if (!marker) {
+                            if (helpers.addBreakpointMarker(editor, ln, this.props.fontSize)) {
+                                this.addLnToLnArray(ln);
+                                this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+                            }
+                        }
+                        else {
+                            if (helpers.removeBreakpointMarker(editor, ln)) {
+                                this.removeLnfromLnArray(ln);
+                                this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+                            }
+                        }
                     } else {
-                        if (helpers.removeBreakpointMarker(editor, ln)) {
-                            this.removeLnfromLnArray(ln);
-                            this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+                        if(!marker){
+                            console.warn('Breakpoint cannot be added at the empty line.');
+                        } else {
+                            if (helpers.removeBreakpointMarker(editor, ln)) {
+                                this.removeLnfromLnArray(ln);
+                                this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+                            }
                         }
                     }
                 }

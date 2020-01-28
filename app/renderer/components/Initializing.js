@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 
-export default class Initializing extends PureComponent {
+export default class Initializing extends React.PureComponent {
     constructor(props) {
         super(props);
     }

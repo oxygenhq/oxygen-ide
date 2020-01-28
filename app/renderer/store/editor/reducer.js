@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /*
  * Copyright (C) 2015-2018 CloudBeat Limited
  *
@@ -23,12 +24,18 @@ const DEFAULT_OPEN_FILE_STATE = {
 };
 
 export default (state = DEFAULT_STATE, action) => {
-    const { name, path, newPath, line, time , cache, doUnknown } = action.payload || {};
+    const { name, path, newPath, line, time, cache, doUnknown, fromIndex, toIndex } = action.payload || {};
     let _openFilesClone, _newActiveFile, _newActiveFileName;
 
     switch (action.type) {
     // SET_ACTIVE_LINE
     case types.EDITOR_SET_ACTIVE_LINE: {
+
+        console.log('--- debug EDITOR_SET_ACTIVE_LINE ---');
+        console.log('line', line);
+        console.log('path', path);
+        console.log('--- debug ---');
+
         // check if we has file with the specified path in openFiles list
         if (!state.openFiles.hasOwnProperty(path)) {
             return state;
@@ -216,6 +223,23 @@ export default (state = DEFAULT_STATE, action) => {
         }
 
         return result;
+    }
+
+    case 'TABS_CHANGE_ORDER': {
+        const _newList= {};
+        const keys = Object.keys(state.openFiles);
+        const firstItem = keys[fromIndex];
+        
+        keys[fromIndex] = keys[toIndex];
+        keys[toIndex] = firstItem;
+        keys.forEach(function(key) {
+            _newList[key] = state.openFiles[key];
+        });
+
+        return {
+            ...state,
+            openFiles: _newList,
+        };
     }
 
     case 'FROM_CACHE': 

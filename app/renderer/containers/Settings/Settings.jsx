@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { PureComponent } from 'react';
+import React from 'react';
 import Panel from '../../components/Panel.jsx';
 import ScrollContainer from '../../components/ScrollContainer.jsx';
 import PropertyList, { PropertyItem } from '../../components/PropertyList/index.jsx';
@@ -17,7 +17,7 @@ type Props = {
   refreshScroll: Function
 };
 
-export default class Settings extends PureComponent<Props> {
+export default class Settings extends React.PureComponent<Props> {
   props: Props;
 
   render() {

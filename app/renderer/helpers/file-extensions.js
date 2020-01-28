@@ -12,6 +12,7 @@
 export default {
     '.jsx': 'javascript',
     '.js': 'javascript',
+    '.feature': 'feature',
     '.json': 'json',
     '.txt': 'text',
     '.csv': 'text',

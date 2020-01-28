@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Icon } from 'antd';
 
@@ -15,7 +15,7 @@ import '../css/navbar.scss';
 
 type Props = {};
 
-export default class Navbar extends Component<Props> {
+export default class Navbar extends React.Component<Props> {
   props: Props;
 
   render() {

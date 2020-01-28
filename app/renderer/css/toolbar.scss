@@ -26,7 +26,8 @@
   pointer-events: none;
 }
 /* Patch Ant Select component, to narrow down a bit the component height to be in match with other toolbar controls */
-.appTollbar .control.select .ant-select-selection--single {
+.appTollbar .control.select .ant-select-selection--single,
+.appTollbar .ant-select .ant-select-selection--single{
   height: 30px !important;
 }
 .appTollbar .control.select .ant-select-selection__rendered {
@@ -48,7 +49,7 @@
   justify-content: center;
   align-items: center;
   border-radius: 3px;
-  padding: 3px 5px;
+  padding: 3.5px 5px;
   margin-right: 4px;
   margin-left: 4px;
 }

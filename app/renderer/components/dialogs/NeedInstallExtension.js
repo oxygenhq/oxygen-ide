@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Modal, Button } from 'antd';
 import electron from 'electron';
 
@@ -6,7 +6,7 @@ type Props = {
     onClose: Function
 };
 
-export default class NeedInstallExtension extends PureComponent<Props> {
+export default class NeedInstallExtension extends React.PureComponent<Props> {
   close = () => {
       if(this.props.onClose){
           this.props.onClose();

@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { PureComponent } from 'react';
+import React from 'react';
 import Tree from '../../components/Tree';
 
 import renderTreeNodes from './renderTreeNodes';
@@ -19,7 +19,7 @@ type Props = {
   searchResults: Array
 };
 
-export default class ObjectTree extends PureComponent<Props> {
+export default class ObjectTree extends React.PureComponent<Props> {
   props: Props;
 
   state = {

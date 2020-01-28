@@ -6,6 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
+process.env._TESTING=1; // https://www.npmjs.com/package/appium-support
 export const OXY_ALLOWED_FILES = ['js', 'jsx', 'json', 'xml', 'yml', 'txt'];
 
 export const MENU_CMD_NEW_FILE = 'MENU_CMD_NEW_FILE';
@@ -66,6 +67,7 @@ export const MENU_CMD_HELP_REPORT_ISSUE = 'MENU_CMD_HELP_REPORT_ISSUE';
 export const MENU_CMD_HELP_CONTRIBUTE = 'MENU_CMD_HELP_CONTRIBUTE';
 export const MENU_CMD_HELP_GO_PRO = 'MENU_CMD_HELP_GO_PRO';
 export const MENU_CMD_HELP_CHECK_UPDATES = 'MENU_CMD_HELP_CHECK_UPDATES';
+export const MENU_CMD_OPEL_LOG_FILE = 'MENU_CMD_OPEL_LOG_FILE';
 
 export const CHROME_EMULATED_DEVICES = [
     'iPhone 5/SE',

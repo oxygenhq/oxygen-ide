@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import type { Element } from 'react';
 import styled from '@emotion/styled';
 
@@ -29,7 +29,7 @@ type Props = {
 };
 
 /* eslint-disable react/no-did-update-set-state */
-export default class Panel extends Component<Props> {
+export default class Panel extends React.Component<Props> {
     props: Props;
 
     static Container = styled(FlexColumn)(props => ({

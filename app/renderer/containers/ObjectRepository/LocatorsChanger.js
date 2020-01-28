@@ -1,10 +1,10 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Input, Button, Icon } from 'antd';
 import '../../css/locators-changer.scss';
 
-export default class LocatorsChanger extends PureComponent<Props> {
+export default class LocatorsChanger extends React.PureComponent<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
         this.state = {
             text: '',
             addLocator: false

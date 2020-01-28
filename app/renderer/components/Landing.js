@@ -1,7 +1,7 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import electron from 'electron';
 
-export default class Landing extends PureComponent {
+export default class Landing extends React.PureComponent {
     constructor(props) {
         super(props);
     }

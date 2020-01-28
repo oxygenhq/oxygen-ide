@@ -17,7 +17,6 @@
  *
  * @flow
  */
-
 import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
 
 import Logger from './Logger';
@@ -25,18 +24,23 @@ import MainProcess from './MainProcess';
 import * as Sentry from '@sentry/electron';
 import fs from 'fs';
 import path from 'path';
+import packageJson from '../../package.json';
+
+if(packageJson && packageJson.version){
+    console.log('Version : ', packageJson.version);
+}
 
 try {
     if (
         typeof process !== 'undefined' && 
-    process && 
-    process.env && 
-    process.env.NODE_ENV && 
-    process.env.NODE_ENV === 'development'
+        process && 
+        process.env && 
+        process.env.NODE_ENV && 
+        process.env.NODE_ENV === 'development'
     ) {
     // dev mode
     // ignore sentry logging
-        initializeCrashReporterAndSentry();
+    // initializeCrashReporterAndSentry();
     } else {
         initializeCrashReporterAndSentry();
     }
@@ -66,9 +70,9 @@ try{
     alert('Please, open later (2 sec)');
     console.log(e);
 
-    if(Sentry && Sentry.captureException){
-        Sentry.captureException(e);
-    }
+    // if(Sentry && Sentry.captureException){
+    //     Sentry.captureException(e);
+    // }
 }
 
 if (process.env.NODE_ENV === 'production') {
@@ -77,6 +81,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+    const sourceMapSupport = require('source-map-support');
+    sourceMapSupport.install();
     require('electron-debug')();
     const p = path.join(__dirname, 'node_modules');
     require('module').globalPaths.push(p);
@@ -150,9 +156,9 @@ app.on('ready', async () => {
         mainProc = new MainProcess(mainWindow);
     } catch(e){
     
-        if(Sentry && Sentry.captureException){
-            Sentry.captureException(e);
-        }
+        // if(Sentry && Sentry.captureException){
+        //     Sentry.captureException(e);
+        // }
     
         console.log('e', e);
     }
@@ -199,8 +205,18 @@ function initializeCrashReporterAndSentry() {
             submitURL: 'https://sentry.io/api/1483628/minidump/?sentry_key=cbea024b06984b9ebb56cffce53e4d2f',
             uploadToServer: true
         });
+
+        const DSN = 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893';
+        const sentryConfig = {
+            dsn: DSN
+        };
+
+        if(packageJson && packageJson.version){
+            sentryConfig.release = packageJson.version;
+        }
+
         // initialize Sentry
-        Sentry.init({dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893'});
+        Sentry.init(sentryConfig);
     }
 }
 

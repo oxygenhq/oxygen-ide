@@ -26,6 +26,10 @@
   top: 3px;
 }
 
+.breakpointStyle.halfOpacity {
+  opacity: 0.5;
+}
+
 $base: 12;
 $r: 1;
 
@@ -155,6 +159,10 @@ $b: 0.25;
       padding-left: 0 !important;
     }
   }
+}
+
+.ant-modal .ant-tabs {
+  margin-top: -15px !important;
 }
 
 .ant-modal .ant-form-item {

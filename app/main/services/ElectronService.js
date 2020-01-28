@@ -10,7 +10,7 @@ import electron from 'electron';
 import appSettings from 'electron-settings';
 import { spawn  } from 'child_process';
 import ServiceBase from './ServiceBase';
-var decache = require('decache');
+import { moduleRequire } from 'oxygen-cli';
 var path = require('path');
 
 const { dialog } = electron;
@@ -22,8 +22,14 @@ export default class ElectronService extends ServiceBase {
 
     replaceBackslash(moduleName){
         return new Promise((resolve, reject) => {
-            try{                
-                const pathToFile = __dirname+path.sep+'services'+path.sep+'backslash.js';
+            try{    
+                let pathToFile;
+
+                if(process.env.NODE_ENV === 'development'){
+                    pathToFile = __dirname+path.sep+'backslash.js';
+                } else {
+                    pathToFile = __dirname+path.sep+'services'+path.sep+'backslash.js';
+                }
                 
                 const cp = spawn('node', [pathToFile, moduleName]);
             
@@ -55,7 +61,13 @@ export default class ElectronService extends ServiceBase {
     require(moduleName){
         return new Promise((resolve, reject) => {
             try{                
-                const pathToFile = __dirname+path.sep+'services'+path.sep+'require.js';
+                let pathToFile; 
+
+                if(process.env.NODE_ENV === 'development'){
+                    pathToFile = __dirname+path.sep+'require.js';
+                } else {
+                    pathToFile = __dirname+path.sep+'services'+path.sep+'require.js';
+                }
                 
                 const cp = spawn('node', [pathToFile, moduleName]);
             
@@ -85,35 +97,13 @@ export default class ElectronService extends ServiceBase {
     }
 
     async orgRequire(moduleName) {
-        if (process.platform === 'win32') {
-            if(process.env.NODE_ENV === 'development'){
-                decache(moduleName);
-                return require(moduleName);
-            } else {
-                try{
-                    let newModuleName = await this.replaceBackslash(moduleName);
-                    
-                    if(newModuleName){
-                        newModuleName = newModuleName.slice(0, -1);
-                        decache(newModuleName);
-
-                        try{
-                            const requireResult = await this.require(newModuleName);
-                            return requireResult;
-                        } catch(e){
-                            console.log('orgRequire win32 e2', e);
-                        }
-                    }
-                } catch(e){
-                    console.log('orgRequire win32 e', e);
-                }
-            }
-        } else  {
-            decache(moduleName);
-            return require(moduleName);
+        try{
+            const result = moduleRequire(moduleName);
+            console.log('orgRequire moduleRequire result', result);
+            return result;
+        } catch(e){
+            console.log('orgRequire moduleRequire e', e);
         }
-        
-
     }
 
     addFile(key, name, content = ''){
@@ -183,8 +173,13 @@ export default class ElectronService extends ServiceBase {
     updateCache(cache) {
         if(cache){
             const settings = appSettings.get('appSettings');
+            let newSettings;
             
-            const newSettings = { ...settings };
+            if(settings){
+                newSettings = settings;
+            } else { 
+                newSettings = {};
+            }
 
             newSettings.cache = cache;
     
@@ -204,7 +199,8 @@ export default class ElectronService extends ServiceBase {
     }
 
     getSettings() {
-        return appSettings.get('appSettings');
+        const settings = appSettings.get('appSettings');
+        return settings;
     }
 
     updateSettings(settings) {
@@ -275,5 +271,10 @@ export default class ElectronService extends ServiceBase {
 
     shellOpenExternal(url, options = null) {
         electron.shell.openExternal(url, options);
+    }
+
+    getLogFilePath() {
+        const result = global.log.getLogFilePath();
+        return result;
     }
 }

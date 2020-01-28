@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import styled from '@emotion/styled';
 import { Icon } from 'antd';
 
@@ -24,22 +24,22 @@ type Props = {
     refreshScroll: Function
 };
 
-export default class ObjectRepositoryNotValidView extends PureComponent<Props> {
-    static Container = styled(FlexColumn)(props => ({
-        height: '100vh',
-        flexShrink: 0,
-        padding: props.floating ? 10 : 0,
-        //borderBottom: props.collapsed ? 'none' : BORDER,
-    }));
-
+export default class ObjectRepositoryNotValidView extends React.PureComponent<Props> {
     constructor(props: Props) {
-        super(props: Props);
+        super(props);
         this.state = {
             searchResults: []
         };
 
         this.inputRef = React.createRef();
     }
+
+    static Container = styled(FlexColumn)(props => ({
+        height: '100vh',
+        flexShrink: 0,
+        padding: props.floating ? 10 : 0,
+        //borderBottom: props.collapsed ? 'none' : BORDER,
+    }));
 
     onSelectNode(path) {
         this.props.setActive(path);

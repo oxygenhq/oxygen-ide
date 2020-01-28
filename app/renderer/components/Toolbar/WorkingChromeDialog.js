@@ -1,5 +1,5 @@
 //@flow
-import React, { Component, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Modal, Button, Checkbox } from 'antd';
 import electron from 'electron';
 
@@ -9,7 +9,7 @@ type Props = {
   hide: Function
 };
 
-export default class WorkingChromeDialog extends Component<Props> {
+export default class WorkingChromeDialog extends React.Component<Props> {
     constructor(props){
         super(props);
 

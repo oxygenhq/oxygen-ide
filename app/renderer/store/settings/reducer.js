@@ -32,9 +32,9 @@ const saveCloudProvidersDestruction = (fieldName, object) => {
         }
     } catch(e){
         console.warn('e', e);
-        if(window && window.Sentry && window.Sentry.captureException){
-            window.Sentry.captureException(e);
-        }
+        // if(window && window.Sentry && window.Sentry.captureException){
+        //     window.Sentry.captureException(e);
+        // }
     }
 
     return result;
@@ -43,6 +43,14 @@ const saveCloudProvidersDestruction = (fieldName, object) => {
 const defaultAppSettings = {
     cache: null,
     files: {},
+    visualProviders: {
+        applitools: {
+            title: 'Applitools',
+            accessKey: null,
+            checkOnEveryAction: false,
+            inUse: false,
+        },
+    },
     cloudProviders: {
         sauceLabs: {
             title: 'Sauce Labs',
@@ -73,6 +81,7 @@ const defaultAppSettings = {
             inUse: false,
         }
     },
+    cloudProvidesBrowsersAndDevices: null,
     lastSession: {
         tabs: [],
         rootFolder: null,    
@@ -109,17 +118,9 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { value, target, settings, zoom, cache, uuid, providers } = payload;
+    const { value, target, settings, zoom, cache, uuid, providers, browsersAndDevices, testProvider, visualProviders } = payload;
     switch (action.type) {
     
-    // // FIRST OPEN
-    // case types.FIRST_OPEN: {
-    //   return { 
-    //     ...state,
-    //     first: false
-    //   }
-    // }
-
     // CREATE USER
     case types.CREATE_USER: {
         return { 
@@ -308,6 +309,24 @@ export default (state = defaultState, action) => {
         return {
             ...state,
             cloudProviders: providers
+        };
+
+    case types.UPDATE_VISUAL_PROVIDERS_SETTINGS: 
+        if (!visualProviders || typeof visualProviders !== 'object') {
+            return state;
+        }
+        return {
+            ...state,
+            visualProviders: visualProviders
+        };
+
+    case types.SET_CLOUD_PROVIDERS_BROWSERS_AND_DEVICES : 
+        return {
+            ...state,
+            cloudProvidesBrowsersAndDevices: {
+                ...state.cloudProvidesBrowsersAndDevices, 
+                [testProvider]: browsersAndDevices
+            }
         };
 
     case 'RESET': 

@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import type { Element } from 'react';
 import { Layout } from 'antd';
 import '../css/sidebar.scss';
@@ -24,7 +24,7 @@ type Props = {
 };
 
 /* eslint-disable react/no-did-update-set-state */
-export default class Sidebar extends Component<Props> {
+export default class Sidebar extends React.Component<Props> {
   props: Props;
 
   state = {

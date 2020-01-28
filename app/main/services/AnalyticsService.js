@@ -12,9 +12,9 @@ import ServiceBase from './ServiceBase';
 import moment from 'moment';
 import { version }  from '../../../package.json';
 import os from 'os';
-import osLocale from 'os-locale';
+// import osLocale from 'os-locale';
 import uuidv4 from'uuid/v4';
-import * as Sentry from '@sentry/electron';
+// import * as Sentry from '@sentry/electron';
 
 export default class AnalyticsService extends ServiceBase {
     constructor() {
@@ -27,8 +27,8 @@ export default class AnalyticsService extends ServiceBase {
                 this.mixpanel = Mixpanel.init('e80db0ad2789b5718fa1b84b6661f008');
             }
         } catch(e){
-            console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            console.warn('Mixpanel error: ', e);
+            // Sentry.captureException(e);
         }
     }
 
@@ -85,6 +85,12 @@ export default class AnalyticsService extends ServiceBase {
             console.log('osLocale e', e);
         }
 
+        // try{
+        //     language = await osLocale();
+        // } catch(e){
+        //     console.warn('osLocale e', e);
+        //     // Sentry.captureException(e);
+        // }
         try{
             const { net } = require('electron');
             const request = net.request('https://api.ipdata.co/?api-key=143415c75d2d5036d29cc48ecb1c742bfef9ab3f25af45fbd0939367');
@@ -131,12 +137,12 @@ export default class AnalyticsService extends ServiceBase {
                                 }
                             } catch(e){
                                 console.warn('mixpanel e', e);
-                                Sentry.captureException(e);
+                                // Sentry.captureException(e);
                             }
                         }
                     } catch(e){
                         console.warn('e',e);
-                        Sentry.captureException(e);
+                        // Sentry.captureException(e);
                     }
                 });
                 response.on('end', () => {
@@ -149,7 +155,7 @@ export default class AnalyticsService extends ServiceBase {
             request.end();
         } catch(e){
             console.warn('e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
 
         
@@ -167,7 +173,7 @@ export default class AnalyticsService extends ServiceBase {
             }
         } catch(e){
             console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
         this.ideOpen();
     }
@@ -182,15 +188,15 @@ export default class AnalyticsService extends ServiceBase {
                 }); 
             }
 
-            if(Sentry && Sentry.configureScope){
-                Sentry.configureScope((scope) => {
-                    scope.setUser({'userId': this.uuid});
-                });
-            }
+            // if(Sentry && Sentry.configureScope){
+            //     Sentry.configureScope((scope) => {
+            //         scope.setUser({'userId': this.uuid});
+            //     });
+            // }
 
         } catch(e){
             console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
     }
 
@@ -208,7 +214,7 @@ export default class AnalyticsService extends ServiceBase {
                 }
             } catch(e){
                 console.warn('mixpanel e', e);
-                Sentry.captureException(e);
+                // Sentry.captureException(e);
             }
             setTimeout(() => {
                 resolve('result');
@@ -229,7 +235,7 @@ export default class AnalyticsService extends ServiceBase {
             }
         } catch(e){
             console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
     }
 
@@ -248,7 +254,7 @@ export default class AnalyticsService extends ServiceBase {
             }
         } catch(e){
             console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
         this.recStartMoment = null;
     }
@@ -265,7 +271,7 @@ export default class AnalyticsService extends ServiceBase {
             }
         } catch(e){
             console.warn('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
     }
 
@@ -285,7 +291,7 @@ export default class AnalyticsService extends ServiceBase {
             }
         } catch(e){
             console.log('mixpanel e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
 
         this.playStartMoment = null;

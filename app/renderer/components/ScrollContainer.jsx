@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { Component } from 'react';
+import React from 'react';
 import { initializeScroll } from './common';
 
 type Props = {
@@ -20,7 +20,7 @@ type Props = {
 };
 
 /* eslint-disable import/prefer-default-export */
-export default class ScrollContainer extends Component<Props> {
+export default class ScrollContainer extends React.Component<Props> {
     componentDidMount() {
         if (!this.scroller) {
             const {

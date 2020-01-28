@@ -6,38 +6,34 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React, { PureComponent, Fragment } from 'react';
-import { Form, Input, Select, Modal, InputNumber, Switch } from 'antd';
-import ServicesSingleton from '../../services';
-const services = ServicesSingleton();
+import React from 'react';
+import { Tabs, Modal } from 'antd';
+import GeneralSettings from './GeneralSettings';
+import CloudProvidersSettings from './CloudProvidersSettings';
+import VisualTestingSettings from './VisualTestingProvidersSettings';
+const { TabPane } = Tabs;
 
-const { Option } = Select;
 const DEFAULT_STATE = {
+    tabKey: 1,
     visible: false,
-    iterations: 1,
-    reopenSession: false,
-    useParams: false,
-    paramFilePath: null,
-    paramMode: 'sequential',
 };
 
 type Props = {
-    visible: boolean,
-    settings: Object,
-    form: Object,
+    settings: Object | undefined,
+    providers: Object | undefined,
+    visible: boolean | undefined,
+    cloudProviders: Object | undefined,
+    visualProviders: Object | undefined,
     onSubmit: () => void,
     onCancel: () => void
 };
 
-class SettingsDialog extends PureComponent<Props> {
-    constructor(props){
-        super(props);
+export default class SettingsDialog extends React.PureComponent<Props> {
+    props: Props;
 
-        this.state = {
-            ...DEFAULT_STATE,
-        };
+    state = {
+        ...DEFAULT_STATE,
     }
-
 
     static getDerivedStateFromProps(nextProps, prevState) {
         // if the dialog was just dismissed (e.g. visible is now false)
@@ -51,109 +47,52 @@ class SettingsDialog extends PureComponent<Props> {
         else if (prevState.visible == false && nextProps.visible == true && nextProps.settings) {
             return {
                 visible: true,
-                iterations: nextProps.settings.iterations || 1,
-                paramMode: nextProps.settings.paramMode || 'sequential',
-                paramFilePath: nextProps.settings.paramFilePath || null,
-                reopenSession: nextProps.settings.reopenSession || false,
-                useParams: nextProps.settings.paramFilePath != null,
             };
         }
         // else, leave the previous state 
         return null;
     }
-
-    onChangeIterations(value) {
-        this.setState({
-            iterations: value,
-        });
-    }
-
-    onChangeParamMode(value) {
-        this.setState({
-            paramMode: value,
-        });
-    }
-
-    async onBrowseFile() {
-        const paths = await services.mainIpc.call('ElectronService', 'showOpenFileDialog', [[
-            {name: 'Excel & CSV Files', extensions: ['xlsx', 'csv']},
-            {name: 'Text Files', extensions: ['txt']},
-            {name: 'All Files', extensions: ['*']}
-        ]]);
-        if (Array.isArray(paths) && paths.length > 0) {
-            this.props.form.setFieldsValue({
-                paramFilePath: paths[0]
-            });
-            this.setState({
-                paramFilePath: paths[0],
-            });
-        }
-    }
-
-    onUseParamsChange(value) {
-        this.setState({
-            useParams: value,
-            // make sure to set paramFilePath to null if use parameters switch is off
-            paramFilePath: value == false ? null : this.state.paramFilePath,
-        });
-    }
-
-    onReopenSessionChange(value) {
-        this.setState({
-            reopenSession: value,
-        });
-    }
   
-    
-    handleOk() {
-        const { iterations, useParams, paramMode, reopenSession } = this.state;
-        this.props.form.validateFields((err, values) => {
-            if (err) {
-                return;
-            }
-            this.props.onSubmit({
-                iterations: iterations,
-                paramMode: paramMode,
-                reopenSession: reopenSession,
-                paramFilePath: useParams ? values.paramFilePath : null,
-            });
-        });    
+  
+    async handleOk() {
+        let generalSettingsResult = null;
+        let cloudProvidersResult = null;
+        let visualTestingSettings = null;
+        
+        if(this.GeneralSettings && this.GeneralSettings.formWrap && this.GeneralSettings.formWrap.validateFormFields){
+            generalSettingsResult = await this.GeneralSettings.formWrap.validateFormFields();
+        }
+        
+        if(this.CloudProvidersSettings && this.CloudProvidersSettings.formWrap && this.CloudProvidersSettings.formWrap.validateFormFields){
+            cloudProvidersResult = await this.CloudProvidersSettings.formWrap.validateFormFields();
+        }
+        
+        if(this.VisualTestingSettings && this.VisualTestingSettings.formWrap && this.VisualTestingSettings.formWrap.validateFormFields){
+            visualTestingSettings = await this.VisualTestingSettings.formWrap.validateFormFields();
+        }
+
+        this.props.onSubmit(generalSettingsResult, cloudProvidersResult, visualTestingSettings);
+    }
+
+    onTabChange = (key) => {
+        this.setState({
+            tabKey: key
+        });
     }
 
     render() {
         const {
+            settings,
+            cloudProviders,
+            visualProviders,
             visible,
             onCancel,
         } = this.props;
-        const {
-            iterations,
-            paramFilePath,
-            useParams,
-            reopenSession,
-        } = this.state;
-        // form layout settings
-        const formItemLayout = {
-            labelCol: { span: 8 },
-            wrapperCol: { span: 14 },
-        };
-        // file picker button
-        const afterFilePicker = (
-            <button
-                style={{
-                    border: 'none',
-                    background: 'transparent',
-                    outline: 'none',
-                    cursor: 'pointer'
-                }}
-                onClick={ ::this.onBrowseFile }
-            >Browse...
-            </button>
-        );
-        const { getFieldDecorator } = this.props.form;    
 
         return (
             <Modal
                 title={'Run Settings'}
+                className="scroll-y"
                 okText="Save &amp; Close"
                 width={700}
                 visible={visible}
@@ -161,54 +100,30 @@ class SettingsDialog extends PureComponent<Props> {
                 onCancel={onCancel}
                 bodyStyle={ { overflow: 'hidden', overflowY: 'hidden', height: '425px' } }
             >
-                <Form>
-                    <Form.Item label="Iterations" {...formItemLayout} >
-                        <InputNumber
-                            min={1}
-                            value={ iterations }
-                            onChange={ (e) => ::this.onChangeIterations(e) }
+                <Tabs defaultActiveKey="1" onChange={this.onTabChange}>
+                    <TabPane tab="General" key="1">
+                        <GeneralSettings
+                            ref={node => (this.GeneralSettings = node)}
+                            settings={ settings }
+                            visible={ visible }
                         />
-                    </Form.Item>
-                    <Form.Item label="Re-Open Session" {...formItemLayout} extra="Create (re-open) a new or use an existing Selenium session on next iteration." >
-                        <Switch onChange={ ::this.onReopenSessionChange } checked={ reopenSession } />
-                    </Form.Item>
-                    <Form.Item label="Use Parameter File" {...formItemLayout} extra="Use parameter file (CSV or Excel) to run data-driven tests." >
-                        <Switch onChange={ ::this.onUseParamsChange } checked={ useParams } />
-                    </Form.Item>
-                    { useParams && 
-                <Fragment>
-                    <Form.Item label="Parameter File" {...formItemLayout} >            
-                        { getFieldDecorator('paramFilePath', {
-                            rules: [{
-                                required: true,
-                                message: 'Please choose a file!',
-                            }],
-                            initialValue: paramFilePath,
-                        })(
-                            <Input
-                                addonAfter={afterFilePicker}
-                                placeholder="Choose CSV or Excel file..."
-                                style={{ width: '100%' }}
-                                required
-                                readOnly
-                            />
-                        )}
-                    </Form.Item>
-                    <Form.Item label="Read Next Row" {...formItemLayout} >
-                        <Select 
-                            defaultValue="sequential"
-                            onChange={ (e) => ::this.onChangeParamMode(e) }
-                        >
-                            <Option value="random">Random</Option>
-                            <Option value="sequential">Sequentially</Option>
-                        </Select>
-                    </Form.Item>
-                </Fragment>
-                    }
-                </Form>
+                    </TabPane>
+                    <TabPane tab="Cloud Providers" key="2">
+                        <CloudProvidersSettings
+                            ref={node => (this.CloudProvidersSettings = node)}
+                            providers={ cloudProviders }
+                            visible={ visible }
+                        />
+                    </TabPane>
+                    <TabPane tab="Visual Testing" key="3">
+                        <VisualTestingSettings
+                            ref={node => (this.VisualTestingSettings = node)}
+                            providers={ visualProviders }
+                            visible={ visible }
+                        />
+                    </TabPane>
+                </Tabs>
             </Modal>
         );
     }
 }
-
-export default Form.create()(SettingsDialog);

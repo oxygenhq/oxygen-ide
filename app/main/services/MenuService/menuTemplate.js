@@ -8,7 +8,7 @@
  */
 import * as Const from '../../../const';
 import { app } from 'electron';
-import * as Sentry from '@sentry/electron';
+// import * as Sentry from '@sentry/electron';
 /**
  * @param  {Function} cmdHandler - function that will handle menu command
  * @param  {Object} settings - a set of settings for selected menu items
@@ -60,7 +60,7 @@ export default (cmdHandler, settings) => {
                     app.exit();
                 } catch (e) {
                     console.warn(e.message);
-                    Sentry.captureException(e);
+                    // Sentry.captureException(e);
                 }
             }
         },
@@ -174,7 +174,7 @@ export default (cmdHandler, settings) => {
             {
                 label: 'DevTools',
                 accelerator: 'CommandOrControl+Shift+I',
-                visible: process.env.NODE_ENV !== 'production',
+                // visible: process.env.NODE_ENV !== 'production',
                 click() { cmdHandler(Const.MENU_CMD_VIEW_DEVTOOLS); }
             }
         ]
@@ -216,6 +216,10 @@ export default (cmdHandler, settings) => {
             {
                 label: 'Check for Updates...',
                 click() { cmdHandler(Const.MENU_CMD_HELP_CHECK_UPDATES); }
+            },
+            {
+                label: 'Open Log file',
+                click() { cmdHandler(Const.MENU_CMD_OPEL_LOG_FILE); }
             }
         ]
     });

@@ -9,7 +9,7 @@
 import https from 'https';
 import ServiceBase from './ServiceBase';
 import pkgInfo from '../../../package.json';
-import * as Sentry from '@sentry/electron';
+// import * as Sentry from '@sentry/electron';
 
 const UPDATE_CHECK = 'UPDATE_CHECK';
 
@@ -109,7 +109,7 @@ export default class UpdateService extends ServiceBase {
             result = checkForUpdate;
         } catch(e){
             console.log('UpdateService e', e);
-            Sentry.captureException(e);
+            // Sentry.captureException(e);
         }
         
         return result;
