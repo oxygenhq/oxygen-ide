@@ -76,14 +76,6 @@ export default class AnalyticsService extends ServiceBase {
         let continent_name = 'unknown';
         let continent_code = 'unknown';
         let language = 'unknown';
-        try {
-            const locale = await osLocale.sync();
-            if(locale){
-                language = locale;
-            }
-        } catch(e){
-            console.log('osLocale e', e);
-        }
 
         // try{
         //     language = await osLocale();
