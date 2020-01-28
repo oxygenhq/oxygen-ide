@@ -97,13 +97,20 @@ export default class TestingBotProvider extends CloudProviderBase {
             }
         }
         caps.name = testName || null;
-        caps.key = this.settings.key;
-        caps.secret = this.settings.secret;
+        caps['testingBot:options'] = {
+            name: testName || null
+        };
 
         return caps;
     }
     updateOptions(target, options = {}) {
         options.seleniumUrl = this.settings.url;
+        
+        options.wdioOpts = {
+            user: this.settings.key,
+            key: this.settings.secret
+        };
+
         return options;
     }
 }

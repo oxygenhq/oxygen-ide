@@ -292,25 +292,29 @@ export default class MonacoEditor extends React.Component<Props> {
     }
 
     async liftOff() {
-        const { featureLanguageLoaded, setFatureLanguageLoaded } = this.props;
-        if(!featureLanguageLoaded){
-            await loadWASM(path.join(__dirname, '../node_modules/onigasm/lib/onigasm.wasm')); // See https://www.npmjs.com/package/onigasm#light-it-up
-        
-            const registry = new Registry({
-                getGrammarDefinition: async (scopeName) => {
-                    return {
-                        format: 'plist',
-                        content: await (await fetch('./components/MonacoEditor/cucumber/feature.tmLanguage')).text()
-                    };
-                }
-            });
-        
-            // map of monaco "language id's" to TextMate scopeNames
-            const grammars = new Map();
-            grammars.set('feature', 'feature.feature');
-        
-            await wireTmGrammars(monaco, registry, grammars);
-            setFatureLanguageLoaded();
+        try {
+            const { featureLanguageLoaded, setFatureLanguageLoaded } = this.props;
+            if(!featureLanguageLoaded){
+                await loadWASM(path.join(__dirname, '../node_modules/onigasm/lib/onigasm.wasm')); // See https://www.npmjs.com/package/onigasm#light-it-up
+            
+                const registry = new Registry({
+                    getGrammarDefinition: async (scopeName) => {
+                        return {
+                            format: 'plist',
+                            content: await (await fetch('./components/MonacoEditor/cucumber/feature.tmLanguage')).text()
+                        };
+                    }
+                });
+            
+                // map of monaco "language id's" to TextMate scopeNames
+                const grammars = new Map();
+                grammars.set('feature', 'feature.feature');
+            
+                await wireTmGrammars(monaco, registry, grammars);
+                setFatureLanguageLoaded();
+            }
+        } catch(e){
+            console.log('liftOff error', e);
         }
     }
 
