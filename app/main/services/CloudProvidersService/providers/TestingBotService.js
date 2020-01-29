@@ -67,6 +67,20 @@ export default class TestingBotProvider extends CloudProviderBase {
         }
 
         if (target && target.browserName) {
+            const MACOS = 'MacOS';
+            const YOSEMITE = 'YOSEMITE';
+            const CAPITAN = 'CAPITAN';
+            const CATALINA = 'CATALINA';
+            const MOJAVE = 'MOJAVE';
+            const SIERRA = 'SIERRA';
+            const HIGH_SIERRA = 'HIGH-SIERRA';
+            const MAVERICKS = 'MAVERICKS';
+            
+            const VISTA = 'VISTA';
+            const WIN10 = 'WIN10';
+            const WIN8 = 'WIN8';
+            const WIN8_1 = 'WIN8_1';
+            const XP = 'XP';
             
             if (target.browserName) {
                 caps.browserName = target.browserName;
@@ -77,11 +91,47 @@ export default class TestingBotProvider extends CloudProviderBase {
             }
 
             if (target.osName) {
-                caps.osName = target.osName;
+                caps.platform = target.osName;
             }
             
             if (target.osVersion) {
-                caps.osVersion = target.osVersion;
+                if(target.osVersion === YOSEMITE){
+                    caps.platform = MACOS;
+                }
+                if(target.osVersion === CAPITAN){
+                    caps.platform = CAPITAN;
+                }
+                if(target.osVersion === CATALINA){
+                    caps.platform = CATALINA;
+                }
+                if(target.osVersion === MOJAVE){
+                    caps.platform = MOJAVE;
+                }
+                if(target.osVersion === SIERRA){
+                    caps.platform = SIERRA;
+                }
+                if(target.osVersion === HIGH_SIERRA){
+                    caps.platform = HIGH_SIERRA;
+                }
+                if(target.osVersion === MAVERICKS){
+                    caps.platform = MAVERICKS;
+                }
+
+                if(target.osVersion === VISTA){
+                    caps.platform = VISTA;
+                }
+                if(target.osVersion === '10'){
+                    caps.platform = WIN10;
+                }
+                if(target.osVersion === '8_1'){
+                    caps.platform = WIN8_1;
+                }
+                if(target.osVersion === '8'){
+                    caps.platform = WIN8;
+                }
+                if(target.osVersion === XP){
+                    caps.platform = XP;
+                }
             }
         } else {
             if (target.osName) {

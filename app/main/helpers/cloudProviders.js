@@ -174,7 +174,11 @@ export const creteBrowsersTree = (browsers) => {
     let result = [];
 
     if(browsers && Array.isArray(browsers) && browsers.length > 0){
-        const uniqueApiNames = getUniqueApiNames(browsers);
+        let uniqueApiNames = getUniqueApiNames(browsers);
+
+        if(uniqueApiNames && Array.isArray(uniqueApiNames) && uniqueApiNames.includes('firefox-unbranded')){
+            uniqueApiNames = uniqueApiNames.filter((item) => item !== 'firefox-unbranded');
+        }
 
         if(uniqueApiNames && Array.isArray(uniqueApiNames) && uniqueApiNames.length > 0){
             result = uniqueApiNames.map((item) => {

@@ -201,16 +201,89 @@ export default class CloudProvidersService extends ServiceBase {
             if(Array.isArray(browsersAndDevices.browsers) && browsersAndDevices.browsers.length > 0){
                 browsersAndDevices.browsers.map((item) => {
                     let deviceName = '';
+                    let platform = item.platform;
+                    let name = item.name;
 
                     if(item && item.deviceName){
                         deviceName = item.deviceName;
                     }
 
+                    if(item.name === 'chrome'){
+                        name = 'Chrome';
+                    }
+
+                    const MACOS = 'MacOS';
+                    const YOSEMITE = 'YOSEMITE';
+                    const CAPITAN = 'CAPITAN';
+                    const CATALINA = 'CATALINA';
+                    const MOJAVE = 'MOJAVE';
+                    const SIERRA = 'SIERRA';
+                    const HIGH_SIERRA = 'HIGH-SIERRA';
+                    const MAVERICKS = 'MAVERICKS';
+                    
+                    const WINDOWS = 'Windows';
+                    const VISTA = 'VISTA';
+                    const WIN10 = 'WIN10';
+                    const WIN8 = 'WIN8';
+                    const WIN8_1 = 'WIN8_1';
+                    const XP = 'XP';
+                    
+
+                    if(item.platform === YOSEMITE){
+                        platform = MACOS;
+                        deviceName = YOSEMITE;
+                    }
+                    if(item.platform === CAPITAN){
+                        platform = MACOS;
+                        deviceName = CAPITAN;
+                    }
+                    if(item.platform === CATALINA){
+                        platform = MACOS;
+                        deviceName = CATALINA;
+                    }
+                    if(item.platform === MOJAVE){
+                        platform = MACOS;
+                        deviceName = MOJAVE;
+                    }
+                    if(item.platform === SIERRA){
+                        platform = MACOS;
+                        deviceName = SIERRA;
+                    }
+                    if(item.platform === HIGH_SIERRA){
+                        platform = MACOS;
+                        deviceName = HIGH_SIERRA;
+                    }
+                    if(item.platform === MAVERICKS){
+                        platform = MACOS;
+                        deviceName = MAVERICKS;
+                    }
+
+                    if(item.platform === VISTA){
+                        platform = WINDOWS;
+                        deviceName = VISTA;
+                    }
+                    if(item.platform === WIN10){
+                        platform = WINDOWS;
+                        deviceName = '10';
+                    }
+                    if(item.platform === WIN8_1){
+                        platform = WINDOWS;
+                        deviceName = '8_1';
+                    }
+                    if(item.platform === WIN8){
+                        platform = WINDOWS;
+                        deviceName = '8';
+                    }
+                    if(item.platform === XP){
+                        platform = WINDOWS;
+                        deviceName = XP;
+                    }
+
                     browsers.push(new BrowserInfo({
-                        apiName: item.name,
-                        name: item.name,
+                        apiName: name,
+                        name: name,
                         version: item.version,
-                        osName: item.platform,
+                        osName: platform,
                         osVersion: deviceName
                     }));
                 });
