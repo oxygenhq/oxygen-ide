@@ -47,6 +47,19 @@ export const getBrowsersTarget = (tree, pos, level = 0, prevValue = '') => {
         result = {
             [key]: item.orTitle
         };
+        
+        if(level < browsersLevels.length && Array.isArray(item.children) && item.children.length > 0){
+            const poss = item.children[item.children.length - 1].orTitle;
+            let fillResult = getBrowsersTarget(item.children, poss, level+1, value);
+            
+            if(fillResult && typeof fillResult === 'object' && Object.keys(fillResult)){
+                const keys = Object.keys(fillResult);
+                keys.map((key) => {
+                    result[key] = fillResult[key];
+                });
+            }
+        }
+
     }
 
     return result;
@@ -103,6 +116,18 @@ export const getDevicesTarget = (tree, pos, level = 0, prevValue = '') => {
         result = {
             [key]: item.orTitle
         };
+        
+        if(level < devicesLevels.length && Array.isArray(item.children) && item.children.length > 0){
+            const poss = item.children[item.children.length - 1].orTitle;
+            let fillResult = getDevicesTarget(item.children, poss, level+1, value);
+
+            if(fillResult && typeof fillResult === 'object' && Object.keys(fillResult)){
+                const keys = Object.keys(fillResult);
+                keys.map((key) => {
+                    result[key] = fillResult[key];
+                });
+            }
+        }
     }
 
     return result;
