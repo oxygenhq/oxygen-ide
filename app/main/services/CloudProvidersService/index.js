@@ -160,13 +160,21 @@ export default class CloudProvidersService extends ServiceBase {
 
                             if(item.browsers && Array.isArray(item.browsers) && item.browsers.length > 0){
                                 item.browsers.map((browser) => {
-                                    browsers.push(new BrowserInfo({
-                                        apiName: browser.browser_name,
-                                        name: browser.browser_name,
-                                        version: browser.version,
-                                        osName: osName,
-                                        osVersion: osVersion
-                                    }));
+
+                                    if(browser && browser.browser_name && browser.browser_name === 'Firefox' && osName === 'Windows' && osVersion === '10'){
+                                        // ignore need seleniumVersion: 3.11.0, not 3.4.0
+                                    } else if(browser.browser_name && browser.browser_name === 'Firefox' && parseInt(browser.version) < 55){
+                                        // ignore  < 55
+                                    } else {
+                                        browsers.push(new BrowserInfo({
+                                            apiName: browser.browser_name,
+                                            name: browser.browser_name,
+                                            version: browser.version,
+                                            osName: osName,
+                                            osVersion: osVersion
+                                        }));
+                                    }
+
                                 });
                             }
                         }

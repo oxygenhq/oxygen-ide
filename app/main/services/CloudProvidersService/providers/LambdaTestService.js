@@ -79,6 +79,7 @@ export default class LambdaTestService extends CloudProviderBase {
 
             if (target.browserVersion) {
                 caps.browserVersion = target.browserVersion;
+                caps.version = target.browserVersion;
             }
 
             if (target.osName) {
