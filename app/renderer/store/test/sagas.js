@@ -309,10 +309,32 @@ export function* handleOnLineUpdate ({ payload }) {
     const { file, line, time } = payload || {};
  
     const openFiles = yield select(state => state.editor.openFiles);
+
+    let findedFile;
+
     // check if we have this file open in one of the editors
     if (openFiles[file]) {
-        yield put(tabActions.setActiveTab(file));
-        yield put(editorActions.setActiveFile(file));
+        findedFile = file;
+    } else {
+        if(Object.keys(openFiles)){
+            for (var filePath of Object.keys(openFiles)) {
+                if(
+                    filePath &&
+                    filePath.toLowerCase &&
+                    file &&
+                    file.toLowerCase &&
+                    filePath.toLowerCase() === file.toLowerCase()
+                ){
+                    findedFile = filePath;
+                }
+            }
+        }
     }
-    yield put(editorActions.setActiveLine(time, file, line));
+
+    if(findedFile){
+        yield put(tabActions.setActiveTab(findedFile));
+        yield put(editorActions.setActiveFile(findedFile));
+        yield put(editorActions.setActiveLine(time, findedFile, line));
+    }
+
 }
