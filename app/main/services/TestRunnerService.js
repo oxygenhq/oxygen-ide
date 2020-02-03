@@ -21,6 +21,7 @@ const EVENT_BREAKPOINT = 'BREAKPOINT';
 const EVENT_LINE_UPDATE = 'LINE_UPDATE';
 const EVENT_TEST_STARTED = 'TEST_STARTED';
 const EVENT_TEST_ENDED = 'TEST_ENDED';
+const EVENT_SEND_START_DATA = 'SEND_START_DATA';
 
 // Severities
 const SEVERITY_ERROR = 'ERROR';
@@ -204,6 +205,34 @@ export default class TestRunnerService extends ServiceBase {
             }
         }
         
+
+        if(caps){
+            const playStartEventData = {
+                provider: 'Local'
+            };
+
+            if(caps.browserName){
+                playStartEventData.browserName = caps.browserName;
+            }
+            if(caps.browserVersion){
+                playStartEventData.browserVersion = caps.browserVersion;
+            }
+            if(caps.platform){
+                playStartEventData.platform = caps.platform;
+            }
+            if(caps['lamda:options']){
+                playStartEventData.provider = 'Lambdatest';
+            }
+            if(caps['testingBot:options']){
+                playStartEventData.provider = 'TestingBot';
+            }
+            if(caps['sauce:options']){
+                playStartEventData.provider = 'Saucelabs';
+            }
+            
+            this._emitplayStartEvent(playStartEventData);
+        }
+
         // initialize Oxygen Runner
         try {
             this.reporter = new ReportAggregator(options);            
@@ -341,6 +370,13 @@ export default class TestRunnerService extends ServiceBase {
         this.finished = false;
         this.notify({
             type: EVENT_TEST_STARTED,
+        });
+    }
+
+    _emitplayStartEvent(playStartEventData){
+        this.notify({
+            type: EVENT_SEND_START_DATA,
+            data: playStartEventData
         });
     }
 

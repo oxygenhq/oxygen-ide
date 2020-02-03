@@ -85,10 +85,10 @@ export default class CloudProvidersService extends ServiceBase {
                                     osName = 'Linux';
                                     osVersion = '';
                                 } else {
-                                    throw new Error('Unsupported os item '+ JSON.stringify(item));
+                                    console.log('Unsupported os item '+ JSON.stringify(item));
                                 }
                             } else {
-                                throw new Error('Unsupported item os '+ JSON.stringify(item));
+                                console.log('Unsupported item os '+ JSON.stringify(item));
                             }
 
 
@@ -117,10 +117,10 @@ export default class CloudProvidersService extends ServiceBase {
                                     osName = 'Linux';
                                     osVersion = '';
                                 } else {
-                                    throw new Error('Unsupported os item '+ JSON.stringify(item));
+                                    console.log('Unsupported os item '+ JSON.stringify(item));
                                 }
                             } else {
-                                throw new Error('Unsupported item os '+ JSON.stringify(item));
+                                console.log('Unsupported item os '+ JSON.stringify(item));
                             }
 
                             browsers.push(new BrowserInfo({
@@ -131,7 +131,7 @@ export default class CloudProvidersService extends ServiceBase {
                                 osVersion: osVersion
                             }));
                         } else {
-                            throw new Error('Unsupported item '+ JSON.stringify(item));
+                            console.log('Unsupported item '+ JSON.stringify(item));
                         }
                     } else if(providerName === 'lambdaTest'){
 
@@ -154,7 +154,7 @@ export default class CloudProvidersService extends ServiceBase {
                                     osName = 'OS X';
                                     osVersion = item.platform.split('OS X ')[1];
                                 } else {
-                                    throw new Error('Unsupported os item '+ JSON.stringify(item));
+                                    console.log('Unsupported os item '+ JSON.stringify(item));
                                 }
                             }
 
@@ -324,7 +324,7 @@ export default class CloudProvidersService extends ServiceBase {
                         // testingBot
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                     } else {
-                        throw new Error('browsersAndDevices does not exist.', browsersAndDevices);
+                        console.log('browsersAndDevices does not exist.', browsersAndDevices);
                     }
     
                 }

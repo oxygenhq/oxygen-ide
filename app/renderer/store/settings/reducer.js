@@ -32,9 +32,9 @@ const saveCloudProvidersDestruction = (fieldName, object) => {
         }
     } catch(e){
         console.warn('e', e);
-        // if(window && window.Sentry && window.Sentry.captureException){
-        //     window.Sentry.captureException(e);
-        // }
+        if(window && window.Sentry && window.Sentry.captureException){
+            window.Sentry.captureException(e);
+        }
     }
 
     return result;

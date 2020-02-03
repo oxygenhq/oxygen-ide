@@ -97,6 +97,9 @@ function* handleTestRunnerServiceEvent(event) {
 
         yield put(testActions.onBreakpoint(event.file, event.line, variables));
     }
+    else if (event.type === 'SEND_START_DATA') {
+        yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', [event.data]);
+    }
 }
 
 function* handleSeleniumServiceEvent(event) {
@@ -249,7 +252,6 @@ export function* startTest({ payload }) {
         
         yield put(testActions.waitUpdateBreakpoints(false));
         yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'stop', []);
-        yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', []);
         yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
         yield put({
             type: success(ActionTypes.TEST_START),

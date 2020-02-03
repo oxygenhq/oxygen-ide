@@ -70,9 +70,9 @@ try{
     alert('Please, open later (2 sec)');
     console.log(e);
 
-    // if(Sentry && Sentry.captureException){
-    //     Sentry.captureException(e);
-    // }
+    if(Sentry && Sentry.captureException){
+        Sentry.captureException(e);
+    }
 }
 
 if (process.env.NODE_ENV === 'production') {
@@ -156,9 +156,9 @@ app.on('ready', async () => {
         mainProc = new MainProcess(mainWindow);
     } catch(e){
     
-        // if(Sentry && Sentry.captureException){
-        //     Sentry.captureException(e);
-        // }
+        if(Sentry && Sentry.captureException){
+            Sentry.captureException(e);
+        }
     
         console.log('e', e);
     }
