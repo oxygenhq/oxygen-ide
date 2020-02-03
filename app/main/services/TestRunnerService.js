@@ -182,7 +182,11 @@ export default class TestRunnerService extends ServiceBase {
                 const config = await cliutil.getConfigurations(targetFile, argv, this.mainFilePath);
 
                 if(config && config.suites){
-                    delete config.suites;
+                    if(oxConfigFile && mainFilePath && mainFilePath === oxConfigFile){
+                        // use suites from config file if user run config file
+                    } else {
+                        delete config.suites;
+                    }
                 }
 
                 // console.log('TestRunner : config', config);
