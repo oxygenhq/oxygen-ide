@@ -118,7 +118,7 @@ export default class AnalyticsService extends ServiceBase {
 
                             try{
                                 if(this.mixpanel && this.mixpanel.people && this.mixpanel.people.set){
-                                    this.mixpanel.people.set(uuid, {
+                                    this.mixpanel.people.set(this.uuid, {
                                         $region: region,
                                         $country_code: country_code,
                                         'Сountry Name': country_name,
@@ -153,7 +153,7 @@ export default class AnalyticsService extends ServiceBase {
         
         try{
             if(this.mixpanel && this.mixpanel.people && this.mixpanel.people.set){
-                this.mixpanel.people.set(uuid, {
+                this.mixpanel.people.set(this.uuid, {
                     $created: (new Date()).toISOString(),
                     $timezone: ''+moment().format('Z'),
                     'IDE Version': version,
@@ -163,6 +163,9 @@ export default class AnalyticsService extends ServiceBase {
                     'Dev': process.env.NODE_ENV === 'development'
                 }); 
             }
+            this.mixpanel.track('NEW_USER', {
+                distinct_id: this.uuid
+            }); 
         } catch(e){
             console.warn('mixpanel e', e);
             Sentry.captureException(e);
