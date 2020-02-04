@@ -22,7 +22,7 @@ export default class NoChromeDialog extends React.Component<Props> {
       if(event){
           event.preventDefault();
       }
-      const docsUrl = 'http://docs.oxygenhq.org/recording-troubleshooting.html';
+      const docsUrl = 'http://docs.oxygenhq.org/download-and-installation/recording-troubleshooting';
       electron.shell.openExternal(docsUrl);
   }
 
