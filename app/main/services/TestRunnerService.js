@@ -314,9 +314,9 @@ export default class TestRunnerService extends ServiceBase {
         }
     }
 
-    async dispose() {
+    async dispose(status = null) {
         if (this.runner) {
-            this.runner.dispose().then(()=>{});
+            this.runner.dispose(status).then(()=>{});
             this.runner = null;
             this.mainFilePath = null;
             this.isRunning = false;
@@ -336,9 +336,12 @@ export default class TestRunnerService extends ServiceBase {
             await runner.init(opts, caps, this.reporter);   
             // run test 
             this._emitLogEvent(SEVERITY_INFO, 'Running test...');
-            await runner.run();
+            const result = await runner.run();
             // dispose runner
-            await runner.dispose();
+
+            if(result && result.status){
+                await runner.dispose(result.status);
+            }
         }
         catch (e) {
             // if this is custom error message
