@@ -27,7 +27,7 @@
     "monaco-editor-textmate": "2.2.1",
     "monaco-textmate": "3.0.1",
     "onigasm": "2.2.4",
-    "oxygen-cli": "1.0.0",
+    "oxygen-cli": "1.0.1",
     "typescript": "3.7.5"
   }
 }

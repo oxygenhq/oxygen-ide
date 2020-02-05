@@ -163,9 +163,12 @@ export default class AnalyticsService extends ServiceBase {
                     'Dev': process.env.NODE_ENV === 'development'
                 }); 
             }
-            this.mixpanel.track('NEW_USER', {
-                distinct_id: this.uuid
-            }); 
+
+            if (this.mixpanel && this.mixpanel.track) {
+                this.mixpanel.track('NEW_USER', {
+                    distinct_id: this.uuid
+                });
+            }
         } catch(e){
             console.warn('mixpanel e', e);
             Sentry.captureException(e);
