@@ -7,7 +7,7 @@ Code-signs all nested binaries inside an app bundle in an inside-out manner.
 import os, sys, re
 import subprocess as sp
 
-SIGN_EXTENSIONS = ['.so', '.dylib', '.jar'] # extension-less binaries are auto-included
+SIGN_EXTENSIONS = ['.so', '.dylib', '.jar', '.node'] # extension-less binaries are auto-included
 CODE_SIGN_OPTS  = ['--verbose', '--entitlements', 'Entitlements.plist', '--force', '--options=runtime', '--timestamp', '--sign']
 
 def is_probably_binary(path):
