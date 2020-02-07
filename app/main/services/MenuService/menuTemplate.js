@@ -170,13 +170,13 @@ export default (cmdHandler, settings) => {
                 type: 'checkbox',
                 checked: viewEventLogChecked,
                 click() { cmdHandler(Const.MENU_CMD_VIEW_EVENT_LOG, !viewEventLogChecked); }
-            },
-            {
-                label: 'DevTools',
-                accelerator: 'CommandOrControl+Shift+I',
-                // visible: process.env.NODE_ENV !== 'production',
-                click() { cmdHandler(Const.MENU_CMD_VIEW_DEVTOOLS); }
             }
+            // {
+            //     label: 'DevTools',
+            //     accelerator: 'CommandOrControl+Shift+I',
+            //     // visible: process.env.NODE_ENV !== 'production',
+            //     click() { cmdHandler(Const.MENU_CMD_VIEW_DEVTOOLS); }
+            // }
         ]
     });
     template.push({
