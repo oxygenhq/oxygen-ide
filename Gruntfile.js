@@ -239,7 +239,7 @@ module.exports = function(grunt) {
                     OUTDIR + RESOURCES + '/app/main/selenium/darwin/geckodriver']
             },
             oxygendarwin: {
-                src: [OUTDIR + RESOURCES + '/../MacOS/Electron']
+                src: [OUTDIR + RESOURCES + '/../MacOS/Electron', OUTDIR + RESOURCES + '/app/node_modules/term-size/vendor/macos/term-size']
             }
         },
         compress: {

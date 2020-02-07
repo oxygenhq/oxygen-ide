@@ -1,5 +1,58 @@
 # CHANGELOG
 
+
+## v1.14.0 (2020-02-06)
+
+#### :tada: New Feature
+* Significant improvements to test structure organization, allowing to define all configurations using a project file.
+* Improvements to the script development flexibility:  
+  - Automation tests can be written using ES6.
+  - Tests can hook into exposed `before` and `after` hooks for `test`, `suite`, `case`, `command` actions.
+* Improvements to Oxygen extendability:  
+  - Internal modules can be written using ES6 and can be developed in both synchronous and asynchronous (using `async/await` operators) manner.  
+  - Modules can contain submodules. E.g. `web.network.assertUrl`.
+  - Added support for Service. Services are add-ons which can be developed for providing additional custom logic for tests.
+* Support for Applitools for visual UI testing.
+* Support for native Windows applications (via WinApiDriver) automation - WinForms, WPF, UWP, Classic Win32.
+* Support for writing tests using Cucumber.
+* Support for environment variables.
+* Project level Page Object support.
+* Support for running multiple Suites as a part of a single test.
+* Improved debugging support when using breakpoints in external files.
+* Added `web.rightClick`.
+* Added `win.rightClick`.
+* Improvements to SauceLabs, LambdaTest, TestingBot integrations.
+* `pdf` methods accept optional argument for reversing string order (useful when working with RTL languages).
+
+#### :boom: Breaking Change
+* `ox.*` is no longer available. `ox.modules.*` should be used instead. All available modules `web`, `mob`, etc are also exposed globally now and can be used directly.
+* `return` is no longer supported for terminating user scripts.
+* Suite configuration JSONs are no longer supported. Project level configuration files should be used instead.
+* `web.network*` commands are now accessible via a submodule `web.network.*` and have different names. See documentation for more details.
+
+#### :beetle: Bug Fix
+* `twilio` not producing proper error when no matching messages found.
+* `web.network` not recording responses for redirected requests.
+* `web.click` not working on IE under certain conditions.
+* Debugger not entering into module code if module name is specified using wrong case.
+* Crash when launching the IDE under certain situations.
+* Relative paths not working in `pdf` module.
+* Folder being duplicated sometimes when creating new folders.
+
+#### :nail_care: Polish
+* Improved error handling. Errors now contain proper stacktraces and provide more details about where in user script the error has occurred.
+* More errors from underlying frameworks are handled and processed.
+* JUnit XML reports improved to include more details about test failures.
+* `twilio` module performance improvements.
+* Added JS injection fall-back for `web.doubleClick` when element is not clickable.
+
+#### :book: Documentation
+* Documentation has been migrated to a new infrastructure providing better user experience. Documentation has been, as well, improved with more topics.
+
+#### :house: Internal
+* Webdriverio updated to v5.18.6.
+* Updated pre-bundled Chrome drivers.
+
 ## v1.12.1 (2019-11-27)
 
 #### :tada: New Feature
