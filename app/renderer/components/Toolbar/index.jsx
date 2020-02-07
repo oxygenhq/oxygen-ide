@@ -416,17 +416,38 @@ export default class Toolbar extends React.Component<Props> {
 
                 {/* RUN part */}
                 { this._isVisible(Controls.TEST_RUN) && (
-                    <button
-                        onClick={ () => ::this.handleClickEvent(Controls.TEST_RUN) }
-                        className={ this._getControlClassNames(Controls.TEST_RUN, 'button') }
-                        disabled={ !this._isEnabled(Controls.TEST_RUN) }
-                    >
-                        <Icon
-                            title="Run Test"
-                            type="play-circle"
-                            theme="filled"
-                        /> <span>Run</span>
-                    </button>
+                    <React.Fragment>
+                        <button
+                            onClick={ () => ::this.handleClickEvent(Controls.TEST_RUN) }
+                            className={ this._getControlClassNames(Controls.TEST_RUN, 'button') }
+                            disabled={ !this._isEnabled(Controls.TEST_RUN) }
+                        >
+                            <Icon
+                                title="Run Test"
+                                type="play-circle"
+                                theme="filled"
+                            /> <span>Run</span>
+                        </button>
+                        {
+                            cloudProvidesBrowsersAndDevicesEnabled && 
+                            cloudProviderTestMode === 'web' &&
+                            process &&
+                            process.env &&
+                            process.env.NODE_ENV &&
+                            process.env.NODE_ENV === 'development' &&
+                            <button
+                                onClick={ () => ::this.handleClickEvent(Controls.TEST_RUN_ALL) }
+                                // className={ this._getControlClassNames(Controls.TEST_RUN, 'button') }
+                                // disabled={ !this._isEnabled(Controls.TEST_RUN) }
+                            >
+                                <Icon
+                                    title="Run Test"
+                                    type="play-square"
+                                    theme="filled"
+                                /> <span>Run all</span>
+                            </button>
+                        }
+                    </React.Fragment>
                 )}
 
                 { this._isVisible(Controls.TEST_CONTINUE) && (

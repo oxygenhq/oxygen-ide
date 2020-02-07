@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 export const TEST_START = 'TEST_START';
+export const TEST_START_ALL = 'TEST_START_ALL';
 export const TEST_STOP = 'TEST_STOP';
 export const TEST_CONTINUE = 'TEST_CONTINUE';
 export const TEST_SET_MAIN = 'TEST_SET_MAIN';

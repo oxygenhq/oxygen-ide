@@ -22,6 +22,7 @@ export const TEST_STEP_DELAY = 'TEST_STEP_DELAY';
 export const TEST_TARGET = 'TEST_TARGET';
 export const TEST_PROVIDER = 'TEST_PROVIDER';
 export const TEST_RUN = 'TEST_RUN';
+export const TEST_RUN_ALL = 'TEST_RUN_ALL';
 export const TEST_CONTINUE = 'TEST_CONTINUE';
 export const TEST_STOP = 'TEST_STOP';
 export const TEST_RECORD = 'TEST_RECORD';

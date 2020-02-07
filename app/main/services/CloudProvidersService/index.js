@@ -301,7 +301,9 @@ export default class CloudProvidersService extends ServiceBase {
 
         return {
             browsersTree: creteBrowsersTree(browsers),
-            devicesTree: creteDevicesTree(devices)
+            browsersList: browsers,
+            devicesTree: creteDevicesTree(devices),
+            devicesList: devices,
         };
     }
 

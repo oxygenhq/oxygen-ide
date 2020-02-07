@@ -104,6 +104,11 @@ export const startTest = () => ({
     payload: null,
 });
 
+export const startAllTests = () => ({
+    type: ActionTypes.TEST_START_ALL,
+    payload: null,
+});
+
 export const stopTest = () => ({
     type: ActionTypes.TEST_STOP,
     payload: null,

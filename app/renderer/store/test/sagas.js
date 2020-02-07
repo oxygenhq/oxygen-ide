@@ -24,6 +24,7 @@ const services = ServicesSingleton();
 export default function* root() {
     yield all([
         takeLatest(ActionTypes.TEST_START, startTest),
+        takeLatest(ActionTypes.TEST_START_ALL, startTestAll),
         takeLatest(ActionTypes.TEST_STOP, stopTest),
         takeLatest(ActionTypes.TEST_CONTINUE, continueTest),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
@@ -126,6 +127,197 @@ function* handleDeviceDiscoveryServiceEvent(event) {
         yield put(testActions.removeDevice(event.device));
     } else if(event.type === 'XCODE_ERROR'){
         yield put(wbActions.setXCodeError());
+    }
+}
+
+export function* runItem(itemsLength, browsersList, inputCurrentItem, saveMainFile, breakpoints, runtimeSettingsClone){
+    let currentItem = inputCurrentItem;
+
+    console.log('---');
+    console.log('currentItem', currentItem);
+    console.log('itemsLength', itemsLength);
+    console.log('---');
+
+    if(currentItem < itemsLength){
+        const browser = browsersList[currentItem];
+        console.log('browser', browser);
+        
+        const testBrowser = {
+            browserName: browser._apiName,
+            browserVersion: browser._version,
+            osName: browser._osName,
+            osVersion: browser._osVersion
+        };
+
+        runtimeSettingsClone.testTarget = testBrowser;
+        yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);
+        currentItem++;
+        yield runItem(itemsLength, browsersList, currentItem, saveMainFile, breakpoints, runtimeSettingsClone);
+    } else {
+        return;
+    }
+}
+
+export function* startTestAll({ payload }) {
+    let currentItem = 0;
+    const { mainFile, breakpoints, runtimeSettings } = yield select(state => state.test);
+    const { cloudProvidesBrowsersAndDevices } = yield select(state => state.settings);
+
+    const editor = yield select(state => state.editor);
+
+    let file;
+    let saveMainFile;
+
+    if(mainFile){
+        // check if main file of the test is saved (e.g. unmodified)
+        file = yield select(state => state.fs.files[mainFile]);
+        saveMainFile = mainFile;
+    } else if (editor && editor.activeFile){
+        // check if main file of the test is saved (e.g. unmodified)
+        file = yield select(state => state.fs.files[editor.activeFile]);
+        saveMainFile = editor.activeFile;
+    }
+
+    if (!file) {
+        yield put({
+            type: failure(ActionTypes.TEST_START),
+            payload: { error: { type: ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SELECTED } },
+        });
+        return;
+    }
+    // check if file content exist (e.g. was pre-loaded from the file)
+    else if (!file.hasOwnProperty('content') || typeof(file.content) !== 'string') {
+        return;     // silently ignore it
+    } 
+    else if (file.content.trim().length == 0) {
+        yield put({
+            type: failure(ActionTypes.TEST_START),
+            payload: { error: { type: ActionTypes.TEST_ERR_MAIN_SCRIPT_IS_EMPTY } },
+        });
+        return;
+    }
+    else if (file.modified) {
+        yield put(wbActions.saveCurrentFile());
+    }
+    // clone runtime settings and add cloud provider information, if a provider was selected
+    const runtimeSettingsClone = {
+        ...runtimeSettings
+    };
+
+    if(file && file.ext && file.ext === '.feature'){
+        runtimeSettingsClone.framework = 'cucumber';
+    }
+
+    // add test provider information
+    if (runtimeSettings.testProvider) {
+        const cloudProviders = yield select(state => state.settings.cloudProviders);
+        runtimeSettingsClone.testProvider = cloudProviders.hasOwnProperty(runtimeSettings.testProvider) ? { ...cloudProviders[runtimeSettings.testProvider], id: runtimeSettings.testProvider } : null;
+    }
+    // add device information 
+    if (runtimeSettings.testTarget && runtimeSettings.testMode === 'mob') {
+        const devices = yield select(state => state.test.devices);
+        const targetDevice = devices.find(x => x.id === runtimeSettings.testTarget);
+        if(targetDevice){
+            runtimeSettingsClone.testTarget = targetDevice;
+        }
+    }
+
+    const rootPath = yield select(state => state.fs.rootPath);
+    if(rootPath && typeof rootPath === 'string'){
+        runtimeSettingsClone.rootPath = rootPath;
+    }
+
+    const fsTree = yield select(state => state.fs.tree);
+
+    if(fsTree && fsTree.data && Array.isArray(fsTree.data) && fsTree.data.length > 0){
+        
+        const OXYGEN_CONFIG_FILE_NAME = 'oxygen.conf';
+        const OXYGEN_ENV_FILE_NAME = 'oxygen.env';
+        const OXYGEN_PAGE_OBJECT_FILE_NAME = 'oxygen.po';
+
+        let oxConfigFile = null;
+        let oxEnvFile = null;
+        let oxPageObjectFile = null;
+
+        fsTree.data.map((item) => {
+            if(
+                item && 
+                item.type && 
+                item.type === 'file' && 
+                ['.js', '.json'].includes(item.ext) && 
+                item.path && 
+                typeof item.path === 'string' && 
+                item.name && 
+                typeof item.name === 'string'
+            ){
+                if(item.name.startsWith(OXYGEN_CONFIG_FILE_NAME)){
+                    oxConfigFile = item.path;
+                }
+                if(item.name.startsWith(OXYGEN_ENV_FILE_NAME)){
+                    oxEnvFile = item.path;
+                }
+                if(item.name.startsWith(OXYGEN_PAGE_OBJECT_FILE_NAME)){
+                    oxPageObjectFile = item.path;
+                }
+            }
+        });
+
+        if(oxConfigFile){
+            runtimeSettingsClone.oxConfigFile = oxConfigFile;
+        }
+        if(oxEnvFile){
+            runtimeSettingsClone.oxEnvFile = oxEnvFile;
+        }
+        if(oxConfigFile){
+            runtimeSettingsClone.oxPageObjectFile = oxPageObjectFile;
+        }
+    }
+
+    try {        
+        // reset active line cursor in all editors
+        yield put(editorActions.resetActiveLines());
+        // reset General log
+        yield put(loggerActions.resetGeneralLogs());
+        // call TestRunner service to start the test
+        
+        
+        yield put(testActions.waitUpdateBreakpoints(false));
+        yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'stop', []);
+
+        if(
+            runtimeSettings.testProvider &&
+            cloudProvidesBrowsersAndDevices &&
+            cloudProvidesBrowsersAndDevices[runtimeSettings.testProvider]
+        ){
+            const providerData = cloudProvidesBrowsersAndDevices[runtimeSettings.testProvider];
+
+            if(
+                providerData && 
+                providerData.browsersList && 
+                Array.isArray(providerData.browsersList) &&
+                providerData.browsersList.length > 0
+            ){
+                const itemsLength = providerData.browsersList.length;
+
+                console.log('itemsLength', itemsLength);
+
+                yield runItem(itemsLength, providerData.browsersList, currentItem, saveMainFile, breakpoints, runtimeSettingsClone);
+            
+                console.log('runItems finished');
+            }
+        }
+
+        yield put({
+            type: success(ActionTypes.TEST_START),
+            payload: null,
+        });
+    }
+    catch (err) {
+        /* istanbul ignore next */
+        yield put({
+            type: failure(ActionTypes.TEST_START),
+            payload: { error: err },
+        });
     }
 }
 

@@ -65,6 +65,7 @@ type Props = {
   editorActiveFile: object,
   createNewRealFile: Function,
   startTest: Function,
+  startAllTests: Function,
   stopTest: Function,
   continueTest: Function,
   setTestMode: Function,
@@ -272,6 +273,9 @@ export default class Workbench extends React.Component<Props> {
               });
           }
       
+      }
+      else if (ctrlId === Controls.TEST_RUN_ALL){
+        this.props.startAllTests();
       }
       else if (ctrlId === Controls.TEST_STOP) {
           this.props.stopTest();
