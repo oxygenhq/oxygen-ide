@@ -74,8 +74,12 @@ export default class Logger {
             this.logsPath = logsPath;
             this.logFilePath = path.resolve(logsPath, this.logFileName);
 
-            if(Sentry && Sentry.captureException){
-                Sentry.captureException(err);
+            if(err && err.message && err.message === "Failed to get 'logs' path"){
+                //ignore
+            } else {
+                if(Sentry && Sentry.captureException){
+                    Sentry.captureException(err);
+                }
             }
         }
         
@@ -225,13 +229,13 @@ export default class Logger {
             return log.apply(log, args);
         };
         this.error = (...args) => {
-            prepError(args);
-            const log = _log.error.bind(_log);
-            const ret = _log.apply(log, args);
             // do not show errors to the user about deprecated Buffer()
             if (args[0] && args[0].includes('DeprecationWarning: Buffer() is deprecated')) {
                 return ret;
             }
+            prepError(args);
+            const log = _log.error.bind(_log);
+            const ret = _log.apply(log, args);
             showDialog(args[0], args.length === 2 ? args[1] : '', 'error');
             return ret;
         };
