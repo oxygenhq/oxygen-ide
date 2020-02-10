@@ -528,22 +528,31 @@ export default class TestRunnerService extends ServiceBase {
             return null;
         }
         const parts = location.split(':');
-                
+
         let fileName;
         let line;
         let column;
 
         if (process.platform === 'win32') {
-            if (parts.length != 4) {
-                return null;
-            }
+            if (parts.length === 4) {
 
-            fileName = parts[0] + ':' + parts[1];
-            // on Windows, file path might include Linux '/' path delimeter
-            // make sure to replace it with a proper Windows path delimiter ('\')
-            fileName = fileName.replace(/\//g, '\\');
-            line = parts[2];
-            column = parts[3];
+                fileName = parts[0] + ':' + parts[1];
+                // on Windows, file path might include Linux '/' path delimeter
+                // make sure to replace it with a proper Windows path delimiter ('\')
+                fileName = fileName.replace(/\//g, '\\');
+                line = parts[2];
+                column = parts[3];
+                
+            } else {
+                // network folder
+                fileName = parts[0];
+                // on Windows, file path might include Linux '/' path delimeter
+                // make sure to replace it with a proper Windows path delimiter ('\')
+                fileName = fileName.replace(/\//g, '\\');
+                line = parts[1];
+                column = parts[2];
+
+            }
         } else {
             if (parts.length != 3) {
                 return null;
