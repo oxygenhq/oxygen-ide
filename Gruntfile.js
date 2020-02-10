@@ -38,6 +38,7 @@ module.exports = function(grunt) {
         defaultTasks.push('chmod:geckodriver');
         defaultTasks.push('chmod:oxygendarwin');
     } else if (process.platform === 'win32') {
+        defaultTasks.push('Win32FileService');
         //ignore
     }
     defaultTasks.push('sentry-browser');
@@ -59,7 +60,8 @@ module.exports = function(grunt) {
     grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'comments:chrome-ext']);
     grunt.registerTask('sentry-browser', ['copy:sentry-browser']);
     grunt.registerTask('package', ['copy:package']);
-    grunt.registerTask('feature', ['copy:feature']);    
+    grunt.registerTask('feature', ['copy:feature']); 
+    grunt.registerTask('Win32FileService', ['copy:Win32FileService']);    
     
 
     const OUTDIR = 'dist/temp';
@@ -219,6 +221,16 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: 'app',
                         src: ['renderer/components/MonacoEditor/cucumber/feature.tmLanguage'], 
+                        dest: OUTDIR + RESOURCES + '/app'
+                    }
+                ]
+            },
+            'Win32FileService': {
+                files: [
+                    { 
+                        expand: true, 
+                        cwd: 'app',
+                        src: ['main/services/Win32FileService/CodeHelper.exe'], 
                         dest: OUTDIR + RESOURCES + '/app'
                     }
                 ]
