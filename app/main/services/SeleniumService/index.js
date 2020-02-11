@@ -25,6 +25,7 @@ const selSettings = cfg.selenium;
 // Events
 const ON_SELENIUM_STARTED = 'SELENIUM_STARTED';
 const ON_SELENIUM_STOPPED = 'SELENIUM_STOPPED';
+const ON_CHROME_DRIVER_ERROR = 'ON_CHROME_DRIVER_ERROR';
 
 const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.googleapis.com';
 
@@ -178,7 +179,15 @@ export default class SeleniumService extends ServiceBase {
             } else {
                 // if no user placed driver then use, the latest bundled version
                 chromedriver = await this.findLocalChromeDriver(versions[0].driverVersion);
-                console.log('Using latest bundled ChromeDriver from ' + chromedriver);
+                if(chromedriver){
+                    console.log('Using latest bundled ChromeDriver from ' + chromedriver);
+                } else {                    
+                    this.notify({
+                        type: ON_CHROME_DRIVER_ERROR,
+                        chromeVersion: chromeDriverVersion,
+                        chromeDriverVersion: chromedriver,
+                    });
+                }
             }
         }
 
@@ -326,7 +335,10 @@ export default class SeleniumService extends ServiceBase {
                     }
                     return res.buffer();
                 })
-                .then(body => resolve(body))
+                .then(body => {
+                    const version = new Buffer(body,'utf-8').toString();
+                    resolve(version);
+                })
                 .catch(err => reject(err));
         });
     }

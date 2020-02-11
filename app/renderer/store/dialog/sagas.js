@@ -11,8 +11,7 @@ export default function* root() {
     yield all([
         takeLatest(ActionTypes.DIALOG_START_DOWNLOAD_CHROME_DRIVER, startDownloadChromeDriver),
         takeLatest(ActionTypes.DIALOG_SHOW_DOWNLOADING_CHROME_DRIVER_FAILED, showDownloadChromeDriverFailed),
-        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
-        takeLatest('SELENIUM_RUNTIME_ERROR', handleSeleniumRuntimeError)
+        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents)
     ]);
 }
 
@@ -74,25 +73,6 @@ function* handleSeleniumServiceEvent(event) {
             chromeDriverVersion: event.chromeDriverVersion,
             chromeVersion: event.chromeVersion
         }));
-    }
-}
-
-function* handleSeleniumRuntimeError(event) {
-
-    const result = yield services.mainIpc.call('SeleniumService', 'getChromeDriverVersionAndChromeVersion');
-
-
-    if(result){
-        const {
-            chromeDriverVersion,
-            chromeVersion,
-            error
-        } = result;
-
-        if(error && chromeDriverVersion && chromeVersion){
-            yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, {chromeDriverVersion, chromeVersion}));
-        } else if(error && chromeVersion){
-            yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, { chromeVersion }));
-        }
+        yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, event));
     }
 }
