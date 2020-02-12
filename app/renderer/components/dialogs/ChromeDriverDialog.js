@@ -18,10 +18,10 @@ export default class ChromeDriverDialog extends React.PureComponent<Props> {
     }
 
     download = () => {
-        const { chromeDriverVersion, onNoChromeDriverSubmit } = this.props;
+        const { chromeVersion, onNoChromeDriverSubmit } = this.props;
 
-        if(chromeDriverVersion){
-            this.props.onSubmit(chromeDriverVersion);
+        if(chromeVersion){
+            this.props.onSubmit(chromeVersion);
         } else {
             if(onNoChromeDriverSubmit){
                 this.props.onNoChromeDriverSubmit();
