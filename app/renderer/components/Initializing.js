@@ -12,7 +12,6 @@ export default class Initializing extends React.PureComponent {
                     <h1 className="initializing-title">
             Initializing...
                     </h1>
-                    <p className="initializing-text">(Shouldn&apos;t take more than a minute)</p>
                 </div>
             </div>
         );
