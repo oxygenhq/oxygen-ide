@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v1.14.1 (2020-02-13)
+
+#### :beetle: Bug Fix
+* Windows version not working properly when project's folder is located on a network drive.
+* Linux related fixes.
+* ChromeDriver update mechanism not working.
+* Invalid video tutorials links in welcome page.
+
+#### :house: Internal
+* * Bump oxygen-cli from v1.0.1 to v1.0.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 
 ## v1.14.0 (2020-02-06)
 
