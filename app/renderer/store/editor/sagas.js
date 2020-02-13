@@ -6,14 +6,12 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { all, put, select, takeLatest, call } from 'redux-saga/effects';
+import { all, put, select, takeLatest } from 'redux-saga/effects';
 import { putAndTake } from '../../helpers/saga';
 import * as fsActions from '../fs/actions';
 import * as editorActions from './actions';
 import { success } from '../../helpers/redux';
 import ActionTypes from '../types';
-import ServicesSingleton from '../../services';
-const services = ServicesSingleton();
 
 /**
  * Editor Sagas
@@ -21,14 +19,8 @@ const services = ServicesSingleton();
 export default function* root() {
     yield all([
         takeLatest(ActionTypes.EDITOR_OPEN_FILE, openFile),
-        takeLatest(ActionTypes.SAVE_SETTINGS, saveSettings),
         takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
     ]);
-}
-
-export function* saveSettings() {
-    const settings = yield select(state => state.settings);
-    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
 }
 
 export function* openFile({ payload }) {

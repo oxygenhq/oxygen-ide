@@ -96,10 +96,7 @@ export default function* root() {
         takeLatest(ActionTypes.WB_ON_TAB_CHANGE, changeTab),
         takeLatest(ActionTypes.WB_ON_CONTENT_UPDATE, contentUpdate),      
         takeLatest(success(ActionTypes.FS_RENAME), handleFileRename),
-        takeLatest(success(ActionTypes.FS_DELETE), handleFileDelete),
-        takeLatest(ActionTypes.UPDATE_CLOUD_PROVIDERS_SETTINGS, handleUpdatedCloudProvidersSettings),
-        takeLatest(ActionTypes.UPDATE_VISUAL_PROVIDERS_SETTINGS, handleVisualTestingSettings),
-        takeLatest(ActionTypes.TEST_UPDATE_RUN_SETTINGS, handleUpdatedRunSettings),      
+        takeLatest(success(ActionTypes.FS_DELETE), handleFileDelete),      
         takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
         takeLatest(JAVA_NOT_FOUND, handleJavaNotFound),
@@ -303,9 +300,6 @@ export function* initialize() {
     } else {
         yield put(settingsActions.showLanding());
     }
-    // retrieve and save merged settings back to Electron store
-    const allSettings = yield select(state => state.settings);
-    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [allSettings]);
 
     //start CloudProvidersService
     services.mainIpc.call('CloudProvidersService', 'start').then(() => {});
@@ -358,11 +352,6 @@ export function* openFolder({ payload }) {
         yield put(wbActions._openFile_Failure(path, error));
         return;
     }
-    // store new root folder in the App Settings
-    // yield put(settingsActions.setLastSessionRootFolder(path));
-    // const settings = yield select(state => state.settings);
-    // persiste settings in the Electron store
-    // yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
     // report success
     yield put(wbActions._openFile_Success(path));
 }
@@ -1610,29 +1599,6 @@ export function* setVisualTestingProviders(){
             yield call(services.mainIpc.call, 'VisualTestingProvidersService', 'updateProviderSettings', ['applitools', visualProviders.applitools]);
         }
     }
-}
-
-export function* handleUpdatedCloudProvidersSettings({payload}) {
-    const settings = yield select(state => state.settings);
-    // persiste settings in the Electron store
-    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
-    yield setCloudProvidersBrowsersAndDevices();
-}
-
-export function* handleVisualTestingSettings({payload}) {
-    const settings = yield select(state => state.settings);
-    // persiste settings in the Electron store
-    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
-
-    if(settings && settings.visualProviders && settings.visualProviders.applitools){
-        yield call(services.mainIpc.call, 'VisualTestingProvidersService', 'updateProviderSettings', ['applitools', settings.visualProviders.applitools]);
-    }
-}
-
-export function* handleUpdatedRunSettings(payload) {
-    const settings = yield select(state => state.settings);
-    // persiste settings in the Electron store
-    yield call(services.mainIpc.call, 'ElectronService', 'updateSettings', [settings]);
 }
 
 function getUnsavedFiles(files, tabs) {

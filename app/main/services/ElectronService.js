@@ -203,10 +203,6 @@ export default class ElectronService extends ServiceBase {
         return settings;
     }
 
-    updateSettings(settings) {
-        appSettings.set('appSettings', settings);
-    }
-
     setTitle(title) {
         this.mainWindow.setTitle(title);
     }
