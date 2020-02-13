@@ -473,6 +473,7 @@ export function* stopTest({ payload }) {
         });
     }
     catch (err) {
+        console.log('stop err', err);
         /* istanbul ignore next */
         yield put({
             type: failure(ActionTypes.TEST_STOP),

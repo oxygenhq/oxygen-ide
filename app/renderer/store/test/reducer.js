@@ -11,7 +11,7 @@ import { message } from 'antd';
 
 import * as ActionTypes from './types';
 import * as Const from '../../../const';
-import { failure } from '../../helpers/redux';
+import { success, failure } from '../../helpers/redux';
 
 const defaultState = {
     isRunning: false,         // indicates if a test is currently running
@@ -118,6 +118,20 @@ export default (state = defaultState, action) => {
     case ActionTypes.TEST_STOP:
         return {
             ...state,
+            stopingTest: true,
+        };
+    case success(ActionTypes.TEST_STOP):
+        return {
+            ...state,
+            stopingTest: false,
+            isRunning: false,
+            isPaused: false,
+            variables: null
+    };
+    case failure(ActionTypes.TEST_STOP):
+        return {
+            ...state,
+            stopingTest: false,
             isRunning: false,
             isPaused: false,
             variables: null

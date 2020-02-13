@@ -256,37 +256,46 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     async stop() {
-        if(this.finished){
-            // ignore
-        } else {
-            this.notify({
-                type: EVENT_LOG_ENTRY,
-                severity: SEVERITY_INFO,
-                message: 'Test finished with status --> CANCELED'
-            });
-    
-            if(this.reporter && this.reporter.removeListener){
-                this.reporter.removeListener('runner:start',() => {});
-                this.reporter.removeListener('runner:end',() => {});
-                this.reporter.removeListener('step:start',() => {});
-                this.reporter.removeListener('test-error',() => {});
-                this.reporter.removeListener('log',() => {});
-            }
-    
-            if (this.runner) {
-                this.isStopping = true;
-                this.isRunning = false;
-                try {
-                    this.runner.kill('CANCELED').then(()=>{});
-                    this.runner.dispose('CANCELED').then(()=>{});
-                    this.runner = null;
-                    this.mainFilePath = null;
-                }
-                catch (e) {
-                    // ignore any errors
-                }        
-            }
+        this.notify({
+            type: EVENT_LOG_ENTRY,
+            severity: SEVERITY_INFO,
+            message: 'Test finished with status --> CANCELED'
+        });
+
+        if(this.reporter && this.reporter.removeListener){
+            this.reporter.removeListener('runner:start',() => {});
+            this.reporter.removeListener('runner:end',() => {});
+            this.reporter.removeListener('step:start',() => {});
+            this.reporter.removeListener('test-error',() => {});
+            this.reporter.removeListener('log',() => {});
         }
+
+        if (this.runner) {
+            this.isStopping = true;
+            this.isRunning = false;
+            try {
+                if(this.runner.removeListener){
+                    this.runner.removeListener('breakpoint',() => {});
+                    this.runner.removeListener('init-done',() => {});
+                    this.runner.removeListener('line-update',() => {});
+                    this.runner.removeListener('log',() => {});
+                    this.runner.removeListener('test-error',() => {});
+                    this.runner.removeListener('iteration-end',() => {});
+                    this.runner.removeListener('test-end',() => {});
+                }
+
+                await this.runner.kill('CANCELED');
+                await this.runner.dispose('CANCELED');
+
+                this.runner = null;
+                this.mainFilePath = null;
+            }
+            catch (e) {
+                console.log('this.runner.dispose', e);
+                // ignore any errors
+            }        
+        }
+        return 'stoped';
     }
 
     async updateBreakpoints(breakpoints, filePath) {        
