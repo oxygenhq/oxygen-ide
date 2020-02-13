@@ -7,6 +7,7 @@
 * Linux related fixes.
 * ChromeDriver update mechanism not working.
 * Invalid video tutorials links in welcome page.
+* IDE sometimes freezing when stopping tests.
 
 #### :house: Internal
 * * Bump oxygen-cli from v1.0.1 to v1.0.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
