@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import { all, put, select, takeLatest, call } from 'redux-saga/effects';
-
+import { getBrowsersTarget } from '../../helpers/cloudProviders';
 import { success, failure } from '../../helpers/redux';
 import * as testActions from './actions';
 import * as wbActions from '../workbench/actions';
@@ -28,8 +28,71 @@ export default function* root() {
         takeLatest(ActionTypes.TEST_STOP, stopTest),
         takeLatest(ActionTypes.TEST_CONTINUE, continueTest),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
-        takeLatest(ActionTypes.TEST_EVENT_LINE_UPDATE, handleOnLineUpdate)
+        takeLatest(ActionTypes.TEST_EVENT_LINE_UPDATE, handleOnLineUpdate),
+        takeLatest(ActionTypes.TEST_SET_PROVIDER, setTestProvider),
+        takeLatest(ActionTypes.TEST_SET_MODE, setTestMode)
+         
     ]);
+}
+
+function* setTestProvider({payload}){
+    const testProvider = payload.value;
+    if(testProvider === ''){
+        // local
+        yield put(testActions.setTestMode('web'));
+    } else {
+        // cloud
+        const testProviders = yield select(state => state.settings.cloudProvidesBrowsersAndDevices);
+
+        if(testProviders && testProviders[testProvider]){
+            const providerData = testProviders[testProvider];
+            if(providerData && providerData.browsersTree){
+                yield put(testActions.setTestMode('web'));
+            } else if(providerData && providerData.devicesTree){
+                yield put(testActions.setTestMode('mob'));
+            }
+        }        
+    }
+}
+
+function* setTestMode({payload}){
+    const { value } = payload;
+    const testMode = value;
+    const testProvider = yield select(state => state.test.runtimeSettings.testProvider);
+    if(typeof testProvider !== 'undefined' && testProvider === ''){
+        // local
+        if(testMode === 'web'){
+            const browsers = yield select(state => state.test.browsers);
+            if(browsers && Array.isArray(browsers) && browsers.length > 0){
+                yield put(testActions.setTestTarget(browsers[0].id));
+            }
+        }
+    } else {
+        if(testMode && testProvider){
+            // cloud
+            const testProviders = yield select(state => state.settings.cloudProvidesBrowsersAndDevices);
+            if(testProviders && testProviders[testProvider]){
+                const providerData = testProviders[testProvider];
+                let browser = '';
+                if(testProvider === 'lambdaTest'){
+                    browser = 'Chrome';
+                } else if(testProvider === 'testingBot'){
+                    browser = 'Chrome';
+                } else if(testProvider === 'sauceLabs'){
+                    browser = 'chrome';
+                }
+                
+
+                if(browser && providerData.browsersTree){
+                    const target = getBrowsersTarget(providerData.browsersTree, browser);
+                    if(target){
+                        yield put(testActions.setTestTarget(target));
+                    }
+                }
+            }      
+        }
+    }
+    
 }
 
 export function* handleServiceEvents({ payload }) {
