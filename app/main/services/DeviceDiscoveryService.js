@@ -43,8 +43,8 @@ export default class DeviceDiscoveryService extends ServiceBase {
     }
 
     async start() {
-        await this._updateDeviceList();
         await this._reportADBVersion();
+        await this._updateDeviceList();
 
         const self = this;
         this.devListInterval = setInterval(function() {
