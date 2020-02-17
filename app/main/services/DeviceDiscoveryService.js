@@ -10,6 +10,7 @@ import ADB from 'appium-adb';
 import { instrumentsUtils } from 'appium-ios-driver';
 import ServiceBase from './ServiceBase';
 import * as Sentry from '@sentry/electron';
+import { execSync } from 'child_process';
 
 const DEVICE_CONNECTED = 'DEVICE_CONNECTED';
 const DEVICE_DISCONNECTED = 'DEVICE_DISCONNECTED';
@@ -43,6 +44,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
 
     async start() {
         await this._updateDeviceList();
+        await this._reportADBVersion();
 
         const self = this;
         this.devListInterval = setInterval(function() {
@@ -53,6 +55,32 @@ export default class DeviceDiscoveryService extends ServiceBase {
         },  DEVICE_MONITOR_INTERVAL);
         
         return this.devices;
+    }
+
+    async _reportADBVersion() {
+        try {
+            const execResult = execSync('adb version');
+
+            if(execResult && execResult.toString){
+                const result = execResult.toString().trim();
+    
+                if(result){
+                    if(Sentry && Sentry.configureScope){
+                        Sentry.configureScope((scope) => {
+                            scope.setUser({'abdVersion': result});
+                        });
+                    }
+                }
+
+
+            }
+        } catch(e){
+            console.log('adb get version error', e);
+            
+            Sentry.configureScope((scope) => {
+                scope.setUser({'abdVersion': 'not finded'});
+            });
+        }
     }
 
     async _updateDeviceList() {
