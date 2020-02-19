@@ -473,22 +473,23 @@ export default class TestRunnerService extends ServiceBase {
             this.runner.on('breakpoint', (breakpoint) => {
                 this._handleBreakpoint(breakpoint);
             });
+            
+            this.runner.on('test-error', (err) => {
+                let message = null;
+                if (err.type && err.message) {
+                    message = `${err.type} - ${err.message}`;
+                } else if (err.type) {
+                    message = err.type;
+                } else if (err.message) {
+                    message = err.message; // eslint-disable-line
+                }
+                if (err.line) {
+                    message += ` at line ${err.line}`;
+                }
+                this._emitLogEvent(SEVERITY_ERROR, message);
+            });
         }
 
-        this.reporter.on('test-error', (err) => {
-            let message = null;
-            if (err.type && err.message) {
-                message = `${err.type} - ${err.message}`;
-            } else if (err.type) {
-                message = err.type;
-            } else if (err.message) {
-                message = err.message; // eslint-disable-line
-            }
-            if (err.line) {
-                message += ` at line ${err.line}`;
-            }
-            this._emitLogEvent(SEVERITY_ERROR, message);
-        });
 
         this.reporter.on('log', ({ level, msg, src }) => {    
             if (src && src !== 'system') {
