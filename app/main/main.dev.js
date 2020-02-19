@@ -164,6 +164,14 @@ app.on('ready', async () => {
     }
 });
 
+app.on('unresponsive', () => {
+    require('dialog').showMessageBox({
+        type: 'info',
+        message: 'Reload window?',
+        buttons: ['Cancel', 'Reload']
+    });
+});
+
 function disposeMainAndQuit() {
     if (mainProc) {
         // dispose main process and all its services
