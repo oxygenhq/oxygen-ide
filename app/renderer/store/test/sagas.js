@@ -144,6 +144,23 @@ function* handleTestRunnerServiceEvent(event) {
                 call(services.mainIpc.call, 'AnalyticsService', 'playStop', [summary]),
                 call(services.mainIpc.call, 'DeviceDiscoveryService', 'start', [])
             ]);
+        } else if(event && event.error){
+            let message = 'Error: ';
+            const error = event.error;
+
+            if(error.message){
+                message += error.message;
+            }
+            
+            if(error.code){
+                message += ' code: '+error.code;
+            }
+            if(error.column){
+                message += ' column: '+error.column;
+            }
+
+            yield put(loggerActions.addLog(message, null, 'general'));
+            yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'start', []);
         }
     }
     else if (event.type === 'LINE_UPDATE') {
