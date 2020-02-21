@@ -18,6 +18,10 @@ if (Object.keys(dependencies || {}).length > 0 && fs.existsSync(nodeModulesPath)
         ? electronRebuildCmd.replace(/\//g, '\\')
         : electronRebuildCmd;
 
+    // remove fibers for node v8 since we cannot rebuild it under electron 5+
+    // FIXME: this won't be needed once WDIO is updated to v6
+    rimraf.sync(path.join(nodeModulesPath, 'fibers_node_v8'));
+
     // cleanup everything in fibers and deasync bin folders. see relevant entry in Confluence for more details.
     rimraf.sync(path.join(nodeModulesPath, 'fibers', 'bin'));
     rimraf.sync(path.join(nodeModulesPath, 'deasync', 'bin'));
