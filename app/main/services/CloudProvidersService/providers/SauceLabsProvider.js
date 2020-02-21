@@ -52,6 +52,8 @@ export default class SauceLabsProvider extends CloudProviderBase {
             throw new Error('"accessKey" must not be null');
         }
 
+        console.log('target', target);
+
         if (target && target.browserName) {
             
             if (target.browserName) {
@@ -63,15 +65,22 @@ export default class SauceLabsProvider extends CloudProviderBase {
             }
 
             if (target.osName) {
-                caps.platformName = target.osName;
+                caps.automationName = target.osName;
             }
             
             if (target.osVersion) {
                 caps.platformName += ' '+target.osVersion;
             }
         } else {
+
             if (target.osName) {
-                caps.osName = target.osName;
+                caps.platformName = target.osName;
+
+                if(target.osName === 'android'){
+                    caps.browserName = 'Android';
+                } else {
+                    caps.browserName = 'Safari';
+                }
             }
 
             if (target.deviceName) {
@@ -79,8 +88,27 @@ export default class SauceLabsProvider extends CloudProviderBase {
             }
 
             if (target.osVersion) {
-                caps.osVersion = target.osVersion;
+                caps.platformVersion = target.osVersion;
             }
+            
+            caps.deviceName = 'iPad Air 2';
+            // caps.automationName = 'UiAutomator2',
+            caps.testobject_app_id = '1';
+            caps.testobject_api_key = '538928FCB13C48EA87DB885DD1FB2F69';
+            caps.testobject_test_name = 'wdio-demo-app-test';
+            caps.platformName = 'iOS';
+            // caps.idleTimeout = 180;
+            // caps.maxInstances = 6;
+            // caps.testobject_cache_device = true;
+            // caps.noReset = true;
+            // caps.orientation = 'PORTRAIT';
+            // caps.newCommandTimeout = 180;
+            // caps.phoneOnly = true;
+            // caps.tabletOnly = false;
+
+            // caps.appiumVersion = '1.15.0';
+            caps.platformVersion = '12.1.4';
+            caps.browserName = 'Safari';
         }
         caps['sauce:options'] = {
             name: testName || null,
@@ -94,6 +122,7 @@ export default class SauceLabsProvider extends CloudProviderBase {
     }
     updateOptions(target, options = {}) {
         options.seleniumUrl = this.settings.url;
+        options.appiumUrl = this.settings.url;
         return options;
     }
 }
