@@ -65,7 +65,7 @@ export default class SauceLabsProvider extends CloudProviderBase {
             }
 
             if (target.osName) {
-                caps.automationName = target.osName;
+                caps.platformName = target.osName;
             }
             
             if (target.osVersion) {
@@ -91,24 +91,24 @@ export default class SauceLabsProvider extends CloudProviderBase {
                 caps.platformVersion = target.osVersion;
             }
             
-            caps.deviceName = 'iPad Air 2';
-            // caps.automationName = 'UiAutomator2',
-            caps.testobject_app_id = '1';
-            caps.testobject_api_key = '538928FCB13C48EA87DB885DD1FB2F69';
-            caps.testobject_test_name = 'wdio-demo-app-test';
-            caps.platformName = 'iOS';
-            // caps.idleTimeout = 180;
-            // caps.maxInstances = 6;
-            // caps.testobject_cache_device = true;
-            // caps.noReset = true;
-            // caps.orientation = 'PORTRAIT';
-            // caps.newCommandTimeout = 180;
-            // caps.phoneOnly = true;
-            // caps.tabletOnly = false;
+            // caps.deviceName = 'iPad Air 2';
+            // // caps.automationName = 'UiAutomator2',
+            // caps.testobject_app_id = '1';
+            // caps.testobject_api_key = '538928FCB13C48EA87DB885DD1FB2F69';
+            // caps.testobject_test_name = 'wdio-demo-app-test';
+            // caps.platformName = 'iOS';
+            // // caps.idleTimeout = 180;
+            // // caps.maxInstances = 6;
+            // // caps.testobject_cache_device = true;
+            // // caps.noReset = true;
+            // // caps.orientation = 'PORTRAIT';
+            // // caps.newCommandTimeout = 180;
+            // // caps.phoneOnly = true;
+            // // caps.tabletOnly = false;
 
-            // caps.appiumVersion = '1.15.0';
-            caps.platformVersion = '12.1.4';
-            caps.browserName = 'Safari';
+            // // caps.appiumVersion = '1.15.0';
+            // caps.platformVersion = '12.1.4';
+            // caps.browserName = 'Safari';
         }
         caps['sauce:options'] = {
             name: testName || null,
