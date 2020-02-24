@@ -23,11 +23,11 @@
     "lodash.merge": "4.6.2",
     "lodash.uniq": "^4.5.0",
     "lodash.uniqwith": "^4.5.0",
-    "monaco-editor": "0.18.1",
+    "monaco-editor": "0.19.3",
     "monaco-editor-textmate": "2.2.1",
     "monaco-textmate": "3.0.1",
     "onigasm": "2.2.4",
-    "oxygen-cli": "1.0.3",
+    "oxygen-cli": "1.1.0-alpha.2",
     "typescript": "3.7.5"
   }
 }
