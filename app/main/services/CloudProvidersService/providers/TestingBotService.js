@@ -155,6 +155,7 @@ export default class TestingBotProvider extends CloudProviderBase {
     }
     updateOptions(target, options = {}) {
         options.seleniumUrl = this.settings.url;
+        options.appiumUrl = this.settings.url;
         
         options.wdioOpts = {
             user: this.settings.key,
