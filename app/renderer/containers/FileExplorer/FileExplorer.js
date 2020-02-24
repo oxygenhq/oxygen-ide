@@ -55,6 +55,10 @@ export default class FileExplorer extends React.Component<Props> {
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
+        if(this.props.rootPath !== nextProps.rootPath){
+            this.doRefreshScrollTop();
+        }
+
         if (this.props.activeNodePath !== nextProps.activeNodePath) {
             if (!nextProps.activeNodePath) {
                 this.setState({
