@@ -38,12 +38,8 @@ module.exports = function(grunt) {
         defaultTasks.push('chmod:geckodriver');
         defaultTasks.push('chmod:oxygendarwin');
     } else if (process.platform === 'win32') {
-        defaultTasks.push('Win32FileService');
-        //ignore
+        defaultTasks.push('copy:win');
     }
-    defaultTasks.push('sentry-browser');
-    defaultTasks.push('package');
-    defaultTasks.push('feature');
     defaultTasks.push('rebrand');
     
 
@@ -58,11 +54,6 @@ module.exports = function(grunt) {
     grunt.registerTask('default', defaultTasks);
 
     grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'comments:chrome-ext']);
-    grunt.registerTask('sentry-browser', ['copy:sentry-browser']);
-    grunt.registerTask('package', ['copy:package']);
-    grunt.registerTask('feature', ['copy:feature']); 
-    grunt.registerTask('Win32FileService', ['copy:Win32FileService']);    
-    
 
     const OUTDIR = 'dist/temp';
     const RESOURCES = process.platform === 'darwin' ? '/Electron.app/Contents/Resources' : '/resources';
@@ -166,6 +157,23 @@ module.exports = function(grunt) {
                             'main/services/require.js',
                             'package.json'],
                         dest: OUTDIR + RESOURCES + '/app' 
+                    },
+                    { 
+                        expand: true, 
+                        cwd: SENTRY_BROWSER_SRC, src: ['**'], 
+                        dest: SENTRY_BROWSER_DIST
+                    },
+                    { 
+                        expand: true, 
+                        cwd: '',
+                        src: ['package.json'], 
+                        dest: OUTDIR + RESOURCES
+                    },
+                    { 
+                        expand: true, 
+                        cwd: 'app',
+                        src: ['renderer/components/MonacoEditor/cucumber/feature.tmLanguage'], 
+                        dest: OUTDIR + RESOURCES + '/app'
                     }
                 ]
             },
@@ -187,45 +195,7 @@ module.exports = function(grunt) {
                     }
                 ]
             },
-            'chrome-ext': {
-                files: [
-                    { 
-                        expand: true, 
-                        cwd: CHROME_EXT_SRC, src: ['**'], 
-                        dest: CHROME_EXT_DIST
-                    }
-                ]
-            },
-            'sentry-browser': {
-                files: [
-                    { 
-                        expand: true, 
-                        cwd: SENTRY_BROWSER_SRC, src: ['**'], 
-                        dest: SENTRY_BROWSER_DIST
-                    }
-                ]
-            },
-            'package': {
-                files: [
-                    { 
-                        expand: true, 
-                        cwd: '',
-                        src: ['package.json'], 
-                        dest: OUTDIR + RESOURCES
-                    }
-                ]
-            },
-            'feature': {
-                files: [
-                    { 
-                        expand: true, 
-                        cwd: 'app',
-                        src: ['renderer/components/MonacoEditor/cucumber/feature.tmLanguage'], 
-                        dest: OUTDIR + RESOURCES + '/app'
-                    }
-                ]
-            },
-            'Win32FileService': {
+            win: {
                 files: [
                     { 
                         expand: true, 
@@ -235,6 +205,15 @@ module.exports = function(grunt) {
                     }
                 ]
             },
+            'chrome-ext': {
+                files: [
+                    { 
+                        expand: true, 
+                        cwd: CHROME_EXT_SRC, src: ['**'], 
+                        dest: CHROME_EXT_DIST
+                    }
+                ]
+            }
         },
         chmod: {
             options: {
