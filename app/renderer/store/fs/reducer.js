@@ -207,11 +207,21 @@ export default (state = defaultState, action, dispatch) => {
         isLoading: false,
       };
     case failure(ActionTypes.FS_TREE_LOAD_NODE_CHILDREN):
-      let errMsg = error.code ? error.code : (error.message ? error.message : error);
+      let errMsg = 'Unknown load node children error';
+      let nodePath = 'Unknown nodePath';
+
+      if(error){
+        errMsg = error.code ? error.code : (error.message ? error.message : error);
+      }
+
+      if(node && node.path){
+        nodePath = node.path;
+      }
+
       // generate rxjs event
-      subjects["FILE.CHILDREN.LOADED"].next({ path: node.path, error: errMsg });
+      subjects["FILE.CHILDREN.LOADED"].next({ path: nodePath, error: errMsg });
       // display error to the user
-      message.error(`Error creating folder '${name}' in '${node.path}': ${errMsg}`);
+      message.error(`Error creating folder '${name}' in '${nodePath}': ${errMsg}`);
       return { 
         ...state, 
         isLoading: false,
