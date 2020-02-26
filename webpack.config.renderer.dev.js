@@ -62,7 +62,7 @@ export default merge.smart(baseConfig, {
                         presets: [
                             ['@babel/preset-env',{
                                 'targets': {
-                                  'node': '8.10'
+                                  'node': '10.11'
                                 },
                                 // Allow importing core-js in entrypoint and use browserlist to select polyfills
                                 'useBuiltIns': 'entry',
