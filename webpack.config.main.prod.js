@@ -4,7 +4,7 @@
 
 import webpack from 'webpack';
 import merge from 'webpack-merge';
-import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
@@ -22,15 +22,21 @@ export default merge.smart(baseConfig, {
         path: __dirname,
         filename: './app/main/main.prod.js'
     },
-
+    optimization: {
+        minimize: true,
+        minimizer: [
+            new TerserPlugin({
+                parallel: true,
+                sourceMap: true,
+                terserOptions: {
+                    ecma: 2016
+                }
+            })
+        ]
+    },
     plugins: [
         new webpack.DefinePlugin({
             'process.type': '"browser"'
-        }),
-    
-        new UglifyJSPlugin({
-            parallel: true,
-            sourceMap: true
         }),
 
         new BundleAnalyzerPlugin({

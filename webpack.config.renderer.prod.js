@@ -4,12 +4,11 @@
 
 import path from 'path';
 import webpack from 'webpack';
-import TerserJSPlugin from 'terser-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import merge from 'webpack-merge';
-import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
 
@@ -85,9 +84,18 @@ export default merge.smart(baseConfig, {
             }
         ]
     },
-
     optimization: {
-        minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
+        minimize: true,
+        minimizer: [
+            new TerserPlugin({
+                parallel: true,
+                sourceMap: true,
+                terserOptions: {
+                    ecma: 2016
+                }
+            }),
+            new OptimizeCSSAssetsPlugin({})
+        ]
     },
     plugins: [
         new webpack.DefinePlugin({
@@ -104,11 +112,6 @@ export default merge.smart(baseConfig, {
      */
         new webpack.EnvironmentPlugin({
             NODE_ENV: 'production'
-        }),
-
-        new UglifyJSPlugin({
-            parallel: true,
-            sourceMap: true
         }),
 
         new MiniCssExtractPlugin({
