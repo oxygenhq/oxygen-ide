@@ -42,7 +42,6 @@ export default merge.smart(baseConfig, {
                             // before react-hot-loader/babel
                             ['@babel/plugin-proposal-class-properties', { 'loose': true }],
                             '@babel/plugin-syntax-class-properties',
-                            'transform-class-properties',
                             '@babel/plugin-transform-classes',
                             'react-hot-loader/babel'
                         ],

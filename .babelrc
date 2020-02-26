@@ -82,7 +82,6 @@
       "plugins": [
         ["@babel/plugin-proposal-class-properties", { "loose": true }],
         "@babel/plugin-syntax-class-properties",
-        "transform-class-properties",
         "@babel/plugin-transform-classes",
         ["flow-runtime", {
           "assert": true,
