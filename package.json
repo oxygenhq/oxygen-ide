@@ -147,7 +147,6 @@
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "postcss-discard-font-face": "^3.0.0",
     "postcss-loader": "^3.0.0",
-    "recursive-copy": "^2.0.10",
     "redux-logger": "^3.0.6",
     "repeat-string": "^1.6.1",
     "sass-loader": "8.0.2",

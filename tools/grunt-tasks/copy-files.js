@@ -1,24 +1,23 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-var copy = require('recursive-copy');
+var fs = require('fs-extra');
 
 module.exports = function(grunt) {
-    grunt.registerTask('copy-files', 'Copy a folder recursivly', function() {
+    grunt.registerTask('copy-files', 'Copy a folder recursively', function() {
         var done = this.async();
         var cfg = grunt.config.get('copy-files');
-        copy(cfg.src, cfg.dest, function(err, results) {
-            if (err) {
+        fs.copy(cfg.src, cfg.dest, function (err) {
+            if (err){
                 grunt.fail.fatal(err);
-            } else {
-                grunt.log.writeln('Copied ' + results.length + ' files');
-                done(true);
             }
+            grunt.log.ok('Done');
+            done(true);
         });
     });
 };
