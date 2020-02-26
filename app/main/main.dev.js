@@ -26,26 +26,10 @@ import fs from 'fs';
 import path from 'path';
 import packageJson from '../../package.json';
 
-if(packageJson && packageJson.version){
-    console.log('Version : ', packageJson.version);
-}
+console.log('Version: ', packageJson.version);
 
-try {
-    if (
-        typeof process !== 'undefined' && 
-        process && 
-        process.env && 
-        process.env.NODE_ENV && 
-        process.env.NODE_ENV === 'development'
-    ) {
-    // dev mode
-    // ignore sentry logging
-    // initializeCrashReporterAndSentry();
-    } else {
-        initializeCrashReporterAndSentry();
-    }
-} catch(e){
-    console.warn('Cannot initialize CrashReporter and Sentry', e);
+if (process && process.env && process.env.NODE_ENV !== 'development') {
+    initializeCrashReporterAndSentry();
 }
 global.log = new Logger('debug', 'info');
 
@@ -184,28 +168,7 @@ function disposeMainAndQuit() {
 }
 
 function initializeCrashReporterAndSentry() {
-    const crashesDirectory = crashReporter.getCrashesDirectory();
-    const completedDirectory = path.join(crashesDirectory, 'completed');
-    const newDirectory = path.join(crashesDirectory, 'new');
-    const pendingDirectory = path.join(crashesDirectory, 'pending');
-    // make sure crashesDirectory and its sub folders exist, otherwise we will get an error while initializing Sentry
-    if (!fs.existsSync(crashesDirectory)){
-        fs.mkdirSync(crashesDirectory);
-    }
-    if (!fs.existsSync(completedDirectory)){
-        fs.mkdirSync(completedDirectory);
-    }
-    if (!fs.existsSync(newDirectory)){
-        fs.mkdirSync(newDirectory);
-    }
-    if (!fs.existsSync(pendingDirectory)){
-        fs.mkdirSync(pendingDirectory);
-    }
-  
-    if (process.env.NODE_ENV === 'development') {
-    // ignore
-    } else {
-    // start CrashReporter
+    try {
         crashReporter.start({
             companyName: 'no-company-nc',
             productName: 'ide',
@@ -214,17 +177,31 @@ function initializeCrashReporterAndSentry() {
             uploadToServer: true
         });
 
-        const DSN = 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893';
+        const crashesDirectory = crashReporter.getCrashesDirectory();
+        const completedDirectory = path.join(crashesDirectory, 'completed');
+        const newDirectory = path.join(crashesDirectory, 'new');
+        const pendingDirectory = path.join(crashesDirectory, 'pending');
+        // make sure crashesDirectory and its sub folders exist, otherwise we will get an error while initializing Sentry
+        if (!fs.existsSync(crashesDirectory)){
+            fs.mkdirSync(crashesDirectory);
+        }
+        if (!fs.existsSync(completedDirectory)){
+            fs.mkdirSync(completedDirectory);
+        }
+        if (!fs.existsSync(newDirectory)){
+            fs.mkdirSync(newDirectory);
+        }
+        if (!fs.existsSync(pendingDirectory)){
+            fs.mkdirSync(pendingDirectory);
+        }
+  
         const sentryConfig = {
-            dsn: DSN
+            dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893',
+            release: packageJson.version
         };
 
-        if(packageJson && packageJson.version){
-            sentryConfig.release = packageJson.version;
-        }
-
-        // initialize Sentry
         Sentry.init(sentryConfig);
+    } catch(e) {
+        console.warn('Cannot initialize CrashReporter and Sentry', e);
     }
 }
-

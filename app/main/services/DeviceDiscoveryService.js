@@ -71,12 +71,8 @@ export default class DeviceDiscoveryService extends ServiceBase {
                         });
                     }
                 }
-
-
             }
         } catch(e){
-            // console.log('adb get version error', e);
-            
             Sentry.configureScope((scope) => {
                 scope.setUser({'abdVersion': 'not finded'});
             });

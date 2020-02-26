@@ -157,11 +157,7 @@ const configureStore = (initialState?: counterStateType) => {
     };
 
     async function sendError(error) {
-        try{
-            // window.Sentry.captureException(error);
-        } catch(e){
-            console.warn('sendError error', e);
-        }
+        // not implemented
     }
 
     async function setUserIdToSentry(userId) {
