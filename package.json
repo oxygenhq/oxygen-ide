@@ -115,7 +115,7 @@
     "cross-env": "7.0.0",
     "cross-spawn": "7.0.1",
     "css-loader": "^0.28.11",
-    "electron": "^3.1.12",
+    "electron": "4.2.12",
     "electron-devtools-installer": "^2.2.4",
     "electron-rebuild": "1.10.0",
     "enzyme": "3.11.0",
