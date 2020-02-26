@@ -220,8 +220,12 @@ export default (state = defaultState, action, dispatch) => {
 
       // generate rxjs event
       subjects["FILE.CHILDREN.LOADED"].next({ path: nodePath, error: errMsg });
-      // display error to the user
-      message.error(`Error creating folder '${name}' in '${nodePath}': ${errMsg}`);
+
+      if(name && nodePath && errMsg){
+        // display error to the user
+        message.error(`Error creating folder '${name}' in '${nodePath}': ${errMsg}`);
+      }
+
       return { 
         ...state, 
         isLoading: false,
