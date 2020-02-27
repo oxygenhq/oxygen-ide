@@ -102,14 +102,14 @@ export default merge.smart(baseConfig, {
             'process.type': '"renderer"'
         }),
         /**
-     * Create global constants which can be configured at compile time.
-     *
-     * Useful for allowing different behaviour between development builds and
-     * release builds
-     *
-     * NODE_ENV should be production so that modules do not perform certain
-     * development checks
-     */
+         * Create global constants which can be configured at compile time.
+         *
+         * Useful for allowing different behaviour between development builds and
+         * release builds
+         *
+         * NODE_ENV should be production so that modules do not perform certain
+         * development checks
+         */
         new webpack.EnvironmentPlugin({
             NODE_ENV: 'production'
         }),
@@ -121,6 +121,9 @@ export default merge.smart(baseConfig, {
         new BundleAnalyzerPlugin({
             analyzerMode: process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',
             openAnalyzer: process.env.OPEN_ANALYZER === 'true'
-        })
+        }),
+
+        // ignore locale files of moment.js
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
     ],
 });
