@@ -10,7 +10,7 @@
 /* eslint-disable react/no-unused-state */
 import { Icon, Select, Input, TreeSelect } from 'antd';
 import React, { Fragment } from 'react';
-import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/lib/fa';
+import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import '../../css/toolbar.scss';
 
 import * as Controls from './controls';
