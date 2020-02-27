@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,7 +10,6 @@
 /* eslint-disable react/no-unused-state */
 import { Icon, Select, Input, TreeSelect } from 'antd';
 import React, { Fragment } from 'react';
-import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import '../../css/toolbar.scss';
 
 import * as Controls from './controls';
@@ -493,43 +492,36 @@ export default class Toolbar extends React.Component<Props> {
                 <div className="separator" />
                 { (waitChromeExtension || testRunning) &&
                     <span
-                        style={ getOpacity(false) }
-                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active' : 'control selectable' }
+                        style={{ ...getOpacity(false), fontFamily: 'FontAwesome' }}
+                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active fas fa-microphone' : 'control selectable fas fa-microphone' }
                         title="Record"
                     >
-                        <FaMicrophone
-                            style={{ marginRight: 0 }}
-                        />
                     </span>
                 }
 
                 { 
                     !(waitChromeExtension || testRunning) && !canRecord && 
                     <span
-                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable not-work active' : 'control selectable not-work' }
+                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable not-work active fas fa-microphone-slash' : 'control selectable not-work fas fa-microphone-slash' }
+                        style={{ fontFamily: 'FontAwesome' }}
                         title="Record"
+                        onClick={ this.showNotWorkingOxygenExtensionModal }
                     >
-                        <FaMicrophoneSlash
-                            style={{ marginRight: 0 }}
-                            onClick={ this.showNotWorkingOxygenExtensionModal }
-                        />
                     </span>
                 }
 
                 { 
                     !(waitChromeExtension || testRunning) && canRecord &&
                     <span
-                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active green-bg' : 'control selectable' }
+                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active green-bg fas fa-microphone' : 'control selectable fas fa-microphone' }
+                        style={{ fontFamily: 'FontAwesome' }}
                         title="Record"
+                        onClick={ this.showWorkingOxygenExtensionModal }
                     >
-                        <FaMicrophone
-                            style={{ marginRight: 0 }}
-                            onClick={ this.showWorkingOxygenExtensionModal }
-                        />
                     </span>
                 }
 
-                <span style={{ marginLeft: 'auto' }}>             
+                <span style={{ marginLeft: 'auto' }}>
                     <span 
                         className={ this._isSelected(Controls.TEST_SETTINGS) ? 'control selectable active' : 'control selectable' }
                         style={{ float: 'right' }}
