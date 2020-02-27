@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## v1.15.0 (2020-02-xx)
+
+#### :boom: Breaking Change
+* Bumped minimum supported macOS version to 10.10.
+
+#### :beetle: Bug Fix
+* Processing of CSV files with spaces in the header.
+* SauceLabs test execution not working.
+* Local Appium was used during mobile test execution on cloud providers.
+* If opened folder was renamed outside of the IDE, Open Folder button stopped working.
+* Other small fixes & improvements.
+
+#### :house: Internal
+* Bumped oxygen-cli from v1.0.2 to v1.1.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Updated pre-bundled Chrome drivers.
+* Bumped dependencies.
+
 ## v1.14.1 (2020-02-13)
 
 #### :beetle: Bug Fix
@@ -10,7 +27,7 @@
 * IDE sometimes freezing when stopping tests.
 
 #### :house: Internal
-* * Bump oxygen-cli from v1.0.1 to v1.0.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bump oxygen-cli from v1.0.1 to v1.0.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 
 ## v1.14.0 (2020-02-06)
 
