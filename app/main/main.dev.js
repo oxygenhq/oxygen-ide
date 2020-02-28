@@ -72,20 +72,6 @@ if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true')
     require('module').globalPaths.push(p);
 }
 
-// const installExtensions = async () => {
-//     const installer = require('electron-devtools-installer');
-//     const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-//     const extensions = [
-//         'REACT_DEVELOPER_TOOLS',
-//         'REDUX_DEVTOOLS'
-//     ];
-
-//     return Promise
-//         .all(extensions.map(name => installer.default(installer[name], forceDownload)))
-//         .catch(console.log);
-// };
-
-
 /**
  * Add event listeners...
  */
@@ -93,19 +79,10 @@ if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true')
 app.on('window-all-closed', () => {
     // Respect the OSX convention of having the application in memory even
     // after all windows have been closed
-    //if (process.platform !== 'darwin') {
     disposeMainAndQuit(); 
-    //}
 });
 
 app.on('ready', async () => {
-    /*
-  if (
-    process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
-  ) {
-    await installExtensions();
-  }
-  */
     mainWindow = new BrowserWindow({
         show: false,
         width: 1024,
@@ -115,32 +92,42 @@ app.on('ready', async () => {
         },
     });
 
-    // Prevent refresh
-    // @FIXME: it'll cause preventing refreshesh for all windows
-    // https://stackoverflow.com/questions/51187602/electron-js-prevent-refresh-for-created-window
-    globalShortcut.register('CommandOrControl+R', () => false);
-    globalShortcut.register('F5', () => false);
-    mainWindow.loadURL(`file://${__dirname}/../renderer/app.html`);
-
-    mainWindow.webContents.on('did-finish-load', () => {
-        mainWindow.show();
-        mainWindow.focus();
-    });
-
-    mainWindow.on('closed', () => {
-        disposeMainAndQuit();
-    });
-
-    try{
-        mainProc = new MainProcess(mainWindow);
-    } catch(e){
+    if(mainWindow){
+        // Prevent refresh
+        // @FIXME: it'll cause preventing refreshesh for all windows
+        // https://stackoverflow.com/questions/51187602/electron-js-prevent-refresh-for-created-window
+        globalShortcut.register('CommandOrControl+R', () => false);
+        globalShortcut.register('F5', () => false);
+        mainWindow.loadURL(`file://${__dirname}/../renderer/app.html`);
     
-        if(Sentry && Sentry.captureException){
-            Sentry.captureException(e);
+        mainWindow.webContents.on('did-finish-load', () => {
+            if(mainWindow){
+                mainWindow.show();
+                mainWindow.focus();
+            }
+        });
+
+        mainWindow.webContents.on('destroyed', () => {
+            disposeMainAndQuit();
+        });
+    
+        mainWindow.on('closed', () => {
+            disposeMainAndQuit();
+        });
+        
+        try{
+            mainProc = new MainProcess(mainWindow);
+        } catch(e){
+        
+            if(Sentry && Sentry.captureException){
+                console.log('LOCATION : mainProc = new MainProcess(mainWindow)');
+                Sentry.captureException(e);
+            }
+        
+            console.log('e', e);
         }
-    
-        console.log('e', e);
     }
+
 });
 
 app.on('unresponsive', () => {
@@ -152,6 +139,8 @@ app.on('unresponsive', () => {
 });
 
 function disposeMainAndQuit() {
+    mainWindow = null;
+
     if (mainProc) {
         // dispose main process and all its services
         /*eslint-disable */
