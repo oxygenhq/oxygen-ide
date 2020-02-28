@@ -116,9 +116,18 @@ var LIMIT_ALL = 0;
 var LIMIT_TWO = 1;
 var LIMIT_ONE = 2;
 
+const invalidIDChars = ['~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '+', '=', ',', '.', '/', "'", ';', ':', '"', '?', '>', '<', '[', ']', '\\', '{', '}', '|', '`', '#'];
+
 var config = {
     root: document.body,
-    idName: function (name) { return true; },
+    idName: function (name) {
+        // do not process IDs containing illegal CSS selector chars
+        if (!name ||
+            name.length < 2 ||
+            invalidIDChars.some(function(v) { return name.indexOf(v) >= 0; })) {
+            return false;
+        }
+    },
     className: function (name) { return true; },
     tagName: function (name) { return true; },
     attr: function (name, value) { return false; },
