@@ -27,7 +27,7 @@
     "test-e2e": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r @babel/register ./internals/scripts/RunTests.js e2e",
     "test-watch": "npm test -- --watch"
   },
-  "browserslist": "electron 2.0",
+  "browserslist": "electron 4.2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/oxygenhq/oxygen-ide.git"
