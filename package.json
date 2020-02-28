@@ -118,7 +118,6 @@
     "flow-typed": "3.0.0",
     "grunt": "^1.0.4",
     "grunt-chmod": "^1.1.1",
-    "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-compress": "1.6.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-stripcomments": "^0.7.2",

@@ -12,7 +12,6 @@ var path = require('path');
 
 module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-chmod');
     grunt.loadNpmTasks('grunt-stripcomments');
