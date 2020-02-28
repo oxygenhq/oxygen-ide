@@ -65,25 +65,27 @@ module.exports = function(grunt) {
     // get production dependencies. instead of using '**' we get the actual deps list
     // because ** and tons of ingores (from modclean task) don't play along nicely
     var prodDeps = [];
-    try {
-        var cwd = process.cwd();
-        process.chdir('app');
-        // peer dependency for Onigasm
-        cp.execSync('npm i typescript@3.7.5');
-        var out = cp.execSync('npm ls --prod=true --parseable');
-        var prodDepsUnfiltered = out.toString().split(/\r?\n/);
-        var si = __dirname.length + 1 + 'app'.length + 1 + 'node_modules'.length + 1;
-        for (var i = 0; i < prodDepsUnfiltered.length; i++) {
-            var dep = prodDepsUnfiltered[i].substring(si);
-            if (dep === '' || dep.indexOf('node_modules') > 0) {
-                continue;
+    if (!grunt.cli.tasks.includes('chrome-ext')) {
+        try {
+            var cwd = process.cwd();
+            process.chdir('app');
+            // peer dependency for Onigasm
+            cp.execSync('npm i typescript@3.7.5');
+            var out = cp.execSync('npm ls --prod=true --parseable');
+            var prodDepsUnfiltered = out.toString().split(/\r?\n/);
+            var si = __dirname.length + 1 + 'app'.length + 1 + 'node_modules'.length + 1;
+            for (var i = 0; i < prodDepsUnfiltered.length; i++) {
+                var dep = prodDepsUnfiltered[i].substring(si);
+                if (dep === '' || dep.indexOf('node_modules') > 0) {
+                    continue;
+                }
+                prodDeps.push(dep + '/**');
             }
-            prodDeps.push(dep + '/**');
+            cp.execSync('npm uninstall typescript');
+            process.chdir(cwd);
+        } catch (e) {
+            grunt.fail.fatal('Unable to get production dependencies list', e);
         }
-        cp.execSync('npm uninstall typescript');
-        process.chdir(cwd);
-    } catch (e) {
-        grunt.fail.fatal('Unable to get production dependencies list', e);
     }
 
     grunt.initConfig({
