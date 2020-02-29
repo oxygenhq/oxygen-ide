@@ -121,7 +121,7 @@ module.exports = function(grunt) {
                     multiline: true,
                     keepSpecialComments: false
                 },
-                src: [CHROME_EXT_DIST + 'recorder.js']
+                src: [CHROME_EXT_DIST + '*.js']
             }
         },
         copy: {

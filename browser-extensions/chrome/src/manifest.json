@@ -12,12 +12,20 @@
     "webRequestBlocking",
     "<all_urls>"],
   "icons": { "16": "32x32.png", "48": "48x48.png", "128": "128x128.png"},
-  "content_scripts": [ {
-    "js": [ "content.js", "recorder.js" ],
-    "matches": [ "<all_urls>"],
-    "run_at" : "document_end",
-    "all_frames" : true
-  }],
+  "content_scripts": [
+    {
+      "js": [ "content.js", "recorder.js" ],
+      "matches": [ "<all_urls>"],
+      "run_at" : "document_end",
+      "all_frames" : true
+    },
+    {
+      "js": [ "eventListeners.js" ],
+      "matches": [ "<all_urls>"],
+      "run_at" : "document_start",
+      "all_frames" : true
+    }
+  ],
   "background": {
     "scripts": [ "background.js" ]
   },
