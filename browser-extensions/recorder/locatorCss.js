@@ -50,8 +50,6 @@ var LIMIT_ALL = 0;
 var LIMIT_TWO = 1;
 var LIMIT_ONE = 2;
 
-const invalidIDChars = ['~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '+', '=', ',', '.', '/', "'", ';', ':', '"', '?', '>', '<', '[', ']', '\\', '{', '}', '|', '`', '#'];
-
 var config = {
     root: document.body,
     idName: function (name) { return true; },
