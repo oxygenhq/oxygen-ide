@@ -12,7 +12,6 @@ var path = require('path');
 
 module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-chmod');
 
     grunt.loadTasks('./tools/grunt-tasks');
@@ -230,17 +229,8 @@ module.exports = function(grunt) {
         },
         compress: {
             linux: {
-                options: {
-                    archive: 'dist/oxygen-' + pkg.version + '-linux-x64.zip',
-                    level: 9
-                },
-                files: [
-                    { 
-                        expand: true, 
-                        cwd: OUTDIR, src: ['**'], 
-                        dest: 'oxygen-' + pkg.version + '-linux-x64'
-                    }
-                ]
+                src: OUTDIR,
+                dest: path.join(__dirname, 'dist', 'oxygen-' + pkg.version + '-linux-x64.zip')
             }
         },
         'installer-dmg': {
