@@ -14,7 +14,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-chmod');
-    grunt.loadNpmTasks('grunt-stripcomments');
 
     grunt.loadTasks('./tools/grunt-tasks');
 
@@ -52,7 +51,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('default', defaultTasks);
 
-    grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'comments:chrome-ext']);
+    grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'strip-comments:chrome-ext']);
 
     const OUTDIR = 'dist/temp';
     const RESOURCES = process.platform === 'darwin' ? '/Electron.app/Contents/Resources' : '/resources';
@@ -114,15 +113,8 @@ module.exports = function(grunt) {
                 RECORDER + 'engineXpath.js'],
             dest: [CHROME_EXT_DIST + 'recorder.js']
         },
-        comments: {
-            'chrome-ext': {
-                options: {
-                    singleline: true,
-                    multiline: true,
-                    keepSpecialComments: false
-                },
-                src: [CHROME_EXT_DIST + '*.js']
-            }
+        'strip-comments': {
+            'chrome-ext': CHROME_EXT_DIST + '*.js'
         },
         copy: {
             main: {
