@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,16 +10,27 @@
 import loggerSetup from './helpers/logger';
 loggerSetup();
 
+import * as Sentry from '@sentry/electron';
 import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import 'antd/dist/antd.css';
-
 import App from './containers/App';
 import importConfigureStore from './store/configureStore';
 import { configureServices } from './services';
-// import './helpers/';
 import './app.global.scss';
+import packageJson from '../../package.json';
+
+if (process.env.NODE_ENV === 'production') {
+    try {
+        Sentry.init({
+            dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893',
+            release: packageJson.version
+        });
+    } catch(e) {
+        console.warn('Cannot initialize CrashReporter and Sentry', e);
+    }
+}
 
 const { configureStore, history } = importConfigureStore;
 
