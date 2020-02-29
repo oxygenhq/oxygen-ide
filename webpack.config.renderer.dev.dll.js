@@ -88,6 +88,16 @@ export default merge.smart(baseConfig, {
                 ]
             },
 
+            // monaco editor css & ttf
+            {
+                test: /node_modules[/\\]*monaco-editor[/\\]*esm.*\.css$/,
+                use: ['style-loader', 'css-loader']
+            },
+            {
+                test: /node_modules[/\\]*monaco-editor[/\\]*esm.*\.ttf$/,
+                use: ['file-loader']
+            },
+
             // doesn't contains module keyword
             // also is using for global and imports
             {

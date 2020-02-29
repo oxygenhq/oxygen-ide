@@ -26,9 +26,6 @@
     "flowtype/valid-syntax": "error"
   },
   "globals": {
-    "ace": true,
-    "self": true,
-    "amdRequire": true,
     "monaco": true
   }
 }

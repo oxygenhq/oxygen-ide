@@ -11,6 +11,7 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import merge from 'webpack-merge';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
+import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 
 CheckNodeEnv('production');
 
@@ -23,7 +24,7 @@ export default merge.smart(baseConfig, {
 
     output: {
         path: path.join(__dirname, 'app/dist'),
-        publicPath: '',
+        publicPath: path.join(__dirname, 'app/dist/'),
         filename: 'renderer.prod.js'
     },
 
@@ -81,6 +82,12 @@ export default merge.smart(baseConfig, {
             {
                 test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
                 use: 'url-loader',
+            },
+            // WASM
+            {
+                test: /\.wasm$/,
+                loader: 'file-loader',
+                type: 'javascript/auto',
             }
         ]
     },
@@ -124,6 +131,17 @@ export default merge.smart(baseConfig, {
         }),
 
         // ignore locale files of moment.js
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+        new MonacoWebpackPlugin({
+            languages: ['javascript', 'typescript', 'json', 'xml'],
+            features: [
+            'accessibilityHelp', 'bracketMatching', 'caretOperations', 'clipboard', 'codeAction', 'codelens',
+            'comment', 'contextmenu', 'coreCommands', 'cursorUndo', 'find', 'folding', 'fontZoom', 'format',
+            'gotoError', 'gotoLine', 'gotoSymbol', 'hover', 'inPlaceReplace', 'inspectTokens', 'linesOperations',
+            'links', 'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 
+            'rename', 'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 
+            'transpose', 'wordHighlighter', 'wordOperations', 'wordPartOperations']
+        })
     ],
 });

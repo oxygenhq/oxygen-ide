@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-//import * as monaco from 'monaco-editor';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import React from 'react';
 import path from 'path';
 import { loadWASM } from 'onigasm';
@@ -22,23 +22,6 @@ const RATIO = 1.58;
 const DEFAULT_FONT_SIZE = 12;
 const FONT_SIZE_MIN = 12;
 const FONT_SIZE_MAX = 36;
-
-// load Monaco Editor module
-function uriFromPath(_path) {
-    let pathName = path.resolve(_path).replace(/\\/g, '/');
-    if (pathName.length > 0 && pathName.charAt(0) !== '/') {
-        pathName = `/${pathName}`;
-    }
-    return encodeURI(`file://${pathName}`);
-}
-try {
-    amdRequire.config({
-        ignoreDuplicateModules: 'vs/editor/editor.main',
-        baseUrl: uriFromPath(path.join(__dirname, '../node_modules/monaco-editor/min'))
-    });
-} catch(e){
-    console.log('amdRequire config e', e);
-}
 
 function noop() {}
 
@@ -97,11 +80,9 @@ export default class MonacoEditor extends React.Component<Props> {
     }
 
     componentDidMount() {
-        try{
-            amdRequire(['vs/editor/editor.main'], () => {
-                this.initMonaco();
-            });
-        } catch(e){
+        try {
+            this.initMonaco();
+        } catch(e) {
             console.log('monaco editor e', e);
         }
     }
@@ -295,7 +276,10 @@ export default class MonacoEditor extends React.Component<Props> {
         try {
             const { featureLanguageLoaded, setFatureLanguageLoaded } = this.props;
             if(!featureLanguageLoaded){
-                await loadWASM(path.join(__dirname, '../node_modules/onigasm/lib/onigasm.wasm')); // See https://www.npmjs.com/package/onigasm#light-it-up
+                // see https://www.npmjs.com/package/onigasm#light-it-up
+                await loadWASM(process.env.NODE_ENV === 'development' ?
+                    path.join(__dirname, '../../node_modules/onigasm/lib/onigasm.wasm') :
+                    require('onigasm/lib/onigasm.wasm'));
             
                 const registry = new Registry({
                     getGrammarDefinition: async (scopeName) => {
