@@ -6,74 +6,8 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-// https://github.com/mathiasbynens/cssesc v3.0.0
-
-const regexExcessiveSpaces = /(^|\\+)?(\\[A-F0-9]{1,6})\x20(?![a-fA-F0-9\x20])/g;
-
-// https://mathiasbynens.be/notes/css-escapes#css
-const cssesc = (string, isIdentifier) => {
-    const firstChar = string.charAt(0);
-    let output = '';
-    let counter = 0;
-    const length = string.length;
-    while (counter < length) {
-        const character = string.charAt(counter++);
-        let codePoint = character.charCodeAt();
-        let value;
-        // If it’s not a printable ASCII character…
-        if (codePoint < 0x20 || codePoint > 0x7E) {
-            if (codePoint >= 0xD800 && codePoint <= 0xDBFF && counter < length) {
-                // It’s a high surrogate, and there is a next character.
-                const extra = string.charCodeAt(counter++);
-                if ((extra & 0xFC00) == 0xDC00) { // next character is low surrogate
-                    codePoint = ((codePoint & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000;
-                } else {
-                    // It’s an unmatched surrogate; only append this code unit, in case
-                    // the next code unit is the high surrogate of a surrogate pair.
-                    counter--;
-                }
-            }
-            value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
-        } else {
-            if (/[\t\n\f\r\x0B]/.test(character)) {
-                value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
-            } else if (
-                character == '\\' ||
-                (!isIdentifier && character == '\'')
-            ) {
-                value = '\\' + character;
-            } else {
-                value = character;
-            }
-        }
-        output += value;
-    }
-
-    if (isIdentifier) {
-        if (/^-[-\d]/.test(output)) {
-            output = '\\-' + output.slice(1);
-        } else if (/\d/.test(firstChar)) {
-            output = '\\3' + firstChar + ' ' + output.slice(1);
-        }
-    }
-
-    // Remove spaces after `\HEX` escapes that are not followed by a hex digit,
-    // since they’re redundant. Note that this is only possible if the escape
-    // sequence isn’t preceded by an odd number of backslashes.
-    output = output.replace(regexExcessiveSpaces, function($0, $1, $2) {
-        if ($1 && $1.length % 2) {
-            // It’s not safe to remove the space, so don’t.
-            return $0;
-        }
-        // Strip the space.
-        return ($1 || '') + $2;
-    });
-
-    return output;
-};
 
 // https://github.com/antonmedv/finder  v1.1.2
-
 var __generator = (this && this.__generator) || function (thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
     return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
@@ -120,14 +54,7 @@ const invalidIDChars = ['~', '!', '@', '$', '%', '^', '&', '*', '(', ')', '+', '
 
 var config = {
     root: document.body,
-    idName: function (name) {
-        // do not process IDs containing illegal CSS selector chars
-        if (!name ||
-            name.length < 2 ||
-            invalidIDChars.some(function(v) { return name.indexOf(v) >= 0; })) {
-            return false;
-        }
-    },
+    idName: function (name) { return true; },
     className: function (name) { return true; },
     tagName: function (name) { return true; },
     attr: function (name, value) { return false; },
@@ -267,7 +194,7 @@ function id(input) {
     var elementId = input.getAttribute('id');
     if (elementId && config.idName(elementId)) {
         return {
-            name: '#' + cssesc(elementId, { isIdentifier: true }),
+            name: '#' + CSS.escape(elementId),
             penalty: 0,
         };
     }
@@ -276,7 +203,7 @@ function id(input) {
 function attr(input) {
     var attrs = Array.from(input.attributes).filter(function (attr) { return config.attr(attr.name, attr.value); });
     return attrs.map(function (attr) { return ({
-        name: '[' + cssesc(attr.name, { isIdentifier: true }) + '="' + cssesc(attr.value) + '"]',
+        name: '[' + CSS.escape(attr.name) + '="' + CSS.escape(attr.value) + '"]',
         penalty: 0.5
     }); });
 }
@@ -284,7 +211,7 @@ function classNames(input) {
     var names = Array.from(input.classList)
         .filter(config.className);
     return names.map(function (name) { return ({
-        name: '.' + cssesc(name, { isIdentifier: true }),
+        name: '.' + CSS.escape(name),
         penalty: 1
     }); });
 }
