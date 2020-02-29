@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.15.0 (2020-02-xx)
+## v1.15.0 (2020-03-xx)
 
 #### :boom: Breaking Change
 * Bumped minimum supported macOS version to 10.10.
@@ -13,9 +13,13 @@
 * Other small fixes & improvements.
 
 #### :house: Internal
-* Bumped oxygen-cli from v1.0.2 to v1.1.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bumped oxygen-cli from v1.0.2 to v1.1.1. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 * Updated pre-bundled Chrome drivers.
-* Bumped dependencies.
+* Bumped and cleaned-up dependencies.
+
+#### :studio_microphone: Chrome Extension (v0.71.0)
+* Fixed generation of CSS selector when ID contains illegal characters.
+* Do not pollute website's message event handlers with recorder messages.
 
 ## v1.14.1 (2020-02-13)
 
