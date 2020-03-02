@@ -31,6 +31,13 @@ Recorder.cmdPrepare = function(command, target, value) {
     // use locator in the target parameter
     var trg, trgLocs;
     if (target && target.constructor === Array) {
+        // escape backslashes in CSS locators (if CSS was escaped due to illigal chars)
+        for (var locator of target) {
+            if (locator[1] === 'css') {
+                locator[0] = locator[0].replace(/\\/g, '\\\\');
+                break;
+            }
+        }
         trg = target[0][0];
         trgLocs = target;
     } else {
