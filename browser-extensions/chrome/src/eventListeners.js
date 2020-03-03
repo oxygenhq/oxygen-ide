@@ -67,8 +67,12 @@ window.addEventListener(
                 var frame = framesAll[i];
                 // is it "our" frame? i.e. the one that is ready to receive the locator
                 if (frame.contentWindow === e.source) {
-                    var locs = _ox_recorder.findLocators(frame);
-                    e.source.postMessage(JSON.stringify({type: _ox_FRAME_LOCATORS, data: JSON.stringify(locs)}), '*');
+                    // ox_recorder is not available yet since it's initialized on document_end,
+                    // and this handler inited on document_start, thus we pospone
+                    setTimeout(function() {
+                        var locs = _ox_recorder.findLocators(frame);
+                        e.source.postMessage(JSON.stringify({type: _ox_FRAME_LOCATORS, data: JSON.stringify(locs)}), '*');
+                    }, 1000);
                     break;
                 }
             }
