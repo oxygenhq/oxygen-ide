@@ -112,3 +112,8 @@ function enableLogging(debuggingEnabled) {
         };`;
     document.body.appendChild(s);
 })();
+
+if (window.parent != window) {  // are we a frame?
+    window.parent.postMessage(JSON.stringify({type: 'FRAME_IS_READY'}), '*');
+    window.parent.postMessage(JSON.stringify({type: 'WINDOW_GROUP', data: window.__hash}), '*');
+}

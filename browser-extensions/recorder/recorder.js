@@ -505,3 +505,99 @@ Recorder.prototype.recordClick = function (target) {
 };
 
 _ox_recorder = new Recorder();
+
+var _ox_FRAME_LOCATORS = 'FRAME_LOCATORS';
+var _ox_FRAME_IS_READY = 'FRAME_IS_READY';
+var _ox_WINDOW_GROUP = 'WINDOW_GROUP';
+
+window.addEventListener(
+    'message', 
+    function(e) {
+        // NOTE: messages are serialized and passed as strings since IE < 11 can pass only primitives
+        var msg;
+        try {
+            msg = JSON.parse(e.data);
+            if (!msg) {
+                return;
+            }
+        } catch (err) {
+            return; // ignore unparsable 3rd party messages from the page
+        }
+
+        if (msg.type === _ox_FRAME_LOCATORS) {
+            e.stopPropagation();
+            window.__frameLocators = JSON.parse(msg.data);
+        } else if (msg.type === _ox_FRAME_IS_READY) {
+            e.stopPropagation();
+            // get all (i)frames in this document
+            var framesAll = [];
+            var frames = document.getElementsByTagName('frame');
+            for (var i = 0; i < frames.length; i++) {
+                framesAll.push(frames[i]);
+            }
+            var iframes = document.getElementsByTagName('iframe');
+            for (var i = 0; i < iframes.length; i++) {
+                framesAll.push(iframes[i]);
+            }
+
+            for (var i = 0; i < framesAll.length; i++) {
+                var frame = framesAll[i];
+                // is it "our" frame? i.e. the one that is ready to receive the locator
+                if (frame.contentWindow === e.source) {
+                    var locs = _ox_recorder.findLocators(frame);
+                    e.source.postMessage(JSON.stringify({type: _ox_FRAME_LOCATORS, data: JSON.stringify(locs)}), '*');
+                    break;
+                }
+            }
+        } else if (msg.type === _ox_WINDOW_GROUP) {
+            e.stopPropagation();
+            var hash = msg.data + ',' + window.__hash;
+            if (window.parent != window) {  // we are in a frame
+                window.parent.postMessage(JSON.stringify({type: _ox_WINDOW_GROUP, data: hash}), '*');
+            } else {                        // we have reached the top
+                if (hash.length > 16) { // only if group contains more than one window 
+                    window.postMessage(JSON.stringify({cmd: 'RECORDER_WINDOW_GROUP_ADD', data: hash }), '*');
+                }
+            }
+        } else if (msg.type === 'CONTEXT_MENU_RECORD') { // not related to frames...
+            e.stopPropagation();
+            var el = window.__contextmenuEl;
+            switch (msg.cmd) {
+            case 'waitForText':
+            case 'assertText':
+                var txt = getText(el);
+                if (!txt) {
+                    ox_log('error: selected element doesn\'t have text');
+                    return;
+                }
+                _ox_recorder.record(msg.cmd, _ox_recorder.findLocators(el), txt);
+                break;
+            case 'waitForValue':
+            case 'assertValue':
+                if (!el.getAttribute('value')) {
+                    ox_log('error: selected element doesn\'t have value attribute');
+                    return;
+                }
+                _ox_recorder.record(msg.cmd, _ox_recorder.findLocators(el), el.value);
+                break;
+            case 'waitForExist':
+                _ox_recorder.record(msg.cmd, _ox_recorder.findLocators(el));
+                break;
+            case 'assertTitle':
+                _ox_recorder.record(msg.cmd, document.title, null);
+                break;
+            }
+        } else if (msg.type === 'SETTINGS_DEBUG') { // not related to frames...
+            e.stopPropagation();
+            window.ox_debug = msg.enable;
+        } else if (msg.type === 'RECORD_COMMAND') { // not related to frames...
+            e.stopPropagation();
+            _ox_recorder.recordSendCommand(msg.lastWindow);
+        } else if (msg.type === 'RECORD_ALERT') {
+            e.stopPropagation();
+            _ox_recorder.recordNoLocators(msg.cmd, msg.val);
+            _ox_recorder.recordSendCommand();
+        }
+    },
+    false
+);
