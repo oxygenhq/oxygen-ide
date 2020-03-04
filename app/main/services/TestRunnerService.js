@@ -64,6 +64,7 @@ export default class TestRunnerService extends ServiceBase {
             testTarget,
             testProvider,
             seleniumPort,
+            selenuimPid,
             stepDelay,
             testName,
             rootPath,
@@ -170,6 +171,10 @@ export default class TestRunnerService extends ServiceBase {
 
         if(rootPath){
             options.rootPath = rootPath;
+        }
+
+        if(selenuimPid){
+            options.selenuimPid = selenuimPid;
         }
 
         if(oxConfigFile){

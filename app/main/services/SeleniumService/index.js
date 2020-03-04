@@ -47,14 +47,14 @@ export default class SeleniumService extends ServiceBase {
     _detectPortAndStart(){
         return detectPort(selSettings.port)
             .then(availablePort => {
-                this._startProcess(availablePort);
+                const seleniumPid = this._startProcess(availablePort);
                 this.availablePort = availablePort;
-                return availablePort;
+                return seleniumPid;
             })
             .catch(err => {
                 const result = 'Unable to start Selenium';
                 console.log(result, err);
-                return result;
+                return null;
             });
     }
 
@@ -215,8 +215,17 @@ export default class SeleniumService extends ServiceBase {
 
         console.log('Attempting to start Selenium process with the following args:', selArgs);
         this.seleniumProc = cp.spawn('java', selArgs, { cwd, shell: true });
+
+        let seleniumPid = null;
+
+        if (this.seleniumProc && this.seleniumProc.pid) {
+            seleniumPid = this.seleniumProc.pid;
+        }
+
         this._emitStartedEvent(port);
         this._handleProcessEvents();
+
+        return seleniumPid;
     }
 
     _handleProcessEvents() {

@@ -249,8 +249,6 @@ export function* initialize() {
     yield put(testActions.waitUpdateBreakpoints(false));
     // start check for update
     services.mainIpc.call('UpdateService', 'start', [false]);
-    // start Selenium server
-    services.mainIpc.call('SeleniumService', 'start');
     // start Android and iOS device watcher
     services.mainIpc.call('DeviceDiscoveryService', 'start').catch((e) => console.error(e.message));
 
@@ -293,6 +291,13 @@ export function* initialize() {
         if(appSettings){
             appSettings.cacheUsed = true;
         }
+    }
+
+    // start Selenium server
+    const seleniumPid = yield services.mainIpc.call('SeleniumService', 'start');
+
+    if(seleniumPid){
+        yield put(testActions.setSelenuimPid(seleniumPid));
     }
 
     if(appSettings && appSettings.lastSession && appSettings.lastSession.rootFolder){
