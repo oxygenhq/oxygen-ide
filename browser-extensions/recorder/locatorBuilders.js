@@ -366,7 +366,7 @@ LocatorBuilders.add('css', function(e) {
     }
 
     try {
-        var loc = 'css=' + cssFinder(e);
+        var loc = 'css=' + cssFinder(e, true);
         return this.findElement(loc, true) ? loc : null;
     } catch (e) {
         ox_error('error calculating CSS locator', e);

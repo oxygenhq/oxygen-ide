@@ -1,333 +1,192 @@
-/*
- * Copyright (C) 2015-present CloudBeat Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- */
+// Taken from https://github.com/ChromeDevTools/devtools-frontend/blob/97611c9403b4eb056eba05eb508c0a81aacdf0a5/front_end/elements/DOMPath.js
 
-// https://github.com/antonmedv/finder  v1.1.2
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+// Copyright 2018 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+const cssFinder = function (node, optimized) {
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+        return '';
     }
-};
-var __values = (this && this.__values) || function (o) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
-    if (m) return m.call(o);
-    return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
+
+    const steps = [];
+    let contextNode = node;
+
+    while (contextNode) {
+        const step = _cssPathStep(contextNode, !!optimized, contextNode === node);
+
+        if (!step) {
+            break;
+        } // Error - bail out early.
+
+        steps.push(step);
+
+        if (step.optimized) {
+            break;
         }
-    };
-};
 
-var LIMIT_ALL = 0;
-var LIMIT_TWO = 1;
-var LIMIT_ONE = 2;
-
-var config = {
-    root: document.body,
-    idName: function (name) { return true; },
-    className: function (name) { return true; },
-    tagName: function (name) { return true; },
-    attr: function (name, value) { return false; },
-    seedMinLength: 1,
-    optimizedMinLength: 2,
-    threshold: 600
-};
-
-var rootDocument;
-function cssFinder(input) {
-    if (input.nodeType !== Node.ELEMENT_NODE) {
-        throw new Error("Can't generate CSS selector for non-element node type.");
-    }
-    if ('html' === input.tagName.toLowerCase()) {
-        return 'html';
+        contextNode = contextNode.parentNode;
     }
 
-    rootDocument = findRootDocument(config.root);
-    var path = bottomUpSearch(input, LIMIT_ALL, function () {
-        return bottomUpSearch(input, LIMIT_TWO, function () {
-            return bottomUpSearch(input, LIMIT_ONE);
+    steps.reverse();
+    return steps.join(' > ');
+};
+
+const _cssPathStep = function (node, optimized, isTargetNode) {
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+        return null;
+    }
+
+    const id = node.getAttribute('id');
+
+    if (optimized) {
+        if (id) {
+            return new _ox_Step(idSelector(id), true);
+        }
+
+        const nodeNameLower = node.nodeName.toLowerCase();
+        if (nodeNameLower === 'body' || nodeNameLower === 'head' || nodeNameLower === 'html') {
+            return new _ox_Step(nodeNameInCorrectCase(node), true);
+        }
+    }
+
+    const nodeName = nodeNameInCorrectCase(node);
+
+    if (id) {
+        return new _ox_Step(nodeName + idSelector(id), true);
+    }
+
+    const parent = node.parentNode;
+
+    if (!parent || parent.nodeType === Node.DOCUMENT_NODE) {
+        return new _ox_Step(nodeName, true);
+    }
+
+    function prefixedElementClassNames(node) {
+        const classAttribute = node.getAttribute('class');
+
+        if (!classAttribute) {
+            return [];
+        }
+
+        return classAttribute.split(/\s+/g).filter(Boolean).map(function (name) {
+            // The prefix is required to store "__proto__" in a object-based map.
+            return '$' + name;
         });
-    });
-    if (path) {
-        var optimized = sort(optimize(path, input));
-        if (optimized.length > 0) {
-            path = optimized[0];
-        }
-        return selector(path);
-    } else {
-        throw new Error('Selector was not found.');
     }
-}
 
-function findRootDocument(rootNode, defaults) {
-    if (rootNode.nodeType === Node.DOCUMENT_NODE) {
-        return rootNode;
+    function idSelector(id) {
+        return '#' + CSS.escape(id);
     }
-    if (rootNode === document.body) {
-        return rootNode.ownerDocument;
+
+    const prefixedOwnClassNamesArray = prefixedElementClassNames(node);
+    let needsClassNames = false;
+    let needsNthChild = false;
+    let ownIndex = -1;
+    let elementIndex = -1;
+    const siblings = parent.children;
+
+    for (let i = 0; (ownIndex === -1 || !needsNthChild) && i < siblings.length; ++i) {
+        const sibling = siblings[i];
+
+        if (sibling.nodeType !== Node.ELEMENT_NODE) {
+            continue;
+        }
+
+        elementIndex += 1;
+
+        if (sibling === node) {
+            ownIndex = elementIndex;
+            continue;
+        }
+
+        if (needsNthChild) {
+            continue;
+        }
+
+        if (nodeNameInCorrectCase(sibling) !== nodeName) {
+            continue;
+        }
+
+        needsClassNames = true;
+        const ownClassNames = new Set(prefixedOwnClassNamesArray);
+
+        if (!ownClassNames.size) {
+            needsNthChild = true;
+            continue;
+        }
+
+        const siblingClassNamesArray = prefixedElementClassNames(sibling);
+
+        for (let j = 0; j < siblingClassNamesArray.length; ++j) {
+            const siblingClass = siblingClassNamesArray[j];
+
+            if (!ownClassNames.has(siblingClass)) {
+                continue;
+            }
+
+            ownClassNames.delete(siblingClass);
+
+            if (!ownClassNames.size) {
+                needsNthChild = true;
+                break;
+            }
+        }
     }
-    return rootNode;
-}
-function bottomUpSearch(input, limit, fallback) {
-    var path = null;
-    var stack = [];
-    var current = input;
-    var i = 0;
-    var _loop_1 = function () {
-        var level = maybe(id(current)) || maybe.apply(void 0, attr(current)) || maybe.apply(void 0, classNames(current)) || maybe(tagName(current)) || [any()];
-        var nth = index(current);
-        if (limit === LIMIT_ALL) {
-            if (nth) {
-                level = level.concat(level.filter(dispensableNth).map(function (node) { return nthChild(node, nth); }));
-            }
-        } else if (limit === LIMIT_TWO) {
-            level = level.slice(0, 1);
-            if (nth) {
-                level = level.concat(level.filter(dispensableNth).map(function (node) { return nthChild(node, nth); }));
-            }
-        } else if (limit === LIMIT_ONE) {
-            var node = (level = level.slice(0, 1))[0];
-            if (nth && dispensableNth(node)) {
-                level = [nthChild(node, nth)];
-            }
+
+    let result = nodeName;
+
+    if (isTargetNode && nodeName.toLowerCase() === 'input' && node.getAttribute('type') && !node.getAttribute('id') && !node.getAttribute('class')) {
+        result += '[type=' + CSS.escape(node.getAttribute('type')) + ']';
+    }
+
+    if (needsNthChild) {
+        result += ':nth-child(' + (ownIndex + 1) + ')';
+    } else if (needsClassNames) {
+        for (const prefixedName of prefixedOwnClassNamesArray) {
+            result += '.' + CSS.escape(prefixedName.slice(1));
         }
-        for (var _i = 0, level_1 = level; _i < level_1.length; _i++) {
-            var node = level_1[_i];
-            node.level = i;
+    }
+
+    return new _ox_Step(result, false);
+};
+
+let _ox_Step = function () {
+    function _ox_Step(value, optimized) {
+        this.value = value;
+        this.optimized = optimized || false;
+    }
+
+    var descriptor = {
+        key: "toString",
+        value: function toString() {
+            return this.value;
         }
-        stack.push(level);
-        if (stack.length >= config.seedMinLength) {
-            path = findUniquePath(stack, fallback);
-            if (path) {
-                return "break";
-            }
-        }
-        current = current.parentElement;
-        i++;
     };
-    while (current && current !== config.root.parentElement) {
-        var state_1 = _loop_1();
-        if (state_1 === "break")
-            break;
+
+    descriptor.enumerable = false;
+    descriptor.configurable = true;
+    descriptor.writable = true;
+    Object.defineProperty(_ox_Step.prototype, descriptor.key, descriptor);
+    return _ox_Step;
+}();
+
+function nodeNameInCorrectCase(node) {
+    const shadowRootType = node.shadowRoot && node.shadowRoot.mode;
+    if (shadowRootType) {
+        return '#shadow-root (' + shadowRootType + ')';
     }
-    if (!path) {
-        path = findUniquePath(stack, fallback);
+
+    // If there is no local name, it's case sensitive
+    if (!node.localName) {
+        return node.nodeName;
     }
-    return path;
-}
-function findUniquePath(stack, fallback) {
-    var paths = sort(combinations(stack));
-    if (paths.length > config.threshold) {
-        return fallback ? fallback() : null;
+
+    // If the names are different lengths, there is a prefix and it's case sensitive
+    if (node.localName.length !== node.nodeName.length) {
+        return node.nodeName;
     }
-    for (var _i = 0, paths_1 = paths; _i < paths_1.length; _i++) {
-        var candidate = paths_1[_i];
-        if (unique(candidate)) {
-            return candidate;
-        }
-    }
-    return null;
-}
-function selector(path) {
-    var node = path[0];
-    var query = node.name;
-    for (var i = 1; i < path.length; i++) {
-        var level = path[i].level || 0;
-        if (node.level === level - 1) {
-            query = path[i].name + " > " + query;
-        }
-        else {
-            query = path[i].name + " " + query;
-        }
-        node = path[i];
-    }
-    return query;
-}
-function penalty(path) {
-    return path.map(function (node) { return node.penalty; }).reduce(function (acc, i) { return acc + i; }, 0);
-}
-function unique(path) {
-    switch (rootDocument.querySelectorAll(selector(path)).length) {
-        case 0:
-            throw new Error("Can't select any node with this selector: " + selector(path));
-        case 1:
-            return true;
-        default:
-            return false;
-    }
-}
-function id(input) {
-    // Note: added by CB
-    if (!input.getAttribute) {
-        return null;
-    }
-    var elementId = input.getAttribute('id');
-    if (elementId && config.idName(elementId)) {
-        return {
-            name: '#' + CSS.escape(elementId),
-            penalty: 0,
-        };
-    }
-    return null;
-}
-function attr(input) {
-    var attrs = Array.from(input.attributes).filter(function (attr) { return config.attr(attr.name, attr.value); });
-    return attrs.map(function (attr) { return ({
-        name: '[' + CSS.escape(attr.name) + '="' + CSS.escape(attr.value) + '"]',
-        penalty: 0.5
-    }); });
-}
-function classNames(input) {
-    var names = Array.from(input.classList)
-        .filter(config.className);
-    return names.map(function (name) { return ({
-        name: '.' + CSS.escape(name),
-        penalty: 1
-    }); });
-}
-function tagName(input) {
-    var name = input.tagName.toLowerCase();
-    if (config.tagName(name)) {
-        return {
-            name: name,
-            penalty: 2
-        };
-    }
-    return null;
-}
-function any() {
-    return {
-        name: '*',
-        penalty: 3
-    };
-}
-function index(input) {
-    var parent = input.parentNode;
-    if (!parent) {
-        return null;
-    }
-    var child = parent.firstChild;
-    if (!child) {
-        return null;
-    }
-    var i = 0;
-    while (child) {
-        if (child.nodeType === Node.ELEMENT_NODE) {
-            i++;
-        }
-        if (child === input) {
-            break;
-        }
-        child = child.nextSibling;
-    }
-    return i;
-}
-function nthChild(node, i) {
-    return {
-        name: node.name + (":nth-child(" + i + ")"),
-        penalty: node.penalty + 1
-    };
-}
-function dispensableNth(node) {
-    return node.name !== 'html' && !node.name.startsWith('#');
-}
-function maybe() {
-    var level = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        level[_i] = arguments[_i];
-    }
-    var list = level.filter(notEmpty);
-    if (list.length > 0) {
-        return list;
-    }
-    return null;
-}
-function notEmpty(value) {
-    return value !== null && value !== undefined;
-}
-function combinations(stack, path) {
-    var _i, _a, node;
-    if (path === void 0) { path = []; }
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                if (!(stack.length > 0)) return [3 /*break*/, 5];
-                _i = 0, _a = stack[0];
-                _b.label = 1;
-            case 1:
-                if (!(_i < _a.length)) return [3 /*break*/, 4];
-                node = _a[_i];
-                return [5 /*yield**/, __values(combinations(stack.slice(1, stack.length), path.concat(node)))];
-            case 2:
-                _b.sent();
-                _b.label = 3;
-            case 3:
-                _i++;
-                return [3 /*break*/, 1];
-            case 4: return [3 /*break*/, 7];
-            case 5: return [4 /*yield*/, path];
-            case 6:
-                _b.sent();
-                _b.label = 7;
-            case 7: return [2 /*return*/];
-        }
-    });
-}
-function sort(paths) {
-    return Array.from(paths).sort(function (a, b) { return penalty(a) - penalty(b); });
-}
-function optimize(path, input) {
-    var i, newPath;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                if (!(path.length > 2 && path.length > config.optimizedMinLength)) return [3 /*break*/, 5];
-                i = 1;
-                _a.label = 1;
-            case 1:
-                if (!(i < path.length - 1)) return [3 /*break*/, 5];
-                newPath = path.slice();
-                newPath.splice(i, 1);
-                if (!(unique(newPath) && rootDocument.querySelector(selector(newPath)) === input)) return [3 /*break*/, 4];
-                return [4 /*yield*/, newPath];
-            case 2:
-                _a.sent();
-                return [5 /*yield**/, __values(optimize(newPath, input))];
-            case 3:
-                _a.sent();
-                _a.label = 4;
-            case 4:
-                i++;
-                return [3 /*break*/, 1];
-            case 5: return [2 /*return*/];
-        }
-    });
+
+    // Return the localname, which will be case insensitive if its an html node
+    return node.localName;
 }
