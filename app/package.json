@@ -23,6 +23,6 @@
     "lodash.merge": "4.6.2",
     "lodash.uniq": "^4.5.0",
     "lodash.uniqwith": "^4.5.0",
-    "oxygen-cli": "1.1.2-alpha.1"
+    "oxygen-cli": "1.1.2"
   }
 }
