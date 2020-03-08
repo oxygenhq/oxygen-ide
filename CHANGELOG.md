@@ -1,11 +1,12 @@
 # CHANGELOG
 
-## v1.15.0 (2020-03-xx)
+## v1.15.0 (2020-03-08)
 
 #### :boom: Breaking Change
 * Bumped minimum supported macOS version to 10.10.
 
 #### :beetle: Bug Fix
+* Crash on test end under certain conditions.
 * Processing of CSV files with spaces in the header.
 * SauceLabs test execution not working.
 * Local Appium was used during mobile test execution on cloud providers.
@@ -13,12 +14,12 @@
 * Other small fixes & improvements.
 
 #### :house: Internal
-* Bumped oxygen-cli from v1.0.2 to v1.1.1. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bumped oxygen-cli from v1.0.2 to v1.1.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 * Updated pre-bundled Chrome drivers.
 * Bumped and cleaned-up dependencies.
 
-#### :studio_microphone: Chrome Extension (v0.71.0)
-* Fixed generation of CSS selector when ID contains illegal characters.
+#### :studio_microphone: Chrome Extension (v0.72.0)
+* Fixed issue with website hanging under certain conditions when trying to generate CSS selector.
 * Do not pollute website's message event handlers with recorder messages.
 
 ## v1.14.1 (2020-02-13)
