@@ -195,7 +195,11 @@ module.exports = function(grunt) {
                     { 
                         expand: true, 
                         cwd: 'app',
-                        src: ['main/services/Win32FileService/CodeHelper.exe'], 
+                        src: [
+                            'main/services/Win32FileService/CodeHelper.exe',
+                            'main/services/cloudbeat-key.pem',
+                            'main/services/cloudbeat-cert.pem',
+                        ], 
                         dest: OUTDIR + RESOURCES + '/app'
                     }
                 ]

@@ -7,17 +7,25 @@
  * (at your option) any later version.
  */
 import http from 'http';
+import https from 'https';
 import dns from 'dns';
+import fs from 'fs';
+import path from 'path';
 import * as Sentry from '@sentry/electron';
 
 import ServiceBase from './ServiceBase';
 
 const PORT_HTTP = 7778;
+const PORT_HTTPS = 8889;
 
 const RECORDER_EVENT = 'RECORDER_EVENT';
 const RECORDER_NEW_CAN_RECORD = 'RECORDER_NEW_CAN_RECORD';
 const CHROME_EXTENSION_ENABLED = 'CHROME_EXTENSION_ENABLED';
 const EXTENSION_CHECK_TIMEOUT = 4500;
+
+const RECORDER_DIR = process.env.NODE_ENV === 'production' ?
+                        path.resolve(__dirname, 'services') :
+                        path.resolve(__dirname, '.');
 
 export default class RecorderService extends ServiceBase {
     constructor(mainWindow) {
@@ -34,12 +42,24 @@ export default class RecorderService extends ServiceBase {
 
     start() {
         // prevent starting the recorder twice
-        if (this.httpSrv) {
+        if (this.httpSrv || this.httpsSrv) {
             return;
         }
         this.httpSrv = http.createServer(::this._onRequest);
         this.httpSrv.on('error', (err) => {
             console.log("Unable to bind recorder's HTTP listener. " + err);
+        });
+
+        const options = {
+            key: fs.readFileSync(path.join(RECORDER_DIR, 'cloudbeat-key.pem')),
+            cert: fs.readFileSync(path.join(RECORDER_DIR, 'cloudbeat-cert.pem')),
+            requestCert: false,
+            rejectUnauthorized: false
+        };
+
+        this.httpsSrv = https.createServer(options, ::this._onRequest);
+        this.httpsSrv.on('error', (err) => {
+            console.log("Unable to bind recorder's HTTPS listener ", err);
         });
 
         // here be horrors...
@@ -62,6 +82,12 @@ export default class RecorderService extends ServiceBase {
                 Sentry.captureException(e);
                 console.error('Unable to open ' + hostname + ':' + PORT_HTTP, e);
             }
+
+            try{
+                this.httpsSrv.listen(PORT_HTTPS, hostname, function(){ });
+            } catch (e){
+                console.log('httpsSrv listen e', e);
+            }
         });
     }
 
@@ -69,6 +95,10 @@ export default class RecorderService extends ServiceBase {
         if (this.httpSrv) {
             this.httpSrv.close();
             this.httpSrv = null;
+        }
+        if (this.httpsSrv) {
+            this.httpsSrv.close();
+            this.httpsSrv = null;
         }
     }
 
@@ -101,19 +131,57 @@ export default class RecorderService extends ServiceBase {
             });
 
             request.on('end', function () {
-                response.end();
-                setTimeout(function() {
-                    self._emit(JSON.parse(body));
+                if (request.url === '/lastwin_attach') {
+                    if (!self.lastWin) {
+                        self.lastWin = body;
+                    }
+                    
+                    response.statusCode = 200;
+                    response.statusMessage = 'OK';
+                    response.end();
+                } else if (request.url === '/lastwin_update') {
+                    var tmpLastWin = self.lastWin;
+                    self.lastWin = body;
 
-                    // For stress test
-                    // for(var i = 1; i < 500; i++){
-                    //     setTimeout(function(i) {
-                    //         return function() { 
-                    //             self._emit(JSON.parse(body));
-                    //         }
-                    //     }(i), 100);
-                    // }
-                }, 100);
+                    // find top window for the previous window
+                    var top;
+                    for (let group of self.windowGroups) {
+                        if (group.indexOf(tmpLastWin) >= 0) {
+                            top = group.substring(group.length - 20);
+                            break;
+                        }
+                    }
+                    // check whether new window has same top as the previous one
+                    var sameGroup = false;
+                    for (let group of self.windowGroups) {
+                        if (group.indexOf(body) >= 0 && group.indexOf(top) >= 0) {
+                            sameGroup = true;
+                        }
+                    }
+
+                    response.write(JSON.stringify({
+                        hash: tmpLastWin ? tmpLastWin : '',
+                        sameGroup: sameGroup
+                    }));
+                    response.end();
+                } else if (request.url === '/windowgroup_add') {
+                    self.windowGroups.push(body);
+                    
+                    response.statusCode = 200;
+                    response.statusMessage = 'OK';
+                    response.end();
+                } else {
+                    try {
+                        self._emit(JSON.parse(body));
+                    } catch(e){
+                        console.log('body JSON.parse e', e);
+                        console.log('body', body);
+                    }
+
+                    response.statusCode = 200;
+                    response.statusMessage = 'OK';
+                    response.end();
+                }
             });
         } else if (request.method === 'OPTIONS') {
             response.statusCode = 200;
@@ -159,6 +227,7 @@ export default class RecorderService extends ServiceBase {
                 newCanRecord = true;
             }
 
+            newCanRecord = true;
 
             this.notify({
                 type: RECORDER_NEW_CAN_RECORD,

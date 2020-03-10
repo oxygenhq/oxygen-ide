@@ -22,7 +22,7 @@ import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
 
-let canRecord = false;
+// let canRecord = false;
 
 /**
  * Recorder Sagas
@@ -41,24 +41,27 @@ export default function* root() {
 }
 
 export function reset() {
-    canRecord = false;
+    // canRecord = false;
 }
 
 export function* recorderNewCanRecord({ payload }) {
     const recorder = yield select(state => state.recorder);
     const { waitChromeExtension } = recorder;
-    const { event } = payload;
-    const { newCanRecord } = event;
+    // const { event } = payload;
+    // const { newCanRecord } = event;
 
-    if (newCanRecord !== canRecord) {
-        canRecord = newCanRecord;
+    
+    yield put(recorderActions.changeCanRecord(true));
 
-        yield put(recorderActions.changeCanRecord(newCanRecord));
+    // if(newCanRecord !== canRecord){
+    //     canRecord = newCanRecord;
 
-        if (!newCanRecord) {
-            yield put(recorderActions.stopRecorder());
-        }
-    }
+    //     yield put(recorderActions.changeCanRecord(newCanRecord));
+
+    //     if(!newCanRecord){
+    //         yield put(recorderActions.stopRecorder());
+    //     }
+    // }
     if (waitChromeExtension) {
         yield put(recorderActions.stopWaitChromeExtension());
     }
