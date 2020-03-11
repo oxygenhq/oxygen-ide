@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.15.0 (2020-03-08)
+## v1.15.0 (2020-03-11)
 
 #### :boom: Breaking Change
 * Bumped minimum supported macOS version to 10.10.
