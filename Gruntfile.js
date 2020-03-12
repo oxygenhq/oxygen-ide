@@ -93,7 +93,7 @@ module.exports = function(grunt) {
             src: OUTDIR + RESOURCES + '/app',
             dest: OUTDIR + RESOURCES + '/app.asar',
             unpack: '*.node',
-            'unpack-dir': 'main/selenium'
+            'unpack-dir': '{main/selenium,main/services/Win32FileService}'
         },
         'config-patch': {
             dist: OUTDIR
