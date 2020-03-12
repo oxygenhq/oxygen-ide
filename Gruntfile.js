@@ -38,7 +38,7 @@ module.exports = function(grunt) {
         defaultTasks.push('copy:win');
     }
     defaultTasks.push('rebrand');
-    
+    defaultTasks.push('asar'); 
 
     if (process.platform === 'linux') {
         defaultTasks.push('compress:linux');
@@ -88,6 +88,12 @@ module.exports = function(grunt) {
             name: pkg.name,
             version: pkg.version,
             dist: OUTDIR,
+        },
+        asar: {
+            src: OUTDIR + RESOURCES + '/app',
+            dest: OUTDIR + RESOURCES + '/app.asar',
+            unpack: '*.node',
+            'unpack-dir': 'main/selenium'
         },
         'config-patch': {
             dist: OUTDIR
