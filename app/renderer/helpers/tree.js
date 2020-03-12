@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 import path from 'path';
-import uniqWith from 'lodash.uniqwith';
-import isEqual from 'lodash.isequal';
+import uniqWith from 'lodash/uniqWith';
+import isEqual from 'lodash/isEqual';
 import fileFolderSorter from '../../main/helpers/fileFolderSorter';
 
 export function checkEmpty(data) {

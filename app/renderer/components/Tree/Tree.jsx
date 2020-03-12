@@ -12,7 +12,7 @@ import classNames from 'classnames';
 import warning from 'warning';
 import toArray from 'rc-util/lib/Children/toArray';
 import { polyfill } from 'react-lifecycles-compat';
-import debounce from 'lodash.debounce';
+import debounce from 'lodash/debounce';
 
 import { treeContextTypes } from './contextTypes';
 import {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,7 +8,7 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import uniq from 'lodash.uniq';
+import uniq from 'lodash/uniq';
 import FileExplorer from './FileExplorer';
 import * as actions from '../../store/fs/actions';
 import { showContextMenu } from '../../store/workbench/actions';

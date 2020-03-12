@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,9 +8,6 @@
  */
 
 // @flow
-// import uniqid from 'uniqid';
-// import cloneDeep from 'lodash/cloneDeep';
-// import uniqBy from 'lodash/uniqBy';
 import React, { Fragment } from 'react';
 import { Icon } from 'antd';
 

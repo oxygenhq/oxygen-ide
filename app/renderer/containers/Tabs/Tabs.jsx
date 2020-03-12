@@ -12,7 +12,7 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { Icon, Tooltip, Modal, Button } from 'antd';
-import debounce from 'lodash.debounce';
+import debounce from 'lodash/debounce';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
 import DraggableTab from './DraggableTab.jsx';
 import '../../css/tabs.scss';
