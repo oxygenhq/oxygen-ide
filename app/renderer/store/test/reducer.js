@@ -24,7 +24,7 @@ const defaultState = {
     runtimeSettings: {
         testMode: 'web',
         testTarget: 'chrome',
-        testProvider: null,
+        testProvider: 'Local',
         stepDelay: 0,
         reopenSession: false,   // indicates if Selenium session must be re-opened for each iteration
         seleniumPort: null,     // holds Selenium server port number
@@ -170,28 +170,22 @@ export default (state = defaultState, action) => {
         // let newTestProvider = state.runtimeSettings.testProvider;
 
         // // determine new testTarget value, depending on the selected test mode
-        // let newTestTarget = null;
-        // if (value === 'web') {
-        //     newTestTarget = state.browsers.length > 0 ? state.browsers[0].id : null;
-        // }
-        // else if (value === 'mob') {
-        //     newTestTarget = state.devices.length > 0 ? state.devices[0].id : null;
-
-        //     // if(newTestTarget === null){
-        //     //     message.error('No connected devices or emulators found. Mobile device needs to be connected to the computer in order to run mobile tests.');
-        //     // }
-        // }
-        // else if (value === 'resp') {
-        //     newTestProvider = '';
-        //     newTestTarget = state.emulators.length > 0 ? state.emulators[0] : null;
-        // }
+        let newTestTarget = null;
+        if (value === 'web') {
+            newTestTarget = state.browsers.length > 0 ? state.browsers[0].id : null;
+        } else if (value === 'mob') {
+            newTestTarget = state.devices.length > 0 ? state.devices[0].id : null;
+        }
+        else if (value === 'resp') {
+            newTestTarget = state.emulators.length > 0 ? state.emulators[0] : null;
+        }
 
         return {
             ...state,
             runtimeSettings: {
                 ...state.runtimeSettings,
                 testMode: value,
-                testTarget: null,
+                testTarget: newTestTarget,
             },
         };
 

@@ -101,7 +101,9 @@ export default function* root() {
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
         takeLatest(JAVA_NOT_FOUND, handleJavaNotFound),
         takeLatest(JAVA_BAD_VERSION, handleJavaBadVersion),
-        takeLatest(ActionTypes.WB_OR_ADD_TO_ROOT, orAddToRoot)
+        takeLatest(ActionTypes.WB_OR_ADD_TO_ROOT, orAddToRoot),
+        takeLatest(ActionTypes.TEST_UPDATE_RUN_SETTINGS, setCloudProvidersBrowsersAndDevices)
+        
     ]);
 }
 

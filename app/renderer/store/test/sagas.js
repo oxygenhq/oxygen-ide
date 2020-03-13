@@ -37,7 +37,7 @@ export default function* root() {
 
 function* setTestProvider({payload}){
     const testProvider = payload.value;
-    if(testProvider === ''){
+    if(testProvider === 'Local'){
         // local
         yield put(testActions.setTestMode('web'));
     } else {

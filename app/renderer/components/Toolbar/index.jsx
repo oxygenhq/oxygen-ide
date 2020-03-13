@@ -8,10 +8,9 @@
  */
 // @flow
 /* eslint-disable react/no-unused-state */
-import { Icon, Select, Input, TreeSelect } from 'antd';
+import { Icon, Select, Input, TreeSelect, Tooltip } from 'antd';
 import React, { Fragment } from 'react';
 import '../../css/toolbar.scss';
-
 import * as Controls from './controls';
 import NoChromeDialog from './NoChromeDialog';
 import WorkingChromeDialog from './WorkingChromeDialog';
@@ -47,6 +46,12 @@ type Props = {
 };
 
 const { Option } = Select;
+const NoTargetAvailable = 'NoTargetAvailable';
+const noTargetAvailable = (
+    <Option key={ NoTargetAvailable } value={ NoTargetAvailable }>
+        { 'No target available' }
+    </Option>
+);
 
 export default class Toolbar extends React.Component<Props> {
     constructor(props){
@@ -146,7 +151,6 @@ export default class Toolbar extends React.Component<Props> {
     render() {
         const {
             testMode, 
-            testTarget, 
             devices, 
             browsers, 
             emulators, 
@@ -161,9 +165,15 @@ export default class Toolbar extends React.Component<Props> {
             cloudProvidesBrowsersAndDevices = {}
         } = this.props;
 
+        let testTarget = this.props.testTarget;
+
         let browsersTree = null;
         let devicesTree = null;
         let currentCloudProvidesBrowsersAndDevices = null;
+
+        if(testProvider && testProvider !== 'Local'){
+            currentCloudProvidesBrowsersAndDevices = true;
+        }
 
         if(testProvider && cloudProvidesBrowsersAndDevices && cloudProvidesBrowsersAndDevices[testProvider]){
             currentCloudProvidesBrowsersAndDevices = cloudProvidesBrowsersAndDevices[testProvider];
@@ -201,6 +211,32 @@ export default class Toolbar extends React.Component<Props> {
                 cloudProviderTestMode = 'mob';
             }
         }
+        
+        let mobSelectOptions;
+        let noAvailableTestTarget = false;
+
+        if(testMode === 'mob' && !currentCloudProvidesBrowsersAndDevices){
+            mobSelectOptions = sortDevices(devices).map(device => {
+                const options = [];
+                if (prevDevice && prevDevice.osName === 'Android' && device.osName === 'iOS') {
+                    options.push(iOSAndroidSeparator);
+                }
+                prevDevice = device;
+                options.push(
+                    <Option key={ device.id } value={ device.id } title={ device.name }>
+                        { device.name }
+                    </Option>
+                );
+                return options;
+            });
+
+            if(mobSelectOptions && Array.isArray(mobSelectOptions) && mobSelectOptions.length === 0){
+                testTarget = NoTargetAvailable;
+                mobSelectOptions = noTargetAvailable;
+                noAvailableTestTarget = true;
+            }
+        }
+
         return (
             <div className="appTollbar">
                 { typeof showNoChromeDialog !== 'undefined' && showNoChromeDialog && 
@@ -257,11 +293,11 @@ export default class Toolbar extends React.Component<Props> {
                 { providersUnabled && (
                     <Select
                         className="control select"
-                        value={ testProvider || '' }
+                        value={ testProvider || 'Local' }
                         style={{ width: 120 }}
                         onChange={ (value) => ::this.handleValueChange(Controls.TEST_PROVIDER, value) }
                     >
-                        <Option key='' value=''>-- Local --</Option>
+                        <Option key='Local' value='Local'>-- Local --</Option>
                         {
                             providers.map((provider) => (
                                 <Option key={ provider.id } value={ provider.id }>
@@ -329,7 +365,15 @@ export default class Toolbar extends React.Component<Props> {
                     </span>
                 }
                 {
-                    (!providersUnabled || !testProvider) && (
+                    cloudProvidesBrowsersAndDevicesEnabled && !cloudProvidesBrowsersEnabled && !cloudProvidesDevicesEnabled &&
+                    <Tooltip title="Check your internet connection and cloud provider credentials">
+                        <span style={{ padding: '0px 10px' }}>
+                            Not found any cloud browsers/devices
+                        </span>
+                    </Tooltip>
+                }
+                {
+                    (!providersUnabled || testProvider === 'Local') && (
                         <span key='resp' className={testMode === 'resp' ? 'control selectable active' : 'control selectable'}>
                             <Icon
                                 onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_RESP) }
@@ -375,9 +419,10 @@ export default class Toolbar extends React.Component<Props> {
                     !cloudProvidesBrowsersAndDevicesEnabled && 
                     <Select
                         className="control select"
-                        value={testTarget}
+                        value={ testTarget }
                         style={{ width: 170 }}
                         onChange={ (value) => ::this.handleValueChange(Controls.TEST_TARGET, value) }
+                        disabled={ noAvailableTestTarget }
                     >
                         {
                             testMode === 'web' && browsers.map((browser) => (
@@ -387,19 +432,7 @@ export default class Toolbar extends React.Component<Props> {
                             ))
                         }
                         {
-                            testMode === 'mob' && sortDevices(devices).map(device => {
-                                const options = [];
-                                if (prevDevice && prevDevice.osName === 'Android' && device.osName === 'iOS') {
-                                    options.push(iOSAndroidSeparator);
-                                }
-                                prevDevice = device;
-                                options.push(
-                                    <Option key={ device.id } value={ device.id } title={ device.name }>
-                                        { device.name }
-                                    </Option>
-                                );
-                                return options;
-                            })
+                            testMode === 'mob' && mobSelectOptions
                         }
                         {
                             testMode === 'resp' && emulators.map((emulator) => (
