@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2019 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,15 +7,16 @@
  * (at your option) any later version.
  */
 import ADB from 'appium-adb';
-import { instrumentsUtils } from 'appium-ios-driver';
 import ServiceBase from './ServiceBase';
 import * as Sentry from '@sentry/electron';
 import { execSync } from 'child_process';
+import { exec } from 'teen_process';
 
 const DEVICE_CONNECTED = 'DEVICE_CONNECTED';
 const DEVICE_DISCONNECTED = 'DEVICE_DISCONNECTED';
 const XCODE_ERROR = 'XCODE_ERROR';
 const DEVICE_MONITOR_INTERVAL = 10000;
+const INST_STALL_TIMEOUT = 16000;
 
 const DEVICE_INFO = {
     os: {
@@ -185,7 +186,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
     
     async _updateIOSDevices(timestamp) {
         try {
-            const connectedDevices = await instrumentsUtils.getAvailableDevices();
+            const connectedDevices = await this._iosGetAvailableDevices();
             for (var i = 0; i < connectedDevices.length; i++) {
                 var devInfoStr = connectedDevices[i];
                 var info = this._extractIOSDeviceInfo(devInfoStr);
@@ -199,8 +200,8 @@ export default class DeviceDiscoveryService extends ServiceBase {
                     this.devices[uuid].new = this.devices[uuid].connected == false;
                     this.devices[uuid].connected = true;
                     this.devices[uuid].timestamp = timestamp;
-                } else {    
-                    // add new device                
+                } else {
+                    // add new device
                     this.devices[uuid] = {
                         id: uuid,
                         name: `${info.name} [iOS ${info.version}]`,
@@ -243,7 +244,41 @@ export default class DeviceDiscoveryService extends ServiceBase {
             }
         }
     }
-    
+
+    // from https://github.com/appium/appium-ios-driver/blob/master/lib/instruments/utils.js
+    async _iosGetInstrumentsPath() {
+        let instrumentsPath;
+        try {
+            let {stdout} = await exec('xcrun', ['-find', 'instruments']);
+            instrumentsPath = (stdout || '').trim().replace('\n$', '');
+        } catch (err) {
+            if (err) {
+                console.error(err.message);
+            }
+        }
+        if (!instrumentsPath) {
+            throw new Error('Could not find the instruments binary. Please ensure `xcrun -find instruments` can locate it.');
+        }
+        return instrumentsPath;
+    }
+
+    async _iosGetAvailableDevices(timeout = INST_STALL_TIMEOUT) {
+        let instrumentsPath = await this._iosGetInstrumentsPath();
+        let opts = {timeout};
+        let lines;
+        try {
+            let {stdout} = await exec(instrumentsPath, ['-s', 'devices'], opts);
+            lines = stdout.split('\n');
+        } catch (err) {
+            throw new Error(`Failed getting devices, err: ${err}.`);
+        }
+        let devices = lines.filter((line) => {
+            // https://regex101.com/r/aE6aS3/6
+            return /^.+ \(\d+\.(\d+\.)?\d+( Simulator)?\) \[.+\]( \(Simulator\))?$/.test(line);
+        });
+        return devices;
+    }
+        
     _emitDeviceConnected(device) {
         this.notify({
             type: DEVICE_CONNECTED,

@@ -188,6 +188,7 @@
     "rimraf": "2.7.1",
     "rxjs": "6.5.4",
     "source-map-support": "0.5.16",
+    "teen_process": "1.15.0",
     "tmp": "0.1.0",
     "uniqid": "5.2.0",
     "uuid": "3.4.0",
