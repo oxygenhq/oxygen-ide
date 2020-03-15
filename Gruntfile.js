@@ -37,8 +37,8 @@ module.exports = function(grunt) {
     } else if (process.platform === 'win32') {
         defaultTasks.push('copy:win');
     }
-    defaultTasks.push('rebrand');
     defaultTasks.push('asar'); 
+    defaultTasks.push('rebrand');
 
     if (process.platform === 'linux') {
         defaultTasks.push('compress:linux');
