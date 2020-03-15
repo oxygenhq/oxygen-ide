@@ -136,12 +136,12 @@ export default merge.smart(baseConfig, {
         new MonacoWebpackPlugin({
             languages: ['javascript', 'typescript', 'json', 'xml'],
             features: [
-            'accessibilityHelp', 'bracketMatching', 'caretOperations', 'clipboard', 'codeAction', 'codelens',
-            'comment', 'contextmenu', 'coreCommands', 'cursorUndo', 'find', 'folding', 'fontZoom', 'format',
-            'gotoError', 'gotoLine', 'gotoSymbol', 'hover', 'inPlaceReplace', 'inspectTokens', 'linesOperations',
-            'links', 'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 
-            'rename', 'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 
-            'transpose', 'wordHighlighter', 'wordOperations', 'wordPartOperations']
+            'accessibilityHelp', 'bracketMatching', 'caretOperations', 'clipboard', 'codeAction', 'comment',
+            'contextmenu', 'coreCommands', 'cursorUndo', 'find', 'folding', 'fontZoom', 'format',
+            'gotoError', 'gotoLine', 'gotoSymbol', 'hover', 'inPlaceReplace', 'linesOperations', 'links',
+            'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 'rename',
+            'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 'transpose',
+            'wordHighlighter', 'wordOperations', 'wordPartOperations']
         })
     ],
 });
