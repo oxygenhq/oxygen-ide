@@ -14,7 +14,8 @@ const fs = require('fs-extra');
 module.exports = function(grunt) {
     grunt.registerTask('asar', 'Creates ASAR', function() {
         const cfg = grunt.config.get('asar');
-grunt.log.writeln(path.resolve(__dirname, '..', '..', cfg.src));
+        removeEmptyDirs(cfg.src);
+
         const child = cp.spawnSync(path.resolve(__dirname, '..', '..', 'node_modules', '.bin', os.platform() === 'win32' ? 'asar.cmd' : 'asar'), 
             [ 'pack',
                 cfg.src,
@@ -33,4 +34,24 @@ grunt.log.writeln(path.resolve(__dirname, '..', '..', cfg.src));
 
         grunt.log.ok('Done');
     });
+
+    function removeEmptyDirs(src) {
+        if (!fs.statSync(src).isDirectory()) {
+            return;
+        }
+
+        var files = fs.readdirSync(src);
+        if (files.length > 0) {
+            files.forEach(function(file) {
+                var fullPath = path.join(src, file);
+                removeEmptyDirs(fullPath);
+            });
+            files = fs.readdirSync(src);
+        }
+
+        if (files.length === 0) {
+            fs.rmdirSync(src);
+            return;
+        }
+    }
 };
