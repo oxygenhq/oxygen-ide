@@ -17,13 +17,16 @@ module.exports = function(grunt) {
         new modclean.ModClean({
             cwd: path.join(process.cwd(), 'app', 'node_modules'),
             patterns: ['default:safe'],
-            additionalPatterns: ['doc', 'docs', 'documentation',
+            additionalPatterns: [
+                'doc', 'docs', 'documentation',
+                'LICENSE.*', 'LICENSE',
                 'coverage',
                 '*.txt',
                 'gruntfile.js',
                 'quick-test.js',
                 '*.c', '*.cpp',
-                '*.d.ts',
+                '*.d.ts', '*.d.ts.map',
+                'yarn.lock', 'package-lock.json',
                 '*.html', '*.htm', '*.png', '*.map'],
             test: true
         }, function(err, results) {
