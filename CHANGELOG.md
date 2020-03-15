@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v1.16.0 (2020-03-15)
+
+#### :tada: New Feature
+* Significantly improved installation speed on Windows and reduced package size for all platforms.
+
+#### :beetle: Bug Fix
+* Number of issues in editor introduced in v1.15.0.
+* No default browser/devices selected when switching between web, mobile, and responsive modes.
+
+#### :house: Internal
+* Bumped oxygen-cli from v1.1.2 to v1.1.3. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+
 ## v1.15.0 (2020-03-11)
 
 #### :boom: Breaking Change
