@@ -45,17 +45,18 @@ export default merge.smart(baseConfig, {
         }),
 
         /**
-     * Create global constants which can be configured at compile time.
-     *
-     * Useful for allowing different behaviour between development builds and
-     * release builds
-     *
-     * NODE_ENV should be production so that modules do not perform certain
-     * development checks
-     */
+         * Create global constants which can be configured at compile time.
+         *
+         * Useful for allowing different behaviour between development builds and
+         * release builds
+         *
+         * NODE_ENV should be production so that modules do not perform certain
+         * development checks
+         */
         new webpack.EnvironmentPlugin({
             NODE_ENV: 'production',
-            DEBUG_PROD: 'false'
+            DEBUG_PROD: 'false',
+            RELEASE_BUILD: process.env.RELEASE_BUILD || false
         }),
 
         // adbkit has a double require for CoffeScript and Javascript and packing fails if we don't ingore the CS ones.

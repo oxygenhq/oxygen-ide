@@ -151,7 +151,12 @@ export default class SeleniumService extends ServiceBase {
 
 
     async _startProcess(port) {
-        const cwd = process.env.NODE_ENV === 'production' ? path.resolve(__dirname, 'selenium') : path.resolve(__dirname, '..', '..', 'selenium');
+        let cwd;
+        if (process.env.NODE_ENV === 'production') {
+            cwd = path.resolve(__dirname, process.env.RELEASE_BUILD ? '../../app.asar.unpacked/main/selenium' : 'selenium');
+        } else {
+            cwd = path.resolve(__dirname, '..', '..', 'selenium');
+        }
 
         await this.copyBundledChromeDrivers(cwd);
 

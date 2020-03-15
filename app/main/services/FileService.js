@@ -210,7 +210,15 @@ export default class FileService extends ServiceBase {
                 folderPath.startsWith('\\')
             ) {
                 // network folder
-                const exePath = path.resolve(__dirname, './Win32FileService/CodeHelper.exe');
+                let exePath;
+                if (process.env.NODE_ENV === 'production') {
+                    exePath = path.resolve(__dirname, process.env.RELEASE_BUILD ?
+                        '../../app.asar.unpacked/main/services/Win32FileService/CodeHelper.exe' :
+                        'services/Win32FileService/CodeHelper.exe');
+                } else {
+                    exePath = path.resolve(__dirname, './Win32FileService/CodeHelper.exe');
+                }
+
                 const args = [folderPath];
                 this.handleNetworkFolderChanges = cp.spawn(exePath, args);
 
