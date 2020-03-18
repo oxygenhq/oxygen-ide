@@ -184,6 +184,11 @@ export const updateBreakpoints = (filePath, breakpoints, fileName) => ({
     payload: { path: filePath, breakpoints, fileName },
 });
 
+export const onDisabledBreakpoint = (filePath, breakpoint) => ({
+    type: ActionTypes.TEST_UPDATE_DISABLED_BREAKPOINTS,
+    payload: { path: filePath, breakpoint },
+});
+
 export const waitUpdateBreakpoints = (value) => ({
     type: ActionTypes.WAIT_TEST_UPDATE_BREAKPOINTS,
     payload: { value: value },

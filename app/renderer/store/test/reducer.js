@@ -19,6 +19,7 @@ const defaultState = {
     isSeleniumReady: false,   // indicates if built-in Selenium server has been successfully started
     isAppiumReady: false,     // indicates if built-in Appium server has been successfully started
     breakpoints: {},          // holds all user-defined breakpoints per file, shall include file name and line number
+    disabledBreakpoints: {},
     waitUpdateBreakpoints: false,
     mainFile: null,           // main test (script) file to be executed 
     runtimeSettings: {
@@ -64,7 +65,7 @@ if (process.platform === 'darwin') {
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { value, settings, device, breakpoints, path, error, cache, fileName, variables, selenuimPid } = payload;
+    const { value, settings, device, breakpoints, breakpoint, path, error, cache, fileName, variables, selenuimPid } = payload;
     let _newDevices = [];
     let _newBreakpoints = {};
 
@@ -75,6 +76,7 @@ export default (state = defaultState, action) => {
             ...state,
             isRunning: true,
             isPaused: false,
+            disabledBreakpoints: {},
         };
 
     // TEST_START_FAILURE
@@ -269,6 +271,26 @@ export default (state = defaultState, action) => {
             };
         }
 
+    case ActionTypes.TEST_UPDATE_DISABLED_BREAKPOINTS:
+
+            let previousDisabledBreakpoints = [];
+            if(
+                path &&
+                state.disabledBreakpoints &&
+                state.disabledBreakpoints[path] &&
+                Array.isArray(state.disabledBreakpoints[path]) 
+            ){
+                previousDisabledBreakpoints = state.disabledBreakpoints[path];
+            }
+
+            return {
+                ...state,
+                disabledBreakpoints: {
+                    ...state.disabledBreakpoints,
+                    [path]: [...previousDisabledBreakpoints, breakpoint],
+                },
+            };
+        
     // TEST_UPDATE_BREAKPOINTS
     case ActionTypes.WAIT_TEST_UPDATE_BREAKPOINTS: {
         return {
