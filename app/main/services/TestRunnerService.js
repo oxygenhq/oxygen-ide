@@ -18,6 +18,7 @@ import ServiceBase from './ServiceBase';
 // Events
 const EVENT_LOG_ENTRY = 'LOG_ENTRY';
 const EVENT_BREAKPOINT = 'BREAKPOINT';
+const EVENT_BREAKPOIN_DEACTIVATE = 'BREAKPOIN_DEACTIVATE';
 const EVENT_LINE_UPDATE = 'LINE_UPDATE';
 const EVENT_TEST_STARTED = 'TEST_STARTED';
 const EVENT_TEST_ENDED = 'TEST_ENDED';
@@ -430,11 +431,14 @@ export default class TestRunnerService extends ServiceBase {
 
     _emitLogEvent(severity, message) {
         if(this.runner && this.isRunning){
-            this.notify({
-                type: EVENT_LOG_ENTRY,
-                severity: severity,
-                message: message,
-            });
+            if(message !== 'message'){
+                this.notify({
+                    type: EVENT_LOG_ENTRY,
+                    severity: severity,
+                    message: message,
+                });
+            }
+
         }
     }
 
@@ -478,6 +482,11 @@ export default class TestRunnerService extends ServiceBase {
             this.runner.on('breakpoint', (breakpoint) => {
                 this._handleBreakpoint(breakpoint);
             });
+
+            this.runner.on('breakpointError', (breakpointError) => {
+                this._handleBreakpointError(breakpointError);
+            });
+            
             
             this.runner.on('test-error', (err) => {
                 let message = null;
@@ -501,6 +510,31 @@ export default class TestRunnerService extends ServiceBase {
                 this._emitLogEvent(level ? level.toUpperCase() : SEVERITY_INFO, msg);
             }
         });
+    }
+
+    _handleBreakpointError(breakpointError){
+        const {
+            message,
+            lineNumber,
+            fileName
+        } = breakpointError;
+
+        const editorFile = fileName ? fileName : this.mainFilePath;
+        let editorLine = lineNumber;
+        const time = moment.utc().valueOf();
+
+        this.notify({
+            type: EVENT_BREAKPOIN_DEACTIVATE,
+            time,
+            file: editorFile,
+            line: editorLine,
+            // alway open the tab (make it active) in which breakpoint occured
+            primary: true,
+        });
+
+        if(message){
+            this._emitLogEvent(SEVERITY_INFO, message);
+        }
     }
 
     _handleBreakpoint(breakpoint) {

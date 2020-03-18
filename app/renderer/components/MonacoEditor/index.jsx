@@ -12,6 +12,7 @@ import path from 'path';
 import { loadWASM } from 'onigasm';
 import { Registry } from 'monaco-textmate';
 import { wireTmGrammars } from 'monaco-editor-textmate';
+import deepDiff from 'deep-diff';
 import oxygenIntellisense from './intellisense';
 import { language as jsTokenizer } from './tokenizers/javascript'; 
 import * as helpers from './helpers';
@@ -43,7 +44,8 @@ const MONACO_DEFAULT_OPTIONS = {
 
 type Props = {
     activeLine: number | null,
-    breakpoints: Array,    
+    breakpoints: Array,
+    disabledBreakpoints: Array,
     visible: boolean,
     editorReadOnly: boolean,
     fontSize: number,
@@ -134,6 +136,10 @@ export default class MonacoEditor extends React.Component<Props> {
                 helpers.makeBreakpointsFullOpacity(this.editor);
             }
         }
+
+        if (deepDiff(prevProps.disabledBreakpoints, this.props.disabledBreakpoints)){
+            helpers.makeBreakpointsHollowCircle(this.editor, this.props.disabledBreakpoints);
+        }
         
         if (prevProps.activeLine !== this.props.activeLine) {
             const { activeLine } = this.props;
@@ -172,7 +178,7 @@ export default class MonacoEditor extends React.Component<Props> {
         if (updateFontSize){
             if(this.ln && Array.isArray(this.ln)){
                 this.ln.map((item) => {
-                    helpers.addBreakpointMarker(this.editor, item, updateFontSize);
+                    helpers.addBreakpointMarker(this.editor, item, updateFontSize, this.props.disabledBreakpoints);
                 });
             }
         }
@@ -222,7 +228,9 @@ export default class MonacoEditor extends React.Component<Props> {
             fontSize:
             diffProps.fontSize !== this.props.fontSize,
             waitUpdateBreakpoints:
-            diffProps.waitUpdateBreakpoints !== this.props.waitUpdateBreakpoints
+            diffProps.waitUpdateBreakpoints !== this.props.waitUpdateBreakpoints,
+            disabledBreakpoints: 
+            diffProps.disabledBreakpoints !== this.props.disabledBreakpoints,
         };
     }
 
@@ -249,7 +257,7 @@ export default class MonacoEditor extends React.Component<Props> {
 
         if(this.props.fontSize && this.props.breakpoints && Array.isArray(this.props.breakpoints) && this.props.breakpoints.length > 0){     
             this.props.breakpoints.map((item) => {
-                helpers.addBreakpointMarker(this.editor, item, this.props.fontSize);
+                helpers.addBreakpointMarker(this.editor, item, this.props.fontSize, this.props.disabledBreakpoints);
             });
         }
     }
@@ -413,7 +421,7 @@ export default class MonacoEditor extends React.Component<Props> {
                     // if user clicks on line-number panel, handle it as adding or removing a breakpoint at this line
                     if (editor.getModel().getLineContent(ln).trim().length > 0) {
                         if (!marker) {
-                            if (helpers.addBreakpointMarker(editor, ln, this.props.fontSize)) {
+                            if (helpers.addBreakpointMarker(editor, ln, this.props.fontSize, this.props.disabledBreakpoints)) {
                                 this.addLnToLnArray(ln);
                                 this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
                             }

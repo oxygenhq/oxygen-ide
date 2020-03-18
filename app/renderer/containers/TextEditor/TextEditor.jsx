@@ -169,6 +169,7 @@ export default class TextEditor extends React.Component<Props> {
                             editorReadOnly={editorReadOnly}
                             fontSize={fontSize}
                             breakpoints={file.breakpoints || []}
+                            disabledBreakpoints={file.disabledBreakpoints || []}
                             waitUpdateBreakpoints={waitUpdateBreakpoints || false}
                             featureLanguageLoaded={featureLanguageLoaded}
                             onBreakpointsUpdate={(bps) => this.props.onBreakpointsUpdate(file.path, bps, file.name)}

@@ -178,6 +178,9 @@ function* handleTestRunnerServiceEvent(event) {
 
         yield put(testActions.onBreakpoint(event.file, event.line, variables));
     }
+    else if (event.type === 'BREAKPOIN_DEACTIVATE') {
+        yield put(testActions.onDisabledBreakpoint(event.file, event.line));
+    }
     else if (event.type === 'SEND_START_DATA') {
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', [event.data]);
     }
