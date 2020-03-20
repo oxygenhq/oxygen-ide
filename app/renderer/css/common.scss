@@ -32,7 +32,12 @@
 
 .breakpointStyle.hollowCircle {
   background: white;
-  border: 1.5px solid #e06331
+  border: 1.25px solid #e06331
+}
+
+.breakpointStyle.resolwedCircle {
+  background: white;
+  border: 4px double #e06331;
 }
 
 $base: 12;

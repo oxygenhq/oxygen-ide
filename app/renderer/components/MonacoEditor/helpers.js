@@ -44,7 +44,7 @@ export function getBreakpointMarkers(editor) {
     return editor.getModel().getAllDecorations().filter( marker => isBreakpointMarker(marker));
 }
 
-export function addBreakpointMarker(editor, line, fontSize=null, disabledBreakpoints) {
+export function addBreakpointMarker(editor, line, fontSize=null, disabledBreakpoints, resolvedBreakpoints) {
     try{
         // check if this line already has breakpoint marker
         if (!fontSize && getBreakpointMarker(editor, line)) {
@@ -64,6 +64,14 @@ export function addBreakpointMarker(editor, line, fontSize=null, disabledBreakpo
             disabledBreakpoints.includes(line)
         ){
             fontSizeClassName += ' hollowCircle';
+        }
+        
+        if(
+            resolvedBreakpoints &&
+            Array.isArray(resolvedBreakpoints) &&
+            resolvedBreakpoints.includes(line)
+        ){
+            fontSizeClassName += ' resolwedCircle';
         }
     
         const newDecorators = [{
@@ -88,7 +96,8 @@ export function addBreakpointMarker(editor, line, fontSize=null, disabledBreakpo
                     item.options &&
                     item.options.linesDecorationsClassName &&
                     typeof item.options.linesDecorationsClassName === 'string' &&
-                    !item.options.linesDecorationsClassName.endsWith(fontSizeClassName)
+                    !item.options.linesDecorationsClassName.endsWith(fontSizeClassName) &&
+                    !item.options.linesDecorationsClassName.includes('currentLineDecoratorStyle')
                 ){
                     return true;
                 } else {
@@ -96,7 +105,6 @@ export function addBreakpointMarker(editor, line, fontSize=null, disabledBreakpo
                 }
             })
         ];
-
         return editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
     } catch(e){
         console.log('addBreakpointMarker error', e);
@@ -288,6 +296,69 @@ function removeHollowCircle(marker, editor){
     editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
 }
 
+function addResolwedCircle(marker, editor){
+    const allMarkers = getAllMarkers(editor);
+        
+    const decoratorsToRemove = [
+        ...allMarkers.filter((item) => {
+            if(
+                item &&
+                item.range &&
+                item.range.endLineNumber && 
+                item.range.endLineNumber === marker.range.endLineNumber &&
+                item.options &&
+                item.options.linesDecorationsClassName &&
+                typeof item.options.linesDecorationsClassName === 'string' &&
+                item.options.linesDecorationsClassName.indexOf('breakpointStyle') > -1
+            ){
+                return true;
+            } else {
+                return false;
+            }
+        })
+    ];
+
+    const newDecorators = [{
+        range: new monaco.Range(marker.range.startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
+        options: {
+            isWholeLine: true,
+            className: marker.options.className,
+            linesDecorationsClassName: marker.options.linesDecorationsClassName+' resolwedCircle',
+            stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
+        }
+    }];
+    
+    editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
+}
+
+function removeResolwedCircle(marker, editor){
+    const allMarkers = getAllMarkers(editor);
+        
+    const decoratorsToRemove = [
+        ...allMarkers.filter((item) => {
+            if(
+                item &&
+                item.range &&
+                item.range.endLineNumber && 
+                item.range.endLineNumber === marker.range.endLineNumber &&
+                item.options &&
+                item.options.linesDecorationsClassName &&
+                typeof item.options.linesDecorationsClassName === 'string' &&
+                item.options.linesDecorationsClassName.indexOf('breakpointStyle') > - 1&&
+                item.options.linesDecorationsClassName.includes('resolwedCircle')
+            ){
+                return true;
+            } else {
+                return false;
+            }
+        })
+    ];
+    
+    const newDecorators = [];
+    
+    editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
+}
+
 export function makeBreakpointsHalfOpacity(editor) {
     const bpMarkers = getBreakpointMarkers(editor);
     return bpMarkers.map(bpMarker => addHalfOpacity(bpMarker, editor));
@@ -316,6 +387,25 @@ export function makeBreakpointsHollowCircle(editor, disabledBreakpoints){
         }
     });
 
+}
+
+export function makeBreakpointsResolwedCircle(editor, resolvedBreakpoints){
+    const bpMarkers = getBreakpointMarkers(editor);
+    
+    return bpMarkers.map(bpMarker => {
+        if(
+            bpMarker &&
+            bpMarker.range &&
+            bpMarker.range.startLineNumber &&
+            resolvedBreakpoints &&
+            Array.isArray(resolvedBreakpoints) &&
+            resolvedBreakpoints.includes(bpMarker.range.startLineNumber)
+        ){
+            addResolwedCircle(bpMarker, editor);
+        } else {
+            removeResolwedCircle(bpMarker, editor);
+        }
+    });
 }
 
 export function updateActiveLineMarker(editor, inputLine, fontSize=null) {

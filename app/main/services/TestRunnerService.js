@@ -19,6 +19,7 @@ import ServiceBase from './ServiceBase';
 const EVENT_LOG_ENTRY = 'LOG_ENTRY';
 const EVENT_BREAKPOINT = 'BREAKPOINT';
 const EVENT_BREAKPOIN_DEACTIVATE = 'BREAKPOIN_DEACTIVATE';
+const EVENT_BREAKPOIN_RESOLVED = 'BREAKPOIN_RESOLVED';
 const EVENT_LINE_UPDATE = 'LINE_UPDATE';
 const EVENT_TEST_STARTED = 'TEST_STARTED';
 const EVENT_TEST_ENDED = 'TEST_ENDED';
@@ -538,7 +539,7 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _handleBreakpoint(breakpoint) {
-        const { lineNumber, fileName, variables } = breakpoint;
+        const { lineNumber, fileName, variables, resolved } = breakpoint;
         // if no fileName is received from the debugger (not suppose to happen), assume we are in the main script file
         const editorFile = fileName ? fileName : this.mainFilePath;
         // if we are in the main script file, adjust line number according to script boilerplate offset
@@ -550,6 +551,7 @@ export default class TestRunnerService extends ServiceBase {
         console.log('--- debug _handleBreakpoint ---');
         console.log('line', editorLine);
         console.log('file', editorFile);
+        console.log('resolved', resolved);
         console.log('--- debug ---');
 
         // make sure to mark breakpoint line with current line mark
@@ -570,6 +572,17 @@ export default class TestRunnerService extends ServiceBase {
             line: editorLine,
             variables: variables
         });
+
+        if(resolved){
+            this.notify({
+                type: EVENT_BREAKPOIN_RESOLVED,
+                time,
+                file: editorFile,
+                line: editorLine,
+                // alway open the tab (make it active) in which breakpoint occured
+                primary: true,
+            });
+        }
     }
 
     _getLocationInfo(location) {

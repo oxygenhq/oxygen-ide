@@ -35,6 +35,11 @@ const mapStoreToProps = (state) => {
         disabledBreakpoints = state.test.disabledBreakpoints;
     }
 
+    let resolvedBreakpoints;
+    if(state && state.test && state.test.resolvedBreakpoints){
+        resolvedBreakpoints = state.test.resolvedBreakpoints;
+    }
+
     // combine file data and editor related metadata
     let openFiles = Object.keys(state.editor.openFiles).map(path => {
 
@@ -66,7 +71,8 @@ const mapStoreToProps = (state) => {
                 ...state.fs.files[path],
                 ...state.editor.openFiles[path],
                 breakpoints: checkForBreakpoints(path, breakpoints),
-                disabledBreakpoints: checkForBreakpoints(path, disabledBreakpoints)
+                disabledBreakpoints: checkForBreakpoints(path, disabledBreakpoints),
+                resolvedBreakpoints: checkForBreakpoints(path, resolvedBreakpoints)
             };
         }
     });

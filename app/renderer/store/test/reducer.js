@@ -20,6 +20,7 @@ const defaultState = {
     isAppiumReady: false,     // indicates if built-in Appium server has been successfully started
     breakpoints: {},          // holds all user-defined breakpoints per file, shall include file name and line number
     disabledBreakpoints: {},
+    resolvedBreakpoints: {},
     waitUpdateBreakpoints: false,
     mainFile: null,           // main test (script) file to be executed 
     runtimeSettings: {
@@ -77,6 +78,7 @@ export default (state = defaultState, action) => {
             isRunning: true,
             isPaused: false,
             disabledBreakpoints: {},
+            resolvedBreakpoints: {},
         };
 
     // TEST_START_FAILURE
@@ -290,6 +292,25 @@ export default (state = defaultState, action) => {
                     [path]: [...previousDisabledBreakpoints, breakpoint],
                 },
             };
+
+    case ActionTypes.TEST_UPDATE_RESOLVED_BREAKPOINT:
+        let previousResolvedBreakpoints = [];
+        if(
+            path &&
+            state.resolvedBreakpoints &&
+            state.resolvedBreakpoints[path] &&
+            Array.isArray(state.resolvedBreakpoints[path]) 
+        ){
+            previousResolvedBreakpoints = state.resolvedBreakpoints[path];
+        }
+
+        return {
+            ...state,
+            resolvedBreakpoints: {
+                ...state.resolvedBreakpoints,
+                [path]: [...previousResolvedBreakpoints, breakpoint],
+            },
+        };
         
     // TEST_UPDATE_BREAKPOINTS
     case ActionTypes.WAIT_TEST_UPDATE_BREAKPOINTS: {
