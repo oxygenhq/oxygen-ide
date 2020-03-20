@@ -60,22 +60,68 @@ export default class DeviceDiscoveryService extends ServiceBase {
 
     async _reportADBVersion() {
         try {
+            const adb = await ADB.createADB();
+            const adbVersion = adb.getAdbVersion();
+            
+            Sentry.configureScope((scope) => {
+                scope.setUser({'abdVersion2': adbVersion});
+            });
+
+        } catch(e){            
+            let message = 'not finded';
+
+            if(e && e.message){
+                message += ' ' + e.message;
+            }
+            
+            Sentry.configureScope((scope) => {
+                scope.setUser({'abdVersion2': message});
+            });
+        }
+        try {
+
+
             const execResult = execSync('adb version');
 
             if(execResult && execResult.toString){
-                const result = execResult.toString().trim();
-    
+                const result = execResult.toString().trim();    
                 if(result){
                     if(Sentry && Sentry.configureScope){
                         Sentry.configureScope((scope) => {
                             scope.setUser({'abdVersion': result});
                         });
                     }
+                } else {
+
+                    console.log('adb version');
+                    console.log(execResult);
+
+                    if(Sentry && Sentry.configureScope){
+                        Sentry.configureScope((scope) => {
+                            scope.setUser({'abdVersion': 'Unknown "adb version" result'});
+                        });
+                    }
+                }
+            } else {
+                console.log('adb version');
+                console.log(execResult);
+                
+
+                if(Sentry && Sentry.configureScope){
+                    Sentry.configureScope((scope) => {
+                        scope.setUser({'abdVersion': 'Unknown "adb version" result'});
+                    });
                 }
             }
         } catch(e){
+            let message = 'not finded';
+
+            if(e && e.message){
+                message += ' ' + e.message;
+            }
+
             Sentry.configureScope((scope) => {
-                scope.setUser({'abdVersion': 'not finded'});
+                scope.setUser({'abdVersion': message});
             });
         }
     }
