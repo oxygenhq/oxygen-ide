@@ -85,5 +85,18 @@ const createModuleAndMethods = (jsonData) => { // eslint-disable-line
 const arrdata = createModuleAndMethods(intellisenseJson);
 
 export default function () {
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(arrdata.join('\n'));
+    try {
+        monaco.languages.typescript.javascriptDefaults.addExtraLib(arrdata.join('\n'));
+    } catch(e){
+        console.log('monaco.languages.typescript.javascriptDefaults error', e);
+    }
+    
+    try {
+        monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+            noSemanticValidation: true,
+            noSyntaxValidation: true,
+        });
+    } catch(e){
+        console.log('monaco.languages.typescript.typescriptDefaults error', e);
+    }
 }
