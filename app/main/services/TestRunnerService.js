@@ -432,14 +432,11 @@ export default class TestRunnerService extends ServiceBase {
 
     _emitLogEvent(severity, message) {
         if(this.runner && this.isRunning){
-            if(message !== 'message'){
-                this.notify({
-                    type: EVENT_LOG_ENTRY,
-                    severity: severity,
-                    message: message,
-                });
-            }
-
+            this.notify({
+                type: EVENT_LOG_ENTRY,
+                severity: severity,
+                message: message,
+            });
         }
     }
 
