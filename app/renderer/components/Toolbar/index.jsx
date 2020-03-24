@@ -368,7 +368,7 @@ export default class Toolbar extends React.Component<Props> {
                     cloudProvidesBrowsersAndDevicesEnabled && !cloudProvidesBrowsersEnabled && !cloudProvidesDevicesEnabled &&
                     <Tooltip title="Check your internet connection and cloud provider credentials">
                         <span style={{ padding: '0px 10px' }}>
-                            Not found any cloud browsers/devices
+                            - no cloud browsers/devices found -
                         </span>
                     </Tooltip>
                 }
