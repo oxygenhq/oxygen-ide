@@ -33,7 +33,7 @@ const defaultState = {
         iterations: 1,
         paramFilePath: null,
         paramMode: 'sequential',
-        selenuimPid: null
+        seleniumPid: null
     },
     browsers: [
         {
@@ -66,7 +66,7 @@ if (process.platform === 'darwin') {
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { value, settings, device, breakpoints, breakpoint, path, error, cache, fileName, variables, selenuimPid } = payload;
+    const { value, settings, device, breakpoints, breakpoint, path, error, cache, fileName, variables, seleniumPid } = payload;
     let _newDevices = [];
     let _newBreakpoints = {};
 
@@ -377,7 +377,7 @@ export default (state = defaultState, action) => {
             ...state,
             runtimeSettings: {
                 ...state.runtimeSettings,
-                selenuimPid: selenuimPid,
+                seleniumPid: seleniumPid,
             },
         };
 

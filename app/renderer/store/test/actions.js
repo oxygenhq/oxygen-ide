@@ -214,9 +214,9 @@ export const updateRunSettings = (settings) => ({
     payload: { settings },
 });
 
-export const setSelenuimPid = (selenuimPid) => ({
+export const setSeleniumPid = (seleniumPid) => ({
     type: ActionTypes.TEST_SELENIUM_PID,
-    payload: { selenuimPid },
+    payload: { seleniumPid },
 });
 
 

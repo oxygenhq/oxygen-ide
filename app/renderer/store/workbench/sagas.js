@@ -299,7 +299,7 @@ export function* initialize() {
     const seleniumPid = yield services.mainIpc.call('SeleniumService', 'start');
 
     if(seleniumPid){
-        yield put(testActions.setSelenuimPid(seleniumPid));
+        yield put(testActions.setSeleniumPid(seleniumPid));
     }
 
     if(appSettings && appSettings.lastSession && appSettings.lastSession.rootFolder){
