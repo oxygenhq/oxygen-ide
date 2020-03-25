@@ -161,11 +161,19 @@ export default class CloudProvidersService extends ServiceBase {
                             if(item.browsers && Array.isArray(item.browsers) && item.browsers.length > 0){
                                 item.browsers.map((browser) => {
 
-                                    if(browser && browser.browser_name && browser.browser_name === 'Firefox' && osName === 'Windows' && osVersion === '10'){
-                                        // ignore need seleniumVersion: 3.11.0, not 3.4.0
-                                    } else if(browser.browser_name && browser.browser_name === 'Firefox' && parseInt(browser.version) < 55){
+                                    if(browser.browser_name && browser.browser_name === 'Firefox' && parseInt(browser.version) < 55){
                                         // ignore  < 55
-                                    } else {
+                                    } else if(browser.browser_name && browser.browser_name.toLowerCase() === 'chrome' && parseInt(browser.version) < 43){
+                                        // ignore  < 43
+                                    } else if(
+                                        browser.browser_name &&
+                                        browser.browser_name === 'Firefox' &&
+                                        parseInt(browser.version) < 59 &&
+                                        osName === 'OS X'
+                                    ){
+                                        // ignore lambdatest vm fails on bootstrap
+                                    }
+                                    else {
                                         browsers.push(new BrowserInfo({
                                             apiName: browser.browser_name,
                                             name: browser.browser_name,
