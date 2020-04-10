@@ -26,6 +26,7 @@ export default class CloudProvidersService extends ServiceBase {
 
     start() {
         // initialize each enabled provider
+        console.log('this.settings', JSON.stringify(this.settings, null, 4))
         const { cloudProviders } = this.settings || {};
         if (!cloudProviders) {
             console.warn('No cloud providers defined');
@@ -33,11 +34,11 @@ export default class CloudProvidersService extends ServiceBase {
         }
         for (var providerName in cloudProviders) {
             const providerSettings = cloudProviders[providerName];
-            if (!Providers.default.hasOwnProperty(providerName)) {
+            if (!Providers.hasOwnProperty(providerName)) {
                 continue;
             }
 
-            const provider = this.providers[providerName] = new Providers.default[providerName](providerSettings);
+            const provider = this.providers[providerName] = new Providers[providerName](providerSettings);
 
             provider.start();
         }
@@ -316,7 +317,7 @@ export default class CloudProvidersService extends ServiceBase {
     }
 
     async getBrowsersAndDevices(providerName, userName = null, key = null) {
-
+        console.log('this.providers', this.providers)
         if (this.providers.hasOwnProperty(providerName)) {
             const provider = this.providers[providerName];
 
