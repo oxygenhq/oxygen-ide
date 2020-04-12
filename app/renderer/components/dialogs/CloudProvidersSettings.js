@@ -50,7 +50,7 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                 ...this.state.providers,
                 sauceLabs: {
                     ...sauceLabs,
-                    userNamme: value,
+                    username: value,
                 }
             }
         });
