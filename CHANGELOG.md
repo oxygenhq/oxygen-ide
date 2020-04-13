@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## v1.16.1 (2020-04-xx)
+
+#### :beetle: Bug Fix
+* Wrong current line indication when breakpoint is set on commented line.
+* `log.*` output not being displayed in the log panel.
+* Number of issues with browser disposal.
+* Various issues with running tests on LambdaTest provider.
+
+#### :house: Internal
+* Bumped oxygen-cli from v1.1.3 to v1.2.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update bundled ChromeDriver 81.
+* Update bundled GeckoDriver for Linux and OS X to v0.26.0.
+
 ## v1.16.0 (2020-03-15)
 
 #### :tada: New Feature
