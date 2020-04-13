@@ -202,6 +202,7 @@ export default class Toolbar extends React.Component<Props> {
         const cloudProvidesBrowsersAndDevicesEnabled = currentCloudProvidesBrowsersAndDevices;
         const cloudProvidesBrowsersEnabled = cloudProvidesBrowsersAndDevicesEnabled && browsersTree && Array.isArray(browsersTree) && browsersTree.length > 0;
         const cloudProvidesDevicesEnabled = cloudProvidesBrowsersAndDevicesEnabled && devicesTree && Array.isArray(devicesTree) && devicesTree.length > 0;
+        const cloudProvidersLoading = currentCloudProvidesBrowsersAndDevices && currentCloudProvidesBrowsersAndDevices.loading && currentCloudProvidesBrowsersAndDevices.loading === true;
 
         let cloudProviderTestMode = testMode;
         if(cloudProvidesBrowsersEnabled && !cloudProviderTestMode){
@@ -365,10 +366,18 @@ export default class Toolbar extends React.Component<Props> {
                     </span>
                 }
                 {
-                    cloudProvidesBrowsersAndDevicesEnabled && !cloudProvidesBrowsersEnabled && !cloudProvidesDevicesEnabled &&
+                    cloudProvidesBrowsersAndDevicesEnabled && !cloudProvidesBrowsersEnabled && !cloudProvidesDevicesEnabled && !cloudProvidersLoading &&
                     <Tooltip title="Check your internet connection and cloud provider credentials">
                         <span style={{ padding: '0px 10px' }}>
                             - no cloud browsers/devices found -
+                        </span>
+                    </Tooltip>
+                }
+                {
+                    cloudProvidesBrowsersAndDevicesEnabled && !cloudProvidesBrowsersEnabled && !cloudProvidesDevicesEnabled && cloudProvidersLoading &&
+                    <Tooltip title="Check your internet connection and cloud provider credentials">
+                        <span style={{ padding: '0px 10px' }}>
+                            - Loading -
                         </span>
                     </Tooltip>
                 }

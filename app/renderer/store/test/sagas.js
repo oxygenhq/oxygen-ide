@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import { all, put, select, takeLatest, call } from 'redux-saga/effects';
-import { getBrowsersTarget } from '../../helpers/cloudProviders';
+import { getBrowsersTarget, getDevicesTarget } from '../../helpers/cloudProviders';
 import { success, failure } from '../../helpers/redux';
 import * as testActions from './actions';
 import * as wbActions from '../workbench/actions';
@@ -73,20 +73,31 @@ function* setTestMode({payload}){
             const testProviders = yield select(state => state.settings.cloudProvidesBrowsersAndDevices);
             if(testProviders && testProviders[testProvider]){
                 const providerData = testProviders[testProvider];
-                let browser = '';
-                if(testProvider === 'lambdaTest'){
-                    browser = 'Chrome';
-                } else if(testProvider === 'testingBot'){
-                    browser = 'Chrome';
-                } else if(testProvider === 'sauceLabs'){
-                    browser = 'chrome';
+                
+                if(testMode === 'web'){
+                    let browser = '';
+                    if(testProvider === 'lambdaTest'){
+                        browser = 'Chrome';
+                    } else if(testProvider === 'testingBot'){
+                        browser = 'Chrome';
+                    } else if(testProvider === 'sauceLabs'){
+                        browser = 'chrome';
+                    }
+
+                    if(browser && providerData.browsersTree){
+                        const target = getBrowsersTarget(providerData.browsersTree, browser);
+                        if(target){
+                            yield put(testActions.setTestTarget(target));
+                        }
+                    }
                 }
                 
-
-                if(browser && providerData.browsersTree){
-                    const target = getBrowsersTarget(providerData.browsersTree, browser);
-                    if(target){
-                        yield put(testActions.setTestTarget(target));
+                if(testMode === 'mob'){
+                    if(providerData && providerData.devicesTree){
+                        const target = getDevicesTarget(providerData.devicesTree, 'iOS');
+                        if(target){
+                            yield put(testActions.setTestTarget(target));
+                        }
                     }
                 }
             }      
