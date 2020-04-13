@@ -1544,6 +1544,8 @@ function fetchCloudBrowsersAndDevicesError(msg){
     });
 }
 
+const LOADING_RESULT = {loading: true};
+
 export function* setCloudProvidersBrowsersAndDevices(){
     try {
         const settings = yield select(state => state.settings);
@@ -1556,6 +1558,7 @@ export function* setCloudProvidersBrowsersAndDevices(){
         if(cloudProviders){
             if(cloudProviders.lambdaTest && cloudProviders.lambdaTest.inUse && cloudProviders.lambdaTest.user && cloudProviders.lambdaTest.key){
                 yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['lambdaTest', cloudProviders.lambdaTest]);
+                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'lambdaTest'));
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['lambdaTest', cloudProviders.lambdaTest.user, cloudProviders.lambdaTest.key]);
                 
                 if(typeof browsersAndDevicesResult === 'string'){
@@ -1575,6 +1578,8 @@ export function* setCloudProvidersBrowsersAndDevices(){
 
             if(cloudProviders.sauceLabs && cloudProviders.sauceLabs.inUse){
                 yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['sauceLabs', cloudProviders.sauceLabs]);
+                
+                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'sauceLabs'));
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
         
                 if(typeof browsersAndDevicesResult === 'string'){
@@ -1595,6 +1600,7 @@ export function* setCloudProvidersBrowsersAndDevices(){
 
             if(cloudProviders.testingBot && cloudProviders.testingBot.inUse){
                 yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['testingBot', cloudProviders.testingBot]);
+                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'testingBot'));
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['testingBot']);
         
                 if(typeof browsersAndDevicesResult === 'string'){
