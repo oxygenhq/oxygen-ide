@@ -27,7 +27,6 @@ export default class SauceLabsProvider extends CloudProviderBase {
     }
 
     async getDevice(id){
-        console.log('this.settings', this.settings);
         if (this.settings && this.settings.testObjectUsername && this.settings.testobject_api_key) {
 
             // olejko - username
@@ -239,7 +238,8 @@ export default class SauceLabsProvider extends CloudProviderBase {
             username: this.settings.username,
             accessKey: this.settings.accessKey,
             extendedDebugging: this.settings.extendedDebugging || false,
-            capturePerformance: this.settings.capturePerformance || false
+            capturePerformance: this.settings.capturePerformance || false,
+            testobject_api_key: this.settings.testobject_api_key,
         };
 
         return caps;
