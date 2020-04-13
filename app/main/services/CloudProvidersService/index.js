@@ -27,7 +27,18 @@ export default class CloudProvidersService extends ServiceBase {
 
     start() {
         // initialize each enabled provider
-        const { cloudProviders } = this.settings || {};
+
+        let cloudProviders;
+
+        if(
+            this.settings &&
+            this.settings.cache &&
+            this.settings.cache.settings &&
+            this.settings.cache.settings.cloudProviders
+        ){
+            cloudProviders = this.settings.cache.settings.cloudProviders;
+        }
+
         if (!cloudProviders) {
             console.warn('No cloud providers defined');
             return;
