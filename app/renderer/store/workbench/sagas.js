@@ -308,7 +308,7 @@ export function* initialize() {
     }
 
     //start CloudProvidersService
-    services.mainIpc.call('CloudProvidersService', 'start').then(() => {});
+    yield services.mainIpc.call('CloudProvidersService', 'start').then(() => {});
     yield setCloudProvidersBrowsersAndDevices();
     //start VisualTestingProvidersService
     services.mainIpc.call('VisualTestingProvidersService', 'start').then(() => {});
