@@ -79,11 +79,74 @@ export default class CloudProvidersService extends ServiceBase {
         if(providerName === 'sauceLabs'){
             console.log('~~browsersAndDevices sauceLabs', Object.keys(browsersAndDevices));
 
+            if(browsersAndDevices.browsers && Array.isArray(browsersAndDevices.browsers) && browsersAndDevices.browsers.length > 0){
+                // console.log('~~browsersAndDevices sauceLabs browsers', Object.keys(browsersAndDevices.browsers));
+
+                browsersAndDevices.browsers.map((item) => {
+                    if(browsersNames.includes(item.api_name)){
+
+                        let osName = '';
+                        let osVersion = '';
+
+                        if(item.os){
+                            if(item.os.startsWith('Windows ')){
+                                osName = 'Windows';
+                                osVersion = item.os.split('Windows ')[1];
+                            } else if(item.os.startsWith('Mac ')){
+                                osName = 'Mac';
+                                osVersion = item.os.split('Mac ')[1];
+                            } else if(item.os.startsWith('Linux')){
+                                osName = 'Linux';
+                                osVersion = '';
+                            } else {
+                                console.log('Unsupported os item '+ JSON.stringify(item));
+                            }
+                        } else {
+                            console.log('Unsupported item os '+ JSON.stringify(item));
+                        }
+
+                        
+                        if (item.api_name && item.api_name.toLowerCase() === 'firefox' && parseInt(item.short_version) < 55) {
+                            // ignore firefox < 55
+                        } else if (item.api_name && item.api_name.toLowerCase() === 'chrome' && parseInt(item.short_version) < 76) {
+                            // ignore chrome < 76
+                        } else if (item.api_name && item.api_name.toLowerCase() === 'internet explorer' && parseInt(item.short_version) < 10 ) {
+                            // ignore internet explorer < 10
+                        } else if (item.api_name && item.api_name === 'MicrosoftEdge' && item.short_version === 'dev' ) {
+                            // ignore MicrosoftEdge dev
+                        } else if (item.api_name && item.api_name === 'safari' && parseInt(item.short_version) < 12 ) {
+                            // ignore safari < 12
+                        } else if (item.api_name && item.api_name === 'safari' && parseInt(item.short_version) === 13 ) {
+                            // UNKNOWN_ERROR - element not interactable: unknown error
+                        } else {
+                            
+                            // console.log('===');
+                            // console.log('api_name', item.api_name);
+                            // console.log('long_name', item.long_name);
+                            // console.log('short_version', item.short_version);
+                            // console.log('===');
+
+                            browsers.push(new BrowserInfo({
+                                apiName: item.api_name,
+                                name: item.long_name,
+                                version: item.short_version,
+                                osName: osName,
+                                osVersion: osVersion
+                            }));
+                        }
+                    } else {
+                        // console.log('[108] Unsupported item '+ JSON.stringify(item));
+                    }
+                });
+            }
+
+        }
+        else if(providerName === 'testObject'){
             if(browsersAndDevices.devices){
-                console.log('~~browsersAndDevices sauceLabs devices', Object.keys(browsersAndDevices.devices));
+                // console.log('~~browsersAndDevices sauceLabs devices', Object.keys(browsersAndDevices.devices));
 
                 if(browsersAndDevices.devices && Array.isArray(browsersAndDevices.devices) && browsersAndDevices.devices.length > 0){
-                    console.log('~~device[0]', browsersAndDevices.devices[0]);
+                    // console.log('~~device[0]', browsersAndDevices.devices[0]);
 
                     browsersAndDevices.devices.map((item) => {
                         if(item.deviceFamily && item.deviceFamily.toLowerCase && devicesNames.includes(item.deviceFamily.toLowerCase())){
@@ -122,15 +185,36 @@ export default class CloudProvidersService extends ServiceBase {
                                 console.log('Unsupported item os ', item);
                             }
         
-        
-                            devices.push(new DeviceInfo({
-                                apiName: apiName,
-                                id: item.id,
-                                name: item.name,
-                                version: item.osVersion,
-                                osName: osName,
-                                osVersion: osVersion
-                            }));
+
+                            
+                            // console.log('===');
+                            // console.log('apiName', apiName);
+                            // console.log('name', item.name);
+                            // console.log('version', item.osVersion);
+                            // console.log('===');
+
+                            if (apiName === 'android') {
+                                if (item.name && item.name.startsWith('Samsung Galaxy S20')) {
+                                    devices.push(new DeviceInfo({
+                                        apiName: apiName,
+                                        id: item.id,
+                                        name: item.name,
+                                        version: item.osVersion,
+                                        osName: osName,
+                                        osVersion: osVersion
+                                    }));
+                                }
+                            }
+                            // else {
+                            //     devices.push(new DeviceInfo({
+                            //         apiName: apiName,
+                            //         id: item.id,
+                            //         name: item.name,
+                            //         version: item.osVersion,
+                            //         osName: osName,
+                            //         osVersion: osVersion
+                            //     }));
+                            // }
                         } else {
                             console.log('Unsupported item',item );
                         }
@@ -138,47 +222,8 @@ export default class CloudProvidersService extends ServiceBase {
 
                 }
             }
-
-            if(browsersAndDevices.browsers && Array.isArray(browsersAndDevices.browsers) && browsersAndDevices.browsers.length > 0){
-                // console.log('~~browsersAndDevices sauceLabs browsers', Object.keys(browsersAndDevices.browsers));
-
-                browsersAndDevices.browsers.map((item) => {
-                    if(browsersNames.includes(item.api_name)){
-
-                        let osName = '';
-                        let osVersion = '';
-
-                        if(item.os){
-                            if(item.os.startsWith('Windows ')){
-                                osName = 'Windows';
-                                osVersion = item.os.split('Windows ')[1];
-                            } else if(item.os.startsWith('Mac ')){
-                                osName = 'Mac';
-                                osVersion = item.os.split('Mac ')[1];
-                            } else if(item.os.startsWith('Linux')){
-                                osName = 'Linux';
-                                osVersion = '';
-                            } else {
-                                console.log('Unsupported os item '+ JSON.stringify(item));
-                            }
-                        } else {
-                            console.log('Unsupported item os '+ JSON.stringify(item));
-                        }
-
-                        browsers.push(new BrowserInfo({
-                            apiName: item.api_name,
-                            name: item.long_name,
-                            version: item.short_version,
-                            osName: osName,
-                            osVersion: osVersion
-                        }));
-                    } else {
-                        // console.log('[108] Unsupported item '+ JSON.stringify(item));
-                    }
-                });
-            }
-
-        } else if(browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0 && providerName){
+        }
+        else if(browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0 && providerName){
             browsersAndDevices.map((item) => {
                 if(item){
                     if(providerName === 'sauceLabs'){
@@ -439,10 +484,10 @@ export default class CloudProvidersService extends ServiceBase {
                 try {
                     const browsersAndDevices = await provider.getBrowsersAndDevices(userName, key);
                 
-                    console.log('~~providerName', providerName);
-
                     if(providerName === 'sauceLabs'){
                         // sauceLabs
+                        return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
+                    } else if(providerName === 'testObject'){
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                     } else if(browsersAndDevices && browsersAndDevices.platforms && Array.isArray(browsersAndDevices.platforms) && browsersAndDevices.platforms.length > 0){
                         // lambdaTest
@@ -451,6 +496,7 @@ export default class CloudProvidersService extends ServiceBase {
                         // testingBot
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                     } else {
+                        console.log('~~providerName', providerName);
                         console.log('browsersAndDevices does not exist.', browsersAndDevices);
                     }
     

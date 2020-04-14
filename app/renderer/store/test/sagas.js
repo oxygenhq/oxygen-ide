@@ -46,9 +46,9 @@ function* setTestProvider({payload}){
 
         if(testProviders && testProviders[testProvider]){
             const providerData = testProviders[testProvider];
-            if(providerData && providerData.browsersTree){
+            if(providerData && providerData.browsersTree && Array.isArray(providerData.browsersTree) && providerData.browsersTree.length > 0){
                 yield put(testActions.setTestMode('web'));
-            } else if(providerData && providerData.devicesTree){
+            } else if(providerData && providerData.devicesTree && Array.isArray(providerData.devicesTree) && providerData.devicesTree.length > 0){
                 yield put(testActions.setTestMode('mob'));
             }
         }        
@@ -94,7 +94,7 @@ function* setTestMode({payload}){
                 
                 if(testMode === 'mob'){
                     if(providerData && providerData.devicesTree){
-                        const target = getDevicesTarget(providerData.devicesTree, 'iOS');
+                        const target = getDevicesTarget(providerData.devicesTree, 'android');
                         if(target){
                             yield put(testActions.setTestTarget(target));
                         }

@@ -1596,6 +1596,26 @@ export function* setCloudProvidersBrowsersAndDevices(){
                 }
             }
 
+            
+            if(cloudProviders.testObject && cloudProviders.testObject.inUse){
+                yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['testObject', cloudProviders.testObject]);
+                
+                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'testObject'));
+                const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['testObject']);
+        
+                if(typeof browsersAndDevicesResult === 'string'){
+                    fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
+                } else {
+                    if(browsersAndDevicesResult){
+                        yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'testObject'));
+                    }
+                }
+            } else {
+                // set to local if testObject
+                if(testProvider && testProvider === 'testObject'){
+                    yield put(testActions.setTestProvider('Local'));
+                }
+            }
 
 
             if(cloudProviders.testingBot && cloudProviders.testingBot.inUse){
