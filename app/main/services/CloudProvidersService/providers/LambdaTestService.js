@@ -28,10 +28,6 @@ export default class LambdaTestService extends CloudProviderBase {
 
     async getBrowsersAndDevices() {
         if (this.settings && this.settings.user && this.settings.key) {
-            const headers = new fetch.Headers();
-
-            headers.set('Authorization', 'Basic ' + Buffer.from(this.settings.user + ':' + this.settings.key).toString('base64'));
-            
             let fetchFn;
 
             if(typeof fetch === 'function'){
@@ -46,7 +42,9 @@ export default class LambdaTestService extends CloudProviderBase {
             const response = await fetchFn('https://api.lambdatest.com/automation/api/v1/platforms',
             {
                 method:'GET',
-                headers: headers,
+                headers: {
+                    'Authorization' : 'Basic ' + Buffer.from(this.settings.user + ':' + this.settings.key).toString('base64')
+                },
             });
             if (response) {
                 return response.json();

@@ -28,11 +28,6 @@ export default class TestObjectService extends CloudProviderBase {
 
     async getDevice(id){
         if (this.settings && this.settings.testObjectUsername && this.settings.testobject_api_key) {
-
-            const headers = new fetch.Headers();
-            
-            headers.set('Authorization', 'Basic ' + Buffer.from(this.settings.testObjectUsername + ':' + this.settings.testobject_api_key).toString('base64'));
-
             let fetchFn;
 
             if(typeof fetch === 'function'){
@@ -47,7 +42,9 @@ export default class TestObjectService extends CloudProviderBase {
             const response = await fetchFn(`https://app.testobject.com/api/rest/v2/devices/${id}`,
             {
                 method:'GET',
-                headers: headers,
+                headers: {
+                    'Authorization' : 'Basic ' + Buffer.from(this.settings.testObjectUsername + ':' + this.settings.testobject_api_key).toString('base64')
+                },
             });
             if (response) {
                 // console.log('response', response);
@@ -69,10 +66,6 @@ export default class TestObjectService extends CloudProviderBase {
             // olejko - username
             // F128DBC77A234AF1991D435A5D07A54B - appium/basic/instructions
 
-            const headers = new fetch.Headers();
-            
-            headers.set('Authorization', 'Basic ' + Buffer.from(this.settings.testObjectUsername + ':' + this.settings.testobject_api_key).toString('base64'));
-
             let fetchFn;
 
             if(typeof fetch === 'function'){
@@ -87,7 +80,9 @@ export default class TestObjectService extends CloudProviderBase {
             const response = await fetchFn('https://app.testobject.com/api/rest/v2/devices/available',
             {
                 method:'GET',
-                headers: headers,
+                headers: {
+                    'Authorization' : 'Basic ' + Buffer.from(this.settings.testObjectUsername + ':' + this.settings.testobject_api_key).toString('base64')
+                },
             });
             if (response) {
                 // console.log('response', response);
