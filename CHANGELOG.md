@@ -1,12 +1,12 @@
 # CHANGELOG
 
-## v1.16.1 (2020-04-xx)
+## v1.17.0 (2020-04-15)
 
 #### :beetle: Bug Fix
 * Wrong current line indication when breakpoint is set on commented line.
 * `log.*` output not being displayed in the log panel.
 * Number of issues with browser disposal.
-* Various issues with running tests on LambdaTest provider.
+* Various issues with running tests on LambdaTest and SauceLabs providers.
 
 #### :house: Internal
 * Bumped oxygen-cli from v1.1.3 to v1.2.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
