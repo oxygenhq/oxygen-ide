@@ -147,6 +147,7 @@
     "@babel/runtime": "7.8.4",
     "@emotion/core": "10.0.27",
     "@emotion/styled": "10.0.27",
+    "@sentry/webpack-plugin": "^1.10.0",
     "antd": "3.26.12",
     "appium-adb": "7.24.0",
     "chrome-launcher": "0.13.0",

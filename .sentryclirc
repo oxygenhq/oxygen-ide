@@ -1,0 +1,7 @@
+[defaults]
+url = https://sentry.io/
+org = cloudbeat
+project = ide
+
+[auth]
+token = 5cb07aabfd8c42c4a9e44202d3c30b8c390ad868476041d696cc3115157a7bca

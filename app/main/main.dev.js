@@ -151,6 +151,13 @@ function disposeMainAndQuit() {
     }
 }
 
+
+function normalizeUrl(url) {
+    const PATH_MATCH_RE = /[^/]+$/;
+    const match = url.match(PATH_MATCH_RE);
+    return match ? `~/app/main/${match[0]}` : url;
+}
+
 function initializeCrashReporterAndSentry() {
     try {
         crashReporter.start({
@@ -181,7 +188,41 @@ function initializeCrashReporterAndSentry() {
   
         const sentryConfig = {
             dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893',
-            release: packageJson.version
+            release: packageJson.version,
+            beforeSend(event) {
+                // console.log('~~~event', JSON.stringify(event, null, 2));
+
+                if (
+                    event &&
+                    event.exception &&
+                    event.exception.values &&
+                    Array.isArray(event.exception.values) &&
+                    event.exception.values.length > 0
+                ) {
+                    for(var i = 0; i < event.exception.values.length; i++){
+                        if(
+                            event.exception.values[i] &&
+                            event.exception.values[i].stacktrace &&
+                            event.exception.values[i].stacktrace.frames &&
+                            Array.isArray(event.exception.values[i].stacktrace.frames) &&
+                            event.exception.values[i].stacktrace.frames.length > 0
+                        ){
+                            for(var j = 0; j < event.exception.values[i].stacktrace.frames.length; j++){
+                                const sepBefore = 'app:///main/';
+                                if(
+                                    event.exception.values[i].stacktrace.frames[j] &&
+                                    event.exception.values[i].stacktrace.frames[j].filename &&
+                                    event.exception.values[i].stacktrace.frames[j].filename.startsWith(sepBefore)
+                                ){
+                                    event.exception.values[i].stacktrace.frames[j].filename = normalizeUrl(event.exception.values[i].stacktrace.frames[j].filename);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return event;
+            }
         };
 
         Sentry.init(sentryConfig);

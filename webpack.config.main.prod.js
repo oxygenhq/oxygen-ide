@@ -2,12 +2,15 @@
  * Webpack config for production electron main process
  */
 
+import path from 'path';
 import webpack from 'webpack';
 import merge from 'webpack-merge';
 import TerserPlugin from 'terser-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
+import SentryWebpackPlugin from '@sentry/webpack-plugin';
+import { version }  from './package.json';
 
 CheckNodeEnv('production');
 
@@ -16,11 +19,12 @@ export default merge.smart(baseConfig, {
 
     target: 'electron-main',
 
-    entry: ['core-js/stable', 'regenerator-runtime/runtime',  './app/main/main.dev'],
+    entry: ['core-js/stable', 'regenerator-runtime/runtime',  './app/main/main.dev.js'],
 
     output: {
-        path: __dirname,
-        filename: './app/main/main.prod.js'
+        path: path.join(__dirname, 'app/main'),
+        publicPath: process.env.RELEASE_BUILD ? '../main/' /*npm run package*/ : '../app/main/' /*npm run start*/,
+        filename: 'main.prod.js'
     },
     optimization: {
         minimize: true,
@@ -63,6 +67,19 @@ export default merge.smart(baseConfig, {
         new webpack.IgnorePlugin(/(\.\/src\/adb)|(\.\/src\/monkey)|(\.\/src\/logcat)/),
 
         // ignore locale files of moment.js
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        
+        new SentryWebpackPlugin({
+            release: version,
+            include: [
+                'app/main/main.prod.js.map',
+                'app/main/main.prod.js',
+            ],
+            urlPrefix: '~app/main/',
+            ignoreFile: '.sentrycliignore',
+            ignore: ['node_modules', 'webpack.config.js'],
+            // validate: true,
+            sourceMapReference: false
+        }),
     ],
 });

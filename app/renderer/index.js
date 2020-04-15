@@ -27,6 +27,7 @@ if (process.env.NODE_ENV === 'production') {
             dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893',
             release: packageJson.version
         });
+        window.Sentry = Sentry;
     } catch(e) {
         console.warn('Cannot initialize CrashReporter and Sentry', e);
     }

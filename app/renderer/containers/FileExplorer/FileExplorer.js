@@ -119,10 +119,29 @@ export default class FileExplorer extends React.Component<Props> {
 
 
     onDrop = (info) => {
-        const node = info.node.props.nodeInfo;
-        const dragNode = info.dragNode.props.nodeInfo;
+        let node;
+        let dragNode;
 
-        if(node && typeof node.type !=='undefined' && node.type !== 'file'){
+        if(
+            info &&
+            info.node  &&
+            info.node.props  &&
+            info.node.props.nodeInfo
+        ){
+            node = info.node.props.nodeInfo;
+        }
+        
+        if(
+            info &&
+            info.dragNode &&
+            info.dragNode.props &&
+            info.dragNode.props.nodeInfo
+        ){
+            dragNode = info.dragNode.props.nodeInfo;
+        }
+
+
+        if(node && dragNode && typeof node.type !=='undefined' && node.type !== 'file'){
 
             const oldPath = dragNode.path;
             const newPath = node.path + path.sep + dragNode.name;
@@ -135,7 +154,7 @@ export default class FileExplorer extends React.Component<Props> {
             }
         } else {
             const { rootPath } = this.props;
-            if(rootPath){
+            if(rootPath && dragNode){
                 const oldPath = dragNode.path;
                 const newPath = rootPath + path.sep + dragNode.name;
 

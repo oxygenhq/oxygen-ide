@@ -12,6 +12,8 @@ import merge from 'webpack-merge';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
 import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
+import SentryWebpackPlugin from '@sentry/webpack-plugin';
+import { version }  from './package.json';
 
 CheckNodeEnv('production');
 
@@ -142,6 +144,18 @@ export default merge.smart(baseConfig, {
             'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 'rename',
             'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 'transpose',
             'wordHighlighter', 'wordOperations', 'wordPartOperations']
-        })
+        }),
+        
+        new SentryWebpackPlugin({
+            release: version,
+            include: [
+                'app/dist/renderer.prod.js.map',
+                'app/dist/renderer.prod.js'
+            ],
+            ignoreFile: '.sentrycliignore',
+            ignore: ['node_modules', 'webpack.config.js'],
+            validate: true,
+            sourceMapReference: false
+        }),
     ],
 });
