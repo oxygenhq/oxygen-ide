@@ -7,7 +7,16 @@
  * (at your option) any later version.
  */
 export function getMarkerLine(marker) {
-    return marker.range.startLineNumber;
+    let result = 0;
+
+    if(
+        marker &&
+        marker.range &&
+        marker.range.startLineNumber
+    ){
+        result = marker.range.startLineNumber;
+    }
+    return result;
 }
 /**
    * @param  {Object} item
@@ -125,7 +134,15 @@ export function removeBreakpointMarker(editor, lineOrMarker) {
 export function getBreakpointMarker(editor, line) {
     let firstMatch = getAllMarkers(editor).find((marker) => {
         // return the first marker that matches
-        return isBreakpointMarker(marker) && marker.range.startLineNumber === line;
+        let result = 
+            isBreakpointMarker(marker) && 
+            marker && 
+            marker.range &&
+            marker.range.startLineNumber &&
+            marker.range.startLineNumber === line;
+        
+
+        return result;
     });
     return firstMatch || null;
 }
@@ -174,8 +191,18 @@ function addHalfOpacity(marker, editor){
         })
     ];
 
+    let startLineNumber = 0;
+
+    if(
+        marker &&
+        marker.range &&
+        marker.range.startLineNumber
+    ) {
+        startLineNumber = marker.range.startLineNumber;
+    }
+
     const newDecorators = [{
-        range: new monaco.Range(marker.range.startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
+        range: new monaco.Range(startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
         options: {
             isWholeLine: true,
             className: marker.options.className,
@@ -211,8 +238,18 @@ function removeHalfOpacity(marker, editor){
 
     const newLinesDecorationsClassName = marker.options.linesDecorationsClassName.replace(/ halfOpacity/g, '');
 
+    let startLineNumber = 0;
+
+    if(
+        marker &&
+        marker.range &&
+        marker.range.startLineNumber
+    ) {
+        startLineNumber = marker.range.startLineNumber;
+    }
+
     const newDecorators = [{
-        range: new monaco.Range(marker.range.startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
+        range: new monaco.Range(startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
         options: {
             isWholeLine: true,
             className: marker.options.className,
@@ -283,8 +320,18 @@ function removeHollowCircle(marker, editor){
 
     const newLinesDecorationsClassName = marker.options.linesDecorationsClassName.replace(/ hollowCircle/g, '');
     
+    let startLineNumber = 0;
+
+    if(
+        marker &&
+        marker.range &&
+        marker.range.startLineNumber
+    ) {
+        startLineNumber = marker.range.startLineNumber;
+    }
+    
     const newDecorators = [{
-        range: new monaco.Range(marker.range.startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
+        range: new monaco.Range(startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
         options: {
             isWholeLine: true,
             className: marker.options.className,
@@ -318,8 +365,19 @@ function addResolwedCircle(marker, editor){
         })
     ];
 
+    let startLineNumber = 0;
+
+    if(
+        marker &&
+        marker.range &&
+        marker.range.startLineNumber
+    ) {
+        startLineNumber = marker.range.startLineNumber;
+    }
+    
+
     const newDecorators = [{
-        range: new monaco.Range(marker.range.startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
+        range: new monaco.Range(startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
         options: {
             isWholeLine: true,
             className: marker.options.className,

@@ -20,7 +20,7 @@ export default function (e) {
     }
 
     // identify if user has added or removed a line - if the number of lines hasn't change, then we have nothing to do here
-    const newLineAddedOrDeleted = e.changes.some(change => ( change.text === e.eol || (change.range.startLineNumber != change.range.endLineNumber) ));
+    const newLineAddedOrDeleted = e.changes.some(change => ( change.text === e.eol || (change && change.range && change.range.startLineNumber != change.range.endLineNumber) ));
     //const newLineAddedOrDeleted = e.changes.some(change => { console.dir(change); return false;});
     if (!newLineAddedOrDeleted) {
         return;
