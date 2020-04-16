@@ -434,22 +434,15 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                 { sauceLabs && sauceLabs.inUse &&
                     <div className="cloud-providers-form-wrap cloud-providers-form-wrap-margin-bottom">
                         <Form.Item label="Sauce Labs Settings" style={ {fontWeight: 'bold'} } {...formItemLayout}/>
-                        
-                        <p style={{ padding: '0px 10px' }}>
-                            Please type in the Hub URL that was defined in your Sauce Labs account.
-                            <br/>
-                            If you are not sure what URL to use, please click on the following link to locate the URL
-                            <br/>
-                            <a href="https://wiki.saucelabs.com/display/DOCS/Data+Center+Endpoints#DataCenterEndpoints-Endpoints" onClick={this.processLink}>
-                                https://wiki.saucelabs.com/display/DOCS/Data+Center+Endpoints#DataCenterEndpoints-Endpoints
-                            </a>
-                        </p>
-
                         <Form.Item label="Remote Hub URL" {...formItemLayout} >
                             <Input
                                 value={ sauceLabs.url }
                                 onChange={ (e) => ::this.onChangeSauceLabsUrl(e.target.value) }
                             />
+                            <p style={{ lineHeight: '22px', paddingTop: '4px', paddingBottom: '4px' }}>
+                            Type in the Hub URL that was defined in your Sauce Labs account.
+                            If you are not sure what URL to use - see <a href="https://wiki.saucelabs.com/display/DOCS/Data+Center+Endpoints#DataCenterEndpoints-Endpoints" onClick={this.processLink}>here</a>.
+                            </p>
                         </Form.Item>
                         <Form.Item label="Username" {...formItemLayout} >
                             <Input
@@ -473,7 +466,7 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                             <Checkbox
                                 checked={ sauceLabs.capturePerformance || false }
                                 onChange={ (e) => ::this.onChangeSauceLabsCapturePerformance(e.target.checked) }
-                            />                  
+                            />
                         </Form.Item>
                     </div>
                 }
