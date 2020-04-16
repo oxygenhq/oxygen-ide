@@ -307,16 +307,16 @@ export function* initialize() {
         yield put(settingsActions.showLanding());
     }
 
+    yield put({
+        type: success(ActionTypes.WB_INIT),
+    });
+
     //start CloudProvidersService
     yield services.mainIpc.call('CloudProvidersService', 'start').then(() => {});
     yield setCloudProvidersBrowsersAndDevices();
     //start VisualTestingProvidersService
     services.mainIpc.call('VisualTestingProvidersService', 'start').then(() => {});
     yield setVisualTestingProviders();
-
-    yield put({
-        type: success(ActionTypes.WB_INIT),
-    });
 }
 
 export function* openFolder({ payload }) {
@@ -1562,6 +1562,7 @@ export function* setCloudProvidersBrowsersAndDevices(){
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['lambdaTest', cloudProviders.lambdaTest.user, cloudProviders.lambdaTest.key]);
                 
                 if(typeof browsersAndDevicesResult === 'string'){
+                    yield put(settingsActions.setCloudProvidersBrowsersAndDevices(null, 'lambdaTest'));
                     fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
                 } else {
                     if(browsersAndDevicesResult){
@@ -1583,6 +1584,7 @@ export function* setCloudProvidersBrowsersAndDevices(){
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
         
                 if(typeof browsersAndDevicesResult === 'string'){
+                    yield put(settingsActions.setCloudProvidersBrowsersAndDevices(null, 'sauceLabs'));
                     fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
                 } else {
                     if(browsersAndDevicesResult){
@@ -1604,6 +1606,7 @@ export function* setCloudProvidersBrowsersAndDevices(){
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['testObject']);
         
                 if(typeof browsersAndDevicesResult === 'string'){
+                    yield put(settingsActions.setCloudProvidersBrowsersAndDevices(null, 'testObject'));
                     fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
                 } else {
                     if(browsersAndDevicesResult){
@@ -1624,6 +1627,7 @@ export function* setCloudProvidersBrowsersAndDevices(){
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['testingBot']);
         
                 if(typeof browsersAndDevicesResult === 'string'){
+                    yield put(settingsActions.setCloudProvidersBrowsersAndDevices(null, 'testingBot'));
                     fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
                 } else {
                     if(browsersAndDevicesResult){

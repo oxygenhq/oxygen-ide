@@ -10,7 +10,7 @@ export default class Initializing extends React.PureComponent {
             <div className="initializing-container">
                 <div className="initializing-inner">
                     <h1 className="initializing-title">
-            Initializing...
+                        Initializing...
                     </h1>
                 </div>
             </div>

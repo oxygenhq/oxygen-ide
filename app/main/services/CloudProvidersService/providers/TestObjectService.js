@@ -39,19 +39,24 @@ export default class TestObjectService extends CloudProviderBase {
                 throw new Error('TestObject: fetchFn not found');
             }
             
-            const response = await fetchFn(`https://app.testobject.com/api/rest/v2/devices/${id}`,
-            {
-                method:'GET',
-                headers: {
-                    'Authorization' : 'Basic ' + Buffer.from(this.settings.testObjectUsername + ':' + this.settings.testobject_api_key).toString('base64')
-                },
-            });
-            if (response) {
-                // console.log('response', response);
-                return response.json();
+            try{
+                const response = await fetchFn(`https://app.testobject.com/api/rest/v2/devices/${id}`,
+                {
+                    method:'GET',
+                    headers: {
+                        'Authorization' : 'Basic ' + Buffer.from(this.settings.testObjectUsername + ':' + this.settings.testobject_api_key).toString('base64')
+                    },
+                });
+        
+                if (response) {
+                    // console.log('response', response);
+                    return response.json();
+                }
+                // not suppose to happen
+                return null;
+            } catch(e){
+                console.log('getDevice e', e);
             }
-            // not suppose to happen
-            return null;
         }
         else {
             throw new Error('TestObject: invalid credentials');
@@ -105,21 +110,25 @@ export default class TestObjectService extends CloudProviderBase {
         //OELG_TODO region support
         devicesIds = devicesIds['US'];
 
-        // console.log('~~devicesIds', devicesIds);
+        // console.log('~~devicesIds', JSON.stringify(devicesIds, null, 2));
 
         if(devicesIds && Array.isArray(devicesIds) && devicesIds.length > 0){
             devicesPromises = await devicesIds.map(async(item, idx) => {
                 
-                
-                const device = await this.getDevice(item);
-
-                // console.log('~~idx', idx);
-                // console.log('~~device', device);
-
-                //OELG_TODO region support
-                if(device && device['US']) {
-                    devices.push(device['US']);
-                    return device['US'];
+                try {
+                    const device = await this.getDevice(item);
+    
+                    // console.log('~~idx', idx);
+                    // console.log('~~device', device);
+    
+                    //OELG_TODO region support
+                    if(device && device['US']) {
+                        devices.push(device['US']);
+                        return device['US'];
+                    }
+                } catch(e){
+                    console.log('getDevice e', e);
+                    return null;
                 }
             });
         }
