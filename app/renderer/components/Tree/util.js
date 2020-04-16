@@ -78,7 +78,7 @@ export function traverseTreeNodes(treeNodes, callback) {
                 index,
                 pos,
                 key: node.key || pos,
-                parentPos: parent.node ? parent.pos : null,
+                parentPos: (parent && parent.node) ? parent.pos : null,
             };
 
             callback(data);
