@@ -85,45 +85,49 @@ export function getPageObjectFilePath(config, argv = {}) {
 }
 
 export function processTargetPath(inputTargetPath) {
-    let targetPath = inputTargetPath;
-    // get current working directory if user has not provided path
-    if (typeof(targetPath) === 'undefined') {
-        targetPath = process.cwd();
-    }
-    // user's path might be relative to the current working directory - make sure the relative path will work
-    else {
-        targetPath = oxutil.resolvePath(targetPath, process.cwd());
-    }
-    const stats = fs.lstatSync(targetPath);
-    const isDirector = stats.isDirectory();
-    if (isDirector) {
-        // append oxygen config file name to the directory, if no test case file was provided
-        let configFilePath = path.join(targetPath, OXYGEN_CONFIG_FILE_NAME + '.js');
-        if (!fs.existsSync(configFilePath)) {
-            configFilePath = path.join(targetPath, OXYGEN_CONFIG_FILE_NAME + '.json');
-            if (!fs.existsSync(configFilePath)) {
-                return null;
-            }
+    try{ 
+        let targetPath = inputTargetPath;
+        // get current working directory if user has not provided path
+        if (typeof(targetPath) === 'undefined') {
+            targetPath = process.cwd();
         }
-        targetPath = configFilePath;
+        // user's path might be relative to the current working directory - make sure the relative path will work
+        else {
+            targetPath = oxutil.resolvePath(targetPath, process.cwd());
+        }
+        const stats = fs.lstatSync(targetPath);
+        const isDirector = stats.isDirectory();
+        if (isDirector) {
+            // append oxygen config file name to the directory, if no test case file was provided
+            let configFilePath = path.join(targetPath, OXYGEN_CONFIG_FILE_NAME + '.js');
+            if (!fs.existsSync(configFilePath)) {
+                configFilePath = path.join(targetPath, OXYGEN_CONFIG_FILE_NAME + '.json');
+                if (!fs.existsSync(configFilePath)) {
+                    return null;
+                }
+            }
+            targetPath = configFilePath;
+        }
+        if (!fs.existsSync(targetPath)) {
+            return null;
+        }
+        return {
+            // path to the config or .js file
+            path: targetPath,
+            // working directory
+            cwd: path.dirname(targetPath),
+            // name of the target file without extension
+            name: oxutil.getFileNameWithoutExt(targetPath),        
+            // name including extension
+            fullName: path.basename(targetPath),
+            // parent folder's name
+            baseName: path.basename(path.dirname(targetPath)),
+            // target file extension
+            extension: path.extname(targetPath)
+        };
+    } catch(e){
+        //ignore
     }
-    if (!fs.existsSync(targetPath)) {
-        return null;
-    }
-    return {
-        // path to the config or .js file
-        path: targetPath,
-        // working directory
-        cwd: path.dirname(targetPath),
-        // name of the target file without extension
-        name: oxutil.getFileNameWithoutExt(targetPath),        
-        // name including extension
-        fullName: path.basename(targetPath),
-        // parent folder's name
-        baseName: path.basename(path.dirname(targetPath)),
-        // target file extension
-        extension: path.extname(targetPath)
-    };
 }
 
 export async function getConfigurations(target, argv, mainFilePath) {

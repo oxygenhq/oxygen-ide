@@ -39,17 +39,21 @@ const FileChangeType = {
 const changeTypeMap = [FileChangeType.UPDATED, FileChangeType.ADDED, FileChangeType.DELETED];
 
 const getFileInfo = (filePath) => {
-    // this function accepts either fs.Stats object or path as string
-    const stats = fs.lstatSync(filePath);
-    const type = stats.isDirectory() ? 'folder' : (stats.isFile() ? 'file' : 'other');
-    const parentPath = path.dirname(filePath);
-    return {
-        name: path.basename(filePath),
-        path: filePath,
-        parentPath,
-        type,
-        ext: path.extname(filePath),
-    };
+    try{
+        // this function accepts either fs.Stats object or path as string
+        const stats = fs.lstatSync(filePath);
+        const type = stats.isDirectory() ? 'folder' : (stats.isFile() ? 'file' : 'other');
+        const parentPath = path.dirname(filePath);
+        return {
+            name: path.basename(filePath),
+            path: filePath,
+            parentPath,
+            type,
+            ext: path.extname(filePath),
+        };
+    } catch(e){
+        //ignore
+    }
 };
 
 const send = data => {
@@ -313,50 +317,58 @@ export default class FileService extends ServiceBase {
     }
 
     getFolderContent(folderPath) {
-        let stats = fs.lstatSync(folderPath);
-        if (!stats.isDirectory()) {
-            throw Error('Path is pointing to a file instead of folder.');
+        try{ 
+            let stats = fs.lstatSync(folderPath);
+            if (!stats.isDirectory()) {
+                throw Error('Path is pointing to a file instead of folder.');
+            }
+            let fileNames = fs.readdirSync(folderPath);
+            let children = fileNames
+                .reduce((result, fileName) => {
+                    const filePath = path.join(folderPath, fileName);
+                    // ignore any file that cannot be accessed (either locked or lack of permissions)
+                    try {
+                        stats = fs.lstatSync(filePath);
+                    }
+                    catch (e) {
+                        Sentry.captureException(e);
+                        return result;
+                    }
+                    if (stats.isSymbolicLink() || junk.is(filePath) 
+                        || isUnixHiddenPath(fileName)
+                        || isWinHiddenPath(fileName)) {
+                        return result;
+                    }
+                    result.push(this.getFileInfo(filePath, stats));
+                    return result;
+                }, [])
+                .sort(fileFolderSorter);
+            // return folder's details and its children
+            return {
+                ...this.getFileInfo(folderPath),
+                children: children,
+            };
+        } catch(e){
+            //ignore
         }
-        let fileNames = fs.readdirSync(folderPath);
-        let children = fileNames
-            .reduce((result, fileName) => {
-                const filePath = path.join(folderPath, fileName);
-                // ignore any file that cannot be accessed (either locked or lack of permissions)
-                try {
-                    stats = fs.lstatSync(filePath);
-                }
-                catch (e) {
-                    Sentry.captureException(e);
-                    return result;
-                }
-                if (stats.isSymbolicLink() || junk.is(filePath) 
-                    || isUnixHiddenPath(fileName)
-                    || isWinHiddenPath(fileName)) {
-                    return result;
-                }
-                result.push(this.getFileInfo(filePath, stats));
-                return result;
-            }, [])
-            .sort(fileFolderSorter);
-        // return folder's details and its children
-        return {
-            ...this.getFileInfo(folderPath),
-            children: children,
-        };
     }
 
     getFileInfo(filePath, fsStats = null) {
-        // this function accepts either fs.Stats object or path as string
-        const stats = fsStats ? fsStats : fs.lstatSync(filePath);
-        const type = stats.isDirectory() ? 'folder' : (stats.isFile() ? 'file' : 'other');
-        const parentPath = path.dirname(filePath);
-        return {
-            name: path.basename(filePath),
-            path: filePath,
-            parentPath: parentPath,
-            type: type,
-            ext: path.extname(filePath),
-        };
+        try{
+            // this function accepts either fs.Stats object or path as string
+            const stats = fsStats ? fsStats : fs.lstatSync(filePath);
+            const type = stats.isDirectory() ? 'folder' : (stats.isFile() ? 'file' : 'other');
+            const parentPath = path.dirname(filePath);
+            return {
+                name: path.basename(filePath),
+                path: filePath,
+                parentPath: parentPath,
+                type: type,
+                ext: path.extname(filePath),
+            };
+        } catch(e){
+            //ignore
+        }
     }
 
     returnFileContent(filePath){
