@@ -1598,8 +1598,7 @@ export function* setCloudProvidersBrowsersAndDevices(){
                 }
             }
 
-            
-            if(cloudProviders.testObject && cloudProviders.testObject.inUse){
+            if(cloudProviders.testObject && cloudProviders.testObject.inUse && cloudProviders.testObject.testObjectUsername && cloudProviders.testObject.testobject_api_key){
                 yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['testObject', cloudProviders.testObject]);
                 
                 yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'testObject'));
