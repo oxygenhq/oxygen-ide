@@ -412,24 +412,56 @@ export default class TestRunnerService extends ServiceBase {
             const status = result && result.status ? result.status.toUpperCase() : 'FAILED';
             if (error) {
                 if (typeof error === 'string') {
-                    this._emitLogEvent(SEVERITY_ERROR, `Test failed: ${error}.`);
+                    this.notify({
+                        type: EVENT_LOG_ENTRY,
+                        severity: SEVERITY_ERROR,
+                        message: `Test failed: ${error}.`
+                    });
                 }
                 else {
-                    this._emitLogEvent(SEVERITY_ERROR, `Test failed: ${error.message}. ${error.stack || ''}`);
+                    let message;
+
+                    // avoid print error message twice
+                    if (
+                        error &&
+                        error.stack &&
+                        error.message &&
+                        error.stack.includes(error.message)
+                    ) {
+                        message = `Test failed: ${error.stack}`;
+                    } else {
+                        message = `Test failed: ${error.message}. ${error.stack || ''}`;
+                    }
+
+                    this.notify({
+                        type: EVENT_LOG_ENTRY,
+                        severity: SEVERITY_ERROR,
+                        message: message,
+                    });
                 }
             }
             else if (result && result.failure) {
                 const loc = this._getLocationInfo(result.failure.location);
                 const message = result.failure.message ? ` "${result.failure.message}"` : '';
                 const locStr = loc && loc.line && loc.file && loc.file === this.mainFilePath ? ` at line ${loc.line}` : '';
-                this._emitLogEvent(SEVERITY_ERROR, `Test failed: [${result.failure.type}]${message}${locStr}`);
+                
+                this.notify({
+                    type: EVENT_LOG_ENTRY,
+                    severity: SEVERITY_ERROR,
+                    message: `Test failed: [${result.failure.type}]${message}${locStr}`
+                });
             }
             this._emitLogEvent(SEVERITY_INFO, `Test finished with status --> ${status}.`);
         }
+
+        const errorObj = {
+            message: error && error.message
+        };
+
         this.notify({
             type: EVENT_TEST_ENDED,
             result: result,
-            error: error,
+            error: errorObj,
         });
     }
 
