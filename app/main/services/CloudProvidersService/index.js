@@ -76,7 +76,67 @@ export default class CloudProvidersService extends ServiceBase {
         let browsers = [];
         let devices = [];
         
-        if(providerName === 'sauceLabs'){
+        if(providerName === 'perfectoMobile'){
+            if(browsersAndDevices.devices){
+                
+                if(browsersAndDevices.devices && Array.isArray(browsersAndDevices.devices) && browsersAndDevices.devices.length > 0){
+                    
+                    browsersAndDevices.devices.map((item, idx) => {
+
+                        let osName = '';
+                        let version = '';
+                        let osVersion = '';
+                        let apiName = '';
+                        let model = '';
+    
+                        if (item.os) {
+                            if (item.os === 'iOS') {
+                                apiName = 'iOS';
+                                osName = 'Mac';
+                                osVersion = item.osVersion;
+                            } else if (item.os === 'Android') {
+                                apiName = 'android';
+                                osName = 'Linux';
+                                osVersion = item.osVersion;
+                            } else {
+                                console.log('Unsupported os item ', item);
+                            }
+                        } else {
+                            console.log('Unsupported item os ', item);
+                        }
+
+
+                        if (
+                            item.model &&
+                            item.model.startsWith('iPhone-')
+                        ) {
+                            model = 'iPhone';
+                            version = item.model.split('iPhone-')[1];
+                        } else if (
+                            item.manufacturer &&
+                            item.manufacturer === 'Samsung'
+                        ) {
+                            model = item.manufacturer;
+                            version = item.model;
+                        } else {
+                            model = 'iPad';
+                            version = item.model.replace('iPad ', '');
+                        }
+                        
+                        devices.push(new DeviceInfo({
+                            apiName: apiName,
+                            id: item.deviceId,
+                            name: model,
+                            version: version,
+                            osName: osName,
+                            osVersion: osVersion
+                        }));
+                    });
+
+                }
+            }
+        }
+        else if(providerName === 'sauceLabs'){
             console.log('~~browsersAndDevices sauceLabs', Object.keys(browsersAndDevices));
 
             if(browsersAndDevices.browsers && Array.isArray(browsersAndDevices.browsers) && browsersAndDevices.browsers.length > 0){
@@ -488,6 +548,8 @@ export default class CloudProvidersService extends ServiceBase {
                         // sauceLabs
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                     } else if(providerName === 'testObject'){
+                        return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
+                    } else if (providerName === 'perfectoMobile') {
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                     } else if(browsersAndDevices && browsersAndDevices.platforms && Array.isArray(browsersAndDevices.platforms) && browsersAndDevices.platforms.length > 0){
                         // lambdaTest

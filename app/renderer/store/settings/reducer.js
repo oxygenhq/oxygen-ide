@@ -14,6 +14,7 @@ const SAUCELABS_HUB_DEFAULT_URL = 'https://ondemand.saucelabs.com:443/wd/hub';
 const TESTOBJECT_HUB_DEFAULT_URL = 'https://us1-manual.app.testobject.com/wd/hub';
 const TESTINGBOT_HUB_DEFAULT_URL = 'https://hub.testingbot.com:443/wd/hub';
 const LAMBDATEST_HUB_DEFAULT_URL = 'https://hub.lambdatest.com:443/wd/hub';
+const PERFECTO_MOBILE_HUB_DEFAULT_URL = 'https://partners.perfectomobile.com';
 
 const saveCloudProvidersDestruction = (fieldName, object) => {
     let result = {};
@@ -68,6 +69,12 @@ const defaultAppSettings = {
             testobject_api_key: null,
             region: 'usWest1',
             host: TESTOBJECT_HUB_DEFAULT_URL,
+            inUse: false,
+        },
+        perfectoMobile: {
+            title: 'PerfectoMobile',
+            host: PERFECTO_MOBILE_HUB_DEFAULT_URL,
+            securityToken: '',
             inUse: false,
         },
         testingBot: {
@@ -303,6 +310,10 @@ export default (state = defaultState, action) => {
                 testObject: {
                     ...saveCloudProvidersDestruction('testObject', defaultState),
                     ...saveCloudProvidersDestruction('testObject', cache.settings),
+                },
+                perfectoMobile: {
+                    ...saveCloudProvidersDestruction('perfectoMobile', defaultState),
+                    ...saveCloudProvidersDestruction('perfectoMobile', cache.settings),
                 },
                 testingBot: {
                     ...saveCloudProvidersDestruction('testingBot', defaultState),

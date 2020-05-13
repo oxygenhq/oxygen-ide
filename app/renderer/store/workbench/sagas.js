@@ -1619,6 +1619,27 @@ export function* setCloudProvidersBrowsersAndDevices(){
                 }
             }
 
+            if(cloudProviders.perfectoMobile && cloudProviders.perfectoMobile.inUse && cloudProviders.perfectoMobile.host && cloudProviders.perfectoMobile.securityToken){
+                
+                yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['perfectoMobile', cloudProviders.perfectoMobile]);
+                
+                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'perfectoMobile'));
+                const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['perfectoMobile']);
+        
+                if(typeof browsersAndDevicesResult === 'string'){
+                    yield put(settingsActions.setCloudProvidersBrowsersAndDevices(null, 'perfectoMobile'));
+                    fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
+                } else {
+                    if(browsersAndDevicesResult){
+                        yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'perfectoMobile'));
+                    }
+                }
+            } else {
+                // set to local if perfectoMobile
+                if(testProvider && testProvider === 'perfectoMobile'){
+                    yield put(testActions.setTestProvider('Local'));
+                }
+            }
 
             if(cloudProviders.testingBot && cloudProviders.testingBot.inUse){
                 yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['testingBot', cloudProviders.testingBot]);

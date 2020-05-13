@@ -64,12 +64,7 @@ export default class TestObjectService extends CloudProviderBase {
     }
 
     async getDevices(){
-        
-        // console.log('this.settings', this.settings);
         if (this.settings && this.settings.testObjectUsername && this.settings.testobject_api_key) {
-
-            // olejko - username
-            // F128DBC77A234AF1991D435A5D07A54B - appium/basic/instructions
 
             let fetchFn;
 

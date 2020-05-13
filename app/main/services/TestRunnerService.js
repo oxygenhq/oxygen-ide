@@ -243,6 +243,9 @@ export default class TestRunnerService extends ServiceBase {
             if(caps['testObject:options']){
                 playStartEventData.provider = 'Testobject';
             }
+            if (caps['perfectoMobile:options']) {
+                playStartEventData.provider = 'PerfectoMobile';
+            }
             
             this._emitplayStartEvent(playStartEventData);
         }

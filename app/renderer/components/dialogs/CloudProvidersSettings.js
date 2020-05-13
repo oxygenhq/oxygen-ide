@@ -99,6 +99,34 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
         });
     }
 
+    onChangePerfectoMobileHost(value) {
+        const { providers = {} } = this.state || {};
+        const { perfectoMobile = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                perfectoMobile: {
+                    ...perfectoMobile,
+                    host: value,
+                }
+            }
+        });
+    }
+
+    onChangePerfectoMobileSecurityToken(value) {
+        const { providers = {} } = this.state || {};
+        const { perfectoMobile = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                perfectoMobile: {
+                    ...perfectoMobile,
+                    securityToken: value,
+                }
+            }
+        });
+    }
+
     onChangesTestObjectUsername(value) {
         const { providers = {} } = this.state || {};
         const { testObject = {} } = providers;
@@ -177,6 +205,20 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                 ...this.state.providers,
                 testObject: {
                     ...testObject,
+                    inUse: value,
+                }
+            }
+        });
+    }
+
+    onUsePerfectoMobileChange(value) {
+        const { providers = {} } = this.state || {};
+        const { perfectoMobile = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                perfectoMobile: {
+                    ...perfectoMobile,
                     inUse: value,
                 }
             }
@@ -422,7 +464,8 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
             sauceLabs = {},
             testObject = {},
             testingBot = {},
-            lambdaTest = {}
+            lambdaTest = {},
+            perfectoMobile = {}
         } = providers;
 
         return(
@@ -509,6 +552,29 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                         </Form.Item>
                     </div>
                 }
+                
+                {/* //////////// PerfectoMobile  //////////// */}
+                <Form.Item label="PerfectoMobile" {...formItemLayout} extra="Use PerfectoMobile to run your appium in cloud." >
+                    <Switch onChange={ ::this.onUsePerfectoMobileChange } checked={ perfectoMobile.inUse } />
+                </Form.Item>
+                { perfectoMobile && perfectoMobile.inUse &&
+                    <div className="cloud-providers-form-wrap cloud-providers-form-wrap-margin-bottom">
+                        <Form.Item label="PerfectoMobile Settings" style={ {fontWeight: 'bold'} } {...formItemLayout}/>
+                        <Form.Item label="Remote Hub URL" {...formItemLayout} >
+                            <Input
+                                value={ perfectoMobile.host }
+                                onChange={ (e) => ::this.onChangePerfectoMobileHost(e.target.value) }
+                            />
+                        </Form.Item>
+
+                        <Form.Item label="Security Token" {...formItemLayout} >
+                            <Input
+                                value={ perfectoMobile.securityToken }
+                                onChange={ (e) => ::this.onChangePerfectoMobileSecurityToken(e.target.value) }
+                            />
+                        </Form.Item>
+                    </div>
+                }
 
 
                 {/* //////////// LAMBDA TEST //////////// */}
@@ -516,84 +582,84 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                     <Switch onChange={ ::this.onUseLambdaTestChange } checked={ lambdaTest.inUse } />
                 </Form.Item>
                 { lambdaTest && lambdaTest.inUse &&
-            <div className="cloud-providers-form-wrap">
-                <Form.Item label="LambdaTest Settings" style={ {fontWeight: 'bold'} } {...formItemLayout}/>
-                <Form.Item label="Remote Hub URL" {...formItemLayout} >
-                    <Input
-                        value={ lambdaTest.url }
-                        onChange={ (e) => ::this.onChangeLambdaTestUrl(e.target.value) }
-                    />
-                </Form.Item>
-                <Form.Item label="Username" {...formItemLayout} >
-                    <Input
-                        value={ lambdaTest.user }
-                        onChange={ (e) => ::this.onChangeLambdaTestUsername(e.target.value) }
-                    />
-                </Form.Item>
-                <Form.Item label="Access Token" {...formItemLayout} >
-                    <Input.Password
-                        value={ lambdaTest.key }
-                        onChange={ (e) => ::this.onChangeLambdaTestAccessToken(e.target.value) }
-                    />
-                </Form.Item>
-                <Form.Item label="Build Name" {...formItemLayout} >
-                    <Input
-                        value={ lambdaTest.build }
-                        onChange={ (e) => ::this.onChangeLambdaBuildName(e.target.value) }
-                    />
-                </Form.Item>
-                <Form.Item label="Capture Browser Console" {...formItemLayout} >
-                    <Checkbox
-                        checked={ lambdaTest.captureConsole || false }
-                        onChange={ (e) => ::this.onChangeLambdaTestCaptureBrowserConsole(e.target.checked) }
-                    />
-                </Form.Item>
-                <Form.Item label="Capture Network Logs" {...formItemLayout} >
-                    <Checkbox
-                        checked={ lambdaTest.captureNetwork || false }
-                        onChange={ (e) => ::this.onChangeLambdaTestCaptureNetworkLogs(e.target.checked) }
-                    />
-                </Form.Item>
-                <Form.Item label="Take Screenshots" {...formItemLayout} >
-                    <Checkbox
-                        checked={ lambdaTest.takeScreenshots || false }
-                        onChange={ (e) => ::this.onChangeLambdaTestTakeScreenshots(e.target.checked) }
-                    />
-                </Form.Item>
-                <Form.Item label="Video Recording" {...formItemLayout} >
-                    <Checkbox
-                        checked={ lambdaTest.videoRecording || false }
-                        onChange={ (e) => ::this.onChangeLambdaTestVideoRecording(e.target.checked) }
-                    />
-                </Form.Item>
-            </div>
+                    <div className="cloud-providers-form-wrap">
+                        <Form.Item label="LambdaTest Settings" style={ {fontWeight: 'bold'} } {...formItemLayout}/>
+                        <Form.Item label="Remote Hub URL" {...formItemLayout} >
+                            <Input
+                                value={ lambdaTest.url }
+                                onChange={ (e) => ::this.onChangeLambdaTestUrl(e.target.value) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Username" {...formItemLayout} >
+                            <Input
+                                value={ lambdaTest.user }
+                                onChange={ (e) => ::this.onChangeLambdaTestUsername(e.target.value) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Access Token" {...formItemLayout} >
+                            <Input.Password
+                                value={ lambdaTest.key }
+                                onChange={ (e) => ::this.onChangeLambdaTestAccessToken(e.target.value) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Build Name" {...formItemLayout} >
+                            <Input
+                                value={ lambdaTest.build }
+                                onChange={ (e) => ::this.onChangeLambdaBuildName(e.target.value) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Capture Browser Console" {...formItemLayout} >
+                            <Checkbox
+                                checked={ lambdaTest.captureConsole || false }
+                                onChange={ (e) => ::this.onChangeLambdaTestCaptureBrowserConsole(e.target.checked) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Capture Network Logs" {...formItemLayout} >
+                            <Checkbox
+                                checked={ lambdaTest.captureNetwork || false }
+                                onChange={ (e) => ::this.onChangeLambdaTestCaptureNetworkLogs(e.target.checked) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Take Screenshots" {...formItemLayout} >
+                            <Checkbox
+                                checked={ lambdaTest.takeScreenshots || false }
+                                onChange={ (e) => ::this.onChangeLambdaTestTakeScreenshots(e.target.checked) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Video Recording" {...formItemLayout} >
+                            <Checkbox
+                                checked={ lambdaTest.videoRecording || false }
+                                onChange={ (e) => ::this.onChangeLambdaTestVideoRecording(e.target.checked) }
+                            />
+                        </Form.Item>
+                    </div>
                 }
                 {/* //////////// TESTING BOT //////////// */}
                 <Form.Item label="TestingBot" {...formItemLayout} extra="Use TestingBot to run your tests in cloud." >
                     <Switch onChange={ ::this.onUseTestingBotChange } checked={ testingBot.inUse } />
                 </Form.Item>                        
                 { testingBot && testingBot.inUse &&
-            <div className="cloud-providers-form-wrap">
-                <Form.Item label="TestingBot Settings" style={ {fontWeight: 'bold'} } {...formItemLayout}/>
-                <Form.Item label="Remote Hub URL" {...formItemLayout} >
-                    <Input
-                        value={ testingBot.url }
-                        onChange={ (e) => ::this.onChangeTestingBotUrl(e.target.value) }
-                    />
-                </Form.Item>
-                <Form.Item label="Key" {...formItemLayout} >
-                    <Input
-                        value={ testingBot.key }
-                        onChange={ (e) => ::this.onChangeTestingBotKey(e.target.value) }
-                    />
-                </Form.Item>
-                <Form.Item label="Secret" {...formItemLayout} >
-                    <Input.Password
-                        value={ testingBot.secret }
-                        onChange={ (e) => ::this.onChangeTestingBotSecret(e.target.value) }
-                    />
-                </Form.Item>
-            </div>
+                    <div className="cloud-providers-form-wrap">
+                        <Form.Item label="TestingBot Settings" style={ {fontWeight: 'bold'} } {...formItemLayout}/>
+                        <Form.Item label="Remote Hub URL" {...formItemLayout} >
+                            <Input
+                                value={ testingBot.url }
+                                onChange={ (e) => ::this.onChangeTestingBotUrl(e.target.value) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Key" {...formItemLayout} >
+                            <Input
+                                value={ testingBot.key }
+                                onChange={ (e) => ::this.onChangeTestingBotKey(e.target.value) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Secret" {...formItemLayout} >
+                            <Input.Password
+                                value={ testingBot.secret }
+                                onChange={ (e) => ::this.onChangeTestingBotSecret(e.target.value) }
+                            />
+                        </Form.Item>
+                    </div>
                 }            
             </Form>
         );
