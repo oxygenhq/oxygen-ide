@@ -82,6 +82,8 @@ function* setTestMode({payload}){
                         browser = 'Chrome';
                     } else if(testProvider === 'sauceLabs'){
                         browser = 'chrome';
+                    } else if(testProvider === 'perfectoMobile'){
+                        browser = 'Chrome';
                     }
 
                     if(browser && providerData.browsersTree){

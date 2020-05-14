@@ -135,6 +135,34 @@ export default class CloudProvidersService extends ServiceBase {
 
                 }
             }
+
+            if(
+                browsersAndDevices.browsers &&
+                Array.isArray(browsersAndDevices.browsers) &&
+                browsersAndDevices.browsers.length > 0
+            ){
+                browsersAndDevices.browsers.map((item) => {
+                    if (item.browserName && item.browserName === 'Edge' && parseInt(item.browserVersion) === 81 && parseInt(item.osVersion) === 10) {
+                        // com.perfecto.wfa.server.errors.ErrorCodeException: WFA-500-0131 - Failed to run init script on remote machine.  Details: ' failure status is : 3'
+                        // Build info: version: 'unknown', revision: 'unknown', time: 'unknown'
+                        // System info: host: 'a4a036fcf1ff', ip: '172.17.0.4', os.name: 'Linux', os.arch: 'amd64', os.version: '4.14.123-86.109.amzn1.x86_64', java.version: '11.0.2'
+                        // Driver info: driver.version: WebiumDriver
+                    } else if(item.browserName && item.browserName === 'Internet Explorer' && parseInt(item.browserVersion) === 11){
+                        // com.perfecto.wfa.server.errors.ErrorCodeException: WFA-500-0000 - Internal Server Error  Details: 'Creating a new session failed.'
+                        // Build info: version: 'unknown', revision: 'unknown', time: 'unknown'
+                        // System info: host: 'cbd7e2169ec2', ip: '172.17.0.4', os.name: 'Linux', os.arch: 'amd64', os.version: '4.14.123-86.109.amzn1.x86_64', java.version: '11.0.2'
+                        // Driver info: driver.version: WebiumDriver
+                    } else {
+                        browsers.push(new BrowserInfo({
+                            apiName: item.browserName,
+                            name: item.browserName,
+                            version: item.browserVersion,
+                            osName: item.osName,
+                            osVersion: item.osVersion
+                        }));
+                    }
+                });
+            }
         }
         else if(providerName === 'sauceLabs'){
             console.log('~~browsersAndDevices sauceLabs', Object.keys(browsersAndDevices));

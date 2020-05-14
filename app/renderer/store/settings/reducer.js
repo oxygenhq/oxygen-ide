@@ -15,6 +15,7 @@ const TESTOBJECT_HUB_DEFAULT_URL = 'https://us1-manual.app.testobject.com/wd/hub
 const TESTINGBOT_HUB_DEFAULT_URL = 'https://hub.testingbot.com:443/wd/hub';
 const LAMBDATEST_HUB_DEFAULT_URL = 'https://hub.lambdatest.com:443/wd/hub';
 const PERFECTO_MOBILE_HUB_DEFAULT_URL = 'https://partners.perfectomobile.com';
+const PERFECTO_MOBILE_DEFAULT_REGION = 'US East';
 
 const saveCloudProvidersDestruction = (fieldName, object) => {
     let result = {};
@@ -75,6 +76,7 @@ const defaultAppSettings = {
             title: 'PerfectoMobile',
             host: PERFECTO_MOBILE_HUB_DEFAULT_URL,
             securityToken: '',
+            location: PERFECTO_MOBILE_DEFAULT_REGION,
             inUse: false,
         },
         testingBot: {

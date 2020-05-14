@@ -84,6 +84,20 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
             }
         });
     }
+
+    onChangePerfectoMobileLocation(value) {
+        const { providers = {} } = this.state || {};
+        const { perfectoMobile = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                perfectoMobile: {
+                    ...perfectoMobile,
+                    location: value,
+                }
+            }
+        });
+    }
     
     onChangeTestObjectHost(value) {
         const { providers = {} } = this.state || {};
@@ -573,6 +587,15 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                                 onChange={ (e) => ::this.onChangePerfectoMobileSecurityToken(e.target.value) }
                             />
                         </Form.Item>
+
+                        <Form.Item label="Location (only Web)" {...formItemLayout}>
+                            <Select value={perfectoMobile.location} onChange={(value) => ::this.onChangePerfectoMobileLocation(value)}>
+                                <Option value="US East">US East</Option>
+                                <Option value="EU Frankfurt">EU Frankfurt</Option>
+                                <Option value="AP Sydney">AP Sydney</Option>
+                            </Select>
+                        </Form.Item>
+
                     </div>
                 }
 

@@ -27,6 +27,33 @@ export default class PerfectoMobileService extends CloudProviderBase {
         this.settings=settings;
     }
 
+    async getBrowsers(){
+        if (this.settings && this.settings.host && this.settings.securityToken) {
+            let fetchFn;
+
+            if(typeof fetch === 'function'){
+                fetchFn = fetch;
+            } else if(fetch && fetch.default && typeof fetch.default === 'function'){
+                fetchFn = fetch.default;
+            } else {
+                console.log('fetchFn not found');
+                throw new Error('TestObject: fetchFn not found');
+            }
+            
+            const response = await fetchFn(`${this.settings.host}/web/api/v1/config/devices`,
+            {
+                method:'GET',
+                headers: {
+                    'Perfecto-Authorization': this.settings.securityToken
+                }
+            });
+
+            if(response){
+                return response.json();
+            }
+        }
+    }
+
     async getDevices(){
         if (this.settings && this.settings.host && this.settings.securityToken) {
 
@@ -57,6 +84,7 @@ export default class PerfectoMobileService extends CloudProviderBase {
     }
     async getBrowsersAndDevices() {
         let devices = [];
+        let browsers = [];
 
         const devicesXml = await this.getDevices();
 
@@ -74,7 +102,68 @@ export default class PerfectoMobileService extends CloudProviderBase {
 
         this.devices = devices;
 
+        const getBrowsersRetVal = await this.getBrowsers();
+
+        if(
+            getBrowsersRetVal && 
+            getBrowsersRetVal.desktopDevices && 
+            Array.isArray(getBrowsersRetVal.desktopDevices) &&
+            getBrowsersRetVal.desktopDevices.length > 0
+        ){
+            getBrowsersRetVal.desktopDevices.map((osItem) => {
+                if(
+                    osItem.os
+                ){
+                    const osName = osItem.os;
+
+                    if(
+                        osItem.osVersions &&
+                        Array.isArray(osItem.osVersions) &&
+                        osItem.osVersions.length > 0
+                    ){
+                        osItem.osVersions.map((osVersionItem) => {
+                            if(osVersionItem.osVersion){
+                                const osVersion = osVersionItem.osVersion;
+
+                                if(
+                                    osVersionItem.browsers &&
+                                    Array.isArray(osVersionItem.browsers) &&
+                                    osVersionItem.browsers.length > 0
+                                ){
+                                    osVersionItem.browsers.map((browserItem) => {
+                                        if(browserItem.browser){
+                                            const browserName = browserItem.browser;
+                                            
+                                            if(
+                                                browserItem.browserVersions &&
+                                                Array.isArray(browserItem.browserVersions) &&
+                                                browserItem.browserVersions.length > 0
+                                            ){
+                                                browserItem.browserVersions.map((browserVersion) => {
+                                                    if(parseInt(browserVersion)){
+
+                                                        browsers.push({
+                                                            browserName: browserName,
+                                                            browserVersion: browserVersion,
+                                                            osName: osName,
+                                                            osVersion: osVersion
+                                                        });
+                                                        
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
         return {
+            browsers: browsers,
             devices: devices
         };
     }
@@ -97,40 +186,63 @@ export default class PerfectoMobileService extends CloudProviderBase {
             throw new Error('"securityToken" must not be null');
         }
 
-        if (target.osName) {
-            caps.platformName = target.osName;
-        }
+        if (target && target.browserName) {
+            
+            if (target.browserName) {
+                caps.browserName = target.browserName;
+            }
 
-        if(target.deviceName){
-            caps.manufacturer = target.deviceName;
-        }
+            if (target.browserVersion) {
+                caps.browserVersion = target.browserVersion;
+                caps.version = target.browserVersion;
+            }
 
-        if (target.osVersion) {
-            caps.model = target.osVersion;
-        }
+            if (target.osName) {
+                caps.platformName = target.osName;
+            }
+            
+            if (target.osVersion) {
+                caps.platformVersion = target.osVersion;
+            }
 
-        
-        if(caps.manufacturer === 'iPhone'){
-            caps.manufacturer = 'Apple';
-            caps.model = target.deviceName+'-'+target.osVersion;
-        }
-        if(caps.manufacturer === 'iPad'){
-            caps.manufacturer = 'Apple';
-            caps.model = target.deviceName+' '+target.osVersion;
-        }
-
-        if(
-            caps.model &&
-            this.devices &&
-            Array.isArray(this.devices) &&
-            this.devices.length > 0
-        ){
-            const device = this.devices.find((item) => item.model === caps.model);
-
-            if(device){
-                caps.deviceName = device.deviceId;
+            caps.location = this.settings.location;
+        } else {
+            if (target.osName) {
+                caps.platformName = target.osName;
+            }
+    
+            if(target.deviceName){
+                caps.manufacturer = target.deviceName;
+            }
+    
+            if (target.osVersion) {
+                caps.model = target.osVersion;
+            }
+    
+            
+            if(caps.manufacturer === 'iPhone'){
+                caps.manufacturer = 'Apple';
+                caps.model = target.deviceName+'-'+target.osVersion;
+            }
+            if(caps.manufacturer === 'iPad'){
+                caps.manufacturer = 'Apple';
+                caps.model = target.deviceName+' '+target.osVersion;
+            }
+    
+            if(
+                caps.model &&
+                this.devices &&
+                Array.isArray(this.devices) &&
+                this.devices.length > 0
+            ){
+                const device = this.devices.find((item) => item.model === caps.model);
+    
+                if(device){
+                    caps.deviceName = device.deviceId;
+                }
             }
         }
+
 
         caps['perfectoMobile:options'] = {
             name: testName || null
@@ -141,6 +253,7 @@ export default class PerfectoMobileService extends CloudProviderBase {
         return caps;
     }
     updateOptions(target, options = {}) {
+        options.seleniumUrl = this.settings.host;
         options.appiumUrl = this.settings.host;
         return options;
     }
