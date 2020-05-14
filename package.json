@@ -194,7 +194,8 @@
     "uniqid": "5.2.0",
     "uuid": "3.4.0",
     "winston": "3.2.1",
-    "winston-daily-rotate-file": "4.4.2"
+    "winston-daily-rotate-file": "4.4.2",
+    "xml2json": "0.12.0"
   },
   "optionalDependencies": {
     "appdmg": "0.6.0"
