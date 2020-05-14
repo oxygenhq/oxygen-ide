@@ -229,7 +229,7 @@ function* handleDeviceDiscoveryServiceEvent(event) {
     }
 }
 
-export function* runItem(itemsLength, browsersList, inputCurrentItem, saveMainFile, breakpoints, runtimeSettingsClone){
+export function* runItem(itemsLength, browsersList, inputCurrentItem, saveMainFile, breakpoints, runtimeSettingsClone, runSettings){
     let currentItem = inputCurrentItem;
 
     console.log('---');
@@ -249,9 +249,9 @@ export function* runItem(itemsLength, browsersList, inputCurrentItem, saveMainFi
         };
 
         runtimeSettingsClone.testTarget = testBrowser;
-        yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);
+        yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone, runSettings ]);
         currentItem++;
-        yield runItem(itemsLength, browsersList, currentItem, saveMainFile, breakpoints, runtimeSettingsClone);
+        yield runItem(itemsLength, browsersList, currentItem, saveMainFile, breakpoints, runtimeSettingsClone, runSettings);
     } else {
         return;
     }
@@ -261,6 +261,7 @@ export function* startTestAll({ payload }) {
     let currentItem = 0;
     const { mainFile, breakpoints, runtimeSettings } = yield select(state => state.test);
     const { cloudProvidesBrowsersAndDevices } = yield select(state => state.settings);
+    const { runSettings } = yield select(state => state.settings);
 
     const editor = yield select(state => state.editor);
 
@@ -400,7 +401,7 @@ export function* startTestAll({ payload }) {
 
                 console.log('itemsLength', itemsLength);
 
-                yield runItem(itemsLength, providerData.browsersList, currentItem, saveMainFile, breakpoints, runtimeSettingsClone);
+                yield runItem(itemsLength, providerData.browsersList, currentItem, saveMainFile, breakpoints, runtimeSettingsClone, runSettings);
             
                 console.log('runItems finished');
             }
@@ -422,6 +423,7 @@ export function* startTestAll({ payload }) {
 
 export function* startTest({ payload }) {
     const { mainFile, breakpoints, runtimeSettings } = yield select(state => state.test);
+    const { runSettings } = yield select(state => state.settings);
 
     const editor = yield select(state => state.editor);
 
@@ -543,7 +545,7 @@ export function* startTest({ payload }) {
         
         yield put(testActions.waitUpdateBreakpoints(false));
         yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'stop', []);
-        yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone ]);        
+        yield call(services.mainIpc.call, 'TestRunnerService', 'start', [ saveMainFile, breakpoints, runtimeSettingsClone, runSettings ]);        
         yield put({
             type: success(ActionTypes.TEST_START),
             payload: null,

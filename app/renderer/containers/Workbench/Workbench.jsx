@@ -93,6 +93,7 @@ type Props = {
   updateRunSettings: Function,
   updateCloudProvidersSettings: Function,
   updateVisualTestingSettings: Function,
+  updateRunSettings: Function,
   startDownloadChromeDriver: Function,
   showDownloadChromeDriverError: Function,
   dialog: Object,
@@ -466,7 +467,7 @@ export default class Workbench extends React.Component<Props> {
       this.props.hideDialog('DIALOG_UPDATE');
   }
   // Settings
-  settingsDialog_onSubmit(settings, providers, visualTesting) {
+  settingsDialog_onSubmit(settings, providers, visualTesting, runSettings) {
       this.props.hideDialog('DIALOG_SETTINGS');
 
       if(settings){
@@ -479,6 +480,10 @@ export default class Workbench extends React.Component<Props> {
 
       if(visualTesting){
         this.props.updateVisualTestingSettings(visualTesting);
+      }
+
+      if(runSettings){
+        this.props.updateRunSettings(runSettings);
       }
   }
   settingsDialog_onCancel() {
@@ -524,7 +529,7 @@ export default class Workbench extends React.Component<Props> {
           objrepoName
       } = this.props;
 
-      const { visualProviders = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null } = settings;
+      const { runSettings = {}, visualProviders = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null } = settings;
       const { runtimeSettings } = test;
       // sidebars state
       const leftSidebarSize = settings.sidebars.left.size;
@@ -650,6 +655,7 @@ export default class Workbench extends React.Component<Props> {
                     settings={ runtimeSettings }
                     cloudProviders={ cloudProviders }
                     visualProviders={ visualProviders }
+                    runSettings={ runSettings }
                     onSubmit={ ::this.settingsDialog_onSubmit }
                     onCancel={ ::this.settingsDialog_onCancel } 
                 />

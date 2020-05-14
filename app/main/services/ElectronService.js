@@ -99,7 +99,7 @@ export default class ElectronService extends ServiceBase {
     async orgRequire(moduleName) {
         try{
             const result = moduleRequire(moduleName);
-            console.log('orgRequire moduleRequire result', result);
+            // console.log('orgRequire moduleRequire result', result);
             return result;
         } catch(e){
             console.log('orgRequire moduleRequire e', e);

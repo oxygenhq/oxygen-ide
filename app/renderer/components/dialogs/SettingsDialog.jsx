@@ -11,6 +11,7 @@ import { Tabs, Modal } from 'antd';
 import GeneralSettings from './GeneralSettings';
 import CloudProvidersSettings from './CloudProvidersSettings';
 import VisualTestingSettings from './VisualTestingProvidersSettings';
+import RunSettings from './RunSettings';
 const { TabPane } = Tabs;
 
 const DEFAULT_STATE = {
@@ -24,6 +25,7 @@ type Props = {
     visible: boolean | undefined,
     cloudProviders: Object | undefined,
     visualProviders: Object | undefined,
+    runSettings: Object | undefined,
     onSubmit: () => void,
     onCancel: () => void
 };
@@ -58,6 +60,7 @@ export default class SettingsDialog extends React.PureComponent<Props> {
         let generalSettingsResult = null;
         let cloudProvidersResult = null;
         let visualTestingSettings = null;
+        let runSettings = null;
         
         if(this.GeneralSettings && this.GeneralSettings.formWrap && this.GeneralSettings.formWrap.validateFormFields){
             generalSettingsResult = await this.GeneralSettings.formWrap.validateFormFields();
@@ -71,7 +74,11 @@ export default class SettingsDialog extends React.PureComponent<Props> {
             visualTestingSettings = await this.VisualTestingSettings.formWrap.validateFormFields();
         }
 
-        this.props.onSubmit(generalSettingsResult, cloudProvidersResult, visualTestingSettings);
+        if(this.RunSettings && this.RunSettings.formWrap && this.RunSettings.formWrap.validateFormFields){
+            runSettings = await this.RunSettings.formWrap.validateFormFields();
+        }
+
+        this.props.onSubmit(generalSettingsResult, cloudProvidersResult, visualTestingSettings, runSettings);
     }
 
     onTabChange = (key) => {
@@ -85,13 +92,14 @@ export default class SettingsDialog extends React.PureComponent<Props> {
             settings,
             cloudProviders,
             visualProviders,
+            runSettings,
             visible,
             onCancel,
         } = this.props;
 
         return (
             <Modal
-                title={'Run Settings'}
+                title={'Settings'}
                 className="scroll-y"
                 okText="Save &amp; Close"
                 width={700}
@@ -119,6 +127,13 @@ export default class SettingsDialog extends React.PureComponent<Props> {
                         <VisualTestingSettings
                             ref={node => (this.VisualTestingSettings = node)}
                             providers={ visualProviders }
+                            visible={ visible }
+                        />
+                    </TabPane>
+                    <TabPane tab="Run settings" key="4">
+                        <RunSettings
+                            ref={node => (this.RunSettings = node)}
+                            runSettings={ runSettings }
                             visible={ visible }
                         />
                     </TabPane>

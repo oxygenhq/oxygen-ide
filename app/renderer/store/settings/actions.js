@@ -133,6 +133,11 @@ export const updateVisualTestingSettings = visualProviders => ({
     payload: { visualProviders }
 });
 
+export const updateRunSettings = runSettings => ({
+    type: types.UPDATE_RUN_SETTINGS,
+    payload: { runSettings }
+});
+
 export const updateCloudProvidersSettings = providers => ({
     type: types.UPDATE_CLOUD_PROVIDERS_SETTINGS,
     payload: { providers }

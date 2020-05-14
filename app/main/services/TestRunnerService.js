@@ -39,7 +39,7 @@ export default class TestRunnerService extends ServiceBase {
         this.mainFilePath = null;
     }
     
-    async start(mainFilePath, breakpoints, runtimeSettings) {
+    async start(mainFilePath, breakpoints, runtimeSettings, runSettings) {
         if (this.runner) {
             throw Error('Previous test is still running. Stop the previous test before calling "start" method.');
         }
@@ -124,6 +124,12 @@ export default class TestRunnerService extends ServiceBase {
                         options[value2] = applitoolsproviderOptions[value2];
                     }
                 }
+            }
+        }
+
+        if(runSettings){
+            for (var runValue in runSettings) {
+                options[runValue] = runSettings[runValue];
             }
         }
 
@@ -390,7 +396,7 @@ export default class TestRunnerService extends ServiceBase {
     _instantiateRunner(opts) {
         const framework = opts.framework || 'oxygen';
         if (Runners.hasOwnProperty(framework)) {
-            return new Runners[framework]();
+            return new Runners[framework](opts);
         }
         return null;
     }
