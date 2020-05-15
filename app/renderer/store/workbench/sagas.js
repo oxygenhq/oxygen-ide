@@ -1667,7 +1667,7 @@ export function* setCloudProvidersBrowsersAndDevices(){
             yield put(testActions.setTestProvider('Local'));
         }
     } catch(e){
-        console.log('e', e);
+        console.log('setCloudProvidersBrowsersAndDevices e', e);
     }
 }
 
@@ -1719,7 +1719,7 @@ const getValueByKey = key => {
             result = false;
         }
     } catch(e) {
-        console.warn('e', e);
+        console.warn('getValueByKey e', e);
     }
 
     return result;

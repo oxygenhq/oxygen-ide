@@ -126,7 +126,7 @@ export default class AnalyticsService extends ServiceBase {
                             }
                         }
                     } catch(e){
-                        console.warn('e',e);
+                        console.warn('AnalyticsService e 1',e);
                         Sentry.captureException(e);
                     }
                 });
@@ -139,7 +139,7 @@ export default class AnalyticsService extends ServiceBase {
             });
             request.end();
         } catch(e){
-            console.warn('e', e);
+            console.warn('AnalyticsService e 2', e);
             Sentry.captureException(e);
         }
 

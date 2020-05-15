@@ -52,7 +52,7 @@ export default class ElectronService extends ServiceBase {
                     
                 });
             } catch(e){
-                console.log('e', e);
+                console.log('replaceBackslash e', e);
                 reject(e);
             }
         });
@@ -90,7 +90,7 @@ export default class ElectronService extends ServiceBase {
                     
                 });
             } catch(e){
-                console.log('e', e);
+                console.log('require e', e);
                 reject(e);
             }
         });

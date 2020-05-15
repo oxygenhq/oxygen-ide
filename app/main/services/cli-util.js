@@ -22,7 +22,7 @@ export async function prepareTestData(options) {
         };
     }
     catch (e) {
-        console.log('e', e);
+        console.log('prepareTestData e', e);
     }
 }
 

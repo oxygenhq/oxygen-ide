@@ -124,7 +124,7 @@ app.on('ready', async () => {
                 Sentry.captureException(e);
             }
         
-            console.log('e', e);
+            console.log('mainProc e', e);
         }
     }
 

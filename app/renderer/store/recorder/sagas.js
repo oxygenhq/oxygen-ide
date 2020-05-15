@@ -222,7 +222,7 @@ function* handleRequest(payload) {
         }    
     } catch(e) {
         yield put(reportError(e));
-        console.log('e', e);
+        console.log('handleRequest e', e);
     }
 }
 

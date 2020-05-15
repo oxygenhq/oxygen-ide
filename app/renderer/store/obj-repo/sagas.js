@@ -132,7 +132,7 @@ export function* openFile({ payload }) {
     try{
         treeRoot = convertToObjectTree(repoRoot);
     } catch(e){
-        console.warn('e', e);
+        console.warn('convertToObjectTree e', e);
         
         yield put(settingsActions.setSidebarComponent('right', 'obj-repo-not-valid'));
         yield put(settingsActions.setSidebarVisible('right', true));
