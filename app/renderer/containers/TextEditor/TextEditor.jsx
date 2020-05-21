@@ -120,11 +120,15 @@ export default class TextEditor extends React.Component<Props> {
         }
     }
 
-    handleValueChange(filePath, value, name) {
+    onBreakpointsUpdate = (filePath, bps, fileName) => {
+        this.props.onBreakpointsUpdate(filePath, bps, fileName);
+    }
+
+    handleValueChange = (filePath, value, name) => {
         this.props.onContentUpdate(filePath, value, name);
     }
 
-    handleSelectionChange(filePath, selectedText) {
+    handleSelectionChange = (filePath, selectedText) => {
         // TODO: add here handler for selection-related actions
     }
 
@@ -173,9 +177,11 @@ export default class TextEditor extends React.Component<Props> {
                             resolvedBreakpoints={file.resolvedBreakpoints || []}                            
                             waitUpdateBreakpoints={waitUpdateBreakpoints || false}
                             featureLanguageLoaded={featureLanguageLoaded}
-                            onBreakpointsUpdate={(bps) => this.props.onBreakpointsUpdate(file.path, bps, file.name)}
-                            onValueChange={(bps) => ::this.handleValueChange(file.path, bps, file.name)}
-                            onSelectionChange={(bps) => ::this.handleSelectionChange(file.path, bps)}
+                            filePath={file.path}
+                            fileName={file.name}
+                            onBreakpointsUpdate={this.onBreakpointsUpdate}
+                            onValueChange={this.handleValueChange}
+                            onSelectionChange={this.handleSelectionChange}
                             setFatureLanguageLoaded={this.setFatureLanguageLoaded}
                         />
                     );

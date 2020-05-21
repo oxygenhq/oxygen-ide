@@ -50,7 +50,13 @@ export function  getAllMarkers(editor) {
    * @returns {Array} of decorators
 */
 export function getBreakpointMarkers(editor) {
-    return editor.getModel().getAllDecorations().filter( marker => isBreakpointMarker(marker));
+    const decorators = editor.getModel().getAllDecorations();
+
+    const retVal = decorators.filter( marker => {
+        return isBreakpointMarker(marker);
+    });
+
+    return retVal;
 }
 
 export function addBreakpointMarker(editor, line, fontSize=null, disabledBreakpoints, resolvedBreakpoints) {

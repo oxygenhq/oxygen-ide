@@ -56,6 +56,8 @@ type Props = {
     defaultValue: string,
     language: string,
     theme: string,
+    filePath: string,
+    fileName: string,
     options: object,
     waitUpdateBreakpoints: boolean,
     featureLanguageLoaded: boolean,
@@ -101,6 +103,8 @@ export default class MonacoEditor extends React.Component<Props> {
         let updateFontSize = false;
         let updateActiveLine = false;
 
+        const propsDiff = deepDiff(prevProps, this.props);
+
         if (prevProps.fontSize !== this.props.fontSize && this.editor) {
             updateFontSize = this.props.fontSize;
 
@@ -110,8 +114,9 @@ export default class MonacoEditor extends React.Component<Props> {
                 lineHeight: this.props.fontSize*RATIO
             });
         }
-        if (this.props.value !== this.__current_value) {
-        // Always refer to the latest value
+
+        if (this.props.value !== this.__current_value && propsDiff) {
+            // Always refer to the latest value
             this.__current_value = this.props.value;
             // Consider the situation of rendering 1+ times before the editor mounted
             if (this.editor) {
@@ -169,7 +174,7 @@ export default class MonacoEditor extends React.Component<Props> {
         }
         if (
             this.editor &&
-        (this.props.width !== prevProps.width || this.props.height !== prevProps.height)
+            (this.props.width !== prevProps.width || this.props.height !== prevProps.height)
         ) {
             this.editor.layout();
         }
@@ -265,18 +270,6 @@ export default class MonacoEditor extends React.Component<Props> {
     editorDidMount(editor) {
         this.props.editorDidMount(editor, monaco);
         this.editor.layout();
-
-        editor.onDidChangeModelContent((event) => {
-            const value = editor.getValue();
-
-            // Always refer to the latest value
-            this.__current_value = value;
-
-            // Only invoking when user input changed
-            if (!this.__prevent_trigger_change_event) {
-                this.props.onValueChange(value, event);
-            }
-        });
 
         if(this.props.fontSize && this.props.breakpoints && Array.isArray(this.props.breakpoints) && this.props.breakpoints.length > 0){     
             this.props.breakpoints.map((item) => {
@@ -415,6 +408,32 @@ export default class MonacoEditor extends React.Component<Props> {
         }
     }
 
+    onBreakpointsUpdate = (bps) => {
+        const {
+            filePath,
+            fileName
+        } = this.props;
+
+        this.props.onBreakpointsUpdate(filePath, bps, fileName);
+    }
+
+    onValueChange = (bps) => {
+        const {
+            filePath,
+            fileName
+        } = this.props;
+
+        this.props.onValueChange(filePath, bps, fileName);
+    }
+
+    onSelectionChange = (bps) => {
+        const {
+            filePath
+        } = this.props;
+
+        this.props.onSelectionChange(filePath, bps);
+    }
+
     /**
      * Watching click events
      */
@@ -446,13 +465,13 @@ export default class MonacoEditor extends React.Component<Props> {
                         if (!marker) {
                             if (helpers.addBreakpointMarker(editor, ln, this.props.fontSize, this.props.disabledBreakpoints, this.props.resolvedBreakpoints)) {
                                 this.addLnToLnArray(ln);
-                                this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+                                this.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
                             }
                         }
                         else {
                             if (helpers.removeBreakpointMarker(editor, ln)) {
                                 this.removeLnfromLnArray(ln);
-                                this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+                                this.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
                             }
                         }
                     } else {
@@ -461,7 +480,7 @@ export default class MonacoEditor extends React.Component<Props> {
                         } else {
                             if (helpers.removeBreakpointMarker(editor, ln)) {
                                 this.removeLnfromLnArray(ln);
-                                this.props.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
+                                this.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
                             }
                         }
                     }

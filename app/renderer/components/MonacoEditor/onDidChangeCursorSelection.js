@@ -6,11 +6,11 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-export default function () {
+export default function onDidChangeCursorSelection () {
     const editor = this.editor;
     const editorModel = editor.getModel();
     const selectedText = editorModel
         .getValueInRange(editor.getSelection());
 
-    this.props.onSelectionChange(selectedText);
+    this.onSelectionChange(selectedText);
 }
