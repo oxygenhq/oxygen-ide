@@ -41,11 +41,58 @@ export default class TestingBotProvider extends CloudProviderBase {
                 .catch(err => reject(err));
         });
     }
+
+    async getUser(){
+        if (this.settings && this.settings.key && this.settings.secret) {
+            
+            let fetchFn;
+
+            if(typeof fetch === 'function'){
+                fetchFn = fetch;
+            } else if(fetch && fetch.default && typeof fetch.default === 'function'){
+                fetchFn = fetch.default;
+            } else {
+                console.log('fetchFn not found');
+                throw new Error('TestObject: fetchFn not found');
+            }
+            
+                
+            const response = await fetchFn('https://api.testingbot.com/v1/user',
+            {
+                method:'GET',
+                headers: {
+                    'Authorization' : 'Basic ' + Buffer.from(this.settings.key + ':' + this.settings.secret).toString('base64')
+                },
+            });
+            
+            const responseJson = await response.json();
+            
+            if(
+                response &&
+                response.status !== 200
+            ) {
+                let errorMessage = 'TestingBot: invalid credentials';
+
+                if(
+                    responseJson && 
+                    responseJson.error
+                ) {
+                    errorMessage = responseJson.error;
+                }
+
+                throw new Error(errorMessage);
+            }
+        }
+        else {
+            throw new Error('TestingBot: invalid credentials');
+        }
+    }
     
     async getBrowsersAndDevices() {
         let devices = [];
         let browsers = [];
 
+        await this.getUser();
         devices = await this.getDevices();
         browsers = await this.getBrowsers();
 

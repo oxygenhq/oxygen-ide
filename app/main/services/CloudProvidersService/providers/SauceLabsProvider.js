@@ -34,8 +34,68 @@ export default class SauceLabsProvider extends CloudProviderBase {
         });
     }
     
+
+    async getUser(){
+
+        let errorMessage = 'SauceLabs: invalid credentials';
+
+        if (this.settings && this.settings.username && this.settings.accessKey) {
+            
+            let fetchFn;
+
+            if(typeof fetch === 'function'){
+                fetchFn = fetch;
+            } else if(fetch && fetch.default && typeof fetch.default === 'function'){
+                fetchFn = fetch.default;
+            } else {
+                console.log('fetchFn not found');
+                throw new Error('TestObject: fetchFn not found');
+            }
+            
+                
+            const response = await fetchFn('https://saucelabs.com/rest/v1/users/'+this.settings.username,
+            {
+                method:'GET',
+                headers: {
+                    'Authorization' : 'Basic ' + Buffer.from(this.settings.username + ':' + this.settings.accessKey).toString('base64')
+                },
+            });
+            
+            const responseJson = await response.json();
+            
+            if(
+                response &&
+                response.status === 404 &&
+                responseJson &&
+                responseJson.message
+            ){
+                errorMessage += ' '+responseJson.message;
+            }
+
+            if(
+                response &&
+                response.status === 200 &&
+                responseJson &&
+                responseJson.username &&
+                responseJson.access_key &&
+                responseJson.username === this.settings.username &&
+                responseJson.access_key === this.settings.accessKey
+            ) {
+                // ignore, all correct
+            } else {
+                throw new Error(errorMessage);
+            }
+        }
+        else {
+            throw new Error(errorMessage);
+        }
+    }
+    
     async getBrowsersAndDevices() {
         let browsers = [];
+
+        await this.getUser();
+
         browsers = await this.getBrowsers();
         return {
             browsers: browsers
@@ -93,7 +153,6 @@ export default class SauceLabsProvider extends CloudProviderBase {
         return caps;
     }
     updateOptions(target, options = {}) {
-        console.log('ssthis.settings', this.settings);
         options.seleniumUrl = this.settings.url;
         return options;
     }
