@@ -16,7 +16,7 @@
   "dependencies": {
     "@sentry/electron": "1.3.0",
     "chokidar": "3.4.0",
-    "oxygen-cli": "1.4.0-beta.6",
+    "oxygen-cli": "1.4.0-beta.8",
     "xml2json": "0.12.0"
   }
 }
