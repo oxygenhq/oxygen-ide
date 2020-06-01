@@ -173,15 +173,15 @@ export default class ElectronService extends ServiceBase {
     updateCache(cache) {
         if(cache){
             const settings = appSettings.get('appSettings');
-            let newSettings;
+            let newSettings = {};
+            let files = {};
             
-            if(settings){
-                newSettings = settings;
-            } else { 
-                newSettings = {};
+            if(settings && settings.files){
+                files = settings.files;
             }
 
             newSettings.cache = cache;
+            newSettings.files = files;
     
             appSettings.set('appSettings', newSettings);
     

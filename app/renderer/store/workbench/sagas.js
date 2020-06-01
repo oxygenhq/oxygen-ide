@@ -302,7 +302,7 @@ export function* initialize() {
     }
 
     if(appSettings && appSettings.lastSession && appSettings.lastSession.rootFolder){
-        yield put(settingsActions.hildeLanding());
+        yield put(settingsActions.hideLanding());
     } else {
         yield put(settingsActions.showLanding());
     }

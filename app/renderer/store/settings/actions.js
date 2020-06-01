@@ -73,7 +73,7 @@ export const showLanding = () => ({
 });
 
 /* hide Landing */
-export const hildeLanding = () => ({
+export const hideLanding = () => ({
     type: types.HIDE_LANDING
 });
 
