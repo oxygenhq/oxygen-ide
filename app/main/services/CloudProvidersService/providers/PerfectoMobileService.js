@@ -243,6 +243,7 @@ export default class PerfectoMobileService extends CloudProviderBase {
             }
         }
 
+        caps.enableAppiumBehavior = true;
 
         caps['perfectoMobile:options'] = {
             name: testName || null
