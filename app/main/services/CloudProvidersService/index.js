@@ -602,6 +602,10 @@ export default class CloudProvidersService extends ServiceBase {
                 throw new Error('provider.getBrowsersAndDevices does not exist.');
             }
         } else {
+
+            console.log('this.providers : ', this.providers);
+            console.log('providerName : ', providerName);
+
             throw new Error('Provider does not exist.');
         }
     }
