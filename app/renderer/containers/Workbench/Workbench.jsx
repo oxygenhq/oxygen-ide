@@ -353,7 +353,11 @@ export default class Workbench extends React.Component<Props> {
                 ['.js', '.feature'].includes(editorActiveFile.ext)
           },
           [Controls.TEST_STOP]: {
-              visible: test.isRunning,
+              visible: test.isRunning && !test.isStopingTest,
+          },
+          [Controls.TEST_STOPING]: {
+              visible: !!test.isStopingTest,
+              enabled: false
           },
           [Controls.TEST_CONTINUE]: {
               visible: test.isPaused,

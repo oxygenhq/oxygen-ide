@@ -18,6 +18,7 @@ const defaultState = {
     isPaused: false,          // indicates if the current test is paused
     isSeleniumReady: false,   // indicates if built-in Selenium server has been successfully started
     isAppiumReady: false,     // indicates if built-in Appium server has been successfully started
+    isStopingTest: false,       // indicates if a test is currently stoping
     breakpoints: {},          // holds all user-defined breakpoints per file, shall include file name and line number
     disabledBreakpoints: {},
     resolvedBreakpoints: {},
@@ -123,12 +124,12 @@ export default (state = defaultState, action) => {
     case ActionTypes.TEST_STOP:
         return {
             ...state,
-            stopingTest: true,
+            isStopingTest: true,
         };
     case success(ActionTypes.TEST_STOP):
         return {
             ...state,
-            stopingTest: false,
+            isStopingTest: false,
             isRunning: false,
             isPaused: false,
             variables: null
@@ -136,7 +137,7 @@ export default (state = defaultState, action) => {
     case failure(ActionTypes.TEST_STOP):
         return {
             ...state,
-            stopingTest: false,
+            isStopingTest: false,
             isRunning: false,
             isPaused: false,
             variables: null

@@ -517,6 +517,23 @@ export default class Toolbar extends React.Component<Props> {
                     </button>
                 )}
 
+                { 
+                    this._isVisible(Controls.TEST_STOPING) &&
+                    <button
+                        className="control button stop"
+                        style={ getOpacity(this._isEnabled(Controls.TEST_STOPING)) }
+                        title="Stopping…"
+                        disabled
+                    >
+                        <Icon
+                            title="Terminate Test"
+                            type="close-circle"
+                            theme="filled"
+                        /> 
+                        <span>Stopping…</span>
+                    </button> 
+                }
+
                 <div className="separator" />
 
                 <label className="control label" htmlFor="stepDelay">Delay</label>
