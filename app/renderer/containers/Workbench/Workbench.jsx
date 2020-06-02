@@ -180,13 +180,13 @@ export default class Workbench extends React.Component<Props> {
 
 
   keydownCallback = (e) => {
-      if(e.key === 'Control'){
-          if(!this.on){
-              e.stopPropagation();
-              this.elem.addEventListener('wheel', this.wheelCallback , true);
-              this.on = true;
-          }
-      }
+    //   if(e.key === 'Control'){
+    //       if(!this.on){
+    //           e.stopPropagation();
+    //           this.elem.addEventListener('wheel', this.wheelCallback , true);
+    //           this.on = true;
+    //       }
+    //   }
 
       if(e.ctrlKey || e.metaKey){
           if(e.key === '+' || e.key === '=' || e.code === 'NumpadAdd' || e.code  === 'Equal'){
@@ -206,29 +206,29 @@ export default class Workbench extends React.Component<Props> {
   }
   
   keyupCallback = (e) => {
-      if(e.key === 'Control'){
-          e.stopPropagation();
-          this.elem.removeEventListener('wheel',  this.wheelCallback , true);
-          this.on = false;
-      }
+    //   if(e.key === 'Control'){
+    //       e.stopPropagation();
+    //       this.elem.removeEventListener('wheel',  this.wheelCallback , true);
+    //       this.on = false;
+    //   }
   }
 
-  wheelCallback = (e) => {
-      e.stopPropagation();
+//   wheelCallback = (e) => {
+//       e.stopPropagation();
     
-      if(e && e.deltaY && e.deltaY < 0){
-      //up
-          if(this.props.zoomIn){
-              this.props.zoomIn();
-          }
-      }
-      if(e && e.deltaY && e.deltaY > 0){
-      //down
-          if(this.props.zoomOut){
-              this.props.zoomOut();
-          }
-      }
-  }
+//       if(e && e.deltaY && e.deltaY < 0){
+//       //up
+//           if(this.props.zoomIn){
+//               this.props.zoomIn();
+//           }
+//       }
+//       if(e && e.deltaY && e.deltaY > 0){
+//       //down
+//           if(this.props.zoomOut){
+//               this.props.zoomOut();
+//           }
+//       }
+//   }
 
   handleTabChange(key, name = null) {
       this.props.onTabChange(key, name);
