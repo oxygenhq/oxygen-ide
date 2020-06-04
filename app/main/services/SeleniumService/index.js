@@ -184,7 +184,7 @@ export default class SeleniumService extends ServiceBase {
             } else {
                 // if no user placed driver then use, the latest bundled version
                 chromedriver = await this.findLocalChromeDriver(versions[0].driverVersion);
-                if(chromedriver){
+                if(chromedriver && chromedriver === chromeDriverVersion){
                     console.log('Using latest bundled ChromeDriver from ' + chromedriver);
                 } else {                    
                     this.notify({
