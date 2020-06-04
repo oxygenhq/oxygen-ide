@@ -550,7 +550,7 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
 
 
                         <Form.Item label="Api key" {...formItemLayout} >
-                            <Input
+                            <Input.Password
                                 value={ testObject.testobject_api_key }
                                 onChange={ (e) => ::this.onChangeTestObjectApiKey(e.target.value) }
                             />
@@ -582,7 +582,7 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                         </Form.Item>
 
                         <Form.Item label="Security Token" {...formItemLayout} >
-                            <Input
+                            <Input.Password
                                 value={ perfectoMobile.securityToken }
                                 onChange={ (e) => ::this.onChangePerfectoMobileSecurityToken(e.target.value) }
                             />
@@ -671,7 +671,7 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                             />
                         </Form.Item>
                         <Form.Item label="Key" {...formItemLayout} >
-                            <Input
+                            <Input.Password
                                 value={ testingBot.key }
                                 onChange={ (e) => ::this.onChangeTestingBotKey(e.target.value) }
                             />
