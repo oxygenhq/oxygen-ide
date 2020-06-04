@@ -580,15 +580,22 @@ export default class CloudProvidersService extends ServiceBase {
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                     } else if (providerName === 'perfectoMobile') {
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
-                    } else if(browsersAndDevices && browsersAndDevices.platforms && Array.isArray(browsersAndDevices.platforms) && browsersAndDevices.platforms.length > 0){
+                    } else if(
+                        browsersAndDevices && 
+                        browsersAndDevices.platforms &&
+                        browsersAndDevices.platforms.Desktop &&                         
+                        Array.isArray(browsersAndDevices.platforms.Desktop) && 
+                        browsersAndDevices.platforms.Desktop.length > 0
+                    ){
                         // lambdaTest
-                        return this.sortToBrowsersAndDevice(browsersAndDevices.platforms, providerName);
+                        return this.sortToBrowsersAndDevice(browsersAndDevices.platforms.Desktop, providerName);
                     } else if(providerName === 'testingBot'){
                         // testingBot
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                     } else {
-                        console.log('~~providerName', providerName);
-                        console.log('browsersAndDevices does not exist.', browsersAndDevices);
+                        console.log('ProviderName', providerName);
+                        console.log('BrowsersAndDevices does not exist.', browsersAndDevices);
+                        return `Failed to retrieve devices and browsers data from provider: ${providerName}. Looks like API changed or broken.`;
                     }
     
                 }
