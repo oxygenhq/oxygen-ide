@@ -291,8 +291,15 @@ export const creteDevicesTree = (devices) => {
 
         if(uniqueApiNames){
             result = uniqueApiNames.map((item) => {
+
+                let title = item;
+
+                if(title === 'android'){
+                    title = 'Android';
+                }
+
                 return {
-                    title: item,
+                    title: title,
                     orTitle: item,
                     value: item,
                     key: item,

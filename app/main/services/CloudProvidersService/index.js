@@ -555,7 +555,6 @@ export default class CloudProvidersService extends ServiceBase {
 
         }
 
-        // console.log('devices', devices);
 
         return {
             browsersTree: creteBrowsersTree(browsers),
