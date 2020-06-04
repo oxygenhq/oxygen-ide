@@ -138,6 +138,11 @@ export const updateRunSettings = runSettings => ({
     payload: { runSettings }
 });
 
+export const updateGeneralSettings = generalSettings => ({
+    type: types.UPDATE_GENERAL_SETTINGS,
+    payload: { generalSettings }
+});
+
 export const updateCloudProvidersSettings = providers => ({
     type: types.UPDATE_CLOUD_PROVIDERS_SETTINGS,
     payload: { providers }

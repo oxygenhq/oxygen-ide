@@ -261,7 +261,7 @@ export function* startTestAll({ payload }) {
     let currentItem = 0;
     const { mainFile, breakpoints, runtimeSettings } = yield select(state => state.test);
     const { cloudProvidesBrowsersAndDevices } = yield select(state => state.settings);
-    const { runSettings } = yield select(state => state.settings);
+    const { runSettings, generalSettings } = yield select(state => state.settings);
 
     const editor = yield select(state => state.editor);
 
@@ -301,7 +301,8 @@ export function* startTestAll({ payload }) {
     }
     // clone runtime settings and add cloud provider information, if a provider was selected
     const runtimeSettingsClone = {
-        ...runtimeSettings
+        ...runtimeSettings,
+        ...generalSettings
     };
 
     if(file && file.ext && file.ext === '.feature'){
@@ -423,7 +424,7 @@ export function* startTestAll({ payload }) {
 
 export function* startTest({ payload }) {
     const { mainFile, breakpoints, runtimeSettings } = yield select(state => state.test);
-    const { runSettings } = yield select(state => state.settings);
+    const { runSettings, generalSettings } = yield select(state => state.settings);
 
     const editor = yield select(state => state.editor);
 
@@ -463,7 +464,8 @@ export function* startTest({ payload }) {
     }
     // clone runtime settings and add cloud provider information, if a provider was selected
     const runtimeSettingsClone = {
-        ...runtimeSettings
+        ...runtimeSettings,
+        ...generalSettings
     };
 
     if(file && file.ext && file.ext === '.feature'){

@@ -109,7 +109,8 @@ type Props = {
   objrepoName: string | null,
   isChromeExtensionEnabled: boolean,
   waitChromeExtension: boolean,
-  stopWaitChromeExtension: Function
+  stopWaitChromeExtension: Function,
+  updateGeneralSettings: Function
 };
 
 // set global message position
@@ -471,11 +472,11 @@ export default class Workbench extends React.Component<Props> {
       this.props.hideDialog('DIALOG_UPDATE');
   }
   // Settings
-  settingsDialog_onSubmit(settings, providers, visualTesting, runSettings) {
+  settingsDialog_onSubmit(generalSettings, providers, visualTesting, runSettings) {
       this.props.hideDialog('DIALOG_SETTINGS');
 
-      if(settings){
-        this.props.updateRunSettings(settings);    
+      if(generalSettings){
+        this.props.updateGeneralSettings(generalSettings);    
       }
 
       if(providers){
@@ -533,7 +534,7 @@ export default class Workbench extends React.Component<Props> {
           objrepoName
       } = this.props;
 
-      const { runSettings = {}, visualProviders = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null } = settings;
+      const { generalSettings = {}, runSettings = {}, visualProviders = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null } = settings;
       const { runtimeSettings } = test;
       // sidebars state
       const leftSidebarSize = settings.sidebars.left.size;
@@ -660,6 +661,7 @@ export default class Workbench extends React.Component<Props> {
                     cloudProviders={ cloudProviders }
                     visualProviders={ visualProviders }
                     runSettings={ runSettings }
+                    generalSettings={ generalSettings }
                     onSubmit={ ::this.settingsDialog_onSubmit }
                     onCancel={ ::this.settingsDialog_onCancel } 
                 />

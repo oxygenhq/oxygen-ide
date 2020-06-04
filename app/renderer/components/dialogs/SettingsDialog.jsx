@@ -26,6 +26,7 @@ type Props = {
     cloudProviders: Object | undefined,
     visualProviders: Object | undefined,
     runSettings: Object | undefined,
+    generalSettings: Object | undefined,
     onSubmit: () => void,
     onCancel: () => void
 };
@@ -89,7 +90,7 @@ export default class SettingsDialog extends React.PureComponent<Props> {
 
     render() {
         const {
-            settings,
+            generalSettings,
             cloudProviders,
             visualProviders,
             runSettings,
@@ -112,7 +113,7 @@ export default class SettingsDialog extends React.PureComponent<Props> {
                     <TabPane tab="General" key="1">
                         <GeneralSettings
                             ref={node => (this.GeneralSettings = node)}
-                            settings={ settings }
+                            settings={ generalSettings }
                             visible={ visible }
                         />
                     </TabPane>
