@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## v1.18.0 (2020-06-08)
+
+#### :tada: New Feature
+* Preliminary support for Perfecto Mobile provider.
+* Expose 'npm -g root' option in Settings window.
+
+#### :beetle: Bug Fix
+* Cloud Provider settings not being saved correctly in certain cases.
+* Scroll wheel interacting with text size instead of scrolling the editor's content in certain cases.
+* ChromeDrvier update dialog not shown when required driver version is not found.
+* Various other fixes.
+
+#### :nail_care: Polish
+* Visual improvements for 'Stop' button for situations when stopping test might take some time.
+
+#### :house: Internal
+* Bumped oxygen-cli from v1.1.3 to v1.4.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update bundled ChromeDrivers.
+
 ## v1.17.0 (2020-04-15)
 
 #### :beetle: Bug Fix
