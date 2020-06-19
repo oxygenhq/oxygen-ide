@@ -16,6 +16,7 @@ import * as workbenchActions from './../workbench/actions';
 import { reportError } from '../sentry/actions';
 import { success, failure } from '../../helpers/redux';
 import { putAndTake } from '../../helpers/saga';
+import * as treeHelpers from '../../helpers/tree';
 import fileSubjects from '../../store/fs/subjects';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 
@@ -182,7 +183,7 @@ export function* handleServiceEvents({ payload }) {
 
 function* addFileOrFolder(fileOrFolder) {
     if (fileOrFolder) {
-        yield put(fsActions.addFileOrFolder(fileOrFolder));
+        yield put(fsActions.addFileOrFolder(treeHelpers.wrapSingle(fileOrFolder)));
     }
 }
 

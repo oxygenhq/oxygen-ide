@@ -41,13 +41,20 @@ export function wrap(rawNodes) {
     if (!rawNodes || !Array.isArray(rawNodes)) {
         return rawNodes;
     }
-    return rawNodes.map(rawNode => ({
-        ...rawNode,
+    return rawNodes.map(rawNode => wrapSingle(rawNode));
+}
+
+export function wrapSingle(node) {
+    if (!node || !Object.keys(node)) {
+        return node;
+    }
+    return {
+        ...node,
         isTouched: false,
         isActive: false,
         isExpanded: false,
         children: null,
-    }));
+    };
 }
 
 export function mergeChildren(prevChildren, nextChildren) {

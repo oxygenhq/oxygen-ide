@@ -29,7 +29,7 @@ export function updateFilesAfterRename(files, oldPath, renamedFile) {
     for (var fPath of Object.keys(files)) {
         const file = files[fPath];
         // in case current folder was renamed
-        if (file.path === oldPath) {
+        if (file && file.path === oldPath) {
             newFileList[newPath] = {
                 // preserve some of previous properties (such as 'content' and 'modified')
                 ...file,
@@ -39,7 +39,7 @@ export function updateFilesAfterRename(files, oldPath, renamedFile) {
             };
         }
         // in case parent folder was renamed
-        else if (file.path.startsWith(oldPathNorm)) {
+        else if (file && file.path.startsWith(oldPathNorm)) {
             const adjustedPath = replacePath(file.path, oldPath, newPath);
             newFileList[adjustedPath] = {
                 ...file,
@@ -48,7 +48,7 @@ export function updateFilesAfterRename(files, oldPath, renamedFile) {
             };
         }
         // in case current file/folder is not impacted by path chance (rename)
-        else {
+        else if (file && file.path){
             newFileList[file.path] = file;
         }
     }

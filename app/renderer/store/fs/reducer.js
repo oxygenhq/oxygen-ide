@@ -88,13 +88,16 @@ export default (state = defaultState, action, dispatch) => {
       };
     case success(ActionTypes.FS_RENAME):
       const { oldPath, newFile } = payload;
+
+      const newFileWrapped = treeHelpers.wrapSingle(newFile);
+
       return { 
         ...state, 
         tree: {
-          activeNode: fsHelpers.replacePath(state.tree.activeNode, oldPath, newFile.path),
-          data: treeHelpers.updateTree(state.tree.data, newFile, oldPath),
+          activeNode: fsHelpers.replacePath(state.tree.activeNode, oldPath, newFileWrapped.path),
+          data: treeHelpers.updateTree(state.tree.data, newFileWrapped, oldPath),
         },
-        files: fsHelpers.updateFilesAfterRename(state.files, oldPath, newFile),
+        files: fsHelpers.updateFilesAfterRename(state.files, oldPath, newFileWrapped),
         isLoading: false,
       };
 
