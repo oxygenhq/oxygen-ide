@@ -91,6 +91,7 @@ export default class SettingsDialog extends React.PureComponent<Props> {
     render() {
         const {
             generalSettings,
+            projectSettings,
             cloudProviders,
             visualProviders,
             runSettings,
@@ -114,6 +115,7 @@ export default class SettingsDialog extends React.PureComponent<Props> {
                         <GeneralSettings
                             ref={node => (this.GeneralSettings = node)}
                             settings={ generalSettings }
+                            projectSettings={ projectSettings }
                             visible={ visible }
                         />
                     </TabPane>

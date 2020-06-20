@@ -18,6 +18,7 @@ import RecorderService from './RecorderService';
 import UpdateService from './UpdateService';
 import CloudProvidersService from './CloudProvidersService';
 import VisualTestingProvidersService from './VisualTestingService';
+import ProjectService from './ProjectService';
 
 
 export default {
@@ -32,5 +33,6 @@ export default {
     RecorderService,
     UpdateService,
     CloudProvidersService,
-    VisualTestingProvidersService
+    VisualTestingProvidersService,
+    ProjectService,
 };

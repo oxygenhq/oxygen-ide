@@ -31,6 +31,7 @@ class GeneralSettings extends React.PureComponent<Props> {
         this.state = {
             ...DEFAULT_STATE,
             iterations: props.settings.iterations || 1,
+            env: props.settings.env || null,
             paramMode: props.settings.paramMode || 'sequential',
             paramFilePath: props.settings.paramFilePath || null,
             reopenSession: props.settings.reopenSession || false,
@@ -80,8 +81,14 @@ class GeneralSettings extends React.PureComponent<Props> {
         });
     }
 
+    onChangeEnvironment(value) {
+        this.setState({
+            env: value,
+        });
+    }
+
     validateFields = () => {
-        const { iterations, useParams, paramMode, reopenSession } = this.state;
+        const { iterations, useParams, paramMode, reopenSession, env } = this.state;
 
         return new Promise((resolve, reject) => {
             this.props.form.validateFields((err, values) => {
@@ -94,6 +101,7 @@ class GeneralSettings extends React.PureComponent<Props> {
                     paramMode: paramMode,
                     reopenSession: reopenSession,
                     paramFilePath: useParams ? values.paramFilePath : null,
+                    env: env || null,
                 });
             });   
         });
@@ -112,10 +120,12 @@ class GeneralSettings extends React.PureComponent<Props> {
             paramFilePath,
             useParams,
             reopenSession,
+            env,
         } = this.state;
-
+        const { projectSettings } = this.props;
         const { getFieldDecorator } = this.props.form;
-
+        const envs = projectSettings && projectSettings.envs ? projectSettings.envs : null;
+        const envList = envs ? Object.keys(envs) : null;
         // file picker button
         const afterFilePicker = (
             <button
@@ -133,6 +143,19 @@ class GeneralSettings extends React.PureComponent<Props> {
 
         return(
             <Form>
+                {envList &&
+                <Form.Item label="Environment" {...formItemLayout} >
+                    <Select 
+                        defaultValue="default"
+                        value={ env || undefined }
+                        onChange={ (e) => ::this.onChangeEnvironment(e) }
+                    >
+                        { envList.map(e => 
+                            <Option value={e} key={e}>{e}</Option>
+                        )}
+                    </Select>
+                </Form.Item>
+                }
                 <Form.Item label="Iterations" {...formItemLayout} >
                     <InputNumber
                         min={1}

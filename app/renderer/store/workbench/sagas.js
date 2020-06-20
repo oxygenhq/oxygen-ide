@@ -256,7 +256,7 @@ export function* initialize() {
     // get app settings from the store
     let appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');
 
-    if(appSettings && appSettings.cache){
+    if (appSettings && appSettings.cache) {
         yield putAndTake(wbActions.restoreFromCache(appSettings.cache));
 
         try{
@@ -267,8 +267,8 @@ export function* initialize() {
             yield put(reportError(error));
             
         }
-
-        if(appSettings.cache.settings && appSettings.cache.settings.uuid){
+        // setup analytics
+        if (appSettings.cache.settings && appSettings.cache.settings.uuid) {
             yield call(services.mainIpc.call, 'AnalyticsService', 'setUser', [appSettings.cache.settings.uuid]); 
             yield put(setUserIdToSentry(appSettings.cache.settings.uuid));
             
@@ -277,6 +277,12 @@ export function* initialize() {
             yield call(services.mainIpc.call, 'AnalyticsService', 'createUser', [uuid]);
             yield put(settingsActions.createUser(uuid));
             yield put(setUserIdToSentry(uuid));
+        }
+        // if we have pre-loaded settings folder from cache, 
+        // then check if it has Oxygen project settings file and load it
+        if (appSettings.cache.fs && appSettings.cache.fs.rootPath) {
+            // load project settings, if oxygen.conf.js file found in the folder        
+            yield putAndTake(settingsActions.loadProjectSettings(appSettings.cache.fs.rootPath));
         }
 
     } else {
@@ -297,11 +303,12 @@ export function* initialize() {
     // start Selenium server
     const seleniumPid = yield services.mainIpc.call('SeleniumService', 'start');
 
-    if(seleniumPid){
+    if (seleniumPid) {
         yield put(testActions.setSeleniumPid(seleniumPid));
     }
 
-    if(appSettings && appSettings.lastSession && appSettings.lastSession.rootFolder){
+    if (appSettings && appSettings.lastSession && appSettings.lastSession.rootFolder) {
+        // hide landing page, as we will probably have some tabs open
         yield put(settingsActions.hideLanding());
     } else {
         yield put(settingsActions.showLanding());
@@ -358,6 +365,8 @@ export function* openFolder({ payload }) {
         yield put(wbActions._openFile_Failure(path, error));
         return;
     }
+    // load project settings, if oxygen.conf.js file found in the folder
+    yield putAndTake(settingsActions.loadProjectSettings(path));
     // report success
     yield put(wbActions._openFile_Success(path));
 }

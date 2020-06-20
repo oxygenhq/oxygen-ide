@@ -32,10 +32,17 @@ export default function* root() {
         takeLatest(ActionTypes.TMP_UPDATE_FILE_CONTENT, tmpUpdateFileContent),
         takeLatest(ActionTypes.FIRST_OPEN, firstOpen),
         takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
-        takeLatest(types.default.TEST_UPDATE_BREAKPOINTS, testUpdateBreakpoints)
+        takeLatest(types.default.TEST_UPDATE_BREAKPOINTS, testUpdateBreakpoints),
+        takeLatest(ActionTypes.LOAD_PROJECT_SETTINGS, loadProjectSettings)
     ]);
 }
 
+export function* loadProjectSettings({ payload }) {
+    const { path } = payload;
+    const settings = yield call(services.mainIpc.call, 'ProjectService', 'getProjectSettings', [path]);
+    // report success
+    yield put(settingsActions._loadProjectSettings_Success(path, settings));
+}
 
 export function* testUpdateBreakpoints({ payload }){
         
@@ -73,8 +80,8 @@ export function* testUpdateBreakpoints({ payload }){
             const result = yield call(services.mainIpc.call, 'TestRunnerService', 'updateBreakpoints', [ breakpoints, path ]);
             const end = new Date();
             const duration = (end - start);
-            console.log('TestRunnerService updateBreakpoints takes ' + duration + ' ms ');
-            console.log('TestRunnerService updateBreakpoints result', result);
+            //console.log('TestRunnerService updateBreakpoints takes ' + duration + ' ms ');
+            //console.log('TestRunnerService updateBreakpoints result', result);
             yield put(testActions.waitUpdateBreakpoints(false));
             
         }
