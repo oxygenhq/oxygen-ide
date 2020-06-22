@@ -512,8 +512,7 @@ export default class FileService extends ServiceBase {
 
     createFile(parentPath, name) {
         const newFilePath = path.join(parentPath, name);
-        // make sure we throw an error if file already exist (flag: 'wx')
-        return this.saveFileContent(newFilePath, '', 'utf-8', 'wx');
+        return this.saveFileContent(newFilePath, '', false, 'utf-8', 'wx');
     }
 
     saveFileContent(filePath, content, beautifyContent = false, encoding = 'utf8', flag = 'w') {

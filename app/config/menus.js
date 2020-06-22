@@ -12,7 +12,7 @@ const CONTEXT_MENU_FILE_EXPLORER_FOLDER = [
     {
         label: 'New File',
         accelerator: 'CommandOrControl+N',
-        cmd: Const.MENU_CMD_NEW_FILE,
+        cmd: Const.MENU_CMD_NEW_FILE_IN_FOLDER,
     },
     {
         label: 'New Folder',

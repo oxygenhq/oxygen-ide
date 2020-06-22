@@ -183,6 +183,9 @@ export function* handleMainMenuEvents({ payload }) {
     else if (cmd === Const.MENU_CMD_NEW_FILE) {
         yield openFakeFile();
     }
+    else if (cmd === Const.MENU_CMD_NEW_FILE_IN_FOLDER) {
+        yield showNewFileDialogInFolder();
+    }
     else if (cmd === Const.MENU_CMD_NEW_FOLDER) {
         yield showNewFolderDialog({});
     }
@@ -1339,6 +1342,16 @@ export function* showRemoveObjectElementOrContainerDialog({ type }) {
         );
     } else {
         console.warn('no path');
+    }
+}
+
+export function* showNewFileDialogInFolder() {
+    const activeNode = (yield select(state => state.fs.tree.activeNode)) || null;
+
+    if (activeNode) {
+        yield put(
+            wbActions.showDialog('DIALOG_FILE_CREATE', { type: 'file', path: activeNode })
+        );
     }
 }
 

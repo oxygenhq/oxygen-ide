@@ -10,6 +10,7 @@ process.env._TESTING=1; // https://www.npmjs.com/package/appium-support
 export const OXY_ALLOWED_FILES = ['js', 'jsx', 'json', 'xml', 'yml', 'txt'];
 
 export const MENU_CMD_NEW_FILE = 'MENU_CMD_NEW_FILE';
+export const MENU_CMD_NEW_FILE_IN_FOLDER = 'MENU_CMD_NEW_FILE_IN_FOLDER';
 export const MENU_CMD_NEW_FOLDER = 'MENU_CMD_NEW_FOLDER';
 export const MENU_CMD_OPEN_FOLDER = 'MENU_CMD_OPEN_FOLDER';
 export const MENU_CMD_OPEN_FILE = 'MENU_CMD_OPEN_FILE';
