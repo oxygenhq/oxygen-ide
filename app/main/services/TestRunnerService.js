@@ -303,8 +303,8 @@ export default class TestRunnerService extends ServiceBase {
                     this.runner.removeListener('test-end',() => {});
                 }
 
-                await this.runner.kill('CANCELED');
                 await this.runner.dispose('CANCELED');
+                await this.runner.kill('CANCELED');
 
                 this.runner = null;
                 this.mainFilePath = null;
