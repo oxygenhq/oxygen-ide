@@ -316,7 +316,11 @@ export default class DeviceDiscoveryService extends ServiceBase {
             let {stdout} = await exec(instrumentsPath, ['-s', 'devices'], opts);
             lines = stdout.split('\n');
         } catch (err) {
-            throw new Error(`Failed getting devices, err: ${err}.`);
+            if(err && err.message && err.message.includes('timed out after')){
+                // ignore
+            } else {
+                throw new Error(`Failed getting devices, err: ${err}.`);
+            }
         }
         let devices = lines.filter((line) => {
             // https://regex101.com/r/aE6aS3/6
