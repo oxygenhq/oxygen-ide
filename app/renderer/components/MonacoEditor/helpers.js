@@ -289,8 +289,18 @@ function addHollowCircle(marker, editor){
         })
     ];
 
+    let startLineNumber = 0;
+
+    if(
+        marker &&
+        marker.range &&
+        marker.range.startLineNumber
+    ) {
+        startLineNumber = marker.range.startLineNumber;
+    }
+
     const newDecorators = [{
-        range: new monaco.Range(marker.range.startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
+        range: new monaco.Range(startLineNumber, marker.range.startColumn, marker.range.endLineNumber, marker.range.endColumn),
         options: {
             isWholeLine: true,
             className: marker.options.className,

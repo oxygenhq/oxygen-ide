@@ -20,7 +20,20 @@ export default function onDidChangeModelContent (e) {
     }
 
     // identify if user has added or removed a line - if the number of lines hasn't change, then we have nothing to do here
-    const newLineAddedOrDeleted = e.changes.some(change => ( change.text === e.eol || (change && change.range && change.range.startLineNumber != change.range.endLineNumber) ));
+    const newLineAddedOrDeleted = e.changes.some(change => {
+        
+        let startLineNumber = 0;
+
+        if(
+            change &&
+            change.range &&
+            change.range.startLineNumber
+        ) {
+            startLineNumber = change.range.startLineNumber;
+        }
+        
+        return ( change.text === e.eol || (startLineNumber != change.range.endLineNumber) );
+    });
     
     const editorContent = editor.getModel().getValue();
     // Always refer to the latest value
