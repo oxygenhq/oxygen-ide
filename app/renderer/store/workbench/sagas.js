@@ -249,12 +249,21 @@ export function* deactivate() {
     yield call(services.mainIpc.call, 'SeleniumService', 'stop');
 }
 
+function* deviceDiscoveryServiceSaveStart() {
+    const testMode = yield select(state => state.test.runtimeSettings.testMode);
+
+    if (testMode === 'mob') {
+        // start Android and iOS device watcher
+        services.mainIpc.call('DeviceDiscoveryService', 'start').catch((e) => console.error(e.message));
+    }
+}
+
 export function* initialize() {
     yield put(testActions.waitUpdateBreakpoints(false));
     // start check for update
     services.mainIpc.call('UpdateService', 'start', [false]);
-    // start Android and iOS device watcher
-    services.mainIpc.call('DeviceDiscoveryService', 'start').catch((e) => console.error(e.message));
+
+    yield deviceDiscoveryServiceSaveStart();
 
     // get app settings from the store
     let appSettings = yield call(services.mainIpc.call, 'ElectronService', 'getSettings');

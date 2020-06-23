@@ -106,6 +106,7 @@ function* setTestMode({payload}){
         }
     }
     
+    yield deviceDiscoveryServiceSaveStart();
 }
 
 export function* handleServiceEvents({ payload }) {
@@ -122,6 +123,15 @@ export function* handleServiceEvents({ payload }) {
     else if (service === 'TestRunnerService') {
         yield handleTestRunnerServiceEvent(event);
     }    
+}
+
+function* deviceDiscoveryServiceSaveStart() {
+    const testMode = yield select(state => state.test.runtimeSettings.testMode);
+
+    if (testMode === 'mob') {
+        // start Android and iOS device watcher
+        services.mainIpc.call('DeviceDiscoveryService', 'start').catch((e) => console.error(e.message));
+    }
 }
 
 function* handleTestRunnerServiceEvent(event) {
@@ -155,7 +165,7 @@ function* handleTestRunnerServiceEvent(event) {
             
             yield all([
                 call(services.mainIpc.call, 'AnalyticsService', 'playStop', [summary]),
-                call(services.mainIpc.call, 'DeviceDiscoveryService', 'start', [])
+                deviceDiscoveryServiceSaveStart()
             ]);
         } else if(event && event.error){
             let message = 'Error: ';
@@ -173,7 +183,7 @@ function* handleTestRunnerServiceEvent(event) {
             }
 
             yield put(loggerActions.addLog(message, null, 'general'));
-            yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'start', []);
+            yield deviceDiscoveryServiceSaveStart();
         }
     }
     else if (event.type === 'LINE_UPDATE') {
