@@ -46,12 +46,14 @@ const saveCloudProvidersDestruction = (fieldName, object) => {
 const defaultAppSettings = {
     cache: null,
     files: {},
+    projectSettings: null,
     generalSettings: {
         iterations: 1,
         paramMode: 'sequential',
         paramFilePath: null,
         reopenSession: false,
-        useParams: false
+        useParams: false,
+        env: null
     },
     runSettings: {
         npmGRootExecution: true
@@ -146,7 +148,7 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { value, target, settings, zoom, cache, uuid, providers, browsersAndDevices, testProvider, visualProviders, runSettings, generalSettings } = payload;
+    const { projectSettings, value, target, settings, zoom, cache, uuid, providers, browsersAndDevices, testProvider, visualProviders, runSettings, generalSettings } = payload;
     switch (action.type) {
     
     // CREATE USER
@@ -386,6 +388,12 @@ export default (state = defaultState, action) => {
 
     case 'RESET': 
         return defaultState;
+
+    case types.LOAD_PROJECT_SETTINGS_SUCCESS: 
+        return {
+            ...state,
+            projectSettings: projectSettings
+        };
     
     default:
         return state;

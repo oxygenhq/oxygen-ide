@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 import * as types from './types';
+import { success, failure } from '../../helpers/redux';
 
 /* Create User  */
 export const createUser = (uuid) => {
@@ -151,4 +152,14 @@ export const updateCloudProvidersSettings = providers => ({
 export const setCloudProvidersBrowsersAndDevices = (browsersAndDevices, testProvider) => ({
     type: types.SET_CLOUD_PROVIDERS_BROWSERS_AND_DEVICES,
     payload: { browsersAndDevices, testProvider },
+});
+
+export const loadProjectSettings = (path) => ({
+    type: types.LOAD_PROJECT_SETTINGS,
+    payload: { path },
+});
+
+export const _loadProjectSettings_Success = (path, settings) => ({
+    type: success(types.LOAD_PROJECT_SETTINGS),
+    payload: { path, projectSettings: settings },
 });

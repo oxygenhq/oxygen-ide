@@ -8,8 +8,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { Runners, ReportAggregator, util as oxutil } from 'oxygen-cli';
-import * as cliutil from './cli-util';
+import { Runners, ReportAggregator, util as oxutil, cliutil } from 'oxygen-cli';
 import path from 'path';
 import moment from 'moment';
 import detectPort from 'detect-port';
@@ -61,6 +60,7 @@ export default class TestRunnerService extends ServiceBase {
             paramMode,
             iterations,
             reopenSession,
+            env,
             dbgPort,
             testMode,
             testTarget,
@@ -93,6 +93,9 @@ export default class TestRunnerService extends ServiceBase {
         let caps = {};
         options.suites = [testsuite];
         options.debugPortIde = dbgPort;
+        if (env) {
+            options.env = env;
+        }
         options.require = {
             allow: true,
             allowGlobal: true
@@ -132,7 +135,6 @@ export default class TestRunnerService extends ServiceBase {
                 options[runValue] = runSettings[runValue];
             }
         }
-
         // add local run options, if no cloud provider was selected
         if (!testProvider || !testProvider.id) {
             // prepare module parameters
@@ -181,49 +183,40 @@ export default class TestRunnerService extends ServiceBase {
             options.rootPath = rootPath;
         }
 
-        if(seleniumPid){
+        if (seleniumPid) {
             options.seleniumPid = seleniumPid;
         }
-
-        if(oxConfigFile){
-            const targetFile = cliutil.processTargetPath(oxConfigFile);
-            const argv = {};
-
+        // make sure to load and merge IDE defined test options with the project configuration file
+        if (oxConfigFile) {
+            const targetFile = cliutil.processTargetPath(oxConfigFile);            
             // console.log('TestRunner : targetFile', targetFile);
 
-            if(targetFile){
+            if (targetFile) {
+                const argv = {};
+                // set environment name, if value was selected by user in the Settings dialog
+                if (env) {
+                    argv.env = env;
+                }
                 const config = await cliutil.getConfigurations(targetFile, argv, this.mainFilePath);
 
-                if(config && config.suites){
-                    if(oxConfigFile && mainFilePath && mainFilePath === oxConfigFile){
+                if (config && config.suites) {
+                    if (oxConfigFile && mainFilePath && mainFilePath === oxConfigFile) {
                         // use suites from config file if user run config file
                     } else {
                         delete config.suites;
                     }
                 }
 
-                // console.log('TestRunner : config', config);
-
                 const oxConfigOptions = await cliutil.generateTestOptions(config, argv);
-                
-                // console.log('TestRunner : options', oxConfigOptions);
-
                 if (oxConfigOptions) {
-                    const data = await cliutil.prepareTestData(oxConfigOptions);
-                    
-                    if (data) {
-                        if (data.options) {
-                            for (var oxConfigOption in data.options) {
-                                options[oxConfigOption] = data.options[oxConfigOption];
-                            }
-                        }
-                    }
+                    // merge IDE and project options (IDE options override project options)
+                    options = { ...oxConfigOptions, ...options}
                 }
             }
         }
         
 
-        if(caps){
+        if (caps) {
             const playStartEventData = {
                 provider: 'Local'
             };
@@ -310,7 +303,7 @@ export default class TestRunnerService extends ServiceBase {
                 this.mainFilePath = null;
             }
             catch (e) {
-                console.log('this.runner.dispose', e);
+                console.error('Dispose failed', e);
                 // ignore any errors
             }        
         }
@@ -329,7 +322,7 @@ export default class TestRunnerService extends ServiceBase {
             const result = await this.runner.updateBreakpoints(breakpoints, filePath);
             const end = new Date();
             const duration = (end - start);
-            console.log('updateBreakpoints takes ' + duration + ' ms ');
+            //console.log('updateBreakpoints takes ' + duration + ' ms ');
             return result;
         } else {
             return null;
@@ -351,7 +344,7 @@ export default class TestRunnerService extends ServiceBase {
         }
     }
 
-    async _launchTest(opts, caps) {        
+    async _launchTest(opts, caps) {       
         const runner = this.runner = this._instantiateRunner(opts);
         if (!runner) {
             const framework = opts.framework;
@@ -589,11 +582,11 @@ export default class TestRunnerService extends ServiceBase {
         
         const time = moment.utc().valueOf();
         
-        console.log('--- debug _handleBreakpoint ---');
+        /*console.log('--- debug _handleBreakpoint ---');
         console.log('line', editorLine);
         console.log('file', editorFile);
         console.log('resolved', resolved);
-        console.log('--- debug ---');
+        console.log('--- debug ---');*/
 
         // make sure to mark breakpoint line with current line mark
         this.notify({

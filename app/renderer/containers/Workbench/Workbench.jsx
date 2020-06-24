@@ -534,7 +534,7 @@ export default class Workbench extends React.Component<Props> {
           objrepoName
       } = this.props;
 
-      const { generalSettings = {}, runSettings = {}, visualProviders = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null } = settings;
+      const { generalSettings = {}, runSettings = {}, visualProviders = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null, projectSettings = null } = settings;
       const { runtimeSettings } = test;
       // sidebars state
       const leftSidebarSize = settings.sidebars.left.size;
@@ -658,6 +658,7 @@ export default class Workbench extends React.Component<Props> {
                 <SettingsDialog 
                     { ...dialog['DIALOG_SETTINGS'] } 
                     settings={ runtimeSettings }
+                    projectSettings={ projectSettings }
                     cloudProviders={ cloudProviders }
                     visualProviders={ visualProviders }
                     runSettings={ runSettings }
