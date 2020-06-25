@@ -27,6 +27,7 @@ type Props = {
     visualProviders: Object | undefined,
     runSettings: Object | undefined,
     generalSettings: Object | undefined,
+    projectSettings: Object | undefined,
     onSubmit: () => void,
     onCancel: () => void
 };

@@ -21,7 +21,8 @@ const formItemLayout = {
 type Props = {
     form: Object | undefined | null,
     visible: boolean | undefined,
-    settings: Object | undefined
+    settings: Object | undefined,
+    projectSettings: Object | undefined
 };
 
 

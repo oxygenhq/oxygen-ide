@@ -210,7 +210,7 @@ export default class TestRunnerService extends ServiceBase {
                 const oxConfigOptions = await cliutil.generateTestOptions(config, argv);
                 if (oxConfigOptions) {
                     // merge IDE and project options (IDE options override project options)
-                    options = { ...oxConfigOptions, ...options}
+                    options = { ...oxConfigOptions, ...options};
                 }
             }
         }
@@ -318,12 +318,7 @@ export default class TestRunnerService extends ServiceBase {
         console.log('--- updateBreakpoints ---');
         */
         if (this.runner && breakpoints && filePath) {
-            const start = new Date();
-            const result = await this.runner.updateBreakpoints(breakpoints, filePath);
-            const end = new Date();
-            const duration = (end - start);
-            //console.log('updateBreakpoints takes ' + duration + ' ms ');
-            return result;
+            return await this.runner.updateBreakpoints(breakpoints, filePath);
         } else {
             return null;
         }

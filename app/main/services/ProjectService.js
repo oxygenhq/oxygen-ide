@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import ServiceBase from './ServiceBase';
-import { Runners, ReportAggregator, util as oxutil, cliutil } from 'oxygen-cli';
+import { cliutil } from 'oxygen-cli';
 
 export default class ProjectService extends ServiceBase {
     constructor() {

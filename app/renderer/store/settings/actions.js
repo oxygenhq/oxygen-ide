@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import * as types from './types';
-import { success, failure } from '../../helpers/redux';
+import { success } from '../../helpers/redux';
 
 /* Create User  */
 export const createUser = (uuid) => {

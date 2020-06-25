@@ -25,7 +25,7 @@ import * as editorActions from '../editor/actions';
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
 import pathLib from 'path';
-
+export const OXYGEN_ENV_FILE_NAME = 'oxygen.env';
 /**
  * File System and File Explorer Sagas
  */
@@ -39,6 +39,7 @@ export default function* root() {
         takeLatest(ActionTypes.FS_RENAME, renameFileOrFolder),
         takeLatest(ActionTypes.FS_MOVE, move),
         takeLatest(ActionTypes.FS_DELETE, deleteFileOrFolder),
+        takeLatest(success(ActionTypes.FS_DELETE), deleteFileOrFolderSuccess),
         takeLatest(ActionTypes.FS_SAVE_FILE, saveFileContent),
         takeLatest(ActionTypes.FS_SAVE_FILE_AS, saveFileContentAs),
         takeLatest(ActionTypes.WB_INIT_SUCCESS, initializeSuccess),
@@ -48,7 +49,8 @@ export default function* root() {
         takeLatest(ActionTypes.FS_TREE_UN_WATCH_FOLDER, maybeNeedRemoveWatcherToFolder),
         takeLatest(ActionTypes.FS_TREE_WATCH_FOLDER, addFolderToWatchers),
         takeLatest('FROM_CACHE', fromCache),
-        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents)
+        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
+        takeLatest(ActionTypes. FS_ADD_FILE_OR_FOLDER, fsAddFileOrFolder),
     ]);
 }
 
@@ -73,6 +75,21 @@ export function* maybeNeedRemoveWatcherToFolder({ payload }){
     if(path){
         yield call(services.mainIpc.call, 'FileService', 'removeFolderToWatchers', [path]);
     }
+}
+
+export function* checkIfEnvFileChange(path){    
+    const rootPath = yield select(state => state.fs.rootPath);
+    const encConfigFilePath = pathLib.join(rootPath, `${OXYGEN_ENV_FILE_NAME}.js`);
+
+    if(encConfigFilePath === path){
+        yield putAndTake(settingsActions.loadProjectSettings(path));
+    }
+}
+
+export function* fsAddFileOrFolder({payload}) {
+    const { fileOrFolder } = payload;
+    const { path } = fileOrFolder;
+    yield checkIfEnvFileChange(path);
 }
 
 export function* handleServiceEvents({ payload }) {
@@ -103,7 +120,16 @@ export function* handleServiceEvents({ payload }) {
             if (activeNode && path && activeNode === path) {                    
                 const localPayload = { path };
                 yield fetchFileContent({ payload: localPayload });
+            } else {
+                const activeFile = yield select(state => state.editor.activeFile);
+                if (activeFile && path && activeFile === path) {                    
+                    const localPayload = { path };
+                    yield fetchFileContent({ payload: localPayload });
+                } else {
+                    yield checkIfEnvFileChange(path);
+                }
             }
+
         }
     }
 
@@ -152,6 +178,8 @@ export function* handleServiceEvents({ payload }) {
                 // safe operation, because file not modefied yet 
                 yield put(fsActions._fetchFileContent_Success(path, content));
             }
+            
+            yield checkIfEnvFileChange(path, content);
         } else {
             console.warn('on getFileContent no path');
         }
@@ -592,6 +620,11 @@ export function* deleteFileOrFolder({ payload }) {
         yield put(reportError(err));
         yield put(fsActions._delete_Failure(path, err));
     }
+}
+
+export function* deleteFileOrFolderSuccess({ payload }) {
+    const { path } = payload;
+    yield checkIfEnvFileChange(path);
 }
 
 export function* createFolder({ payload }) {

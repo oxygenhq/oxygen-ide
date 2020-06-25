@@ -76,12 +76,7 @@ export function* testUpdateBreakpoints({ payload }){
             // the file where breackpoints changed in files, where test runs
 
             yield put(testActions.waitUpdateBreakpoints(true));
-            const start = new Date();
-            const result = yield call(services.mainIpc.call, 'TestRunnerService', 'updateBreakpoints', [ breakpoints, path ]);
-            const end = new Date();
-            const duration = (end - start);
-            //console.log('TestRunnerService updateBreakpoints takes ' + duration + ' ms ');
-            //console.log('TestRunnerService updateBreakpoints result', result);
+            yield call(services.mainIpc.call, 'TestRunnerService', 'updateBreakpoints', [ breakpoints, path ]);
             yield put(testActions.waitUpdateBreakpoints(false));
             
         }
