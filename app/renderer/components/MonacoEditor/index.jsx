@@ -134,8 +134,6 @@ export default class MonacoEditor extends React.Component<Props> {
         }
         
         if (prevProps.waitUpdateBreakpoints !== this.props.waitUpdateBreakpoints && this.editor) {
-            this.editor.updateOptions({ readOnly: this.props.waitUpdateBreakpoints });
-
             if(this.props.waitUpdateBreakpoints){
                 helpers.makeBreakpointsHalfOpacity(this.editor);
             } else {
