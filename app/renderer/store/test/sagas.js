@@ -269,7 +269,7 @@ export function* runItem(itemsLength, browsersList, inputCurrentItem, saveMainFi
 
 export function* startTestAll({ payload }) {
     let currentItem = 0;
-    const { mainFile, breakpoints, runtimeSettings } = yield select(state => state.test);
+    const { breakpoints, runtimeSettings } = yield select(state => state.test);
     const { cloudProvidesBrowsersAndDevices } = yield select(state => state.settings);
     const { runSettings, generalSettings } = yield select(state => state.settings);
 
@@ -278,12 +278,7 @@ export function* startTestAll({ payload }) {
     let file;
     let saveMainFile;
 
-    if(mainFile){
-        // check if main file of the test is saved (e.g. unmodified)
-        file = yield select(state => state.fs.files[mainFile]);
-        saveMainFile = mainFile;
-    } else if (editor && editor.activeFile){
-        // check if main file of the test is saved (e.g. unmodified)
+    if (editor && editor.activeFile){
         file = yield select(state => state.fs.files[editor.activeFile]);
         saveMainFile = editor.activeFile;
     }
@@ -433,7 +428,7 @@ export function* startTestAll({ payload }) {
 }
 
 export function* startTest({ payload }) {
-    const { mainFile, breakpoints, runtimeSettings } = yield select(state => state.test);
+    const { breakpoints, runtimeSettings } = yield select(state => state.test);
     const { runSettings, generalSettings } = yield select(state => state.settings);
 
     const editor = yield select(state => state.editor);
@@ -441,12 +436,7 @@ export function* startTest({ payload }) {
     let file;
     let saveMainFile;
 
-    if(mainFile){
-        // check if main file of the test is saved (e.g. unmodified)
-        file = yield select(state => state.fs.files[mainFile]);
-        saveMainFile = mainFile;
-    } else if (editor && editor.activeFile){
-        // check if main file of the test is saved (e.g. unmodified)
+    if (editor && editor.activeFile){
         file = yield select(state => state.fs.files[editor.activeFile]);
         saveMainFile = editor.activeFile;
     }
@@ -639,10 +629,12 @@ export function* handleOnLineUpdate ({ payload }) {
         }
     }
 
-    if(findedFile){
-        yield put(tabActions.setActiveTab(findedFile));
-        yield put(editorActions.setActiveFile(findedFile));
-        yield put(editorActions.setActiveLine(time, findedFile, line));
+    if(!findedFile){
+        yield put(wbActions.openFile(file));
+        yield put(editorActions.openFile(file));
     }
 
+    yield put(tabActions.setActiveTab(file));
+    yield put(editorActions.setActiveFile(file));
+    yield put(editorActions.setActiveLine(time, file, line));
 }

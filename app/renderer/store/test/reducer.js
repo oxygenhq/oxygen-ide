@@ -23,7 +23,6 @@ const defaultState = {
     disabledBreakpoints: {},
     resolvedBreakpoints: {},
     waitUpdateBreakpoints: false,
-    mainFile: null,           // main test (script) file to be executed 
     runtimeSettings: {
         testMode: 'web',
         testTarget: 'chrome',
@@ -141,12 +140,6 @@ export default (state = defaultState, action) => {
             isRunning: false,
             isPaused: false,
             variables: null
-        };
-    // TEST_SET_MAIN
-    case ActionTypes.TEST_SET_MAIN:
-        return {
-            ...state,
-            mainFile: value,
         };
     // TEST_SET_TARGET
     case ActionTypes.TEST_SET_TARGET:

@@ -388,7 +388,6 @@ export function* changeTab({ payload }) {
 
     if(key === 'unknown'){
         yield put(tabActions.setActiveTab(key, name));
-        yield put(testActions.setMainFile(key, name));
         yield put(editorActions.setActiveFile(key, name));
     } else {
         const { error } = yield putAndTake(
@@ -403,7 +402,6 @@ export function* changeTab({ payload }) {
         }
         else {
             yield put(tabActions.setActiveTab(key));
-            yield put(testActions.setMainFile(key));
         }
     }
 }
@@ -605,7 +603,6 @@ export function* openFile({ payload }) {
         yield put(wbActions._openFile_Failure(path, error));
     }
     else {
-        yield put(testActions.setMainFile(path));
         yield put(wbActions._openFile_Success(path));
     }
 }
@@ -948,20 +945,8 @@ export function* closeFile({ payload }) {
     }
 
     yield put(testActions.removeBreakpoints(path));
-    // retrieve new active tab, if there are more files open
-    const activeTab = yield select(state => state.tabs.active);
-    // make sure to update main test file, when current tab is closed
-    // set main file to a new active tab, if any tab is still open
-    if (activeTab) {
-        yield put(testActions.setMainFile(activeTab));
-    }
-    // or set main test file to null if no tab is open
-    else {
-        yield put(testActions.setMainFile(null));
-    }
 
     if(path === 'unknown'){
-
         yield put(settingsActions.removeFile(path, name));
     }
 
