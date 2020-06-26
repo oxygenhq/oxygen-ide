@@ -44,17 +44,19 @@ export default class DeviceDiscoveryService extends ServiceBase {
     }
 
     async start() {
-        await this._reportADBVersion();
-        await this._updateDeviceList();
+        if(!this.devListInterval){
+            await this._reportADBVersion();
+            await this._updateDeviceList();
 
-        const self = this;
-        this.devListInterval = setInterval(function() {
-            // do not update devices if previous update call is not finished yet
-            if (!self.updatingDeviceList) {
-                self._updateDeviceList();
-            }
-        },  DEVICE_MONITOR_INTERVAL);
-        
+            const self = this;
+            this.devListInterval = setInterval(function() {
+                // do not update devices if previous update call is not finished yet
+                if (!self.updatingDeviceList) {
+                    self._updateDeviceList();
+                }
+            },  DEVICE_MONITOR_INTERVAL);
+        }
+
         return this.devices;
     }
 
