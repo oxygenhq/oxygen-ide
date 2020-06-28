@@ -1,5 +1,5 @@
 export default class DeviceInfo {
-    constructor(object){
+    constructor(object) {
         this.id = object.id;
         this._name = object.name;
         this._apiName = object.apiName;

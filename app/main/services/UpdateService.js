@@ -102,12 +102,12 @@ export default class UpdateService extends ServiceBase {
     async start(notifyIfNoUpdate = false) {
         let result;
 
-        try{
+        try {
             console.log('UpdateService start', notifyIfNoUpdate);
             const checkForUpdate = await this._checkForUpdate(notifyIfNoUpdate);
             console.log('checkForUpdate', checkForUpdate);
             result = checkForUpdate;
-        } catch(e){
+        } catch (e) {
             console.log('UpdateService e', e);
             Sentry.captureException(e);
         }
@@ -125,7 +125,7 @@ export default class UpdateService extends ServiceBase {
                     var result = parseResponse(response);
                     if (isNewer(result.version, pkgInfo.version)) {
                         var url = getDownloadUrl(result.downloads);
-                        if(self && self.notify){
+                        if (self && self.notify) {
                             self.notify({
                                 type: UPDATE_CHECK,
                                 version: result.version,
@@ -137,7 +137,7 @@ export default class UpdateService extends ServiceBase {
                         console.log('201');
                         resolve(201);
                     } else if (notifyIfNoUpdate) {
-                        if(self && self.notify){
+                        if (self && self.notify) {
                             self.notify({
                                 type: UPDATE_CHECK
                             });
@@ -151,7 +151,7 @@ export default class UpdateService extends ServiceBase {
                         resolve(203);
                     }
                 } else {
-                    if(notifyIfNoUpdate){
+                    if (notifyIfNoUpdate) {
                         console.log('err response', response);
                         const errMsg = response && response.message ? response.message : (response && response.Error ? response.Error : '');
                         console.info(`Failure checking for updates: ${errMsg}`);

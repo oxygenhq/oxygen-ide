@@ -18,11 +18,11 @@ const services = {
 export function configureServices(store, action$) {
     // bind all services to the store and action$ subject
     for (var name in services) {
-        if(
+        if (
             services &&
             services[name] &&
             services[name].bind
-        ){
+        ) {
             services[name].bind(store, action$ || null);
         }
     }

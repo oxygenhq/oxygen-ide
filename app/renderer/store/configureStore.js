@@ -102,33 +102,33 @@ const configureStore = (initialState?: counterStateType) => {
     ]; 
 
     async function updateCache(lastState, action) {
-        if(action && ignoreTypes.includes(action.type)){
+        if (action && ignoreTypes.includes(action.type)) {
             return;
         }
 
-        if(action && action.type.startsWith('RECORDER_')){
+        if (action && action.type.startsWith('RECORDER_')) {
             return;
         }
 
-        if(action && action.type.startsWith('TEST_')){
+        if (action && action.type.startsWith('TEST_')) {
             return;
         }
         
-        if(action && action.type.startsWith('DIALOG_')){
+        if (action && action.type.startsWith('DIALOG_')) {
             return;
         }        
 
-        if(action && action.type.startsWith('WB_')){
+        if (action && action.type.startsWith('WB_')) {
             return;
         }
         
-        if(action && action.type.startsWith('FROM_CACHE_')){
+        if (action && action.type.startsWith('FROM_CACHE_')) {
             return;
         }
 
-        if(action && action.type === 'LOGGER_SET_VISIBLE'){
+        if (action && action.type === 'LOGGER_SET_VISIBLE') {
             // add to save cache
-        } else if(action && action.type.startsWith('LOGGER_')){
+        } else if (action && action.type.startsWith('LOGGER_')) {
             return;
         }
 
@@ -149,7 +149,7 @@ const configureStore = (initialState?: counterStateType) => {
         let result = next(action);
         const state = store.getState();
 
-        if(state.settings.cacheUsed){
+        if (state.settings.cacheUsed) {
             updateCache(state, action);
         }
 
@@ -161,9 +161,9 @@ const configureStore = (initialState?: counterStateType) => {
     }
 
     async function setUserIdToSentry(userId) {
-        try{
+        try {
 
-            if(userId && window && window.Sentry && window.Sentry.configureScope){
+            if (userId && window && window.Sentry && window.Sentry.configureScope) {
                 window.Sentry.configureScope((scope) => {
                     scope.setUser({'userId': userId});
                 });
@@ -172,7 +172,7 @@ const configureStore = (initialState?: counterStateType) => {
                 console.log('or window.Sentry', window.Sentry);
             }
 
-        } catch(e){
+        } catch (e) {
             console.warn('setUserIdToSentry error', e);
         }
     }
@@ -183,11 +183,11 @@ const configureStore = (initialState?: counterStateType) => {
     const universalError = store => next => action => {
         let result = next(action);
 
-        if(action && action.type && action.payload && action.payload.error && action.type === UNIVERSAL_ERROR){
+        if (action && action.type && action.payload && action.payload.error && action.type === UNIVERSAL_ERROR) {
             sendError(action.payload.error);
         }
     
-        if(action && action.type && action.payload && action.payload.userId && action.type === SET_USER_ID_TO_SENTRY){
+        if (action && action.type && action.payload && action.payload.userId && action.type === SET_USER_ID_TO_SENTRY) {
             setUserIdToSentry(action.payload.userId);
         }
     
@@ -219,7 +219,7 @@ const configureStore = (initialState?: counterStateType) => {
 
 
 const getSettings = (lastState) => {
-    if(lastState && lastState.settings){
+    if (lastState && lastState.settings) {
         
         /* eslint-disable */
         const { cache, cloudProvidesBrowsersAndDevices, ...rest } = lastState.settings;

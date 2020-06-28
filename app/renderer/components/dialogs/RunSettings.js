@@ -12,7 +12,7 @@ const DEFAULT_STATE = {
 };
 
 class RunSettings extends React.PureComponent<Props> {    
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             ...DEFAULT_STATE,
@@ -30,7 +30,7 @@ class RunSettings extends React.PureComponent<Props> {
         });
     }
   
-    validateFields(){
+    validateFields() {
         const { runSettings } = this.state;
         
         return new Promise((resolve, reject) => {
@@ -43,14 +43,14 @@ class RunSettings extends React.PureComponent<Props> {
         });
     }
     
-    async validateFormFields(){
+    async validateFormFields() {
         const validateFieldsResults = await this.validateFields();
         
         return validateFieldsResults;
     }
     
 
-    render(){
+    render() {
         
         const {
             runSettings = {}
@@ -60,7 +60,7 @@ class RunSettings extends React.PureComponent<Props> {
             npmGRootExecution
         } = runSettings;
 
-        return(
+        return (
             <Form>
                 {/* //////////// APPLITOOLS //////////// */}
                 <Form.Item label="“npm -g root” execution" {...formItemLayout} extra="Enable/disable “npm -g root” execution" >
@@ -74,8 +74,8 @@ class RunSettings extends React.PureComponent<Props> {
 const EnhancedForm =  Form.create()(RunSettings);
 
 export default class RunSettingsWrap extends React.PureComponent<Props> {
-    render(){
-        return(
+    render() {
+        return (
             <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />
         );
     }

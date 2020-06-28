@@ -28,7 +28,7 @@ export default function loggerSetup() {
         }
 
         // ignore Monaco Editor error related to doResolve
-        if(error && error.message && typeof error.message === 'string' && error.message.includes('doResolve')){
+        if (error && error.message && typeof error.message === 'string' && error.message.includes('doResolve')) {
             return;
         }
 

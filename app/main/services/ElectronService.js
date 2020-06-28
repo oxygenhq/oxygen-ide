@@ -20,12 +20,12 @@ export default class ElectronService extends ServiceBase {
         super(mainWindow);
     }
 
-    replaceBackslash(moduleName){
+    replaceBackslash(moduleName) {
         return new Promise((resolve, reject) => {
-            try{    
+            try {    
                 let pathToFile;
 
-                if(process.env.NODE_ENV === 'development'){
+                if (process.env.NODE_ENV === 'development') {
                     pathToFile = __dirname+path.sep+'backslash.js';
                 } else {
                     pathToFile = __dirname+path.sep+'services'+path.sep+'backslash.js';
@@ -35,7 +35,7 @@ export default class ElectronService extends ServiceBase {
             
                 cp.stderr.on('data', (stderr) => {
                     console.log('replaceBackslash stderr', stderr);
-                    if(stderr.toString()){
+                    if (stderr.toString()) {
                         console.log('replaceBackslash stderr.toString()', stderr.toString());
                         resolve(stderr.toString());
                     } else {
@@ -44,26 +44,26 @@ export default class ElectronService extends ServiceBase {
                 });
             
                 cp.stdout.on('data', (stdout) => {
-                    if(stdout && stdout.toString()){
+                    if (stdout && stdout.toString()) {
                         resolve(stdout.toString());
                     } else {
                         reject();
                     }
                     
                 });
-            } catch(e){
+            } catch (e) {
                 console.log('replaceBackslash e', e);
                 reject(e);
             }
         });
     }
 
-    require(moduleName){
+    require(moduleName) {
         return new Promise((resolve, reject) => {
-            try{                
+            try {                
                 let pathToFile; 
 
-                if(process.env.NODE_ENV === 'development'){
+                if (process.env.NODE_ENV === 'development') {
                     pathToFile = __dirname+path.sep+'require.js';
                 } else {
                     pathToFile = __dirname+path.sep+'services'+path.sep+'require.js';
@@ -73,7 +73,7 @@ export default class ElectronService extends ServiceBase {
             
                 cp.stderr.on('data', (stderr) => {
                     console.log('require stderr', stderr);
-                    if(stderr.toString()){
+                    if (stderr.toString()) {
                         console.log('require stderr.toString()', stderr.toString());
                         resolve(stderr.toString());
                     } else {
@@ -82,14 +82,14 @@ export default class ElectronService extends ServiceBase {
                 });
             
                 cp.stdout.on('data', (stdout) => {
-                    if(stdout && stdout.toString()){
+                    if (stdout && stdout.toString()) {
                         resolve(stdout.toString());
                     } else {
                         reject();
                     }
                     
                 });
-            } catch(e){
+            } catch (e) {
                 console.log('require e', e);
                 reject(e);
             }
@@ -97,20 +97,20 @@ export default class ElectronService extends ServiceBase {
     }
 
     async orgRequire(moduleName) {
-        try{
+        try {
             const result = moduleRequire(moduleName);
             // console.log('orgRequire moduleRequire result', result);
             return result;
-        } catch(e){
+        } catch (e) {
             console.log('orgRequire moduleRequire e', e);
         }
     }
 
-    addFile(key, name, content = ''){
+    addFile(key, name, content = '') {
         const settings = appSettings.get('appSettings');
 
         const newSettings = { ...settings };
-        if(key, name){
+        if (key, name) {
             newSettings.files = {
                 ...newSettings.files,
                 [key+name] : {
@@ -130,11 +130,11 @@ export default class ElectronService extends ServiceBase {
         return newSettings;
     }
 
-    removeFile(key, name){
+    removeFile(key, name) {
         const settings = appSettings.get('appSettings');
 
         const newSettings = { ...settings };
-        if(key && name){
+        if (key && name) {
             let filesCopy = { ... newSettings.files };
             
             delete filesCopy[key+name];
@@ -149,11 +149,11 @@ export default class ElectronService extends ServiceBase {
         return newSettings;
     }
 
-    updateFileContent(key, name, content = ''){
+    updateFileContent(key, name, content = '') {
         const settings = appSettings.get('appSettings');
 
         const newSettings = { ...settings };
-        if(key && name && typeof content !== 'undefined'){
+        if (key && name && typeof content !== 'undefined') {
             newSettings.files = {
                 ...newSettings.files,
                 [key+name] : {
@@ -171,12 +171,12 @@ export default class ElectronService extends ServiceBase {
     }
 
     updateCache(cache) {
-        if(cache){
+        if (cache) {
             const settings = appSettings.get('appSettings');
             let newSettings = {};
             let files = {};
             
-            if(settings && settings.files){
+            if (settings && settings.files) {
                 files = settings.files;
             }
 

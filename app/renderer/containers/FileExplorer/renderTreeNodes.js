@@ -29,7 +29,7 @@ function renderTreeNodes(nodes) {
         let theTitle = element.name;
         let onIconContextMenu = () => {};
 
-        if(element.type === 'file' && element.name !== '.emptyfile' && element.name.endsWith('.repo.js')){
+        if (element.type === 'file' && element.name !== '.emptyfile' && element.name.endsWith('.repo.js')) {
             theTitle = (
                 <span 
                     className="tree-row-title" 

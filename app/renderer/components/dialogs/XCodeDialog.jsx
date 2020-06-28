@@ -8,7 +8,7 @@ type Props = {
 
 export default class XCodeDialog extends React.PureComponent<Props> {
   close = () => {
-      if(this.props.clean){
+      if (this.props.clean) {
           this.props.clean();
       }
   }

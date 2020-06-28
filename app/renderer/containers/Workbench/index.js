@@ -25,14 +25,14 @@ const mapStoreToProps = (state) => {
     let fullEditorActiveFile = null;
     let editorActiveFilePossibleRepoPath = null;
  
-    if(activeFile){
-        if(activeFile === 'unknown'){
+    if (activeFile) {
+        if (activeFile === 'unknown') {
             const key = activeFile+activeFileName;
             fullEditorActiveFile = state.settings.files.hasOwnProperty(key) ? state.settings.files[key] : null;
         } else {
             fullEditorActiveFile = state.fs.files.hasOwnProperty(activeFile) ? state.fs.files[activeFile] : null;
 
-            if(fullEditorActiveFile && fullEditorActiveFile.path && !fullEditorActiveFile.path.endsWith('.repo.js')){
+            if (fullEditorActiveFile && fullEditorActiveFile.path && !fullEditorActiveFile.path.endsWith('.repo.js')) {
         
                 const splitResult = fullEditorActiveFile.path.split('.js');
                 splitResult.pop();

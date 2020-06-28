@@ -21,7 +21,7 @@ function filterDepWithoutEntryPoints(dep: string): boolean {
         const pkg = JSON.parse(pgkString);
         const fields = ['main', 'module', 'jsnext:main', 'browser'];
         return !fields.some(field => field in pkg);
-    } catch(e) {
+    } catch (e) {
         console.log(e);
         return true;
     }

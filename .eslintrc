@@ -44,7 +44,9 @@
     }],
     "react/jsx-no-bind": "off",
     "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }],
-    "react/prefer-stateless-function": "off"
+    "react/prefer-stateless-function": "off",
+    "keyword-spacing": ["error", { "before": true, "after": true }],
+    "space-before-blocks": ["error"]
   },
   "plugins": [
     "flowtype",

@@ -27,9 +27,9 @@ const javaversion = (callback) => {
             }
             return callback(javaVersion);
         });
-    } catch(e){
+    } catch (e) {
 
-        if(window && window.Sentry && window.Sentry.captureException){
+        if (window && window.Sentry && window.Sentry.captureException) {
             window.Sentry.captureException(e);
         }
 
@@ -42,7 +42,7 @@ export default class JavaService {
     }
 
     checkJavaVersion() {
-        if(window && window.dispatch){
+        if (window && window.dispatch) {
             javaversion((version) => {
                 if (version) {
                     var ver = version.split('.');

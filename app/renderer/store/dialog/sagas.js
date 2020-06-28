@@ -28,16 +28,16 @@ export function* handleServiceEvents({ payload }) {
 export function* startDownloadChromeDriver({ payload }) {
     const { chromeDriverVersion } = payload;
 
-    if(chromeDriverVersion){
+    if (chromeDriverVersion) {
         yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER));
-        try{
+        try {
             const result = yield services.mainIpc.call('SeleniumService', 'downloadChromeDriver', [chromeDriverVersion]);
     
-            if(result){
-                if(typeof result === 'object'){
+            if (result) {
+                if (typeof result === 'object') {
                     //error object
                     const path = yield services.mainIpc.call('SeleniumService', 'getDriversRootPath');
-                    if(path){
+                    if (path) {
                         yield put(actions.hideDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER));
                         yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED, {path}));
                     }
@@ -46,11 +46,11 @@ export function* startDownloadChromeDriver({ payload }) {
                     yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS));
                 }
             }
-        } catch(e){
+        } catch (e) {
             yield put(reportError(e));
             console.warn('startDownloadChromeDriver error in saga', e);
             const path = yield services.mainIpc.call('SeleniumService', 'getDriversRootPath');
-            if(path){
+            if (path) {
                 yield put(actions.hideDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER));
                 yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED, {path}));
             }
@@ -59,16 +59,16 @@ export function* startDownloadChromeDriver({ payload }) {
     
 }
 
-function* showDownloadChromeDriverFailed(){
+function* showDownloadChromeDriverFailed() {
     const path = yield services.mainIpc.call('SeleniumService', 'getDriversRootPath');
-    if(path){
+    if (path) {
         yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED, {path}));
     }
 }
 
 function* handleSeleniumServiceEvent(event) {
 
-    if(event && event.type === 'ON_CHROME_DRIVER_ERROR'){
+    if (event && event.type === 'ON_CHROME_DRIVER_ERROR') {
         yield put(actions.setParamstoDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, {
             chromeDriverVersion: event.chromeDriverVersion,
             chromeVersion: event.chromeVersion

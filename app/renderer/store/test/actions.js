@@ -16,9 +16,9 @@ const convertVariablesForTree = (variables, objectId = null) => {
 
     let result = [];
 
-    if(objectId && variables && variables.child && Array.isArray(variables.child) && variables.child.length > 0){
+    if (objectId && variables && variables.child && Array.isArray(variables.child) && variables.child.length > 0) {
         variables.child.map(item => {
-            if(
+            if (
                 item &&
                 item.objectId &&
                 item.objectId === objectId &&
@@ -26,14 +26,14 @@ const convertVariablesForTree = (variables, objectId = null) => {
                 item.objectIdResponse.result &&
                 Array.isArray(item.objectIdResponse.result) &&
                 item.objectIdResponse.result.length > 0
-            ){
+            ) {
                 item.objectIdResponse.result.map((variable) => {
-                    if(
+                    if (
                         variable &&
                         variable.name &&
                         variable.value &&
                         variable.value.type
-                    ){
+                    ) {
 
                         const element = {
                             name: variable.name,
@@ -42,7 +42,7 @@ const convertVariablesForTree = (variables, objectId = null) => {
                             children: convertVariablesForTree(item, variable.value.objectId || null),
                         };
 
-                        if(variable && variable.value && typeof variable.value.value !== 'undefined'){
+                        if (variable && variable.value && typeof variable.value.value !== 'undefined') {
                             element.value = variable.value.value;
                         }
 
@@ -53,27 +53,27 @@ const convertVariablesForTree = (variables, objectId = null) => {
         });
     }
   
-    if(variables && Array.isArray(variables) && variables.length > 0){
+    if (variables && Array.isArray(variables) && variables.length > 0) {
         variables.map(callFrame => {
-            if(callFrame && Array.isArray(callFrame) && callFrame.length > 0){
+            if (callFrame && Array.isArray(callFrame) && callFrame.length > 0) {
                 callFrame.map(scope => {
-                    if(scope && Array.isArray(scope) && scope.length > 0){
+                    if (scope && Array.isArray(scope) && scope.length > 0) {
                         scope.map(item => {
-                            if(
+                            if (
                                 item && 
                                 item.objectId && 
                                 item.objectIdResponse && 
                                 item.objectIdResponse.result && 
                                 Array.isArray(item.objectIdResponse.result) &&
                                 item.objectIdResponse.result.length > 0
-                            ){
+                            ) {
                                 item.objectIdResponse.result.map((variable) => {
-                                    if(
+                                    if (
                                         variable &&
                                         variable.name &&
                                         variable.value &&
                                         variable.value.type
-                                    ){
+                                    ) {
                                         const element = {
                                             name: variable.name,
                                             type: variable.value.type,
@@ -81,7 +81,7 @@ const convertVariablesForTree = (variables, objectId = null) => {
                                             children: convertVariablesForTree(item, variable.value.objectId || item.objectId || null),
                                         };
                                         
-                                        if(variable && variable.value && typeof variable.value.value !== 'undefined'){
+                                        if (variable && variable.value && typeof variable.value.value !== 'undefined') {
                                             element.value = variable.value.value;
                                         }
 

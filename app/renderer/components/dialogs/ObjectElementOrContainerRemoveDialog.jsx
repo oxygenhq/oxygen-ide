@@ -30,7 +30,7 @@ export default class ObjectElementOrContainerRemoveDialog extends React.PureComp
 
         let name = '';
         
-        if(props.parent && props.parent.name){
+        if (props.parent && props.parent.name) {
             name = props.parent.name;
         }
         
@@ -82,16 +82,16 @@ export default class ObjectElementOrContainerRemoveDialog extends React.PureComp
 
         let typeString = '';
 
-        if(type === 'container'){
+        if (type === 'container') {
             typeString = 'container';
         }
-        if(type === 'element'){
+        if (type === 'element') {
             typeString = 'element';
         }
         
         let parentName = '';
 
-        if(parent && parent.name){
+        if (parent && parent.name) {
             parentName = parent.name;
         }
 

@@ -1,9 +1,9 @@
 const getUniqueOsVersions = (browsers) => {
     const result = [];
 
-    if(browsers && Array.isArray(browsers) && browsers.length > 0){
+    if (browsers && Array.isArray(browsers) && browsers.length > 0) {
         browsers.map((item) => {
-            if(result.includes(item._osVersion)){
+            if (result.includes(item._osVersion)) {
                 // ignore
             } else {
                 result.push(item._osVersion);
@@ -11,7 +11,7 @@ const getUniqueOsVersions = (browsers) => {
         });
     }
 
-    if(result && Array.isArray(result) && result.length > 1){
+    if (result && Array.isArray(result) && result.length > 1) {
         return result.sort((a, b) => a.localeCompare(b, 'en-US', {numeric : true}));
     }
 
@@ -21,10 +21,10 @@ const getUniqueOsVersions = (browsers) => {
 const fillByOSVersion = (browsers, key, label) => {
     let result = [];
 
-    if(browsers && Array.isArray(browsers) && browsers.length > 0){
+    if (browsers && Array.isArray(browsers) && browsers.length > 0) {
         const uniqueOsVersions = getUniqueOsVersions(browsers);
 
-        if(uniqueOsVersions && Array.isArray(uniqueOsVersions) && uniqueOsVersions.length > 0){
+        if (uniqueOsVersions && Array.isArray(uniqueOsVersions) && uniqueOsVersions.length > 0) {
             uniqueOsVersions.map((item) => {    
                 const saveItem = item || 'Unknown';
                 const newKey = key+'-'+saveItem;
@@ -47,9 +47,9 @@ const fillByOSVersion = (browsers, key, label) => {
 const getUniqueOsName = (browsers) => {
     const result = [];
 
-    if(browsers && Array.isArray(browsers) && browsers.length > 0){
+    if (browsers && Array.isArray(browsers) && browsers.length > 0) {
         browsers.map((item) => {
-            if(result.includes(item._osName)){
+            if (result.includes(item._osName)) {
                 // ignore
             } else {
                 result.push(item._osName);
@@ -57,7 +57,7 @@ const getUniqueOsName = (browsers) => {
         });
     }
 
-    if(result && Array.isArray(result) && result.length > 1){
+    if (result && Array.isArray(result) && result.length > 1) {
         return result.sort((a, b) => a.localeCompare(b, 'en-US', {numeric : true}));
     }
 
@@ -67,10 +67,10 @@ const getUniqueOsName = (browsers) => {
 const fillByOSName = (browsers, key, label) => {
     let result = [];
     
-    if(browsers && Array.isArray(browsers) && browsers.length > 0){
+    if (browsers && Array.isArray(browsers) && browsers.length > 0) {
         const uniqueOsNames = getUniqueOsName(browsers);
                     
-        if(uniqueOsNames && Array.isArray(uniqueOsNames) && uniqueOsNames.length > 0){
+        if (uniqueOsNames && Array.isArray(uniqueOsNames) && uniqueOsNames.length > 0) {
             uniqueOsNames.map((item) => {
 
                 const newKey = key+'-'+item;
@@ -96,9 +96,9 @@ const fillByOSName = (browsers, key, label) => {
 const getUniqueVersions = (browsers) => {
     const result = [];
 
-    if(browsers && Array.isArray(browsers) && browsers.length > 0){
+    if (browsers && Array.isArray(browsers) && browsers.length > 0) {
         browsers.map((item) => {
-            if(result.includes(item._version)){
+            if (result.includes(item._version)) {
                 // ignore
             } else {
                 result.push(item._version);
@@ -106,7 +106,7 @@ const getUniqueVersions = (browsers) => {
         });
     }
 
-    if(result && Array.isArray(result) && result.length > 1){
+    if (result && Array.isArray(result) && result.length > 1) {
         return result.sort((a, b) => a.localeCompare(b, 'en-US', {numeric : true}));
     }
 
@@ -117,18 +117,18 @@ const fillByBrowserName = (browsers, apiName, key, label) => {
     let result = [];
     let items = [];
 
-    if(browsers && Array.isArray(browsers) && browsers.length > 0){
+    if (browsers && Array.isArray(browsers) && browsers.length > 0) {
         browsers.map((item) => {
-            if(item && item._apiName && item._apiName === apiName){
+            if (item && item._apiName && item._apiName === apiName) {
                 items.push(item);
             }
         });
     }
 
-    if(items && Array.isArray(items) && items.length > 0){
+    if (items && Array.isArray(items) && items.length > 0) {
         const uniqueVersions = getUniqueVersions(items);
 
-        if(uniqueVersions && Array.isArray(uniqueVersions) && uniqueVersions.length > 0){
+        if (uniqueVersions && Array.isArray(uniqueVersions) && uniqueVersions.length > 0) {
             uniqueVersions.map((item) => {    
                 const newKey = key+'-'+item;
                 const newLabel = label+' '+item;
@@ -153,9 +153,9 @@ const fillByBrowserName = (browsers, apiName, key, label) => {
 const getUniqueApiNames = (browsers) => {
     const result = [];
 
-    if(browsers && Array.isArray(browsers) && browsers.length > 0){
+    if (browsers && Array.isArray(browsers) && browsers.length > 0) {
         browsers.map((item) => {
-            if(result.includes(item._apiName)){
+            if (result.includes(item._apiName)) {
                 // ignore
             } else {
                 result.push(item._apiName);
@@ -163,7 +163,7 @@ const getUniqueApiNames = (browsers) => {
         });
     }
 
-    if(result && Array.isArray(result) && result.length > 1){
+    if (result && Array.isArray(result) && result.length > 1) {
         return result.sort((a, b) => a.localeCompare(b, 'en-US', {numeric : true}));
     }
 
@@ -173,14 +173,14 @@ const getUniqueApiNames = (browsers) => {
 export const creteBrowsersTree = (browsers) => {
     let result = [];
 
-    if(browsers && Array.isArray(browsers) && browsers.length > 0){
+    if (browsers && Array.isArray(browsers) && browsers.length > 0) {
         let uniqueApiNames = getUniqueApiNames(browsers);
 
-        if(uniqueApiNames && Array.isArray(uniqueApiNames) && uniqueApiNames.includes('firefox-unbranded')){
+        if (uniqueApiNames && Array.isArray(uniqueApiNames) && uniqueApiNames.includes('firefox-unbranded')) {
             uniqueApiNames = uniqueApiNames.filter((item) => item !== 'firefox-unbranded');
         }
 
-        if(uniqueApiNames && Array.isArray(uniqueApiNames) && uniqueApiNames.length > 0){
+        if (uniqueApiNames && Array.isArray(uniqueApiNames) && uniqueApiNames.length > 0) {
             result = uniqueApiNames.map((item) => {
                 return {
                     title: item.charAt(0).toUpperCase() + item.slice(1),
@@ -201,10 +201,10 @@ const fillByVersion = (devices, key, label) => {
     let result = [];
     
 
-    if(devices && Array.isArray(devices) && devices.length > 0){
+    if (devices && Array.isArray(devices) && devices.length > 0) {
         const uniqueVersions = getUniqueVersions(devices);
 
-        if(uniqueVersions && Array.isArray(uniqueVersions) && uniqueVersions.length > 0){
+        if (uniqueVersions && Array.isArray(uniqueVersions) && uniqueVersions.length > 0) {
             uniqueVersions.map((item) => {
 
                 const newKey = key+'-'+item;
@@ -227,9 +227,9 @@ const fillByVersion = (devices, key, label) => {
 const getUniqueNames = (devices) => {
     const result = [];
 
-    if(devices && Array.isArray(devices) && devices.length > 0){
+    if (devices && Array.isArray(devices) && devices.length > 0) {
         devices.map((item) => {
-            if(result.includes(item.name)){
+            if (result.includes(item.name)) {
                 // ignore
             } else {
                 result.push(item.name);
@@ -237,7 +237,7 @@ const getUniqueNames = (devices) => {
         });
     }
 
-    if(result && Array.isArray(result) && result.length > 1){
+    if (result && Array.isArray(result) && result.length > 1) {
         return result.sort((a, b) => a.localeCompare(b, 'en-US', {numeric : true}));
     }
 
@@ -248,18 +248,18 @@ const fillByDevicesName = (devices, apiName, key, label) => {
     let result = [];
     let items = [];
 
-    if(devices && Array.isArray(devices) && devices.length > 0){
+    if (devices && Array.isArray(devices) && devices.length > 0) {
         devices.map((item) => {
-            if(item && item._apiName && item._apiName === apiName){
+            if (item && item._apiName && item._apiName === apiName) {
                 items.push(item);
             }
         });
     }
 
-    if(items && Array.isArray(items) && items.length > 0){
+    if (items && Array.isArray(items) && items.length > 0) {
         const uniqueNames = getUniqueNames(items);
         
-        if(uniqueNames && Array.isArray(uniqueNames) && uniqueNames.length > 0){
+        if (uniqueNames && Array.isArray(uniqueNames) && uniqueNames.length > 0) {
             uniqueNames.map((item) => {
 
                 const newKey = key+'-'+item;
@@ -285,16 +285,16 @@ const fillByDevicesName = (devices, apiName, key, label) => {
 export const creteDevicesTree = (devices) => {
     let result = [];
     
-    if(devices && Array.isArray(devices) && devices.length > 0){
+    if (devices && Array.isArray(devices) && devices.length > 0) {
         
         const uniqueApiNames = getUniqueApiNames(devices);
 
-        if(uniqueApiNames){
+        if (uniqueApiNames) {
             result = uniqueApiNames.map((item) => {
 
                 let title = item;
 
-                if(title === 'android'){
+                if (title === 'android') {
                     title = 'Android';
                 }
 

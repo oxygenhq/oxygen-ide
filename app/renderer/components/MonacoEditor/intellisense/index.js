@@ -87,7 +87,7 @@ const arrdata = createModuleAndMethods(intellisenseJson);
 export default function () {
     try {
         monaco.languages.typescript.javascriptDefaults.addExtraLib(arrdata.join('\n'));
-    } catch(e){
+    } catch (e) {
         console.log('monaco.languages.typescript.javascriptDefaults error', e);
     }
     
@@ -96,7 +96,7 @@ export default function () {
             noSemanticValidation: true,
             noSyntaxValidation: true,
         });
-    } catch(e){
+    } catch (e) {
         console.log('monaco.languages.typescript.typescriptDefaults error', e);
     }
 }

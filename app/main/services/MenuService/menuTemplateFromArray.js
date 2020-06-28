@@ -19,7 +19,7 @@ const menuTemplateFromArray = (cmdHandler, menuItems) => {
     }
     for (var item of menuItems) {
         const clickHandler = (item, saveCmd) => {
-            if(saveCmd){
+            if (saveCmd) {
                 cmdHandler(saveCmd);
             }
         };

@@ -48,15 +48,15 @@ export default class LogViewer extends React.PureComponent<Props> {
         let newState = {};
         let maxWidth = 1;
   
-        if(logs && logs.map){
+        if (logs && logs.map) {
             logs.map((log) => {
                 const message = log.message || 'null';
                 const messageSplit = message.split('\n');
 
-                if(messageSplit && messageSplit.map){
+                if (messageSplit && messageSplit.map) {
                     messageSplit.map((item, i) => {
           
-                        if(
+                        if (
                             item &&
                             item.length &&
                             maxWidth < item.length
@@ -103,21 +103,21 @@ export default class LogViewer extends React.PureComponent<Props> {
             };
         }
 
-        if(lengthDiff || (diff && diff.length)){
+        if (lengthDiff || (diff && diff.length)) {
 
             const { logs } = nextProps;
 
             const lines = [];
   
-            if(logs && logs.map){
+            if (logs && logs.map) {
                 logs.map((log) => {
                     const message = log.message || 'null';
                     const messageSplit = message.split('\n');
   
-                    if(messageSplit && messageSplit.map){
+                    if (messageSplit && messageSplit.map) {
                         messageSplit.map((item, i) => {
               
-                            if(
+                            if (
                                 item &&
                                 item.length &&
                                 maxWidth < item.length
@@ -201,13 +201,13 @@ export default class LogViewer extends React.PureComponent<Props> {
       if (!this.state.copyValue) {
           let copyValue = '';
 
-          if(lines && lines.length && lines.length > 0){
+          if (lines && lines.length && lines.length > 0) {
               lines.map((line) => {
                   copyValue+=line.message+os.EOL;
               });
           }
       
-          if(copyValue){
+          if (copyValue) {
               this.setState({
                   keyKeys: ['Meta', 'c'],
                   copyValue: copyValue
@@ -223,7 +223,7 @@ export default class LogViewer extends React.PureComponent<Props> {
       const { refreshScroll, selected, copyValue, lines, maxWidth } = this.state;
     
       const getRowHeight = ({index}) => {
-          if(index){
+          if (index) {
               return 15;
           } else {
               return 20;

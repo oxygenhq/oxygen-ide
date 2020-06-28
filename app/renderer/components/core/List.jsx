@@ -44,7 +44,7 @@ export default class List extends React.PureComponent<ListProps> {
 
 
     deleteSingleLocator = (locator) => {
-        if(this.props.object && this.props.deleteLocator){
+        if (this.props.object && this.props.deleteLocator) {
             this.props.deleteLocator(this.props.object);
         }
     }
@@ -52,11 +52,11 @@ export default class List extends React.PureComponent<ListProps> {
     startEditSingleLocator = (locator) => {
         const { object, startEdit } = this.props;
 
-        if(object && startEdit){
+        if (object && startEdit) {
 
             const { locator, path } = object;
 
-            if(locator && path){
+            if (locator && path) {
                 startEdit(locator, path);
             } else {
                 console.warn('no locator or path');
@@ -69,11 +69,11 @@ export default class List extends React.PureComponent<ListProps> {
     
     startAdd = () => {
         const { object, startEdit } = this.props;
-        if(object && startEdit){
+        if (object && startEdit) {
             
             const { path } = object;
 
-            if(path){
+            if (path) {
                 startEdit('', path);
             } else {
                 console.warn('no path');
@@ -92,7 +92,7 @@ export default class List extends React.PureComponent<ListProps> {
         } = this.props;
 
         if (!data || !Array.isArray(data) || data.length === 0 || !data[0]) {
-            return(
+            return (
                 <Fragment>
                     {
                         !editing && 
@@ -154,8 +154,8 @@ export default class List extends React.PureComponent<ListProps> {
         );
     }
 
-    render(){
-        return(
+    render() {
+        return (
             <Fragment>
                 { this.renderInner() }
             </Fragment>

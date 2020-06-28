@@ -30,12 +30,12 @@ export default class CloudProvidersService extends ServiceBase {
 
         let cloudProviders;
 
-        if(
+        if (
             this.settings &&
             this.settings.cache &&
             this.settings.cache.settings &&
             this.settings.cache.settings.cloudProviders
-        ){
+        ) {
             cloudProviders = this.settings.cache.settings.cloudProviders;
         }
 
@@ -71,15 +71,15 @@ export default class CloudProvidersService extends ServiceBase {
         provider.updateSettings(settings);
     }
 
-    sortToBrowsersAndDevice(browsersAndDevices, providerName){
+    sortToBrowsersAndDevice(browsersAndDevices, providerName) {
 
         let browsers = [];
         let devices = [];
         
-        if(providerName === 'perfectoMobile'){
-            if(browsersAndDevices.devices){
+        if (providerName === 'perfectoMobile') {
+            if (browsersAndDevices.devices) {
                 
-                if(browsersAndDevices.devices && Array.isArray(browsersAndDevices.devices) && browsersAndDevices.devices.length > 0){
+                if (browsersAndDevices.devices && Array.isArray(browsersAndDevices.devices) && browsersAndDevices.devices.length > 0) {
                     
                     browsersAndDevices.devices.map((item, idx) => {
 
@@ -136,23 +136,23 @@ export default class CloudProvidersService extends ServiceBase {
                 }
             }
 
-            if(
+            if (
                 browsersAndDevices.browsers &&
                 Array.isArray(browsersAndDevices.browsers) &&
                 browsersAndDevices.browsers.length > 0
-            ){
+            ) {
                 browsersAndDevices.browsers.map((item) => {
                     if (item.browserName && item.browserName === 'Edge' && parseInt(item.browserVersion) === 81 && parseInt(item.osVersion) === 10) {
                         // com.perfecto.wfa.server.errors.ErrorCodeException: WFA-500-0131 - Failed to run init script on remote machine.  Details: ' failure status is : 3'
                         // Build info: version: 'unknown', revision: 'unknown', time: 'unknown'
                         // System info: host: 'a4a036fcf1ff', ip: '172.17.0.4', os.name: 'Linux', os.arch: 'amd64', os.version: '4.14.123-86.109.amzn1.x86_64', java.version: '11.0.2'
                         // Driver info: driver.version: WebiumDriver
-                    } else if(item.browserName && item.browserName === 'Internet Explorer' && parseInt(item.browserVersion) === 11){
+                    } else if (item.browserName && item.browserName === 'Internet Explorer' && parseInt(item.browserVersion) === 11) {
                         // com.perfecto.wfa.server.errors.ErrorCodeException: WFA-500-0000 - Internal Server Error  Details: 'Creating a new session failed.'
                         // Build info: version: 'unknown', revision: 'unknown', time: 'unknown'
                         // System info: host: 'cbd7e2169ec2', ip: '172.17.0.4', os.name: 'Linux', os.arch: 'amd64', os.version: '4.14.123-86.109.amzn1.x86_64', java.version: '11.0.2'
                         // Driver info: driver.version: WebiumDriver
-                    } else if(parseInt(item.browserVersion) > 81){
+                    } else if (parseInt(item.browserVersion) > 81) {
                         // not stable yet
                     } else {
                         browsers.push(new BrowserInfo({
@@ -166,26 +166,26 @@ export default class CloudProvidersService extends ServiceBase {
                 });
             }
         }
-        else if(providerName === 'sauceLabs'){
+        else if (providerName === 'sauceLabs') {
             console.log('~~browsersAndDevices sauceLabs', Object.keys(browsersAndDevices));
 
-            if(browsersAndDevices.browsers && Array.isArray(browsersAndDevices.browsers) && browsersAndDevices.browsers.length > 0){
+            if (browsersAndDevices.browsers && Array.isArray(browsersAndDevices.browsers) && browsersAndDevices.browsers.length > 0) {
                 // console.log('~~browsersAndDevices sauceLabs browsers', Object.keys(browsersAndDevices.browsers));
 
                 browsersAndDevices.browsers.map((item) => {
-                    if(browsersNames.includes(item.api_name)){
+                    if (browsersNames.includes(item.api_name)) {
 
                         let osName = '';
                         let osVersion = '';
 
-                        if(item.os){
-                            if(item.os.startsWith('Windows ')){
+                        if (item.os) {
+                            if (item.os.startsWith('Windows ')) {
                                 osName = 'Windows';
                                 osVersion = item.os.split('Windows ')[1];
-                            } else if(item.os.startsWith('Mac ')){
+                            } else if (item.os.startsWith('Mac ')) {
                                 osName = 'Mac';
                                 osVersion = item.os.split('Mac ')[1];
-                            } else if(item.os.startsWith('Linux')){
+                            } else if (item.os.startsWith('Linux')) {
                                 osName = 'Linux';
                                 osVersion = '';
                             } else {
@@ -231,40 +231,40 @@ export default class CloudProvidersService extends ServiceBase {
             }
 
         }
-        else if(providerName === 'testObject'){
-            if(browsersAndDevices.devices){
+        else if (providerName === 'testObject') {
+            if (browsersAndDevices.devices) {
                 // console.log('~~browsersAndDevices sauceLabs devices', Object.keys(browsersAndDevices.devices));
 
-                if(browsersAndDevices.devices && Array.isArray(browsersAndDevices.devices) && browsersAndDevices.devices.length > 0){
+                if (browsersAndDevices.devices && Array.isArray(browsersAndDevices.devices) && browsersAndDevices.devices.length > 0) {
                     // console.log('~~device[0]', browsersAndDevices.devices[0]);
 
                     browsersAndDevices.devices.map((item) => {
-                        if(item.deviceFamily && item.deviceFamily.toLowerCase && devicesNames.includes(item.deviceFamily.toLowerCase())){
+                        if (item.deviceFamily && item.deviceFamily.toLowerCase && devicesNames.includes(item.deviceFamily.toLowerCase())) {
 
                             let osName = '';
                             let osVersion = '';
                             let apiName = '';
         
-                            if(item.os){
+                            if (item.os) {
 
                                 // console.log('==');
                                 // console.log('item.os', item.os);
                                 // console.log('item', item);
                                 // console.log('==');
 
-                                if(item.os.startsWith('Mac ')){
+                                if (item.os.startsWith('Mac ')) {
                                     apiName = 'iOS';
                                     osName = 'Mac';
                                     osVersion = item.os.split('Mac ')[1];
-                                } else if(item.os === 'IOS'){
+                                } else if (item.os === 'IOS') {
                                     apiName = 'iOS';
                                     osName = 'Mac';
                                     osVersion = item.osVersion;
-                                } else if(item.os.startsWith('Linux')){
+                                } else if (item.os.startsWith('Linux')) {
                                     apiName = 'android';
                                     osName = 'Linux';
                                     osVersion = '';
-                                } else if(item.os === 'ANDROID'){
+                                } else if (item.os === 'ANDROID') {
                                     apiName = 'android';
                                     osName = 'Linux';
                                     osVersion = item.osVersion;
@@ -313,22 +313,22 @@ export default class CloudProvidersService extends ServiceBase {
                 }
             }
         }
-        else if(browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0 && providerName){
+        else if (browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0 && providerName) {
             browsersAndDevices.map((item) => {
-                if(item){
-                    if(providerName === 'sauceLabs'){
-                        if(devicesNames.includes(item.api_name)){
+                if (item) {
+                    if (providerName === 'sauceLabs') {
+                        if (devicesNames.includes(item.api_name)) {
 
                             let osName = '';
                             let osVersion = '';
                             let apiName = '';
 
-                            if(item.os){
-                                if(item.os.startsWith('Mac ')){
+                            if (item.os) {
+                                if (item.os.startsWith('Mac ')) {
                                     apiName = 'iOS';
                                     osName = 'Mac';
                                     osVersion = item.os.split('Mac ')[1];
-                                } else if(item.os.startsWith('Linux')){
+                                } else if (item.os.startsWith('Linux')) {
                                     apiName = 'android';
                                     osName = 'Linux';
                                     osVersion = '';
@@ -349,19 +349,19 @@ export default class CloudProvidersService extends ServiceBase {
                                 osName: osName,
                                 osVersion: osVersion
                             }));
-                        } else if(browsersNames.includes(item.api_name)){
+                        } else if (browsersNames.includes(item.api_name)) {
 
                             let osName = '';
                             let osVersion = '';
 
-                            if(item.os){
-                                if(item.os.startsWith('Windows ')){
+                            if (item.os) {
+                                if (item.os.startsWith('Windows ')) {
                                     osName = 'Windows';
                                     osVersion = item.os.split('Windows ')[1];
-                                } else if(item.os.startsWith('Mac ')){
+                                } else if (item.os.startsWith('Mac ')) {
                                     osName = 'Mac';
                                     osVersion = item.os.split('Mac ')[1];
-                                } else if(item.os.startsWith('Linux')){
+                                } else if (item.os.startsWith('Linux')) {
                                     osName = 'Linux';
                                     osVersion = '';
                                 } else {
@@ -381,24 +381,24 @@ export default class CloudProvidersService extends ServiceBase {
                         } else {
                             console.log('Unsupported item '+ JSON.stringify(item));
                         }
-                    } else if(providerName === 'lambdaTest'){
+                    } else if (providerName === 'lambdaTest') {
 
-                        if(item){
+                        if (item) {
                             
                             let osName = '';
                             let osVersion = '';
 
-                            if(item.platform){
-                                if(item.platform.startsWith('Windows ')){
+                            if (item.platform) {
+                                if (item.platform.startsWith('Windows ')) {
                                     osName = 'Windows';
                                     osVersion = item.platform.split('Windows ')[1];
-                                } else if(item.platform.startsWith('macOS ')){
+                                } else if (item.platform.startsWith('macOS ')) {
                                     osName = 'macOS';
                                     osVersion = item.platform.split('macOS ')[1];
-                                } else if(item.platform.startsWith('MacOS ')){
+                                } else if (item.platform.startsWith('MacOS ')) {
                                     osName = 'macOS';
                                     osVersion = item.platform.split('MacOS ')[1];
-                                } else if(item.platform.startsWith('OS X ')){
+                                } else if (item.platform.startsWith('OS X ')) {
                                     osName = 'OS X';
                                     osVersion = item.platform.split('OS X ')[1];
                                 } else {
@@ -406,19 +406,19 @@ export default class CloudProvidersService extends ServiceBase {
                                 }
                             }
 
-                            if(item.browsers && Array.isArray(item.browsers) && item.browsers.length > 0){
+                            if (item.browsers && Array.isArray(item.browsers) && item.browsers.length > 0) {
                                 item.browsers.map((browser) => {
 
-                                    if(browser.browser_name && browser.browser_name === 'Firefox' && parseInt(browser.version) < 55){
+                                    if (browser.browser_name && browser.browser_name === 'Firefox' && parseInt(browser.version) < 55) {
                                         // ignore  < 55
-                                    } else if(browser.browser_name && browser.browser_name.toLowerCase() === 'chrome' && parseInt(browser.version) < 43){
+                                    } else if (browser.browser_name && browser.browser_name.toLowerCase() === 'chrome' && parseInt(browser.version) < 43) {
                                         // ignore  < 43
-                                    } else if(
+                                    } else if (
                                         browser.browser_name &&
                                         browser.browser_name === 'Firefox' &&
                                         parseInt(browser.version) < 59 &&
                                         osName === 'OS X'
-                                    ){
+                                    ) {
                                         // ignore lambdatest vm fails on bootstrap
                                     }
                                     else {
@@ -442,13 +442,13 @@ export default class CloudProvidersService extends ServiceBase {
             browsersAndDevices && 
             browsersAndDevices.devices && 
             browsersAndDevices.browsers
-        ){
-            if(Array.isArray(browsersAndDevices.devices) && browsersAndDevices.devices.length > 0){
+        ) {
+            if (Array.isArray(browsersAndDevices.devices) && browsersAndDevices.devices.length > 0) {
                 browsersAndDevices.devices.map((item) => {
                     let version = '';
                     let osVersion = '';
 
-                    if(item && item.test_environment && item.test_environment.version){
+                    if (item && item.test_environment && item.test_environment.version) {
                         version = item.test_environment.version;
                     }
 
@@ -462,17 +462,17 @@ export default class CloudProvidersService extends ServiceBase {
                     }));
                 });
             }
-            if(Array.isArray(browsersAndDevices.browsers) && browsersAndDevices.browsers.length > 0){
+            if (Array.isArray(browsersAndDevices.browsers) && browsersAndDevices.browsers.length > 0) {
                 browsersAndDevices.browsers.map((item) => {
                     let deviceName = '';
                     let platform = item.platform;
                     let name = item.name;
 
-                    if(item && item.deviceName){
+                    if (item && item.deviceName) {
                         deviceName = item.deviceName;
                     }
 
-                    if(item.name === 'chrome'){
+                    if (item.name === 'chrome') {
                         name = 'Chrome';
                     }
 
@@ -493,52 +493,52 @@ export default class CloudProvidersService extends ServiceBase {
                     const XP = 'XP';
                     
 
-                    if(item.platform === YOSEMITE){
+                    if (item.platform === YOSEMITE) {
                         platform = MACOS;
                         deviceName = YOSEMITE;
                     }
-                    if(item.platform === CAPITAN){
+                    if (item.platform === CAPITAN) {
                         platform = MACOS;
                         deviceName = CAPITAN;
                     }
-                    if(item.platform === CATALINA){
+                    if (item.platform === CATALINA) {
                         platform = MACOS;
                         deviceName = CATALINA;
                     }
-                    if(item.platform === MOJAVE){
+                    if (item.platform === MOJAVE) {
                         platform = MACOS;
                         deviceName = MOJAVE;
                     }
-                    if(item.platform === SIERRA){
+                    if (item.platform === SIERRA) {
                         platform = MACOS;
                         deviceName = SIERRA;
                     }
-                    if(item.platform === HIGH_SIERRA){
+                    if (item.platform === HIGH_SIERRA) {
                         platform = MACOS;
                         deviceName = HIGH_SIERRA;
                     }
-                    if(item.platform === MAVERICKS){
+                    if (item.platform === MAVERICKS) {
                         platform = MACOS;
                         deviceName = MAVERICKS;
                     }
 
-                    if(item.platform === VISTA){
+                    if (item.platform === VISTA) {
                         platform = WINDOWS;
                         deviceName = VISTA;
                     }
-                    if(item.platform === WIN10){
+                    if (item.platform === WIN10) {
                         platform = WINDOWS;
                         deviceName = '10';
                     }
-                    if(item.platform === WIN8_1){
+                    if (item.platform === WIN8_1) {
                         platform = WINDOWS;
                         deviceName = '8_1';
                     }
-                    if(item.platform === WIN8){
+                    if (item.platform === WIN8) {
                         platform = WINDOWS;
                         deviceName = '8';
                     }
-                    if(item.platform === XP){
+                    if (item.platform === XP) {
                         platform = WINDOWS;
                         deviceName = XP;
                     }
@@ -573,23 +573,23 @@ export default class CloudProvidersService extends ServiceBase {
                 try {
                     const browsersAndDevices = await provider.getBrowsersAndDevices(userName, key);
                 
-                    if(providerName === 'sauceLabs'){
+                    if (providerName === 'sauceLabs') {
                         // sauceLabs
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
-                    } else if(providerName === 'testObject'){
+                    } else if (providerName === 'testObject') {
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                     } else if (providerName === 'perfectoMobile') {
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
-                    } else if(
+                    } else if (
                         browsersAndDevices && 
                         browsersAndDevices.platforms &&
                         browsersAndDevices.platforms.Desktop &&                         
                         Array.isArray(browsersAndDevices.platforms.Desktop) && 
                         browsersAndDevices.platforms.Desktop.length > 0
-                    ){
+                    ) {
                         // lambdaTest
                         return this.sortToBrowsersAndDevice(browsersAndDevices.platforms.Desktop, providerName);
-                    } else if(providerName === 'testingBot'){
+                    } else if (providerName === 'testingBot') {
                         // testingBot
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                     } else {

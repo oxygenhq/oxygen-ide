@@ -56,9 +56,9 @@ export default class RecorderService extends ServiceBase {
             } else {
                 hostname = 'localhost';
             }
-            try{
-                this.httpSrv.listen(PORT_HTTP, hostname, function(){ });
-            } catch (e){
+            try {
+                this.httpSrv.listen(PORT_HTTP, hostname, function() { });
+            } catch (e) {
                 Sentry.captureException(e);
                 console.error('Unable to open ' + hostname + ':' + PORT_HTTP, e);
             }
@@ -147,13 +147,13 @@ export default class RecorderService extends ServiceBase {
     }
 
     timer = () => {
-        if(this.lastExtensionTime){
+        if (this.lastExtensionTime) {
             let newCanRecord = false;
             const now = Date.now();
             const diff = now - this.lastExtensionTime;
     
     
-            if(diff && diff > EXTENSION_CHECK_TIMEOUT ){
+            if (diff && diff > EXTENSION_CHECK_TIMEOUT ) {
                 newCanRecord = false;
             } else {
                 newCanRecord = true;

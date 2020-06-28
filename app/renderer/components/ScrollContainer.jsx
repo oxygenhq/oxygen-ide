@@ -38,7 +38,7 @@ export default class ScrollContainer extends React.Component<Props> {
             this.scrollWrap.scrollTop = 0;
         }
 
-        if (nextProps.refreshScrollBottom !== this.props.refreshScrollBottom && this.scroller && this.scrollWrap){
+        if (nextProps.refreshScrollBottom !== this.props.refreshScrollBottom && this.scroller && this.scrollWrap) {
             this.scrollWrap.scrollTop = this.scrollWrap.scrollHeight;
         }
 

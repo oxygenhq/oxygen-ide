@@ -44,14 +44,14 @@ export function* loadProjectSettings({ payload }) {
     yield put(settingsActions._loadProjectSettings_Success(path, settings));
 }
 
-export function* testUpdateBreakpoints({ payload }){
+export function* testUpdateBreakpoints({ payload }) {
         
     const FONT_SIZE_MIN = 12;
     const FONT_SIZE_MAX = 36;
 
     const settings = yield select(state => state.settings);
     
-    if(
+    if (
         settings && 
         settings.fontSize && 
         parseInt(settings.fontSize) && 
@@ -70,9 +70,9 @@ export function* testUpdateBreakpoints({ payload }){
 
     const testBreakpoints = test.breakpoints;
 
-    if(isRunning){
+    if (isRunning) {
         // right now run test
-        if(testBreakpoints && testBreakpoints[path]){
+        if (testBreakpoints && testBreakpoints[path]) {
             // the file where breackpoints changed in files, where test runs
 
             yield put(testActions.waitUpdateBreakpoints(true));
@@ -83,7 +83,7 @@ export function* testUpdateBreakpoints({ payload }){
     }
 }
 
-export function* firstOpen({ payload }){
+export function* firstOpen({ payload }) {
     yield put(tabActions.addTab('welcome', 'Welcome'));
     yield put(tabActions.setActiveTab('welcome', 'Welcome'));
     yield put(editorActions.setActiveFile('welcome', 'Welcome'));
@@ -95,7 +95,7 @@ export function* tmpAddFile({ payload }) {
         const { key, name, content } = payload;
         try {            
             const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'addFile', [key, name, content]);
-            if(newSettings){
+            if (newSettings) {
                 yield put(settingsActions.mergeSettings(newSettings));
             }
         } catch (err) {
@@ -112,7 +112,7 @@ export function* tmpRemoveFile({ payload }) {
         try {            
             const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'removeFile', [key, name]);
             
-            if(newSettings){
+            if (newSettings) {
                 yield put(settingsActions.mergeSettings(newSettings));
             }
         } catch (err) {
@@ -128,7 +128,7 @@ export function* tmpUpdateFileContent({ payload }) {
         try {
             const newSettings = yield call(services.mainIpc.call, 'ElectronService', 'updateFileContent', [path, name, content]);
             
-            if(newSettings){
+            if (newSettings) {
                 yield put(settingsActions.mergeSettings(newSettings));
             }
         } catch (err) {
@@ -143,13 +143,13 @@ export function* handleMainMenuEvents({ payload }) {
     if (!cmd) {
         return;
     }
-    if(cmd === Const.MENU_CMD_VIEW_ZOOM_IN) {
+    if (cmd === Const.MENU_CMD_VIEW_ZOOM_IN) {
         yield put(settingsActions.zoomIn());
     }
-    if(cmd === Const.MENU_CMD_VIEW_ZOOM_OUT) {
+    if (cmd === Const.MENU_CMD_VIEW_ZOOM_OUT) {
         yield put(settingsActions.zoomOut());
     }
-    if(cmd === Const.MENU_CMD_VIEW_ZOOM_TO_DEFAULT) {
+    if (cmd === Const.MENU_CMD_VIEW_ZOOM_TO_DEFAULT) {
         yield put(settingsActions.zoomToDefault());
     }
 }

@@ -64,7 +64,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
 
         const same = n.name === t.name && n.path === t.path && n.type === t.type;
         
-        if(!same){
+        if (!same) {
             newState = {...DEFAULT_STATE};
         }
 
@@ -83,7 +83,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
         const { object } = this.props;
         const { path } = object;
 
-        if(this.props.addLocator){
+        if (this.props.addLocator) {
             this.props.addLocator(path, name);
         }
     }
@@ -92,7 +92,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
         const { object } = this.props;
         const { path } = object;
 
-        if(this.props.addArrayObjectLocator){
+        if (this.props.addArrayObjectLocator) {
             this.props.addArrayObjectLocator(path, name);
         }
     }
@@ -102,7 +102,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
         let newSelectedLocatorName;
         let newSelectedLocatorIndex;
 
-        if(selectedName === selectedLocatorName){
+        if (selectedName === selectedLocatorName) {
             newSelectedLocatorName = null;
             newSelectedLocatorIndex = null;
         } else {
@@ -122,7 +122,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
         let newSelectedArrayObjectLocatorIndex;
         let newSelectedArrayObjectLocatorName;
 
-        if(index === selectedArrayObjectLocatorIndex){
+        if (index === selectedArrayObjectLocatorIndex) {
             newSelectedArrayObjectLocatorIndex = null;
             newSelectedArrayObjectLocatorName = null;
         } else {
@@ -141,7 +141,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
         const { object } = this.props;
         const { path } = object;
 
-        if(this.props.removeObjectOrFolder){
+        if (this.props.removeObjectOrFolder) {
             this.props.removeObjectOrFolder(path, name);
         
             this.setState({
@@ -156,7 +156,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
         const { object } = this.props;
         const { path } = object;
 
-        if(this.props.removeArrayObjectLocator){
+        if (this.props.removeArrayObjectLocator) {
             this.props.removeArrayObjectLocator(path, id);
         
             this.setState({
@@ -187,7 +187,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
                 arrayObjectEditing: true
             });
 
-        } catch(error) {
+        } catch (error) {
             console.warn('startEditArrayObject error', error);
         }
     }
@@ -205,7 +205,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
             selectedLocatorName: null
         },
         () => {
-            if(this.props.updateLocator){
+            if (this.props.updateLocator) {
                 this.props.updateLocator(path, name, originStr);
             }
         });
@@ -221,7 +221,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
             selectedLocatorIndex: null
         },
         () => {
-            if(this.props.moveLocator){
+            if (this.props.moveLocator) {
                 this.props.moveLocator(path, name, direction, selectedLocatorIndex);
             }
         });    
@@ -236,7 +236,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           selectedArrayObjectLocatorIndex: null
       },
       () => {
-          if(this.props.moveArrayObjectLocator){
+          if (this.props.moveArrayObjectLocator) {
               this.props.moveArrayObjectLocator(path, index, direction);
           }
       });    
@@ -252,7 +252,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           originPath: null
       },
       () => {
-          if(this.props.updateLocatorValue){
+          if (this.props.updateLocatorValue) {
               this.props.updateLocatorValue(originPath, name);
           }
       });
@@ -263,7 +263,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
       const { path } = object;
       const { arrayObjectOriginIndex } = this.state;
 
-      if(this.props.updateArrayObjecLocatorValue){
+      if (this.props.updateArrayObjecLocatorValue) {
           this.props.updateArrayObjecLocatorValue(path, name, arrayObjectOriginIndex);
       }
 
@@ -314,7 +314,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           selectedArrayObjectLocatorIndex
       } = this.state;
 
-      if(object && object.children && object.children.length) {
+      if (object && object.children && object.children.length) {
           return (
               <LocatorsChanger 
                   moveLocator={this.moveLocator}
@@ -333,8 +333,8 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           );
       }
 
-      if(object && object.children && object.children.length === 0) {
-          return(
+      if (object && object.children && object.children.length === 0) {
+          return (
               <LocatorsChanger 
                   moveLocator={this.moveLocator}
                   startEdit={this.startEdit}
@@ -346,7 +346,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
       }
 
       if (object && object.hasOwnProperty('locator') && this.state.editing) {
-          return(
+          return (
               <LocatorsChanger 
                   moveLocator={this.moveLocator}
                   startEdit={this.startEdit}
@@ -363,14 +363,14 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           );
       }
 
-      if (object && object.hasOwnProperty('locator') && Array.isArray(object.locator)){
+      if (object && object.hasOwnProperty('locator') && Array.isArray(object.locator)) {
       
           let length = 0;
-          if(object && object.locator && object.locator.length){
+          if (object && object.locator && object.locator.length) {
               length = object.locator.length;
           }
 
-          return(
+          return (
               <LocatorsChanger
                   selectedLocatorName = {selectedArrayObjectLocatorIndex}
                   selectedLocatorIndex = {selectedArrayObjectLocatorIndex}
@@ -399,7 +399,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           selectedArrayObjectLocatorIndex
       } = this.state;
     
-      if(object && object.children && object.children.length) {
+      if (object && object.children && object.children.length) {
           return (
               <div className="list list-auto-height">
                   { object.children.map( (itm, index) => 
@@ -422,7 +422,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           );
       }
 
-      if(object && object.children && object.children.length === 0) {
+      if (object && object.children && object.children.length === 0) {
           return (
               <div className="list list-auto-height">
                   <EmptyList />
@@ -434,7 +434,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           return null;
       }
 
-      if(Array.isArray(object.locator) && object.locator.length){
+      if (Array.isArray(object.locator) && object.locator.length) {
           return (
               <Fragment>
                   <div className="list list-auto-height">
@@ -459,7 +459,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           );
       }
     
-      if(Array.isArray(object.locator) && object.locator.length === 0) {
+      if (Array.isArray(object.locator) && object.locator.length === 0) {
           return (
               <div className="list list-auto-height">
                   <EmptyList />
@@ -467,7 +467,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           );
       }
 
-      if(typeof object.locator === 'string'){
+      if (typeof object.locator === 'string') {
           const locators = [object.locator];
           return (
               <Fragment>

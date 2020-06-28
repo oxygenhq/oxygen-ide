@@ -8,7 +8,7 @@ type Props = {
 export default class ChromeDriverDownloadingSuccessDialog extends React.PureComponent<Props> {
 
     close = () => {
-        if(this.props.onClose){
+        if (this.props.onClose) {
             this.props.onClose();
         }
     }

@@ -22,11 +22,11 @@ export default class SauceLabsProvider extends CloudProviderBase {
         return this.isRunning;
     }
 
-    updateSettings(settings){
+    updateSettings(settings) {
         this.settings=settings;
     }
 
-    getBrowsers(){
+    getBrowsers() {
         return new Promise((resolve, reject) => {
             return fetch('https://saucelabs.com/rest/v1/info/platforms/webdriver')
                 .then(response =>  resolve(response.json()))
@@ -35,7 +35,7 @@ export default class SauceLabsProvider extends CloudProviderBase {
     }
     
 
-    async getUser(){
+    async getUser() {
 
         let errorMessage = 'SauceLabs: invalid credentials';
 
@@ -43,9 +43,9 @@ export default class SauceLabsProvider extends CloudProviderBase {
             
             let fetchFn;
 
-            if(typeof fetch === 'function'){
+            if (typeof fetch === 'function') {
                 fetchFn = fetch;
-            } else if(fetch && fetch.default && typeof fetch.default === 'function'){
+            } else if (fetch && fetch.default && typeof fetch.default === 'function') {
                 fetchFn = fetch.default;
             } else {
                 console.log('fetchFn not found');
@@ -63,16 +63,16 @@ export default class SauceLabsProvider extends CloudProviderBase {
             
             const responseJson = await response.json();
             
-            if(
+            if (
                 response &&
                 response.status === 404 &&
                 responseJson &&
                 responseJson.message
-            ){
+            ) {
                 errorMessage += ' '+responseJson.message;
             }
 
-            if(
+            if (
                 response &&
                 response.status === 200 &&
                 responseJson &&
@@ -113,11 +113,11 @@ export default class SauceLabsProvider extends CloudProviderBase {
             throw new Error('"settings" must not be null');
         }
 
-        if(!this.settings.username){
+        if (!this.settings.username) {
             throw new Error('"username" must not be null');
         }
 
-        if(!this.settings.accessKey){
+        if (!this.settings.accessKey) {
             throw new Error('"accessKey" must not be null');
         }
 

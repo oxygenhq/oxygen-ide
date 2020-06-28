@@ -57,7 +57,7 @@ export default (state = defaultState, action, dispatch) => {
         };
 
     // WB_OPEN_FILE_SUCCESS
-    case success(ActionTypes.WB_OPEN_FILE):{
+    case success(ActionTypes.WB_OPEN_FILE): {
         if (error) {
             message.error(error.message);
         }
@@ -68,7 +68,7 @@ export default (state = defaultState, action, dispatch) => {
         };
     }
     // WB_OPEN_FILE_FAILURE
-    case failure(ActionTypes.WB_OPEN_FILE):{
+    case failure(ActionTypes.WB_OPEN_FILE): {
         if (error) {
             message.error(error.message);
         }

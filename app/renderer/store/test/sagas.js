@@ -35,69 +35,69 @@ export default function* root() {
     ]);
 }
 
-function* setTestProvider({payload}){
+function* setTestProvider({payload}) {
     const testProvider = payload.value;
-    if(testProvider === 'Local'){
+    if (testProvider === 'Local') {
         // local
         yield put(testActions.setTestMode('web'));
     } else {
         // cloud
         const testProviders = yield select(state => state.settings.cloudProvidesBrowsersAndDevices);
 
-        if(testProviders && testProviders[testProvider]){
+        if (testProviders && testProviders[testProvider]) {
             const providerData = testProviders[testProvider];
-            if(providerData && providerData.browsersTree && Array.isArray(providerData.browsersTree) && providerData.browsersTree.length > 0){
+            if (providerData && providerData.browsersTree && Array.isArray(providerData.browsersTree) && providerData.browsersTree.length > 0) {
                 yield put(testActions.setTestMode('web'));
-            } else if(providerData && providerData.devicesTree && Array.isArray(providerData.devicesTree) && providerData.devicesTree.length > 0){
+            } else if (providerData && providerData.devicesTree && Array.isArray(providerData.devicesTree) && providerData.devicesTree.length > 0) {
                 yield put(testActions.setTestMode('mob'));
             }
         }        
     }
 }
 
-function* setTestMode({payload}){
+function* setTestMode({payload}) {
     const { value } = payload;
     const testMode = value;
     const testProvider = yield select(state => state.test.runtimeSettings.testProvider);
-    if(typeof testProvider !== 'undefined' && testProvider === ''){
+    if (typeof testProvider !== 'undefined' && testProvider === '') {
         // local
-        if(testMode === 'web'){
+        if (testMode === 'web') {
             const browsers = yield select(state => state.test.browsers);
-            if(browsers && Array.isArray(browsers) && browsers.length > 0){
+            if (browsers && Array.isArray(browsers) && browsers.length > 0) {
                 yield put(testActions.setTestTarget(browsers[0].id));
             }
         }
     } else {
-        if(testMode && testProvider){
+        if (testMode && testProvider) {
             // cloud
             const testProviders = yield select(state => state.settings.cloudProvidesBrowsersAndDevices);
-            if(testProviders && testProviders[testProvider]){
+            if (testProviders && testProviders[testProvider]) {
                 const providerData = testProviders[testProvider];
                 
-                if(testMode === 'web'){
+                if (testMode === 'web') {
                     let browser = '';
-                    if(testProvider === 'lambdaTest'){
+                    if (testProvider === 'lambdaTest') {
                         browser = 'Chrome';
-                    } else if(testProvider === 'testingBot'){
+                    } else if (testProvider === 'testingBot') {
                         browser = 'Chrome';
-                    } else if(testProvider === 'sauceLabs'){
+                    } else if (testProvider === 'sauceLabs') {
                         browser = 'chrome';
-                    } else if(testProvider === 'perfectoMobile'){
+                    } else if (testProvider === 'perfectoMobile') {
                         browser = 'Chrome';
                     }
 
-                    if(browser && providerData.browsersTree){
+                    if (browser && providerData.browsersTree) {
                         const target = getBrowsersTarget(providerData.browsersTree, browser);
-                        if(target){
+                        if (target) {
                             yield put(testActions.setTestTarget(target));
                         }
                     }
                 }
                 
-                if(testMode === 'mob'){
-                    if(providerData && providerData.devicesTree){
+                if (testMode === 'mob') {
+                    if (providerData && providerData.devicesTree) {
                         const target = getDevicesTarget(providerData.devicesTree, 'android');
-                        if(target){
+                        if (target) {
                             yield put(testActions.setTestTarget(target));
                         }
                     }
@@ -143,18 +143,18 @@ function* handleTestRunnerServiceEvent(event) {
 
         const { active } = yield select(state => state.logger);
 
-        if(active && active === 'variables'){
+        if (active && active === 'variables') {
             yield put(loggerActions.setActiveLogger('general'));
         }
 
-        if(event && event.result && event.result.status){
-            if( event.result.status ==='passed'){
+        if (event && event.result && event.result.status) {
+            if ( event.result.status ==='passed') {
                 yield put(editorActions.resetActiveLines());
             }
             
             let duration = 0;
 
-            if(event.result.duration){
+            if (event.result.duration) {
                 duration = event.result.duration;
             }
             
@@ -167,18 +167,18 @@ function* handleTestRunnerServiceEvent(event) {
                 call(services.mainIpc.call, 'AnalyticsService', 'playStop', [summary]),
                 deviceDiscoveryServiceSaveStart()
             ]);
-        } else if(event && event.error){
+        } else if (event && event.error) {
             let message = 'Error: ';
             const error = event.error;
 
-            if(error.message){
+            if (error.message) {
                 message += error.message;
             }
             
-            if(error.code){
+            if (error.code) {
                 message += ' code: '+error.code;
             }
-            if(error.column){
+            if (error.column) {
                 message += ' column: '+error.column;
             }
 
@@ -195,7 +195,7 @@ function* handleTestRunnerServiceEvent(event) {
 
         let variables = null;
 
-        if(event && event.variables){
+        if (event && event.variables) {
             variables = event.variables;
         }
 
@@ -234,12 +234,12 @@ function* handleDeviceDiscoveryServiceEvent(event) {
     }
     else if (event.type === 'DEVICE_DISCONNECTED') {
         yield put(testActions.removeDevice(event.device));
-    } else if(event.type === 'XCODE_ERROR'){
+    } else if (event.type === 'XCODE_ERROR') {
         yield put(wbActions.setXCodeError());
     }
 }
 
-export function* runItem(itemsLength, browsersList, inputCurrentItem, saveMainFile, breakpoints, runtimeSettingsClone, runSettings){
+export function* runItem(itemsLength, browsersList, inputCurrentItem, saveMainFile, breakpoints, runtimeSettingsClone, runSettings) {
     let currentItem = inputCurrentItem;
 
     console.log('---');
@@ -247,7 +247,7 @@ export function* runItem(itemsLength, browsersList, inputCurrentItem, saveMainFi
     console.log('itemsLength', itemsLength);
     console.log('---');
 
-    if(currentItem < itemsLength){
+    if (currentItem < itemsLength) {
         const browser = browsersList[currentItem];
         console.log('browser', browser);
         
@@ -278,7 +278,7 @@ export function* startTestAll({ payload }) {
     let file;
     let saveMainFile;
 
-    if (editor && editor.activeFile){
+    if (editor && editor.activeFile) {
         file = yield select(state => state.fs.files[editor.activeFile]);
         saveMainFile = editor.activeFile;
     }
@@ -310,7 +310,7 @@ export function* startTestAll({ payload }) {
         ...generalSettings
     };
 
-    if(file && file.ext && file.ext === '.feature'){
+    if (file && file.ext && file.ext === '.feature') {
         runtimeSettingsClone.framework = 'cucumber';
     }
 
@@ -323,19 +323,19 @@ export function* startTestAll({ payload }) {
     if (runtimeSettings.testTarget && runtimeSettings.testMode === 'mob') {
         const devices = yield select(state => state.test.devices);
         const targetDevice = devices.find(x => x.id === runtimeSettings.testTarget);
-        if(targetDevice){
+        if (targetDevice) {
             runtimeSettingsClone.testTarget = targetDevice;
         }
     }
 
     const rootPath = yield select(state => state.fs.rootPath);
-    if(rootPath && typeof rootPath === 'string'){
+    if (rootPath && typeof rootPath === 'string') {
         runtimeSettingsClone.rootPath = rootPath;
     }
 
     const fsTree = yield select(state => state.fs.tree);
 
-    if(fsTree && fsTree.data && Array.isArray(fsTree.data) && fsTree.data.length > 0){
+    if (fsTree && fsTree.data && Array.isArray(fsTree.data) && fsTree.data.length > 0) {
         
         const OXYGEN_CONFIG_FILE_NAME = 'oxygen.conf';
         const OXYGEN_ENV_FILE_NAME = 'oxygen.env';
@@ -346,7 +346,7 @@ export function* startTestAll({ payload }) {
         let oxPageObjectFile = null;
 
         fsTree.data.map((item) => {
-            if(
+            if (
                 item && 
                 item.type && 
                 item.type === 'file' && 
@@ -355,26 +355,26 @@ export function* startTestAll({ payload }) {
                 typeof item.path === 'string' && 
                 item.name && 
                 typeof item.name === 'string'
-            ){
-                if(item.name.startsWith(OXYGEN_CONFIG_FILE_NAME)){
+            ) {
+                if (item.name.startsWith(OXYGEN_CONFIG_FILE_NAME)) {
                     oxConfigFile = item.path;
                 }
-                if(item.name.startsWith(OXYGEN_ENV_FILE_NAME)){
+                if (item.name.startsWith(OXYGEN_ENV_FILE_NAME)) {
                     oxEnvFile = item.path;
                 }
-                if(item.name.startsWith(OXYGEN_PAGE_OBJECT_FILE_NAME)){
+                if (item.name.startsWith(OXYGEN_PAGE_OBJECT_FILE_NAME)) {
                     oxPageObjectFile = item.path;
                 }
             }
         });
 
-        if(oxConfigFile){
+        if (oxConfigFile) {
             runtimeSettingsClone.oxConfigFile = oxConfigFile;
         }
-        if(oxEnvFile){
+        if (oxEnvFile) {
             runtimeSettingsClone.oxEnvFile = oxEnvFile;
         }
-        if(oxConfigFile){
+        if (oxConfigFile) {
             runtimeSettingsClone.oxPageObjectFile = oxPageObjectFile;
         }
     }
@@ -390,19 +390,19 @@ export function* startTestAll({ payload }) {
         yield put(testActions.waitUpdateBreakpoints(false));
         yield call(services.mainIpc.call, 'DeviceDiscoveryService', 'stop', []);
 
-        if(
+        if (
             runtimeSettings.testProvider &&
             cloudProvidesBrowsersAndDevices &&
             cloudProvidesBrowsersAndDevices[runtimeSettings.testProvider]
-        ){
+        ) {
             const providerData = cloudProvidesBrowsersAndDevices[runtimeSettings.testProvider];
 
-            if(
+            if (
                 providerData && 
                 providerData.browsersList && 
                 Array.isArray(providerData.browsersList) &&
                 providerData.browsersList.length > 0
-            ){
+            ) {
                 const itemsLength = providerData.browsersList.length;
 
                 console.log('itemsLength', itemsLength);
@@ -436,7 +436,7 @@ export function* startTest({ payload }) {
     let file;
     let saveMainFile;
 
-    if (editor && editor.activeFile){
+    if (editor && editor.activeFile) {
         file = yield select(state => state.fs.files[editor.activeFile]);
         saveMainFile = editor.activeFile;
     }
@@ -468,7 +468,7 @@ export function* startTest({ payload }) {
         ...generalSettings
     };
 
-    if(file && file.ext && file.ext === '.feature'){
+    if (file && file.ext && file.ext === '.feature') {
         runtimeSettingsClone.framework = 'cucumber';
     }
 
@@ -481,19 +481,19 @@ export function* startTest({ payload }) {
     if (runtimeSettings.testTarget && runtimeSettings.testMode === 'mob') {
         const devices = yield select(state => state.test.devices);
         const targetDevice = devices.find(x => x.id === runtimeSettings.testTarget);
-        if(targetDevice){
+        if (targetDevice) {
             runtimeSettingsClone.testTarget = targetDevice;
         }
     }
 
     const rootPath = yield select(state => state.fs.rootPath);
-    if(rootPath && typeof rootPath === 'string'){
+    if (rootPath && typeof rootPath === 'string') {
         runtimeSettingsClone.rootPath = rootPath;
     }
 
     const fsTree = yield select(state => state.fs.tree);
 
-    if(fsTree && fsTree.data && Array.isArray(fsTree.data) && fsTree.data.length > 0){
+    if (fsTree && fsTree.data && Array.isArray(fsTree.data) && fsTree.data.length > 0) {
         
         const OXYGEN_CONFIG_FILE_NAME = 'oxygen.conf';
         const OXYGEN_ENV_FILE_NAME = 'oxygen.env';
@@ -504,7 +504,7 @@ export function* startTest({ payload }) {
         let oxPageObjectFile = null;
 
         fsTree.data.map((item) => {
-            if(
+            if (
                 item && 
                 item.type && 
                 item.type === 'file' && 
@@ -513,26 +513,26 @@ export function* startTest({ payload }) {
                 typeof item.path === 'string' && 
                 item.name && 
                 typeof item.name === 'string'
-            ){
-                if(item.name.startsWith(OXYGEN_CONFIG_FILE_NAME)){
+            ) {
+                if (item.name.startsWith(OXYGEN_CONFIG_FILE_NAME)) {
                     oxConfigFile = item.path;
                 }
-                if(item.name.startsWith(OXYGEN_ENV_FILE_NAME)){
+                if (item.name.startsWith(OXYGEN_ENV_FILE_NAME)) {
                     oxEnvFile = item.path;
                 }
-                if(item.name.startsWith(OXYGEN_PAGE_OBJECT_FILE_NAME)){
+                if (item.name.startsWith(OXYGEN_PAGE_OBJECT_FILE_NAME)) {
                     oxPageObjectFile = item.path;
                 }
             }
         });
 
-        if(oxConfigFile){
+        if (oxConfigFile) {
             runtimeSettingsClone.oxConfigFile = oxConfigFile;
         }
-        if(oxEnvFile){
+        if (oxEnvFile) {
             runtimeSettingsClone.oxEnvFile = oxEnvFile;
         }
-        if(oxConfigFile){
+        if (oxConfigFile) {
             runtimeSettingsClone.oxPageObjectFile = oxPageObjectFile;
         }
     }
@@ -614,22 +614,22 @@ export function* handleOnLineUpdate ({ payload }) {
     if (openFiles[file]) {
         findedFile = file;
     } else {
-        if(Object.keys(openFiles)){
+        if (Object.keys(openFiles)) {
             for (var filePath of Object.keys(openFiles)) {
-                if(
+                if (
                     filePath &&
                     filePath.toLowerCase &&
                     file &&
                     file.toLowerCase &&
                     filePath.toLowerCase() === file.toLowerCase()
-                ){
+                ) {
                     findedFile = filePath;
                 }
             }
         }
     }
 
-    if(!findedFile){
+    if (!findedFile) {
         yield put(wbActions.openFile(file));
         yield put(editorActions.openFile(file));
     }

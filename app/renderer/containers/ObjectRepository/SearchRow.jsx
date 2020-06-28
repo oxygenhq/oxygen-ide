@@ -3,7 +3,7 @@ import { Input } from 'antd';
 import '../../css/search-row.scss';
 
 const check = (treeItem, searchQuery) => {
-    if(treeItem && treeItem.name && searchQuery){
+    if (treeItem && treeItem.name && searchQuery) {
         return treeItem.name.toLowerCase().includes(searchQuery.toLowerCase());
     }
 };
@@ -16,14 +16,14 @@ const getVisibleTrees = (trees, searchQuery) => {
 
         let nameMatch = {};
 
-        if(includeInName){
+        if (includeInName) {
             /*eslint-disable */
             const { children, ...data } = t;
             /*eslint-enable */
             nameMatch = data;
         }
 
-        if(t.children){
+        if (t.children) {
 
             const containerResults = [];
 
@@ -32,10 +32,10 @@ const getVisibleTrees = (trees, searchQuery) => {
 
                 const checkResult = check(c, searchQuery);
 
-                if(c.type === 'container' && c.children && Array.isArray(c.children)){
+                if (c.type === 'container' && c.children && Array.isArray(c.children)) {
                     const containerResult = getVisibleTrees(c.children, searchQuery);
             
-                    if(Array.isArray(containerResult) && containerResult.length > 0){
+                    if (Array.isArray(containerResult) && containerResult.length > 0) {
                         containerResult.forEach(element => {
                             containerResults.push(element);
                         });
@@ -47,19 +47,19 @@ const getVisibleTrees = (trees, searchQuery) => {
 
             let result = [];
 
-            if(nameMatch.name){
+            if (nameMatch.name) {
                 result = [ nameMatch , ...includeInChildren ];
             } else {
                 result = includeInChildren;
             }
 
-            if(containerResults.length){
+            if (containerResults.length) {
                 containerResults.forEach(element => {
                     result.push(element);
                 });
             }
 
-            if(result.length){
+            if (result.length) {
                 result.forEach(element => {
                     results.push(element.name || element);
                 });
@@ -67,7 +67,7 @@ const getVisibleTrees = (trees, searchQuery) => {
                 return false;
             }
         } else {
-            if(includeInName){
+            if (includeInName) {
                 results.push(nameMatch.name);
             }
         }
@@ -117,10 +117,10 @@ export default class SearchRow extends React.PureComponent<Props> {
    render() {
        const { searchQuery, searchResults } = this.state;
        const { tree } = this.props;
-       if(tree){
+       if (tree) {
            let controls = null;
 
-           if(searchQuery){
+           if (searchQuery) {
                controls = (
                    <div className={ 'search-row-contols' }>
                        <div 

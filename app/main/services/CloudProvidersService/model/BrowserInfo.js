@@ -1,5 +1,5 @@
 export default class BrowserInfo {
-    constructor(object){
+    constructor(object) {
         this._name = object.name;
         this._version = object.version;
         this._osName = object.osName;

@@ -44,7 +44,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
     }
 
     async start() {
-        if(!this.devListInterval){
+        if (!this.devListInterval) {
             await this._reportADBVersion();
             await this._updateDeviceList();
 
@@ -69,10 +69,10 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 scope.setUser({'abdVersion2': adbVersion});
             });
 
-        } catch(e){            
+        } catch (e) {            
             let message = 'not finded';
 
-            if(e && e.message){
+            if (e && e.message) {
                 message += ' ' + e.message;
             }
             
@@ -85,10 +85,10 @@ export default class DeviceDiscoveryService extends ServiceBase {
 
             const execResult = execSync('adb version');
 
-            if(execResult && execResult.toString){
+            if (execResult && execResult.toString) {
                 const result = execResult.toString().trim();    
-                if(result){
-                    if(Sentry && Sentry.configureScope){
+                if (result) {
+                    if (Sentry && Sentry.configureScope) {
                         Sentry.configureScope((scope) => {
                             scope.setUser({'abdVersion': result});
                         });
@@ -98,7 +98,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
                     console.log('adb version');
                     console.log(execResult);
 
-                    if(Sentry && Sentry.configureScope){
+                    if (Sentry && Sentry.configureScope) {
                         Sentry.configureScope((scope) => {
                             scope.setUser({'abdVersion': 'Unknown "adb version" result'});
                         });
@@ -109,16 +109,16 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 console.log(execResult);
                 
 
-                if(Sentry && Sentry.configureScope){
+                if (Sentry && Sentry.configureScope) {
                     Sentry.configureScope((scope) => {
                         scope.setUser({'abdVersion': 'Unknown "adb version" result'});
                     });
                 }
             }
-        } catch(e){
+        } catch (e) {
             let message = 'not finded';
 
-            if(e && e.message){
+            if (e && e.message) {
                 message += ' ' + e.message;
             }
 
@@ -278,8 +278,8 @@ export default class DeviceDiscoveryService extends ServiceBase {
             }
         }
         catch (e) {
-            if(e && e.message && e.message === 'Could not find the instruments binary. Please ensure `xcrun -find instruments` can locate it.'){
-                if(this.xCodeNotified){
+            if (e && e.message && e.message === 'Could not find the instruments binary. Please ensure `xcrun -find instruments` can locate it.') {
+                if (this.xCodeNotified) {
                     // ignore
                 } else {
                     this.xCodeNotified = true;
@@ -318,7 +318,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
             let {stdout} = await exec(instrumentsPath, ['-s', 'devices'], opts);
             lines = stdout.split('\n');
         } catch (err) {
-            if(err && err.message && err.message.includes('timed out after')){
+            if (err && err.message && err.message.includes('timed out after')) {
                 // ignore
             } else {
                 throw new Error(`Failed getting devices, err: ${err}.`);

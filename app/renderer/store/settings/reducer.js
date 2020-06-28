@@ -20,22 +20,22 @@ const PERFECTO_MOBILE_DEFAULT_REGION = 'US East';
 const saveCloudProvidersDestruction = (fieldName, object) => {
     let result = {};
 
-    try{
-        if(fieldName && object){
-            if(
+    try {
+        if (fieldName && object) {
+            if (
                 object && 
         typeof object === 'object' &&
         Object.keys(object).length > 0
             ) {
 
-                if(object['cloudProviders'] && object['cloudProviders'][fieldName]){
+                if (object['cloudProviders'] && object['cloudProviders'][fieldName]) {
                     result = object['cloudProviders'][fieldName];
                 }
             }
         }
-    } catch(e){
+    } catch (e) {
         console.warn('saveCloudProvidersDestruction e', e);
-        if(window && window.Sentry && window.Sentry.captureException){
+        if (window && window.Sentry && window.Sentry.captureException) {
             window.Sentry.captureException(e);
         }
     }
@@ -194,7 +194,7 @@ export default (state = defaultState, action) => {
     // ZOOM_IN
     case types.EDITOR_ZOOM_IN: {
         const newFontSize = state.fontSize+2;
-        if(newFontSize > FONT_SIZE_MAX){
+        if (newFontSize > FONT_SIZE_MAX) {
             return state;
         } else {
             return { 
@@ -207,7 +207,7 @@ export default (state = defaultState, action) => {
     // ZOOM_OUT
     case types.EDITOR_ZOOM_OUT: {
         const newFontSize = state.fontSize-2;
-        if(newFontSize < FONT_SIZE_MIN){
+        if (newFontSize < FONT_SIZE_MIN) {
             return state;
         } else {
             return { 
@@ -227,7 +227,7 @@ export default (state = defaultState, action) => {
 
     // SET_ZOOM
     case types.EDITOR_SET_ZOOM: {
-        if(zoom){
+        if (zoom) {
             return { 
                 ...state,
                 fontSize: zoom

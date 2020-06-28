@@ -10,7 +10,7 @@ type Props = {
 
 export default class JavaDialog extends React.PureComponent<Props> {
   clean = () => {
-      if(this.props.clean){
+      if (this.props.clean) {
           this.props.clean();
       }
   }

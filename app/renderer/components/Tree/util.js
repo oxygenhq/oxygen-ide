@@ -47,7 +47,7 @@ export function getPosition(level, index) {
 }
 
 export function isTreeNode(node) {
-    if(node && typeof node.type !== 'undefined' && node.type.isTreeNode){
+    if (node && typeof node.type !== 'undefined' && node.type.isTreeNode) {
         return node && node.type && node.type.isTreeNode;
     } else {
         return false;

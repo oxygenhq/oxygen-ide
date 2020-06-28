@@ -64,19 +64,19 @@ export default class SettingsDialog extends React.PureComponent<Props> {
         let visualTestingSettings = null;
         let runSettings = null;
         
-        if(this.GeneralSettings && this.GeneralSettings.formWrap && this.GeneralSettings.formWrap.validateFormFields){
+        if (this.GeneralSettings && this.GeneralSettings.formWrap && this.GeneralSettings.formWrap.validateFormFields) {
             generalSettingsResult = await this.GeneralSettings.formWrap.validateFormFields();
         }
         
-        if(this.CloudProvidersSettings && this.CloudProvidersSettings.formWrap && this.CloudProvidersSettings.formWrap.validateFormFields){
+        if (this.CloudProvidersSettings && this.CloudProvidersSettings.formWrap && this.CloudProvidersSettings.formWrap.validateFormFields) {
             cloudProvidersResult = await this.CloudProvidersSettings.formWrap.validateFormFields();
         }
         
-        if(this.VisualTestingSettings && this.VisualTestingSettings.formWrap && this.VisualTestingSettings.formWrap.validateFormFields){
+        if (this.VisualTestingSettings && this.VisualTestingSettings.formWrap && this.VisualTestingSettings.formWrap.validateFormFields) {
             visualTestingSettings = await this.VisualTestingSettings.formWrap.validateFormFields();
         }
 
-        if(this.RunSettings && this.RunSettings.formWrap && this.RunSettings.formWrap.validateFormFields){
+        if (this.RunSettings && this.RunSettings.formWrap && this.RunSettings.formWrap.validateFormFields) {
             runSettings = await this.RunSettings.formWrap.validateFormFields();
         }
 

@@ -10,7 +10,7 @@
 * This does the async request and provides Redux thunk feedback 
 */
 export default function dispatchAsync(promise, dispatch, type, payload) {
-    if (typeof dispatch !== 'function'){
+    if (typeof dispatch !== 'function') {
         throw new Error('dispatch was not a function. Did you miss an update to the call?');
     }
     const TYPE_REQ = type + '_REQ';

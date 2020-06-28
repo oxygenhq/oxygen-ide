@@ -53,14 +53,14 @@ export default class ObjectRepositoryNotValidView extends React.PureComponent<Pr
 
     closeSelectedObject = () => {
         const { closeActive } = this.props;
-        if(closeActive){
+        if (closeActive) {
             closeActive();
         }
     }
 
     closeObjectRepository= () => {
         const { clearObjectRepositoryFile } = this.props;
-        if(clearObjectRepositoryFile){
+        if (clearObjectRepositoryFile) {
             clearObjectRepositoryFile();
         }
     }

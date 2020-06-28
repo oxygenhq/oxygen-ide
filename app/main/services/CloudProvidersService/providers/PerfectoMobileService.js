@@ -23,17 +23,17 @@ export default class PerfectoMobileService extends CloudProviderBase {
         return this.isRunning;
     }
 
-    updateSettings(settings){
+    updateSettings(settings) {
         this.settings=settings;
     }
 
-    async getBrowsers(){
+    async getBrowsers() {
         if (this.settings && this.settings.host && this.settings.securityToken) {
             let fetchFn;
 
-            if(typeof fetch === 'function'){
+            if (typeof fetch === 'function') {
                 fetchFn = fetch;
-            } else if(fetch && fetch.default && typeof fetch.default === 'function'){
+            } else if (fetch && fetch.default && typeof fetch.default === 'function') {
                 fetchFn = fetch.default;
             } else {
                 console.log('fetchFn not found');
@@ -48,20 +48,20 @@ export default class PerfectoMobileService extends CloudProviderBase {
                 }
             });
 
-            if(response){
+            if (response) {
                 return response.json();
             }
         }
     }
 
-    async getDevices(){
+    async getDevices() {
         if (this.settings && this.settings.host && this.settings.securityToken) {
 
             let fetchFn;
 
-            if(typeof fetch === 'function'){
+            if (typeof fetch === 'function') {
                 fetchFn = fetch;
-            } else if(fetch && fetch.default && typeof fetch.default === 'function'){
+            } else if (fetch && fetch.default && typeof fetch.default === 'function') {
                 fetchFn = fetch.default;
             } else {
                 console.log('fetchFn not found');
@@ -90,13 +90,13 @@ export default class PerfectoMobileService extends CloudProviderBase {
 
         const devicesJson = parser.toJson(devicesXml, {object: true});
         
-        if(
+        if (
             devicesJson &&
             devicesJson.handsets &&
             devicesJson.handsets.handset &&
             Array.isArray(devicesJson.handsets.handset) &&
             devicesJson.handsets.handset.length > 0
-        ){
+        ) {
             devices = devicesJson.handsets.handset;
         }
 
@@ -104,43 +104,43 @@ export default class PerfectoMobileService extends CloudProviderBase {
 
         const getBrowsersRetVal = await this.getBrowsers();
 
-        if(
+        if (
             getBrowsersRetVal && 
             getBrowsersRetVal.desktopDevices && 
             Array.isArray(getBrowsersRetVal.desktopDevices) &&
             getBrowsersRetVal.desktopDevices.length > 0
-        ){
+        ) {
             getBrowsersRetVal.desktopDevices.map((osItem) => {
-                if(
+                if (
                     osItem.os
-                ){
+                ) {
                     const osName = osItem.os;
 
-                    if(
+                    if (
                         osItem.osVersions &&
                         Array.isArray(osItem.osVersions) &&
                         osItem.osVersions.length > 0
-                    ){
+                    ) {
                         osItem.osVersions.map((osVersionItem) => {
-                            if(osVersionItem.osVersion){
+                            if (osVersionItem.osVersion) {
                                 const osVersion = osVersionItem.osVersion;
 
-                                if(
+                                if (
                                     osVersionItem.browsers &&
                                     Array.isArray(osVersionItem.browsers) &&
                                     osVersionItem.browsers.length > 0
-                                ){
+                                ) {
                                     osVersionItem.browsers.map((browserItem) => {
-                                        if(browserItem.browser){
+                                        if (browserItem.browser) {
                                             const browserName = browserItem.browser;
                                             
-                                            if(
+                                            if (
                                                 browserItem.browserVersions &&
                                                 Array.isArray(browserItem.browserVersions) &&
                                                 browserItem.browserVersions.length > 0
-                                            ){
+                                            ) {
                                                 browserItem.browserVersions.map((browserVersion) => {
-                                                    if(parseInt(browserVersion)){
+                                                    if (parseInt(browserVersion)) {
 
                                                         browsers.push({
                                                             browserName: browserName,
@@ -178,11 +178,11 @@ export default class PerfectoMobileService extends CloudProviderBase {
             throw new Error('"settings" must not be null');
         }
 
-        if(!this.settings.host){
+        if (!this.settings.host) {
             throw new Error('"host" must not be null');
         }
 
-        if(!this.settings.securityToken){
+        if (!this.settings.securityToken) {
             throw new Error('"securityToken" must not be null');
         }
 
@@ -211,7 +211,7 @@ export default class PerfectoMobileService extends CloudProviderBase {
                 caps.platformName = target.osName;
             }
     
-            if(target.deviceName){
+            if (target.deviceName) {
                 caps.manufacturer = target.deviceName;
             }
     
@@ -220,24 +220,24 @@ export default class PerfectoMobileService extends CloudProviderBase {
             }
     
             
-            if(caps.manufacturer === 'iPhone'){
+            if (caps.manufacturer === 'iPhone') {
                 caps.manufacturer = 'Apple';
                 caps.model = target.deviceName+'-'+target.osVersion;
             }
-            if(caps.manufacturer === 'iPad'){
+            if (caps.manufacturer === 'iPad') {
                 caps.manufacturer = 'Apple';
                 caps.model = target.deviceName+' '+target.osVersion;
             }
     
-            if(
+            if (
                 caps.model &&
                 this.devices &&
                 Array.isArray(this.devices) &&
                 this.devices.length > 0
-            ){
+            ) {
                 const device = this.devices.find((item) => item.model === caps.model);
     
-                if(device){
+                if (device) {
                     caps.deviceName = device.deviceId;
                 }
             }

@@ -10,13 +10,13 @@ type Props = {
 export default class ChromeDriverDownloadingFailedDialog extends React.PureComponent<Props> {
 
     close = () => {
-        if(this.props.onClose){
+        if (this.props.onClose) {
             this.props.onClose();
         }
     }
 
     processLink = (event) => {
-        if(event){
+        if (event) {
             event.preventDefault();
     
             if (event.target instanceof HTMLAnchorElement) {

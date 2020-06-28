@@ -13,7 +13,7 @@ module.exports = function(grunt) {
         var done = this.async();
         var cfg = grunt.config.get('copy-files');
         fs.copy(cfg.src, cfg.dest, function (err) {
-            if (err){
+            if (err) {
                 grunt.fail.fatal(err);
             }
             grunt.log.ok('Done');

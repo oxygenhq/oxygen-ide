@@ -22,7 +22,7 @@ export default class LambdaTestService extends CloudProviderBase {
         return this.isRunning;
     }
 
-    updateSettings(settings){
+    updateSettings(settings) {
         this.settings=settings;
     }
 
@@ -30,9 +30,9 @@ export default class LambdaTestService extends CloudProviderBase {
         if (this.settings && this.settings.user && this.settings.key) {
             let fetchFn;
 
-            if(typeof fetch === 'function'){
+            if (typeof fetch === 'function') {
                 fetchFn = fetch;
-            } else if(fetch && fetch.default && typeof fetch.default === 'function'){
+            } else if (fetch && fetch.default && typeof fetch.default === 'function') {
                 fetchFn = fetch.default;
             } else {
                 console.log('fetchFn not found');

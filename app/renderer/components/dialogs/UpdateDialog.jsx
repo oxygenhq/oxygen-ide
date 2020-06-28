@@ -22,7 +22,7 @@ type Props = {
 };
 
 export default class UpdateDialog extends React.PureComponent<Props> {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             visible: this.props.visible ? this.props.visible : false,
@@ -38,7 +38,7 @@ export default class UpdateDialog extends React.PureComponent<Props> {
             });
         }
         else if (nextProps.visible != prevState.visible) {
-            return({
+            return ({
                 visible: nextProps.visible,
                 name: nextProps.name ? nextProps.name : null,
             });

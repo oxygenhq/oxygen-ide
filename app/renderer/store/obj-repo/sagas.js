@@ -46,7 +46,7 @@ export function* openFile({ payload }) {
         return;
     }    
 
-    if(force){
+    if (force) {
         // info from file watcher that file changed
     } else {
         
@@ -71,14 +71,14 @@ export function* openFile({ payload }) {
     // if this is a .js file, then use 'require' to parse the file
     if (file.ext === '.js') {
         try {
-            if(force && repoRootCopy){
+            if (force && repoRootCopy) {
                 repoRoot = repoRootCopy;
 
             } else {
                 repoRoot = yield call(services.mainIpc.call, 'ElectronService', 'orgRequire', [file.path]);
                 console.log('#82', repoRoot);
                 try {
-                    if(typeof repoRoot === 'string'){
+                    if (typeof repoRoot === 'string') {
                         repoRoot = JSON.parse(repoRoot.replace(/'/g, '"'));
                     }
                 }
@@ -98,7 +98,7 @@ export function* openFile({ payload }) {
 
             let content = '';
 
-            if(fetchFileContent && fetchFileContent.content){
+            if (fetchFileContent && fetchFileContent.content) {
                 content = fetchFileContent.content;
             }
             
@@ -129,9 +129,9 @@ export function* openFile({ payload }) {
 
     let treeRoot = null;
 
-    try{
+    try {
         treeRoot = convertToObjectTree(repoRoot);
-    } catch(e){
+    } catch (e) {
         console.warn('convertToObjectTree e', e);
         
         yield put(settingsActions.setSidebarComponent('right', 'obj-repo-not-valid'));
@@ -141,7 +141,7 @@ export function* openFile({ payload }) {
     }
     
 
-    if(treeRoot){
+    if (treeRoot) {
         yield put(settingsActions.setSidebarComponent('right', 'obj-repo'));
         yield put(settingsActions.setSidebarVisible('right', true));
         // report success

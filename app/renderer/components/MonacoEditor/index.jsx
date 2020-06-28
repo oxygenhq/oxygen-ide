@@ -87,7 +87,7 @@ export default class MonacoEditor extends React.Component<Props> {
     componentDidMount() {
         try {
             this.initMonaco();
-        } catch(e) {
+        } catch (e) {
             console.log('monaco editor e', e);
         }
     }
@@ -134,22 +134,22 @@ export default class MonacoEditor extends React.Component<Props> {
         }
         
         if (prevProps.waitUpdateBreakpoints !== this.props.waitUpdateBreakpoints && this.editor) {
-            if(this.props.waitUpdateBreakpoints){
+            if (this.props.waitUpdateBreakpoints) {
                 helpers.makeBreakpointsHalfOpacity(this.editor);
             } else {
                 helpers.makeBreakpointsFullOpacity(this.editor);
             }
         }
 
-        if (deepDiff(prevProps.disabledBreakpoints, this.props.disabledBreakpoints)){
+        if (deepDiff(prevProps.disabledBreakpoints, this.props.disabledBreakpoints)) {
             helpers.makeBreakpointsHollowCircle(this.editor, this.props.disabledBreakpoints);
         }
-        if (deepDiff(prevProps.resolvedBreakpoints, this.props.resolvedBreakpoints)){
-            if(
+        if (deepDiff(prevProps.resolvedBreakpoints, this.props.resolvedBreakpoints)) {
+            if (
                 this.props.resolvedBreakpoints &&
                 Array.isArray(this.props.resolvedBreakpoints) &&
                 this.props.resolvedBreakpoints.length > 0
-            ){
+            ) {
                 this.props.resolvedBreakpoints.map((item) => {
                     helpers.addBreakpointMarker(this.editor, item, this.props.fontSize, this.props.disabledBreakpoints, this.props.resolvedBreakpoints);
                 });
@@ -180,27 +180,27 @@ export default class MonacoEditor extends React.Component<Props> {
             this.editor.layout();
         }
 
-        if(typeof updateActiveLine !== 'boolean' && updateFontSize){
+        if (typeof updateActiveLine !== 'boolean' && updateFontSize) {
             //update ActiveLine and FontSize
             helpers.updateActiveLineMarker(this.editor, updateActiveLine, updateFontSize);
-        } else if (typeof updateActiveLine !== 'boolean'){
+        } else if (typeof updateActiveLine !== 'boolean') {
             //update ActiveLine
             helpers.updateActiveLineMarker(this.editor, updateActiveLine, this.props.fontSize);
-        } else if (updateFontSize){
+        } else if (updateFontSize) {
             //update FontSize
             const { activeLine } = this.props;
             helpers.updateActiveLineMarker(this.editor, activeLine, updateFontSize);
         }
 
-        if (updateFontSize){
-            if(this.ln && Array.isArray(this.ln)){
+        if (updateFontSize) {
+            if (this.ln && Array.isArray(this.ln)) {
                 this.ln.map((item) => {
                     helpers.addBreakpointMarker(this.editor, item, updateFontSize, this.props.disabledBreakpoints, this.props.resolvedBreakpoints);
                 });
             }
 
             
-            if(this.props.resolvedBreakpoints && Array.isArray(this.props.resolvedBreakpoints)){
+            if (this.props.resolvedBreakpoints && Array.isArray(this.props.resolvedBreakpoints)) {
                 this.props.resolvedBreakpoints.map((item) => {
                     helpers.addBreakpointMarker(this.editor, item, updateFontSize, this.props.disabledBreakpoints, this.props.resolvedBreakpoints);
                 });
@@ -212,16 +212,16 @@ export default class MonacoEditor extends React.Component<Props> {
         this.destroyMonaco();
     }
     
-    addLnToLnArray(ln){
-        if(this.ln && Array.isArray(this.ln)){
+    addLnToLnArray(ln) {
+        if (this.ln && Array.isArray(this.ln)) {
             this.ln.push(ln);
         } else {
             this.ln = [ln];
         }
     }
 
-    removeLnfromLnArray(ln){
-        if(ln && this.ln && Array.isArray(this.ln)){
+    removeLnfromLnArray(ln) {
+        if (ln && this.ln && Array.isArray(this.ln)) {
             this.ln = this.ln.filter((item) => {
                 return item !== ln;
             });
@@ -269,7 +269,7 @@ export default class MonacoEditor extends React.Component<Props> {
         this.props.editorDidMount(editor, monaco);
         this.editor.layout();
 
-        if(this.props.fontSize && this.props.breakpoints && Array.isArray(this.props.breakpoints) && this.props.breakpoints.length > 0){     
+        if (this.props.fontSize && this.props.breakpoints && Array.isArray(this.props.breakpoints) && this.props.breakpoints.length > 0) {     
             this.props.breakpoints.map((item) => {
                 helpers.addBreakpointMarker(this.editor, item, this.props.fontSize, this.props.disabledBreakpoints, this.props.resolvedBreakpoints);
             });
@@ -297,7 +297,7 @@ export default class MonacoEditor extends React.Component<Props> {
     async liftOff() {
         try {
             const { featureLanguageLoaded, setFatureLanguageLoaded } = this.props;
-            if(!featureLanguageLoaded){
+            if (!featureLanguageLoaded) {
                 // see https://www.npmjs.com/package/onigasm#light-it-up
                 await loadWASM(process.env.NODE_ENV === 'development' ?
                     path.join(__dirname, '../../node_modules/onigasm/lib/onigasm.wasm') :
@@ -319,7 +319,7 @@ export default class MonacoEditor extends React.Component<Props> {
                 await wireTmGrammars(monaco, registry, grammars);
                 setFatureLanguageLoaded();
             }
-        } catch(e){
+        } catch (e) {
             console.log('liftOff error', e);
         }
     }
@@ -330,7 +330,7 @@ export default class MonacoEditor extends React.Component<Props> {
 
         let saveFontSize = DEFAULT_FONT_SIZE;
 
-        if(
+        if (
             fontSize &&
             parseInt(fontSize) &&
             fontSize >= FONT_SIZE_MIN && 
@@ -343,7 +343,7 @@ export default class MonacoEditor extends React.Component<Props> {
             // Before initializing monaco editor
             this.editorWillMount();
             
-            if(language && typeof language === 'string' && language === 'feature' && !featureLanguageLoaded){
+            if (language && typeof language === 'string' && language === 'feature' && !featureLanguageLoaded) {
                 monaco.languages.register({ 
                     id: 'feature',
                     aliases: [
@@ -454,7 +454,7 @@ export default class MonacoEditor extends React.Component<Props> {
                 const marker = helpers.getBreakpointMarker(editor, ln);
                 const { waitUpdateBreakpoints } = this.props;
 
-                if(waitUpdateBreakpoints){
+                if (waitUpdateBreakpoints) {
                     //ignored
                     console.warn('Breakpoint cannot be added before previous breackpoint adding finished');
                 } else {
@@ -473,7 +473,7 @@ export default class MonacoEditor extends React.Component<Props> {
                             }
                         }
                     } else {
-                        if(!marker){
+                        if (!marker) {
                             console.warn('Breakpoint cannot be added at the empty line.');
                         } else {
                             if (helpers.removeBreakpointMarker(editor, ln)) {

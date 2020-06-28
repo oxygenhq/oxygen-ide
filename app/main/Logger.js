@@ -74,10 +74,10 @@ export default class Logger {
             this.logsPath = logsPath;
             this.logFilePath = path.resolve(logsPath, this.logFileName);
 
-            if(err && err.message && err.message === "Failed to get 'logs' path"){
+            if (err && err.message && err.message === "Failed to get 'logs' path") {
                 //ignore
             } else {
-                if(Sentry && Sentry.captureException){
+                if (Sentry && Sentry.captureException) {
                     Sentry.captureException(err);
                 }
             }
@@ -126,13 +126,13 @@ export default class Logger {
         console.log('Logs file location :', lastLogFilePath);
     }
 
-    getLogFilePath(){
+    getLogFilePath() {
         const currentLogFileName = this.getLogFileName();
         const lastLogFilePath = path.resolve(this.logsPath, currentLogFileName);
         return lastLogFilePath;
     }
 
-    getLogFileName(){
+    getLogFileName() {
         const dateFormat = 'YYYY-MM-DD';
         const dateStr = moment().local().format(dateFormat);
         return this.logFileName.replace(/%DATE%/g, dateStr);
@@ -144,27 +144,27 @@ export default class Logger {
             return result;
         };
 
-        console.log = function(){
+        console.log = function() {
             const log = _log.info.bind(_log);
             return log.apply(_log, formatArgs(arguments));
         };
 
-        console.info = function(){
+        console.info = function() {
             const log = _log.info.bind(_log);
             return log.apply(_log, formatArgs(arguments));
         };
 
-        console.warn = function(){
+        console.warn = function() {
             const log = _log.warn.bind(_log);
             return log.apply(log, formatArgs(arguments));
         };
         
-        console.error = function(){
+        console.error = function() {
             const log = _log.error.bind(_log);
             return log.apply(log, formatArgs(arguments));
         };
 
-        console.debug = function(){
+        console.debug = function() {
             const log = _log.debug.bind(_log);
             return log.apply(log, formatArgs(arguments));
         };
@@ -181,7 +181,7 @@ export default class Logger {
                           + '\n\nFull log is available at: ' + this.logFilePath;
 
                 
-            if(Sentry && Sentry.captureException){                
+            if (Sentry && Sentry.captureException) {                
                 const error = new Error(msg);
 
                 Sentry.captureException(error);
@@ -253,7 +253,7 @@ export default class Logger {
     _catchTheUncaught() {
         process.on('uncaughtException', error => {
             // ignore Monaco Editor error related to doResolve
-            if(error && error.message && typeof error.message === 'string' && error.message.includes('doResolve')){
+            if (error && error.message && typeof error.message === 'string' && error.message.includes('doResolve')) {
                 return;
             }
 

@@ -54,34 +54,34 @@ export default function* root() {
     ]);
 }
 
-export function* maybeNeedAddWatcherToFolder({ payload }){
+export function* maybeNeedAddWatcherToFolder({ payload }) {
     const fs = yield select(state => state.fs);
     const { rootPath } = fs;
 
-    if(rootPath && payload && payload.path && rootPath !== payload.path){      
+    if (rootPath && payload && payload.path && rootPath !== payload.path) {      
         yield call(services.mainIpc.call, 'FileService', 'addFolderToWatchers', [payload.path]);
     }
 }
 
-export function* addFolderToWatchers({ payload }){
-    if(payload && payload.path){
+export function* addFolderToWatchers({ payload }) {
+    if (payload && payload.path) {
         yield call(services.mainIpc.call, 'FileService', 'addFolderToWatchers', [payload.path]);
     }
 }
 
-export function* maybeNeedRemoveWatcherToFolder({ payload }){
+export function* maybeNeedRemoveWatcherToFolder({ payload }) {
     const { path } = payload;
 
-    if(path){
+    if (path) {
         yield call(services.mainIpc.call, 'FileService', 'removeFolderToWatchers', [path]);
     }
 }
 
-export function* checkIfEnvFileChange(path){    
+export function* checkIfEnvFileChange(path) {    
     const rootPath = yield select(state => state.fs.rootPath);
     const encConfigFilePath = pathLib.join(rootPath, `${OXYGEN_ENV_FILE_NAME}.js`);
 
-    if(encConfigFilePath === path){
+    if (encConfigFilePath === path) {
         yield putAndTake(settingsActions.loadProjectSettings(path));
     }
 }
@@ -112,7 +112,7 @@ export function* handleServiceEvents({ payload }) {
         if (type === 'fileUnlink') {
             yield unlinkFile(path);
         }
-        if(type === 'dirUnlink'){
+        if (type === 'dirUnlink') {
             yield unlinkFile(path);
         }
         if (type === 'fileChangeContent') {
@@ -134,16 +134,16 @@ export function* handleServiceEvents({ payload }) {
     }
 
     if (service === 'FileService' && event === 'getFileContent' ) {
-        if(path){
+        if (path) {
             const file = yield select(state => state.fs.files[path]);
-            if(file && typeof file.modified !== 'undefined'){
+            if (file && typeof file.modified !== 'undefined') {
                 //file exist in edit
-                if(file.modified){
+                if (file.modified) {
                     // looks like file modefied in oxygen-ide 
                     // and now modefied outside oxygen-ide
                     // file modefied, but not saved
 
-                    if(content !== file.content){
+                    if (content !== file.content) {
                         const ansver = yield call(
                             services.mainIpc.call,
                             'ElectronService',
@@ -154,13 +154,13 @@ export function* handleServiceEvents({ payload }) {
                                 ['Cancel', 'Reload']
                             ]
                         );
-                        if(typeof ansver !== 'undefined'){
-                            if(ansver === 1){
+                        if (typeof ansver !== 'undefined') {
+                            if (ansver === 1) {
                                 // 1 - Reload
                                 yield put(fsActions._fetchFileContent_Success(path, content));
                             }
     
-                            if(ansver === 0){
+                            if (ansver === 0) {
                                 // 0 - Cancel
                                 // do nothing
                             }
@@ -186,7 +186,7 @@ export function* handleServiceEvents({ payload }) {
     }
 
     if (service === 'FileService' && event === 'ObjectRepoWatcher' ) {
-        if(path && content){
+        if (path && content) {
             const [...cont] = content.split('{');
             
             cont.shift();
@@ -221,13 +221,13 @@ function* unlinkFile(path) {
         const filesState = yield select(state => state.fs.files);
         const editorState = yield select(state => state.editor);
 
-        if(editorState && editorState.openFiles && editorState.openFiles[path]){
+        if (editorState && editorState.openFiles && editorState.openFiles[path]) {
             let unlinkedFileContent = '';
             const pathSplit = path.split(pathLib.sep);
             
             const newName = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
 
-            if(filesState && filesState[path] && filesState[path]['content']){
+            if (filesState && filesState[path] && filesState[path]['content']) {
                 unlinkedFileContent = filesState[path]['content'];
             }
 
@@ -269,7 +269,7 @@ export function* treeOpenFolder({ payload }) {
 
     const rootPath = yield select(state => state.fs.rootPath); 
 
-    if(rootPath === path){
+    if (rootPath === path) {
         //root dir
         yield watchOnFiles(path);
     }  else {
@@ -282,13 +282,13 @@ export function* fromCache({ payload }) {
     const { cache } = payload;
     const { fs } = cache;
     const { rootPath } = fs;
-    if(rootPath){
+    if (rootPath) {
         yield call(services.mainIpc.call, 'FileService', 'createWatchOnFilesChannel', [rootPath]);
     }
     yield put(workbenchActions._restoreFromCache_Success());
 }
 
-export function* watchOnSubFiles(path){
+export function* watchOnSubFiles(path) {
     yield call(services.mainIpc.call, 'FileService', 'addFolderToWatchers', [path]);
 }
 
@@ -300,7 +300,7 @@ export function* initializeSuccess() {
     const filesState = yield select(state => state.fs);
     let path;
 
-    if(filesState && filesState.rootPath){
+    if (filesState && filesState.rootPath) {
         path = filesState.rootPath;
 
         try {
@@ -313,7 +313,7 @@ export function* initializeSuccess() {
 
         const fs = yield select(state => state.fs);  
         
-        if(
+        if (
             fs &&
             fs.files && 
             fs.files[path]
@@ -321,20 +321,20 @@ export function* initializeSuccess() {
             const folder = fs.files[path];
             const rootPath = fs.rootPath;
 
-            if(folder && folder.children){
+            if (folder && folder.children) {
                 yield put(fsActions._treeOpenFolder_Success(path, folder.children));
 
                 const allFiles = folder.children;
 
                 const editorState = yield select(state => state.editor);
                 
-                if(editorState && editorState.openFiles && rootPath){
+                if (editorState && editorState.openFiles && rootPath) {
                     
                     const fileContentArray = [];
 
                     let allResults = yield all(Object.keys(editorState.openFiles).map(openFilePath => {
 
-                        if(!openFilePath.startsWith('unknown') && openFilePath.startsWith(rootPath) && openFilePath.split(rootPath) && openFilePath.split(rootPath)[1]){
+                        if (!openFilePath.startsWith('unknown') && openFilePath.startsWith(rootPath) && openFilePath.split(rootPath) && openFilePath.split(rootPath)[1]) {
 
                             const innerPath = openFilePath.split(rootPath)[1];
                             const innerPathArray = innerPath.split('\\');
@@ -342,7 +342,7 @@ export function* initializeSuccess() {
                             
                             let result = true;
 
-                            if(innerPathArray && innerPathArray.length === 1){
+                            if (innerPathArray && innerPathArray.length === 1) {
                                 // in root folder
 
                                 result = allFiles.some(file => {
@@ -363,10 +363,10 @@ export function* initializeSuccess() {
                                 
                             }
     
-                            if(!result){
+                            if (!result) {
                                 // file removed from folder, but content in cache;
     
-                                if(fs && fs.files && fs.files[openFilePath]){
+                                if (fs && fs.files && fs.files[openFilePath]) {
                                     let unlinkedFileContent = fs.files[openFilePath]['content'] || '';
                                     
                                     const pathSplit = openFilePath.split(pathLib.sep);
@@ -397,16 +397,16 @@ export function* initializeSuccess() {
                         }
                     }));
 
-                    try{
-                        if(fileContentArray && Array.isArray(fileContentArray) && fileContentArray.length > 0){
+                    try {
+                        if (fileContentArray && Array.isArray(fileContentArray) && fileContentArray.length > 0) {
                             const filesResults = yield all(fileContentArray);
     
                             filesResults.map(file => {
-                                if(
+                                if (
                                     file && 
                                     file.filePath && 
                                     typeof file.content === 'string'
-                                ){
+                                ) {
                                     // file exist
                                     
                                     const pRes = all([
@@ -432,7 +432,7 @@ export function* initializeSuccess() {
                                 }
                             });
                         }
-                    } catch(e){
+                    } catch (e) {
                         yield put(reportError(e));
                         console.log('Error when try create deleted from disk file', e);
                     }
@@ -442,7 +442,7 @@ export function* initializeSuccess() {
                         return el != null;
                     });
 
-                    if(allResults && Array.isArray(allResults) && allResults.length > 0){
+                    if (allResults && Array.isArray(allResults) && allResults.length > 0) {
                         yield all(allResults);
                     }
                     
@@ -464,7 +464,7 @@ export function* _fetchFolderContent(path, addWatcher = true) {
         if (path && addWatcher) {
             const rootPath = yield select(state => state.fs.rootPath); 
 
-            if(rootPath === path){
+            if (rootPath === path) {
                 //root dir
                 yield watchOnFiles(path);
             }  else {
@@ -486,7 +486,7 @@ export function* _fetchFolderContent(path, addWatcher = true) {
 export function* fetchFolderContent({ payload }) {
     const { path } = payload;
     try {
-        if(path){
+        if (path) {
             yield _fetchFolderContent(path);
         }
     } catch (err) {
@@ -532,13 +532,13 @@ export function* fetchFileInfo({ payload }) {
 export function* saveFileContent({ payload }) {
     const { path } = payload;
     try {
-        if(path){
+        if (path) {
             const file = yield select(state => state.fs.files[path]);
             if (!file) {
                 return;
             }
             let content = '';
-            if(file && file.content){
+            if (file && file.content) {
                 content = file.content;
             }
             yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ path,  content]);
@@ -549,7 +549,7 @@ export function* saveFileContent({ payload }) {
         yield put(reportError(err));
 
         let saveCode = 'Unknown code';
-        if(err && err.code){
+        if (err && err.code) {
             saveCode = err.code;
         }
 
@@ -575,7 +575,7 @@ export function* saveFileContentAs({ payload }) {
     }
 }
 
-export function* move({ payload }){
+export function* move({ payload }) {
     const { oldPath, newPath } = payload;
     if (!oldPath || !newPath) {
         console.warn('Invalid arguments - saga: FS, method: move');

@@ -21,23 +21,23 @@ export default class ApplitoolsService extends VisualTestingProviderBase {
         return this.isRunning;
     }
 
-    updateSettings(settings){
+    updateSettings(settings) {
         this.settings=settings;
     }
 
-    updateOptions(inputOptions = {}){
+    updateOptions(inputOptions = {}) {
         const options = {...inputOptions};
         if (!this.settings || typeof this.settings !== 'object') {
             throw new Error('"settings" must not be null');
         }
 
-        if(this.settings.accessKey && this.settings.inUse){
+        if (this.settings.accessKey && this.settings.inUse) {
             options.applitoolsOpts = {
                 key: this.settings.accessKey,
                 checkOnEveryAction: false
             };
 
-            if(this.settings.checkOnEveryAction){
+            if (this.settings.checkOnEveryAction) {
                 options.applitoolsOpts.checkOnEveryAction = true;
             }
         }

@@ -55,7 +55,7 @@ export default class ObjectContainerCreateDialog extends React.PureComponent<Pro
         return null;
     }
   
-    componentDidMount(){
+    componentDidMount() {
         this.focusTextInput();
     }
 
@@ -64,9 +64,9 @@ export default class ObjectContainerCreateDialog extends React.PureComponent<Pro
   };
 
   setTextInputRef = element => {
-      if(element){
+      if (element) {
           this.textInput = element;
-          if(this.textInput && this.textInput.focus){
+          if (this.textInput && this.textInput.focus) {
               this.textInput.focus();
           }
       }

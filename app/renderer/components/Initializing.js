@@ -5,7 +5,7 @@ export default class Initializing extends React.PureComponent {
         super(props);
     }
 
-    render(){
+    render() {
         return (
             <div className="initializing-container">
                 <div className="initializing-inner">

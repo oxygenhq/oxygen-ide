@@ -9,11 +9,11 @@
 export function getMarkerLine(marker) {
     let result = 0;
 
-    if(
+    if (
         marker &&
         marker.range &&
         marker.range.startLineNumber
-    ){
+    ) {
         result = marker.range.startLineNumber;
     }
     return result;
@@ -23,18 +23,18 @@ export function getMarkerLine(marker) {
    * Determines if the specified marker represents a breakpoint
 */
 export function isBreakpointMarker(marker) {
-    try{
-        if(
+    try {
+        if (
             marker && 
             marker.options &&
             marker.options.linesDecorationsClassName &&
             typeof marker.options.linesDecorationsClassName === 'string'
-        ){
+        ) {
             return marker.options.linesDecorationsClassName.indexOf('breakpointStyle') > -1;
         } else {
             return false;
         }
-    } catch(e){
+    } catch (e) {
         console.log('isBreakpointMarker error', e);
     }
 }
@@ -60,7 +60,7 @@ export function getBreakpointMarkers(editor) {
 }
 
 export function addBreakpointMarker(editor, line, fontSize=null, disabledBreakpoints, resolvedBreakpoints) {
-    try{
+    try {
         // check if this line already has breakpoint marker
         if (!fontSize && getBreakpointMarker(editor, line)) {
             return false;
@@ -69,23 +69,23 @@ export function addBreakpointMarker(editor, line, fontSize=null, disabledBreakpo
     
         let fontSizeClassName = '';
     
-        if(fontSize && Number.isInteger(fontSize)){
+        if (fontSize && Number.isInteger(fontSize)) {
             fontSizeClassName = 'breakpointStyle'+fontSize;
         }
 
-        if(
+        if (
             disabledBreakpoints &&
             Array.isArray(disabledBreakpoints) &&
             disabledBreakpoints.includes(line)
-        ){
+        ) {
             fontSizeClassName += ' hollowCircle';
         }
         
-        if(
+        if (
             resolvedBreakpoints &&
             Array.isArray(resolvedBreakpoints) &&
             resolvedBreakpoints.includes(line)
-        ){
+        ) {
             fontSizeClassName += ' resolwedCircle';
         }
     
@@ -103,7 +103,7 @@ export function addBreakpointMarker(editor, line, fontSize=null, disabledBreakpo
         
         const decoratorsToRemove = [
             ...allMarkers.filter((item) => {
-                if(
+                if (
                     item &&
                     item.range &&
                     item.range.endLineNumber && 
@@ -113,7 +113,7 @@ export function addBreakpointMarker(editor, line, fontSize=null, disabledBreakpo
                     typeof item.options.linesDecorationsClassName === 'string' &&
                     !item.options.linesDecorationsClassName.endsWith(fontSizeClassName) &&
                     !item.options.linesDecorationsClassName.includes('currentLineDecoratorStyle')
-                ){
+                ) {
                     return true;
                 } else {
                     return false;
@@ -121,7 +121,7 @@ export function addBreakpointMarker(editor, line, fontSize=null, disabledBreakpo
             })
         ];
         return editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
-    } catch(e){
+    } catch (e) {
         console.log('addBreakpointMarker error', e);
     }
 }
@@ -175,12 +175,12 @@ export function breakpointMarkersToLineNumbers(editor) {
     return bpMarkers.map(bpMarker => getMarkerLine(bpMarker));
 }
 
-function addHalfOpacity(marker, editor){
+function addHalfOpacity(marker, editor) {
     const allMarkers = getAllMarkers(editor);
         
     const decoratorsToRemove = [
         ...allMarkers.filter((item) => {
-            if(
+            if (
                 item &&
                 item.range &&
                 item.range.endLineNumber && 
@@ -189,7 +189,7 @@ function addHalfOpacity(marker, editor){
                 item.options.linesDecorationsClassName &&
                 typeof item.options.linesDecorationsClassName === 'string' &&
                 item.options.linesDecorationsClassName.indexOf('breakpointStyle') > -1
-            ){
+            ) {
                 return true;
             } else {
                 return false;
@@ -199,7 +199,7 @@ function addHalfOpacity(marker, editor){
 
     let startLineNumber = 0;
 
-    if(
+    if (
         marker &&
         marker.range &&
         marker.range.startLineNumber
@@ -220,12 +220,12 @@ function addHalfOpacity(marker, editor){
     editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
 }
 
-function removeHalfOpacity(marker, editor){
+function removeHalfOpacity(marker, editor) {
     const allMarkers = getAllMarkers(editor);
         
     const decoratorsToRemove = [
         ...allMarkers.filter((item) => {
-            if(
+            if (
                 item &&
                 item.range &&
                 item.range.endLineNumber && 
@@ -234,7 +234,7 @@ function removeHalfOpacity(marker, editor){
                 item.options.linesDecorationsClassName &&
                 typeof item.options.linesDecorationsClassName === 'string' &&
                 item.options.linesDecorationsClassName.indexOf('breakpointStyle') > -1
-            ){
+            ) {
                 return true;
             } else {
                 return false;
@@ -246,7 +246,7 @@ function removeHalfOpacity(marker, editor){
 
     let startLineNumber = 0;
 
-    if(
+    if (
         marker &&
         marker.range &&
         marker.range.startLineNumber
@@ -267,12 +267,12 @@ function removeHalfOpacity(marker, editor){
     editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
 }
 
-function addHollowCircle(marker, editor){
+function addHollowCircle(marker, editor) {
     const allMarkers = getAllMarkers(editor);
         
     const decoratorsToRemove = [
         ...allMarkers.filter((item) => {
-            if(
+            if (
                 item &&
                 item.range &&
                 item.range.endLineNumber && 
@@ -281,7 +281,7 @@ function addHollowCircle(marker, editor){
                 item.options.linesDecorationsClassName &&
                 typeof item.options.linesDecorationsClassName === 'string' &&
                 item.options.linesDecorationsClassName.indexOf('breakpointStyle') > -1
-            ){
+            ) {
                 return true;
             } else {
                 return false;
@@ -291,7 +291,7 @@ function addHollowCircle(marker, editor){
 
     let startLineNumber = 0;
 
-    if(
+    if (
         marker &&
         marker.range &&
         marker.range.startLineNumber
@@ -312,12 +312,12 @@ function addHollowCircle(marker, editor){
     editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
 }
 
-function removeHollowCircle(marker, editor){
+function removeHollowCircle(marker, editor) {
     const allMarkers = getAllMarkers(editor);
         
     const decoratorsToRemove = [
         ...allMarkers.filter((item) => {
-            if(
+            if (
                 item &&
                 item.range &&
                 item.range.endLineNumber && 
@@ -326,7 +326,7 @@ function removeHollowCircle(marker, editor){
                 item.options.linesDecorationsClassName &&
                 typeof item.options.linesDecorationsClassName === 'string' &&
                 item.options.linesDecorationsClassName.indexOf('breakpointStyle') > -1
-            ){
+            ) {
                 return true;
             } else {
                 return false;
@@ -338,7 +338,7 @@ function removeHollowCircle(marker, editor){
     
     let startLineNumber = 0;
 
-    if(
+    if (
         marker &&
         marker.range &&
         marker.range.startLineNumber
@@ -359,12 +359,12 @@ function removeHollowCircle(marker, editor){
     editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
 }
 
-function addResolwedCircle(marker, editor){
+function addResolwedCircle(marker, editor) {
     const allMarkers = getAllMarkers(editor);
         
     const decoratorsToRemove = [
         ...allMarkers.filter((item) => {
-            if(
+            if (
                 item &&
                 item.range &&
                 item.range.endLineNumber && 
@@ -373,7 +373,7 @@ function addResolwedCircle(marker, editor){
                 item.options.linesDecorationsClassName &&
                 typeof item.options.linesDecorationsClassName === 'string' &&
                 item.options.linesDecorationsClassName.indexOf('breakpointStyle') > -1
-            ){
+            ) {
                 return true;
             } else {
                 return false;
@@ -383,7 +383,7 @@ function addResolwedCircle(marker, editor){
 
     let startLineNumber = 0;
 
-    if(
+    if (
         marker &&
         marker.range &&
         marker.range.startLineNumber
@@ -405,12 +405,12 @@ function addResolwedCircle(marker, editor){
     editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
 }
 
-function removeResolwedCircle(marker, editor){
+function removeResolwedCircle(marker, editor) {
     const allMarkers = getAllMarkers(editor);
         
     const decoratorsToRemove = [
         ...allMarkers.filter((item) => {
-            if(
+            if (
                 item &&
                 item.range &&
                 item.range.endLineNumber && 
@@ -420,7 +420,7 @@ function removeResolwedCircle(marker, editor){
                 typeof item.options.linesDecorationsClassName === 'string' &&
                 item.options.linesDecorationsClassName.indexOf('breakpointStyle') > - 1&&
                 item.options.linesDecorationsClassName.includes('resolwedCircle')
-            ){
+            ) {
                 return true;
             } else {
                 return false;
@@ -443,18 +443,18 @@ export function makeBreakpointsFullOpacity(editor) {
     return bpMarkers.map(bpMarker => removeHalfOpacity(bpMarker, editor));
 }
 
-export function makeBreakpointsHollowCircle(editor, disabledBreakpoints){
+export function makeBreakpointsHollowCircle(editor, disabledBreakpoints) {
     const bpMarkers = getBreakpointMarkers(editor);
     
     return bpMarkers.map(bpMarker => {
-        if(
+        if (
             bpMarker &&
             bpMarker.range &&
             bpMarker.range.startLineNumber &&
             disabledBreakpoints &&
             Array.isArray(disabledBreakpoints) &&
             disabledBreakpoints.includes(bpMarker.range.startLineNumber)
-        ){
+        ) {
             addHollowCircle(bpMarker, editor);
         } else {
             removeHollowCircle(bpMarker, editor);
@@ -463,18 +463,18 @@ export function makeBreakpointsHollowCircle(editor, disabledBreakpoints){
 
 }
 
-export function makeBreakpointsResolwedCircle(editor, resolvedBreakpoints){
+export function makeBreakpointsResolwedCircle(editor, resolvedBreakpoints) {
     const bpMarkers = getBreakpointMarkers(editor);
     
     return bpMarkers.map(bpMarker => {
-        if(
+        if (
             bpMarker &&
             bpMarker.range &&
             bpMarker.range.startLineNumber &&
             resolvedBreakpoints &&
             Array.isArray(resolvedBreakpoints) &&
             resolvedBreakpoints.includes(bpMarker.range.startLineNumber)
-        ){
+        ) {
             addResolwedCircle(bpMarker, editor);
         } else {
             removeResolwedCircle(bpMarker, editor);
@@ -483,7 +483,7 @@ export function makeBreakpointsResolwedCircle(editor, resolvedBreakpoints){
 }
 
 export function updateActiveLineMarker(editor, inputLine, fontSize=null) {
-    try{
+    try {
         let line = inputLine;
         // try to convert string value of line to number if possible (line support to be integer)
         if (line && !Number.isInteger(line) && typeof line === 'string' && !isNaN(line)) {
@@ -496,7 +496,7 @@ export function updateActiveLineMarker(editor, inputLine, fontSize=null) {
         
         let fontSizeClassName = '';
 
-        if(fontSize && Number.isInteger(fontSize)){
+        if (fontSize && Number.isInteger(fontSize)) {
             fontSizeClassName = 'currentLineDecoratorStyle'+fontSize;
         }
         
@@ -513,12 +513,12 @@ export function updateActiveLineMarker(editor, inputLine, fontSize=null) {
         
         const decoratorsToRemove = [
             ...allMarkers.filter((item) => {
-                if(
+                if (
                     item &&
                     item.options && 
                     item.options.linesDecorationsClassName &&
                     typeof item.options.linesDecorationsClassName === 'string'
-                ){
+                ) {
                     return item.options.linesDecorationsClassName.startsWith('currentLineDecoratorStyle');  
                 } else {
                     return false;
@@ -532,7 +532,7 @@ export function updateActiveLineMarker(editor, inputLine, fontSize=null) {
         }
 
         editor.deltaDecorations(decoratorsToFlat(decoratorsToRemove), newDecorators);
-    } catch(e){
+    } catch (e) {
         console.log('updateActiveLineMarker Error', e);
     }
 }

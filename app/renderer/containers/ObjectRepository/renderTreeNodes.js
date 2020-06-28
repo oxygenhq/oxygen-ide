@@ -17,14 +17,14 @@ const checkHighLightChild = (arr, searchResults) => {
 
 function handleContextMenuEvent(e, node, menuName) {
     e.preventDefault();
-    if(this.props.setActiveNode){
+    if (this.props.setActiveNode) {
         this.props.setActiveNode(node.path);
     }
-    if(this.props.showContextMenu){
+    if (this.props.showContextMenu) {
 
         let safeNode = null;
 
-        if(node){
+        if (node) {
             safeNode = node;
         }
 
@@ -74,9 +74,9 @@ function renderTreeNodes(nodes, searchResults) {
         if (element.type === 'container') {
             let highLightChild = false;
 
-            if(element.children && element.children.length){
+            if (element.children && element.children.length) {
                 const checkedHighLightChild = checkHighLightChild(element.children, searchResults);
-                if(checkedHighLightChild){
+                if (checkedHighLightChild) {
                     highLightChild = true;
                 }
             }

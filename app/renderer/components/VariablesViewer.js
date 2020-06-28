@@ -24,11 +24,11 @@ export default class VariablesViewer extends React.PureComponent<Props> {
         let nextPropsVariables = [];
         let thisPropVariables = [];
 
-        if(nextProps && nextProps.variables){
+        if (nextProps && nextProps.variables) {
             nextPropsVariables = nextProps.variables;
         }
 
-        if(this.prop && this.prop.variables){
+        if (this.prop && this.prop.variables) {
             thisPropVariables = this.prop.variables;
         }
 
@@ -47,11 +47,11 @@ export default class VariablesViewer extends React.PureComponent<Props> {
         );
     }
 
-    render(){
+    render() {
         const { height, variables } = this.props;
         const { refreshScroll } = this.state;
 
-        return(
+        return (
             <div style={{height: (height - 32)+'px'}}>
                 <ScrollContainer
                     refreshScroll={refreshScroll}

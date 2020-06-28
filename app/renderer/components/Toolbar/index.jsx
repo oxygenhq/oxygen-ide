@@ -54,7 +54,7 @@ const noTargetAvailable = (
 );
 
 export default class Toolbar extends React.Component<Props> {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             canRecord: false,
@@ -135,14 +135,14 @@ export default class Toolbar extends React.Component<Props> {
     }
 
     handleBrowsersTreeValueChange = (browsersTree, value, label, extra) => {
-        if(value){
+        if (value) {
             const target = getBrowsersTarget(browsersTree, value);
             this.handleValueChange(Controls.TEST_TARGET, target);
         }
     }
 
     handleDevicesTreeValueChange = (devicesTree, value, label, extra) => {
-        if(value){
+        if (value) {
             const target = getDevicesTarget(devicesTree, value);
             this.handleValueChange(Controls.TEST_TARGET, target);
         }
@@ -171,18 +171,18 @@ export default class Toolbar extends React.Component<Props> {
         let devicesTree = null;
         let currentCloudProvidesBrowsersAndDevices = null;
 
-        if(testProvider && testProvider !== 'Local'){
+        if (testProvider && testProvider !== 'Local') {
             currentCloudProvidesBrowsersAndDevices = true;
         }
 
-        if(testProvider && cloudProvidesBrowsersAndDevices && cloudProvidesBrowsersAndDevices[testProvider]){
+        if (testProvider && cloudProvidesBrowsersAndDevices && cloudProvidesBrowsersAndDevices[testProvider]) {
             currentCloudProvidesBrowsersAndDevices = cloudProvidesBrowsersAndDevices[testProvider];
 
-            if(currentCloudProvidesBrowsersAndDevices && currentCloudProvidesBrowsersAndDevices.browsersTree){
+            if (currentCloudProvidesBrowsersAndDevices && currentCloudProvidesBrowsersAndDevices.browsersTree) {
                 browsersTree = currentCloudProvidesBrowsersAndDevices.browsersTree;
             }
 
-            if(currentCloudProvidesBrowsersAndDevices && currentCloudProvidesBrowsersAndDevices.devicesTree){
+            if (currentCloudProvidesBrowsersAndDevices && currentCloudProvidesBrowsersAndDevices.devicesTree) {
                 devicesTree = currentCloudProvidesBrowsersAndDevices.devicesTree;
             }
         }
@@ -205,10 +205,10 @@ export default class Toolbar extends React.Component<Props> {
         const cloudProvidersLoading = currentCloudProvidesBrowsersAndDevices && currentCloudProvidesBrowsersAndDevices.loading && currentCloudProvidesBrowsersAndDevices.loading === true;
 
         let cloudProviderTestMode = testMode;
-        if(cloudProvidesBrowsersEnabled && !cloudProviderTestMode){
-            if(browsersTree && Array.isArray(browsersTree) && browsersTree.length > 0){
+        if (cloudProvidesBrowsersEnabled && !cloudProviderTestMode) {
+            if (browsersTree && Array.isArray(browsersTree) && browsersTree.length > 0) {
                 cloudProviderTestMode = 'web';
-            } else if (devicesTree && Array.isArray(devicesTree) && devicesTree.length > 0){
+            } else if (devicesTree && Array.isArray(devicesTree) && devicesTree.length > 0) {
                 cloudProviderTestMode = 'mob';
             }
         }
@@ -216,7 +216,7 @@ export default class Toolbar extends React.Component<Props> {
         let mobSelectOptions;
         let noAvailableTestTarget = false;
 
-        if(testMode === 'mob' && !currentCloudProvidesBrowsersAndDevices){
+        if (testMode === 'mob' && !currentCloudProvidesBrowsersAndDevices) {
             mobSelectOptions = sortDevices(devices).map(device => {
                 const options = [];
                 if (prevDevice && prevDevice.osName === 'Android' && device.osName === 'iOS') {
@@ -231,7 +231,7 @@ export default class Toolbar extends React.Component<Props> {
                 return options;
             });
 
-            if(mobSelectOptions && Array.isArray(mobSelectOptions) && mobSelectOptions.length === 0){
+            if (mobSelectOptions && Array.isArray(mobSelectOptions) && mobSelectOptions.length === 0) {
                 testTarget = NoTargetAvailable;
                 mobSelectOptions = noTargetAvailable;
                 noAvailableTestTarget = true;

@@ -7,7 +7,7 @@ export default class Landing extends React.PureComponent {
     }
 
   processLink = (event) => {
-      if(event){
+      if (event) {
           event.preventDefault();
 
           if (event.target instanceof HTMLAnchorElement) {
@@ -19,7 +19,7 @@ export default class Landing extends React.PureComponent {
       }
   }
 
-  render(){
+  render() {
       return (
           <div className="landing-container">
               <div className="landing-inner">

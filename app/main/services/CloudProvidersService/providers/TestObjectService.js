@@ -22,24 +22,24 @@ export default class TestObjectService extends CloudProviderBase {
         return this.isRunning;
     }
 
-    updateSettings(settings){
+    updateSettings(settings) {
         this.settings=settings;
     }
 
-    async getDevice(id){
+    async getDevice(id) {
         if (this.settings && this.settings.testObjectUsername && this.settings.testobject_api_key) {
             let fetchFn;
 
-            if(typeof fetch === 'function'){
+            if (typeof fetch === 'function') {
                 fetchFn = fetch;
-            } else if(fetch && fetch.default && typeof fetch.default === 'function'){
+            } else if (fetch && fetch.default && typeof fetch.default === 'function') {
                 fetchFn = fetch.default;
             } else {
                 console.log('fetchFn not found');
                 throw new Error('TestObject: fetchFn not found');
             }
             
-            try{
+            try {
                 const response = await fetchFn(`https://app.testobject.com/api/rest/v2/devices/${id}`,
                 {
                     method:'GET',
@@ -54,7 +54,7 @@ export default class TestObjectService extends CloudProviderBase {
                 }
                 // not suppose to happen
                 return null;
-            } catch(e){
+            } catch (e) {
                 console.log('getDevice e', e);
             }
         }
@@ -63,14 +63,14 @@ export default class TestObjectService extends CloudProviderBase {
         }
     }
 
-    async getDevices(){
+    async getDevices() {
         if (this.settings && this.settings.testObjectUsername && this.settings.testobject_api_key) {
 
             let fetchFn;
 
-            if(typeof fetch === 'function'){
+            if (typeof fetch === 'function') {
                 fetchFn = fetch;
-            } else if(fetch && fetch.default && typeof fetch.default === 'function'){
+            } else if (fetch && fetch.default && typeof fetch.default === 'function') {
                 fetchFn = fetch.default;
             } else {
                 console.log('fetchFn not found');
@@ -107,7 +107,7 @@ export default class TestObjectService extends CloudProviderBase {
 
         // console.log('~~devicesIds', JSON.stringify(devicesIds, null, 2));
 
-        if(devicesIds && Array.isArray(devicesIds) && devicesIds.length > 0){
+        if (devicesIds && Array.isArray(devicesIds) && devicesIds.length > 0) {
             devicesPromises = await devicesIds.map(async(item, idx) => {
                 
                 try {
@@ -117,11 +117,11 @@ export default class TestObjectService extends CloudProviderBase {
                     // console.log('~~device', device);
     
                     //OELG_TODO region support
-                    if(device && device['US']) {
+                    if (device && device['US']) {
                         devices.push(device['US']);
                         return device['US'];
                     }
-                } catch(e){
+                } catch (e) {
                     console.log('getDevice e', e);
                     return null;
                 }
@@ -150,11 +150,11 @@ export default class TestObjectService extends CloudProviderBase {
             throw new Error('"settings" must not be null');
         }
 
-        if(!this.settings.testObjectUsername){
+        if (!this.settings.testObjectUsername) {
             throw new Error('"username" must not be null');
         }
 
-        if(!this.settings.testobject_api_key){
+        if (!this.settings.testobject_api_key) {
             throw new Error('"api_key" must not be null');
         }
 
@@ -163,7 +163,7 @@ export default class TestObjectService extends CloudProviderBase {
         if (target.osName) {
             caps.platformName = target.osName;
 
-            if(target.osName === 'android'){
+            if (target.osName === 'android') {
                 caps.browserName = 'Android';
             } else {
                 caps.browserName = 'Safari';

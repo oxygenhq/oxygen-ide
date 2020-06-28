@@ -174,7 +174,7 @@ class TreeNode extends React.Component {
 
     onDrag = (event) => {
         const { onDrag } = this.props;
-        if(onDrag){
+        if (onDrag) {
             onDrag(event.clientY);
         }
     }
@@ -341,7 +341,7 @@ class TreeNode extends React.Component {
 
         let highLight = '';
         
-        if(highLightChild){
+        if (highLightChild) {
             highLight = '_and_highLight';
         }
 
@@ -423,7 +423,7 @@ class TreeNode extends React.Component {
         // Icon - Still show loading icon when loading without showIcon
         let $icon;
 
-        if(hideIcon){
+        if (hideIcon) {
             //ignore
         } else {
             if (showIcon) {

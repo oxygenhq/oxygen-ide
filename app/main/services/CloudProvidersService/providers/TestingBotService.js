@@ -22,11 +22,11 @@ export default class TestingBotProvider extends CloudProviderBase {
         return this.isRunning;
     }
         
-    updateSettings(settings){
+    updateSettings(settings) {
         this.settings=settings;
     }
 
-    getDevices(){
+    getDevices() {
         return new Promise((resolve, reject) => {
             return fetch('https://api.testingbot.com/v1/devices')
                 .then(response =>  resolve(response.json()))
@@ -34,7 +34,7 @@ export default class TestingBotProvider extends CloudProviderBase {
         });
     }
 
-    getBrowsers(){
+    getBrowsers() {
         return new Promise((resolve, reject) => {
             return fetch('https://api.testingbot.com/v1/browsers')
                 .then(response =>  resolve(response.json()))
@@ -42,14 +42,14 @@ export default class TestingBotProvider extends CloudProviderBase {
         });
     }
 
-    async getUser(){
+    async getUser() {
         if (this.settings && this.settings.key && this.settings.secret) {
             
             let fetchFn;
 
-            if(typeof fetch === 'function'){
+            if (typeof fetch === 'function') {
                 fetchFn = fetch;
-            } else if(fetch && fetch.default && typeof fetch.default === 'function'){
+            } else if (fetch && fetch.default && typeof fetch.default === 'function') {
                 fetchFn = fetch.default;
             } else {
                 console.log('fetchFn not found');
@@ -67,13 +67,13 @@ export default class TestingBotProvider extends CloudProviderBase {
             
             const responseJson = await response.json();
             
-            if(
+            if (
                 response &&
                 response.status !== 200
             ) {
                 let errorMessage = 'TestingBot: invalid credentials';
 
-                if(
+                if (
                     responseJson && 
                     responseJson.error
                 ) {
@@ -142,41 +142,41 @@ export default class TestingBotProvider extends CloudProviderBase {
             }
             
             if (target.osVersion) {
-                if(target.osVersion === YOSEMITE){
+                if (target.osVersion === YOSEMITE) {
                     caps.platform = MACOS;
                 }
-                if(target.osVersion === CAPITAN){
+                if (target.osVersion === CAPITAN) {
                     caps.platform = CAPITAN;
                 }
-                if(target.osVersion === CATALINA){
+                if (target.osVersion === CATALINA) {
                     caps.platform = CATALINA;
                 }
-                if(target.osVersion === MOJAVE){
+                if (target.osVersion === MOJAVE) {
                     caps.platform = MOJAVE;
                 }
-                if(target.osVersion === SIERRA){
+                if (target.osVersion === SIERRA) {
                     caps.platform = SIERRA;
                 }
-                if(target.osVersion === HIGH_SIERRA){
+                if (target.osVersion === HIGH_SIERRA) {
                     caps.platform = HIGH_SIERRA;
                 }
-                if(target.osVersion === MAVERICKS){
+                if (target.osVersion === MAVERICKS) {
                     caps.platform = MAVERICKS;
                 }
 
-                if(target.osVersion === VISTA){
+                if (target.osVersion === VISTA) {
                     caps.platform = VISTA;
                 }
-                if(target.osVersion === '10'){
+                if (target.osVersion === '10') {
                     caps.platform = WIN10;
                 }
-                if(target.osVersion === '8_1'){
+                if (target.osVersion === '8_1') {
                     caps.platform = WIN8_1;
                 }
-                if(target.osVersion === '8'){
+                if (target.osVersion === '8') {
                     caps.platform = WIN8;
                 }
-                if(target.osVersion === XP){
+                if (target.osVersion === XP) {
                     caps.platform = XP;
                 }
             }

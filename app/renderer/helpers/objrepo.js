@@ -77,7 +77,7 @@ export function getRepositoryNameFromFileName(fileName) {
     return fileName;    
 }
 
-export function addLocatorInRepoRoot(repo, parentPath, locatorName){
+export function addLocatorInRepoRoot(repo, parentPath, locatorName) {
     if (!repo && !parentPath && !locatorName) {
         return null;
     }
@@ -85,9 +85,9 @@ export function addLocatorInRepoRoot(repo, parentPath, locatorName){
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(parentPath)){
+    if (Array.isArray(parentPath)) {
         pathToObject = parentPath.join('.');
-    } else if(typeof parentPath === 'object'){
+    } else if (typeof parentPath === 'object') {
         const { path } = parentPath;
         pathToObject = path;
     } else if (typeof parentPath === 'string') {
@@ -99,7 +99,7 @@ export function addLocatorInRepoRoot(repo, parentPath, locatorName){
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -109,8 +109,8 @@ export function addLocatorInRepoRoot(repo, parentPath, locatorName){
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = addLocatorInRepoRoot(value, serchStringLast, locatorName);
                 newRoot[key] = newChildValue;
             } else {
@@ -124,7 +124,7 @@ export function addLocatorInRepoRoot(repo, parentPath, locatorName){
     return newRoot;
 }
 
-export function addArrayObjectLocatorInRepoRoot(repo, parentPath, locatorName){
+export function addArrayObjectLocatorInRepoRoot(repo, parentPath, locatorName) {
     if (!repo && !parentPath && !locatorName) {
         return null;
     }
@@ -132,9 +132,9 @@ export function addArrayObjectLocatorInRepoRoot(repo, parentPath, locatorName){
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(parentPath)){
+    if (Array.isArray(parentPath)) {
         pathToObject = parentPath.join('.');
-    } else if(typeof parentPath === 'object'){
+    } else if (typeof parentPath === 'object') {
         const { path } = parentPath;
         pathToObject = path;
     } else if (typeof parentPath === 'string') {
@@ -146,7 +146,7 @@ export function addArrayObjectLocatorInRepoRoot(repo, parentPath, locatorName){
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -156,14 +156,14 @@ export function addArrayObjectLocatorInRepoRoot(repo, parentPath, locatorName){
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = addArrayObjectLocatorInRepoRoot(value, serchStringLast, locatorName);
                 newRoot[key] = newChildValue;
             } else {
                 let newValue;
 
-                if(value && Array.isArray(value)){
+                if (value && Array.isArray(value)) {
                     newValue = [...value, locatorName];
                 } else {
                     newValue = [locatorName];
@@ -177,7 +177,7 @@ export function addArrayObjectLocatorInRepoRoot(repo, parentPath, locatorName){
     return newRoot;
 }
 
-export function deleteObjectOrFolder(repo, parentPath, name){
+export function deleteObjectOrFolder(repo, parentPath, name) {
     if (!repo && !parentPath && !name) {
         return null;
     }
@@ -185,9 +185,9 @@ export function deleteObjectOrFolder(repo, parentPath, name){
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(parentPath)){
+    if (Array.isArray(parentPath)) {
         pathToObject = parentPath.join('.');
-    } else if(typeof parentPath === 'object'){
+    } else if (typeof parentPath === 'object') {
         pathToObject = parentPath;
     } else if (typeof parentPath === 'string') {
         pathToObject = parentPath;
@@ -198,7 +198,7 @@ export function deleteObjectOrFolder(repo, parentPath, name){
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -208,8 +208,8 @@ export function deleteObjectOrFolder(repo, parentPath, name){
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = deleteObjectOrFolder(value, serchStringLast, name);
                 newRoot[key] = newChildValue;
             } else {
@@ -225,7 +225,7 @@ export function deleteObjectOrFolder(repo, parentPath, name){
 }
 
 
-export function deleteArrayObjectLocator(repo, parentPath, idx){
+export function deleteArrayObjectLocator(repo, parentPath, idx) {
 
     if (!repo && !parentPath && typeof idx === 'undefined') {
         return null;
@@ -234,9 +234,9 @@ export function deleteArrayObjectLocator(repo, parentPath, idx){
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(parentPath)){
+    if (Array.isArray(parentPath)) {
         pathToObject = parentPath.join('.');
-    } else if(typeof parentPath === 'object'){
+    } else if (typeof parentPath === 'object') {
         const { path } = parentPath;
         pathToObject = path;
     } else if (typeof parentPath === 'string') {
@@ -248,7 +248,7 @@ export function deleteArrayObjectLocator(repo, parentPath, idx){
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -258,20 +258,20 @@ export function deleteArrayObjectLocator(repo, parentPath, idx){
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = deleteArrayObjectLocator(value, serchStringLast, idx);
                 newRoot[key] = newChildValue;
             } else {
                 let newValue;
 
-                if(value && Array.isArray(value)){
+                if (value && Array.isArray(value)) {
                     newValue = [...value];
                 } else {
                     newValue = [];
                 }
 
-                if(newValue[idx]){
+                if (newValue[idx]) {
                     newValue.splice(idx, 1);
                 } else {
                     console.warn('in newValue no element with idx', newValue, idx);
@@ -287,7 +287,7 @@ export function deleteArrayObjectLocator(repo, parentPath, idx){
 }
 
 // obj - node where need to delete
-export function deleteLocatorInRepoRoot(repo, obj){
+export function deleteLocatorInRepoRoot(repo, obj) {
     if (!repo) {
         return null;
     }
@@ -295,9 +295,9 @@ export function deleteLocatorInRepoRoot(repo, obj){
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(obj)){
+    if (Array.isArray(obj)) {
         pathToObject = obj.join('.');
-    } else if(typeof obj === 'object'){
+    } else if (typeof obj === 'object') {
         const { path } = obj;
         pathToObject = path;
     } else if (typeof obj === 'string') {
@@ -309,7 +309,7 @@ export function deleteLocatorInRepoRoot(repo, obj){
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -319,8 +319,8 @@ export function deleteLocatorInRepoRoot(repo, obj){
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = deleteLocatorInRepoRoot(value, serchStringLast);
                 newRoot[key] = newChildValue;
             } else {
@@ -333,7 +333,7 @@ export function deleteLocatorInRepoRoot(repo, obj){
     return newRoot;
 }
 
-export function renameLocatorInRepoRoot(repo, parentPath, newName, originName){
+export function renameLocatorInRepoRoot(repo, parentPath, newName, originName) {
     if (!repo && !parentPath && !newName && !originName) {
         return null;
     }
@@ -341,9 +341,9 @@ export function renameLocatorInRepoRoot(repo, parentPath, newName, originName){
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(parentPath)){
+    if (Array.isArray(parentPath)) {
         pathToObject = parentPath.join('.');
-    } else if(typeof parentPath === 'object'){
+    } else if (typeof parentPath === 'object') {
         const { path } = parentPath;
         pathToObject = path;
     } else if (typeof parentPath === 'string') {
@@ -355,7 +355,7 @@ export function renameLocatorInRepoRoot(repo, parentPath, newName, originName){
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -365,8 +365,8 @@ export function renameLocatorInRepoRoot(repo, parentPath, newName, originName){
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = renameLocatorInRepoRoot(value, serchStringLast, newName, originName);
                 newRoot[key] = newChildValue;
             } else {
@@ -398,7 +398,7 @@ function orderKey(obj, keyOrder) {
     return result;
 }
 
-export function moveLocatorInRepoRoot(repo, parentPath, name, direction, index){
+export function moveLocatorInRepoRoot(repo, parentPath, name, direction, index) {
     if (!repo && !parentPath && !name && !direction) {
         return null;
     }
@@ -406,9 +406,9 @@ export function moveLocatorInRepoRoot(repo, parentPath, name, direction, index){
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(parentPath)){
+    if (Array.isArray(parentPath)) {
         pathToObject = parentPath.join('.');
-    } else if(typeof parentPath === 'object'){
+    } else if (typeof parentPath === 'object') {
         const { path } = parentPath;
         pathToObject = path;
     } else if (typeof parentPath === 'string') {
@@ -420,7 +420,7 @@ export function moveLocatorInRepoRoot(repo, parentPath, name, direction, index){
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -430,15 +430,15 @@ export function moveLocatorInRepoRoot(repo, parentPath, name, direction, index){
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = moveLocatorInRepoRoot(value, serchStringLast, name, direction, index);
                 newRoot[key] = newChildValue;
             } else {
 
                 const keys = Object.keys(value);
                 
-                if(direction === 'up'){
+                if (direction === 'up') {
 
                     const indexByValue = keys.indexOf(name);
                     
@@ -449,7 +449,7 @@ export function moveLocatorInRepoRoot(repo, parentPath, name, direction, index){
                     newRoot[key] = newValue;
                 }
 
-                if(direction === 'down'){
+                if (direction === 'down') {
 
                     const indexByValue = keys.indexOf(name);
                     
@@ -480,7 +480,7 @@ function array_move(arr, old_index, new_index) {
     return arr; // for testing
 }
 
-export function moveArrayObjectLocatorInRepoRoot(repo, parentPath, index, direction){
+export function moveArrayObjectLocatorInRepoRoot(repo, parentPath, index, direction) {
     if (!repo && !parentPath && !name && !direction) {
         return null;
     }
@@ -488,9 +488,9 @@ export function moveArrayObjectLocatorInRepoRoot(repo, parentPath, index, direct
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(parentPath)){
+    if (Array.isArray(parentPath)) {
         pathToObject = parentPath.join('.');
-    } else if(typeof parentPath === 'object'){
+    } else if (typeof parentPath === 'object') {
         const { path } = parentPath;
         pathToObject = path;
     } else if (typeof parentPath === 'string') {
@@ -502,7 +502,7 @@ export function moveArrayObjectLocatorInRepoRoot(repo, parentPath, index, direct
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -513,18 +513,18 @@ export function moveArrayObjectLocatorInRepoRoot(repo, parentPath, index, direct
     
     for (var [key, value] of Object.entries(repo)) {
 
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = moveArrayObjectLocatorInRepoRoot(value, serchStringLast, name, direction, index);
                 newRoot[key] = newChildValue;
             } else {
-                if(direction === 'up'){
+                if (direction === 'up') {
                     const newIndex = index - 1;
                     const newValue = array_move(value, index, newIndex);
                     newRoot[key] = newValue;
                 }
 
-                if(direction === 'down'){
+                if (direction === 'down') {
                     const newIndex = index + 1;
                     const newValue = array_move(value, index, newIndex);
                     newRoot[key] = newValue;
@@ -538,7 +538,7 @@ export function moveArrayObjectLocatorInRepoRoot(repo, parentPath, index, direct
     return newRoot;
 }
 
-export function updateLocatorValueInRepoRoot(repo, locatorPath, locatorNewValue){
+export function updateLocatorValueInRepoRoot(repo, locatorPath, locatorNewValue) {
     if (!repo && !locatorPath && !locatorNewValue) {
         return null;
     }
@@ -546,9 +546,9 @@ export function updateLocatorValueInRepoRoot(repo, locatorPath, locatorNewValue)
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(locatorPath)){
+    if (Array.isArray(locatorPath)) {
         pathToObject = locatorPath.join('.');
-    } else if(typeof locatorPath === 'object'){
+    } else if (typeof locatorPath === 'object') {
         const { path } = locatorPath;
         pathToObject = path;
     } else if (typeof locatorPath === 'string') {
@@ -560,7 +560,7 @@ export function updateLocatorValueInRepoRoot(repo, locatorPath, locatorNewValue)
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -570,8 +570,8 @@ export function updateLocatorValueInRepoRoot(repo, locatorPath, locatorNewValue)
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = updateLocatorValueInRepoRoot(value, serchStringLast, locatorNewValue);
                 newRoot[key] = newChildValue;
             } else {
@@ -584,7 +584,7 @@ export function updateLocatorValueInRepoRoot(repo, locatorPath, locatorNewValue)
     return newRoot;
 }
 
-export function updateArrayObjecLocatorValueInRepoRoot(repo, parentPath, locatorNewValue, idx){
+export function updateArrayObjecLocatorValueInRepoRoot(repo, parentPath, locatorNewValue, idx) {
 
     if (!repo && !parentPath && typeof idx === 'undefined') {
         return null;
@@ -593,9 +593,9 @@ export function updateArrayObjecLocatorValueInRepoRoot(repo, parentPath, locator
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(parentPath)){
+    if (Array.isArray(parentPath)) {
         pathToObject = parentPath.join('.');
-    } else if(typeof parentPath === 'object'){
+    } else if (typeof parentPath === 'object') {
         const { path } = parentPath;
         pathToObject = path;
     } else if (typeof parentPath === 'string') {
@@ -607,7 +607,7 @@ export function updateArrayObjecLocatorValueInRepoRoot(repo, parentPath, locator
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -617,20 +617,20 @@ export function updateArrayObjecLocatorValueInRepoRoot(repo, parentPath, locator
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = updateArrayObjecLocatorValueInRepoRoot(value, serchStringLast,locatorNewValue, idx);
                 newRoot[key] = newChildValue;
             } else {
                 let newValue;
 
-                if(value && Array.isArray(value)){
+                if (value && Array.isArray(value)) {
                     newValue = [...value];
                 } else {
                     newValue = [];
                 }
 
-                if(newValue[idx]){
+                if (newValue[idx]) {
                     newValue[idx] = locatorNewValue;
                 } else {
                     console.warn('in newValue no element with idx', newValue, idx);
@@ -646,7 +646,7 @@ export function updateArrayObjecLocatorValueInRepoRoot(repo, parentPath, locator
 }
 
 // obj - parentNode
-export function createContainerInRepoRoot(repo, newObjName, obj){
+export function createContainerInRepoRoot(repo, newObjName, obj) {
     if (!repo && !newObjName) {
         return null;
     }
@@ -654,9 +654,9 @@ export function createContainerInRepoRoot(repo, newObjName, obj){
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(obj)){
+    if (Array.isArray(obj)) {
         pathToObject = obj.join('.');
-    } else if(typeof obj === 'object'){
+    } else if (typeof obj === 'object') {
         const { path } = obj;
         pathToObject = path;
     } else if (typeof obj === 'string') {
@@ -668,7 +668,7 @@ export function createContainerInRepoRoot(repo, newObjName, obj){
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -678,15 +678,15 @@ export function createContainerInRepoRoot(repo, newObjName, obj){
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = createContainerInRepoRoot(value, newObjName, serchStringLast);
                 newRoot[key] = newChildValue;
             } else {
 
                 newRoot[key] = value;
                 
-                if(newRoot && key && newRoot[key] && newRoot[key][newObjName]){
+                if (newRoot && key && newRoot[key] && newRoot[key][newObjName]) {
                     notification['error']({
                         message: 'Tree item with this name already exist',
                         description: newObjName,
@@ -703,7 +703,7 @@ export function createContainerInRepoRoot(repo, newObjName, obj){
 }
 
 // obj - parentNode
-export function createElementInRepoRoot(repo, newObjName, obj){
+export function createElementInRepoRoot(repo, newObjName, obj) {
     if (!repo && !newObjName) {
         return null;
     }
@@ -711,9 +711,9 @@ export function createElementInRepoRoot(repo, newObjName, obj){
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(obj)){
+    if (Array.isArray(obj)) {
         pathToObject = obj.join('.');
-    } else if(typeof obj === 'object'){
+    } else if (typeof obj === 'object') {
         const { path } = obj;
         pathToObject = path;
     } else if (typeof obj === 'string') {
@@ -725,7 +725,7 @@ export function createElementInRepoRoot(repo, newObjName, obj){
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -735,15 +735,15 @@ export function createElementInRepoRoot(repo, newObjName, obj){
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = createElementInRepoRoot(value, newObjName, serchStringLast);
                 newRoot[key] = newChildValue;
             } else {
 
                 newRoot[key] = value;
 
-                if(newRoot && key && newRoot[key] && newRoot[key][newObjName]){
+                if (newRoot && key && newRoot[key] && newRoot[key][newObjName]) {
                     notification['error']({
                         message: 'Tree item with this name already exist',
                         description: newObjName,
@@ -768,7 +768,7 @@ const renameProp = (
     ...others
 });
 
-export function renameElementOrContaimerInRepoRoot(repo, parentPath, type, newName){
+export function renameElementOrContaimerInRepoRoot(repo, parentPath, type, newName) {
 
     if (!repo && !type && !parentPath && !newName) {
         return null;
@@ -779,9 +779,9 @@ export function renameElementOrContaimerInRepoRoot(repo, parentPath, type, newNa
 
     
 
-    if(Array.isArray(parentPath)){
+    if (Array.isArray(parentPath)) {
         pathToObject = parentPath.join('.');
-    } else if(typeof parentPath === 'object'){
+    } else if (typeof parentPath === 'object') {
         const { path } = parentPath;
         pathToObject = path;
     } else if (typeof parentPath === 'string') {
@@ -793,7 +793,7 @@ export function renameElementOrContaimerInRepoRoot(repo, parentPath, type, newNa
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -803,12 +803,12 @@ export function renameElementOrContaimerInRepoRoot(repo, parentPath, type, newNa
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = renameElementOrContaimerInRepoRoot(value, serchStringLast, type, newName);
                 newRoot[key] = newChildValue;
             } else {
-                if(repo && repo[newName]){
+                if (repo && repo[newName]) {
                     notification['error']({
                         message: 'Tree item with this name already exist',
                         description: newName,
@@ -830,7 +830,7 @@ export function renameElementOrContaimerInRepoRoot(repo, parentPath, type, newNa
     return newRoot;
 }
 
-export function removeElementOrContaimerInRepoRoot(repo, parentPath, type){
+export function removeElementOrContaimerInRepoRoot(repo, parentPath, type) {
 
     if (!repo && !type && !parentPath) {
         return null;
@@ -841,9 +841,9 @@ export function removeElementOrContaimerInRepoRoot(repo, parentPath, type){
 
     
 
-    if(Array.isArray(parentPath)){
+    if (Array.isArray(parentPath)) {
         pathToObject = parentPath.join('.');
-    } else if(typeof parentPath === 'object'){
+    } else if (typeof parentPath === 'object') {
         const { path } = parentPath;
         pathToObject = path;
     } else if (typeof parentPath === 'string') {
@@ -855,7 +855,7 @@ export function removeElementOrContaimerInRepoRoot(repo, parentPath, type){
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -865,8 +865,8 @@ export function removeElementOrContaimerInRepoRoot(repo, parentPath, type){
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = removeElementOrContaimerInRepoRoot(value, serchStringLast, type);
                 newRoot[key] = newChildValue;
             } else {
@@ -880,7 +880,7 @@ export function removeElementOrContaimerInRepoRoot(repo, parentPath, type){
     return newRoot;
 }
 
-export function copyObjectInRepoRoot(repo, obj){
+export function copyObjectInRepoRoot(repo, obj) {
     if (!obj && !repo) {
         return null;
     }
@@ -888,9 +888,9 @@ export function copyObjectInRepoRoot(repo, obj){
     let newRoot = {};
     let pathToObject;
     
-    if(Array.isArray(obj)){
+    if (Array.isArray(obj)) {
         pathToObject = obj.join('.');
-    } else if(typeof obj === 'object'){
+    } else if (typeof obj === 'object') {
         const { path } = obj;
         pathToObject = path;
     } else if (typeof obj === 'string') {
@@ -902,7 +902,7 @@ export function copyObjectInRepoRoot(repo, obj){
     let serchString = '';
     let serchStringLast = '';
     
-    if(pathToObject.includes('.')){
+    if (pathToObject.includes('.')) {
         const [ first, ...last ] = pathToObject.split('.');
         serchString = first;
         serchStringLast = last.join('.');
@@ -912,8 +912,8 @@ export function copyObjectInRepoRoot(repo, obj){
     }
 
     for (var [key, value] of Object.entries(repo)) {
-        if(serchString === key){
-            if(serchStringLast){
+        if (serchString === key) {
+            if (serchStringLast) {
                 const newChildValue = copyObjectInRepoRoot(value, serchStringLast);
                 newRoot[key] = newChildValue;
             } else {

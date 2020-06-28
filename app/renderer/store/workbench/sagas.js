@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import uuidv4 from'uuid/v4';
+import uuidv4 from 'uuid/v4';
 import { all, put, select, takeLatest, call } from 'redux-saga/effects';
 import { putAndTake } from '../../helpers/saga';
 import pathHelper from 'path';
@@ -140,10 +140,10 @@ export function* handleMainMenuEvents({ payload }) {
     else if (cmd === Const.MENU_CMD_OPEL_LOG_FILE) {
         try {
             const filePath = yield call(services.mainIpc.call, 'ElectronService', 'getLogFilePath', []);
-            if(filePath && typeof filePath === 'string'){
+            if (filePath && typeof filePath === 'string') {
                 yield put(wbActions.openFile(filePath));
             }
-        } catch(e){
+        } catch (e) {
             console.log('MENU_CMD_OPEL_LOG_FILE e'. e);
         }
     }
@@ -162,16 +162,16 @@ export function* handleMainMenuEvents({ payload }) {
     else if (cmd === Const.MENU_CMD_ORE_NEW_ELEMENT) {
         yield showNewObjectElementDialog({});
     }
-    else if (cmd === Const.MENU_CMD_ORE_RENAME_ELEMENT){
+    else if (cmd === Const.MENU_CMD_ORE_RENAME_ELEMENT) {
         yield showRenameObjectElementOrContainerDialog({ type : 'element' });
     }
-    else if (cmd === Const.MENU_CMD_ORE_RENAME_CONTAINER){
+    else if (cmd === Const.MENU_CMD_ORE_RENAME_CONTAINER) {
         yield showRenameObjectElementOrContainerDialog({ type : 'container' });
     }
-    else if (cmd === Const.MENU_CMD_ORE_DELETE_ELEMENT){
+    else if (cmd === Const.MENU_CMD_ORE_DELETE_ELEMENT) {
         yield showRemoveObjectElementOrContainerDialog({ type : 'element' });
     }
-    else if (cmd === Const.MENU_CMD_ORE_DELETE_CONTAINER){
+    else if (cmd === Const.MENU_CMD_ORE_DELETE_CONTAINER) {
         yield showRemoveObjectElementOrContainerDialog({ type : 'container' });
     }
     else if (cmd === Const.MENU_CMD_ORE_NEW_CONTAINER) {
@@ -220,13 +220,13 @@ export function* handleServiceEvents({ payload }) {
     }
 }
 
-export function* handleJavaNotFound(inner){
+export function* handleJavaNotFound(inner) {
     yield put(wbActions.setJavaError({
         reason: 'not-found'
     }));
 }
 
-export function* handleJavaBadVersion({ payload }){
+export function* handleJavaBadVersion({ payload }) {
     const { version } = payload;
     yield put(wbActions.setJavaError({
         reason: 'bad-version',
@@ -271,9 +271,9 @@ export function* initialize() {
     if (appSettings && appSettings.cache) {
         yield putAndTake(wbActions.restoreFromCache(appSettings.cache));
 
-        try{
+        try {
             yield call(services.javaService.checkJavaVersion);
-        } catch(error){
+        } catch (error) {
             console.warn('Failure checking Java', error);
             
             yield put(reportError(error));
@@ -307,7 +307,7 @@ export function* initialize() {
         yield put(settingsActions.firstOpen());
         yield put(setUserIdToSentry(uuid));
 
-        if(appSettings){
+        if (appSettings) {
             appSettings.cacheUsed = true;
         }
     }
@@ -350,8 +350,8 @@ export function* openFolder({ payload }) {
         let fileNamesStr = '';
         
         unsaved.map((file) => {
-            if(file && file.name && typeof file.name){
-                if(fileNamesStr){
+            if (file && file.name && typeof file.name) {
+                if (fileNamesStr) {
                     fileNamesStr+= ', '+file.name;
                 } else {
                     fileNamesStr+= file.name;
@@ -386,7 +386,7 @@ export function* openFolder({ payload }) {
 export function* changeTab({ payload }) {
     const { key, name } = payload;
 
-    if(key === 'unknown'){
+    if (key === 'unknown') {
         yield put(tabActions.setActiveTab(key, name));
         yield put(editorActions.setActiveFile(key, name));
     } else {
@@ -396,7 +396,7 @@ export function* changeTab({ payload }) {
         // if any error occurs during openning tab's file content (e.g. file doesn't not exist), remove this tab
         if (error) {
             console.warn('error', error);
-            if(key){
+            if (key) {
                 yield put(tabActions.removeTab(key));
             }
         }
@@ -406,7 +406,7 @@ export function* changeTab({ payload }) {
     }
 }
 
-export function* createNewRealFile({ payload }){
+export function* createNewRealFile({ payload }) {
     const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [null, null, [ 
         { name: 'JavaScript file', extensions:['js'] },
         { name: 'All Files', extensions: ['*'] } 
@@ -422,13 +422,13 @@ export function* createNewRealFile({ payload }){
 
     let content = '';
     
-    if(payload && payload.fakeFile){
+    if (payload && payload.fakeFile) {
         content= payload.fakeFile.content;
     }
 
     let saveContent = content;
 
-    if(!content){
+    if (!content) {
         saveContent = '';
     }
 
@@ -447,19 +447,19 @@ export function* createNewRealFile({ payload }){
         }
 
 
-        if(payload && payload.fakeFile){
+        if (payload && payload.fakeFile) {
             const { path, name } = payload.fakeFile;
             const files = yield select(state => state.settings.files);
             const currentFile = files[path+name];
 
-            if(currentFile && saveAsFile && saveAsFile.path){
+            if (currentFile && saveAsFile && saveAsFile.path) {
                 yield closeTmpFile(currentFile, saveAsFile.path);
             }
         }
 
         const fs = yield select(state => state.fs);
                 
-        if(fs && typeof typeof fs.rootPath !== 'undefined' && fs.rootPath === null){
+        if (fs && typeof typeof fs.rootPath !== 'undefined' && fs.rootPath === null) {
             const { error } = yield putAndTake(
                 fsActions.treeOpenFolder(folderPath)
             );
@@ -487,15 +487,15 @@ export function* createNewRealFile({ payload }){
 const getMaxIndex = (tabs) => {
     let index = 0;
 
-    if(Array.isArray(tabs)){
+    if (Array.isArray(tabs)) {
         tabs.map(tab => {
-            if(tab && tab.title && tab.key && tab.key === 'unknown'){
+            if (tab && tab.title && tab.key && tab.key === 'unknown') {
                 const number = parseInt(tab.title.replace( /^\D+/g, ''));
 
-                if(isNaN(number)){
+                if (isNaN(number)) {
                     // ignore
                 } else {
-                    if(number > index){
+                    if (number > index) {
                         index = number;
                     }
                 }
@@ -506,13 +506,13 @@ const getMaxIndex = (tabs) => {
     return index;
 };
 
-export function* openFakeFile(){
+export function* openFakeFile() {
     let tabs = yield select(state => state.tabs);
     let idenity;
 
-    if(tabs && tabs.list && Array.isArray(tabs.list)){
+    if (tabs && tabs.list && Array.isArray(tabs.list)) {
         idenity = tabs.list.filter((tab) => tab.key === 'unknown');
-        if(!idenity){
+        if (!idenity) {
             idenity = [];
         }
     } else {
@@ -525,9 +525,9 @@ export function* openFakeFile(){
     
     const tmpFileExist = tabs.list.some((tab) => tab.key === key && tab.title === name );
 
-    if(tmpFileExist){
+    if (tmpFileExist) {
         const index = getMaxIndex(tabs.list);
-        if(index === 0){
+        if (index === 0) {
             const timestamp = + new Date();
             name = 'Untitled-'+(timestamp);
         } else {
@@ -566,8 +566,8 @@ export function* openFile({ payload }) {
         return;
     }
 
-    if(!force){
-        if(file && file.name && file.parentPath && file.name.endsWith('.js') && !file.name.endsWith('.repo.js')){
+    if (!force) {
+        if (file && file.name && file.parentPath && file.name.endsWith('.js') && !file.name.endsWith('.repo.js')) {
             const splitResult = file.name.split('.js');
             
             splitResult.pop();
@@ -717,7 +717,7 @@ export function* removeObjectOrFolder({ payload }) {
 
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
-    if(objrepo && objrepo.path){
+    if (objrepo && objrepo.path) {
         yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
@@ -735,7 +735,7 @@ export function* removeArrayObjectLocator({ payload }) {
 
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
-    if(objrepo && objrepo.path){
+    if (objrepo && objrepo.path) {
         yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
@@ -753,7 +753,7 @@ export function* updateLocator({ payload }) {
 
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
-    if(objrepo && objrepo.path){
+    if (objrepo && objrepo.path) {
         yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
@@ -771,7 +771,7 @@ export function* moveLocator({ payload }) {
 
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
-    if(objrepo && objrepo.path){
+    if (objrepo && objrepo.path) {
         yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
@@ -788,7 +788,7 @@ export function* moveArrayObjectLocator({ payload }) {
     
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
-    if(objrepo && objrepo.path){
+    if (objrepo && objrepo.path) {
         yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
@@ -806,7 +806,7 @@ export function* addLocator({ payload }) {
 
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
-    if(objrepo && objrepo.path){
+    if (objrepo && objrepo.path) {
         yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
@@ -824,7 +824,7 @@ export function* addArrayObjectLocator({ payload }) {
 
     const repoRootString = JSON.stringify( repoRootCopy );
     const newFileContent = start+repoRootString+end;
-    if(objrepo && objrepo.path){
+    if (objrepo && objrepo.path) {
         yield call(services.mainIpc.call, 'FileService', 'saveFileContent', [ objrepo.path,  newFileContent, true]);
     }
 }
@@ -924,10 +924,10 @@ export function* closeFile({ payload }) {
         }
     }
 
-    if(showDeleteTitle && path){
+    if (showDeleteTitle && path) {
         const pathSplit = path.split(pathHelper.sep);
 
-        if(pathSplit && pathSplit.length){
+        if (pathSplit && pathSplit.length) {
             const newName = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
             
             yield put(tabActions.renameTab(path, 'unknown', newName));
@@ -946,7 +946,7 @@ export function* closeFile({ payload }) {
 
     yield put(testActions.removeBreakpoints(path));
 
-    if(path === 'unknown'){
+    if (path === 'unknown') {
         yield put(settingsActions.removeFile(path, name));
     }
 
@@ -974,7 +974,7 @@ export function* showDialog({ payload }) {
             const path = paths[0];
             const splitResult = path.split('\\');
 
-            if(splitResult && splitResult.length === 2 && !splitResult[1]){
+            if (splitResult && splitResult.length === 2 && !splitResult[1]) {
                 alert('Sorry, we don\'t support opening root disks. Please select a folder.');
             } else {
                 yield openFolder({ payload: { path: paths[0] }});
@@ -1010,14 +1010,14 @@ export function* contentUpdate({ payload }) {
         yield put(tabActions.setTabTouched(path, true, name));
     }    
 
-    if(path === 'unknown'){
+    if (path === 'unknown') {
         yield put(settingsActions.updateFileContent(path, content, name));
     } else {
         yield put(fsActions.updateFileContent(path, content));
     }
 }
 
-export function* closeTmpFile(file, realFilePath){
+export function* closeTmpFile(file, realFilePath) {
     yield put(editorActions.closeFile(file.path, false, file.name));
     yield put(tabActions.removeTab(file.path, file.name));
     yield put(settingsActions.removeFile(file.path, file.name));
@@ -1031,13 +1031,13 @@ export function* saveCurrentFile({ payload }) {
     const fsRootPath = yield select(state => state.fs.rootPath);
     let rootPath = null;
 
-    if(fsRootPath){
+    if (fsRootPath) {
         rootPath = fsRootPath;
     }
 
     const { activeFile, activeFileName } = editor;
 
-    if(activeFile === 'unknown'){
+    if (activeFile === 'unknown') {
         const saveAsPath = yield call(services.mainIpc.call, 'ElectronService', 'showSaveDialog', [activeFileName, rootPath, [ 
             { name: 'JavaScript file', extensions:['js'] },
             { name: 'All Files', extensions: ['*'] } 
@@ -1057,7 +1057,7 @@ export function* saveCurrentFile({ payload }) {
 
         let saveContent = currentFile && currentFile.content;
 
-        if(!saveContent){
+        if (!saveContent) {
             saveContent = '';
         }
 
@@ -1079,13 +1079,13 @@ export function* saveCurrentFile({ payload }) {
             yield fsActions.treeLoadNodeChildren(saveAsFile.parentPath, true);
             // open newly saved file (as it's not necessary open) - e.g. open it in a new tab
 
-            if(currentFile){
+            if (currentFile) {
                 yield closeTmpFile(currentFile, saveAsPath);
             }
 
             const fs = yield select(state => state.fs);
             
-            if(fs && typeof typeof fs.rootPath !== 'undefined' && fs.rootPath === null){
+            if (fs && typeof typeof fs.rootPath !== 'undefined' && fs.rootPath === null) {
                 const { error } = yield putAndTake(
                     fsActions.treeOpenFolder(folderPath)
                 );
@@ -1101,8 +1101,8 @@ export function* saveCurrentFile({ payload }) {
 
             yield openFile({ payload: { path: saveAsPath } });
 
-            if(recorder && recorder.activeFile && recorder.activeFileName){
-                if(recorder.activeFile === activeFile && recorder.activeFileName === activeFileName){
+            if (recorder && recorder.activeFile && recorder.activeFileName) {
+                if (recorder.activeFile === activeFile && recorder.activeFileName === activeFileName) {
                     yield put(recorderActions.replaceFileCredentials(saveAsPath, null));
                 }
             }
@@ -1128,7 +1128,7 @@ export function* saveCurrentFile({ payload }) {
 
             let saveContent = currentFile && currentFile.content;
 
-            if(!saveContent){
+            if (!saveContent) {
                 saveContent = '';
             }
 
@@ -1162,10 +1162,10 @@ export function* saveCurrentFile({ payload }) {
 
             const { list } = tabsFiles;
 
-            if(list && Array.isArray(list)){
+            if (list && Array.isArray(list)) {
                 const tab = list.find(x => x.key === activeFile);
 
-                if(tab && typeof tab.touched !== 'undefined' && tab.touched){
+                if (tab && typeof tab.touched !== 'undefined' && tab.touched) {
                     const { error } = yield putAndTake(
                         fsActions.saveFile(activeFile, currentFile.content)
                     );
@@ -1195,14 +1195,14 @@ export function* handleFileDelete({ payload }) {
     const objrepoPath = yield select(state => state.objrepo.path);
     
 
-    if(path && !path.endsWith('.repo.js')){
+    if (path && !path.endsWith('.repo.js')) {
         const splitResult = path.split('.js');
         splitResult.pop();
         splitResult.push('.repo.js');
         const repoFilePath = splitResult.join('');
         const repoFile = files[repoFilePath];
     
-        if(repoFile && objrepoPath && repoFilePath === objrepoPath){
+        if (repoFile && objrepoPath && repoFilePath === objrepoPath) {
             yield put(orActions.clearObjectRepositoryFile());
         }
     }
@@ -1253,7 +1253,7 @@ export function* copyStringToClipboard(str) {
         document.body.removeChild(el);
 
         result = true;
-    } catch(error){
+    } catch (error) {
         console.warn('copyStringToClipboard error', error);
         yield put(reportError(error));
         result = false;
@@ -1269,16 +1269,16 @@ const openCopyNotificationWithIcon = type => {
 };
 
 export function* copyObject({ payload }) {
-    try{    
+    try {    
         const objrepo = (yield select(state => state.objrepo)) || null;
     
-        if(objrepo){    
+        if (objrepo) {    
             const { parent } = objrepo;
 
-            if(parent && parent.path) {
+            if (parent && parent.path) {
                 const copyResult = yield copyStringToClipboard(parent.path);
 
-                if(copyResult){
+                if (copyResult) {
                     openCopyNotificationWithIcon('success');
                 } else {
                     openCopyNotificationWithIcon('error');
@@ -1290,7 +1290,7 @@ export function* copyObject({ payload }) {
         } else {
             openCopyNotificationWithIcon('error');
         }
-    } catch(error){
+    } catch (error) {
         console.warn('copyObject error', error);
         openCopyNotificationWithIcon('error');
         yield put(reportError(error));
@@ -1302,7 +1302,7 @@ export function* showNewObjectElementDialog({ payload }) {
     const { path, parent } = objrepo;
     if (path) {
         let safeParent = null;
-        if(parent) {
+        if (parent) {
             safeParent = parent;
         }
         yield put(
@@ -1319,7 +1319,7 @@ export function* showRenameObjectElementOrContainerDialog({ type }) {
     const { path, parent } = objrepo;
     if (path) {
         let safeParent = null;
-        if(parent) {
+        if (parent) {
             safeParent = parent;
         }
         yield put(
@@ -1337,7 +1337,7 @@ export function* showRemoveObjectElementOrContainerDialog({ type }) {
     const { path, parent } = objrepo;
     if (path) {
         let safeParent = null;
-        if(parent) {
+        if (parent) {
             safeParent = parent;
         }
         yield put(
@@ -1413,7 +1413,7 @@ export function* showNewFolderDialog({ payload }) {
             );
         }
     }
-    else if(activeNode){
+    else if (activeNode) {
         yield put(
             wbActions.showDialog('DIALOG_FILE_CREATE', { type: 'folder', path: activeNode })
         );
@@ -1434,7 +1434,7 @@ export function* showRenameFolderDialog({ payload }) {
     // in that case, fetch folder info before proceeding
     const { response, error } = yield getOrFetchFileInfo(activeNodePath);
 
-    if(response){
+    if (response) {
         const treeActiveFile = response;
         // ignore any file entry which is not folder
         if (!treeActiveFile || treeActiveFile.type !== 'folder') {
@@ -1444,7 +1444,7 @@ export function* showRenameFolderDialog({ payload }) {
         yield put(wbActions.showDialog('DIALOG_FILE_RENAME', { type, path, name }));
     }
 
-    if(error && error.message){
+    if (error && error.message) {
         alert(error.message);
         yield put(fsActions.deleteFile(activeNodePath));
     }
@@ -1469,7 +1469,7 @@ export function* showRenameFileDialog({ payload }) {
     
     const { response, error } = yield getOrFetchFileInfo(activeNodePath);
 
-    if(response){
+    if (response) {
         const treeActiveFile = response;
 
         // ignore any file entry which is not folder
@@ -1480,7 +1480,7 @@ export function* showRenameFileDialog({ payload }) {
         yield put(wbActions.showDialog('DIALOG_FILE_RENAME', { type, path, name }));
     }
 
-    if(error && error.message){
+    if (error && error.message) {
         alert(error.message);
         yield put(fsActions.deleteFile(activeNodePath));
     }
@@ -1496,7 +1496,7 @@ export function* showDeleteFileDialog({ payload }) {
     // in that case, fetch folder info before proceeding
     const { response, error } = yield getOrFetchFileInfo(activeNodePath);
     
-    if(response){
+    if (response) {
         const treeActiveFile = response;
         if (!treeActiveFile) {
             return;
@@ -1508,7 +1508,7 @@ export function* showDeleteFileDialog({ payload }) {
         yield put(fsActions.deleteFile(activeNodePath));
     }
 
-    if(error && error.message){
+    if (error && error.message) {
         alert(error.message);
         yield put(fsActions.deleteFile(activeNodePath));
     }
@@ -1528,7 +1528,7 @@ export function* showContextMenu({ payload }) {
         y: clientY,
     };
     yield call(services.mainIpc.call, 'MenuService', 'popup', [menuItems, options]);
-    if(node){
+    if (node) {
         yield put(orActions.setParent(node));
     } else {
         //clear when previon context was on folder, but next on object
@@ -1553,7 +1553,7 @@ export function* getOrFetchFileInfo(path) {
     return { response, error };
 }
 
-function fetchCloudBrowsersAndDevicesError(msg){
+function fetchCloudBrowsersAndDevicesError(msg) {
     notification['error']({
         message: msg,
         description: 'Unauthorized access, check your user name or access key'
@@ -1562,7 +1562,7 @@ function fetchCloudBrowsersAndDevicesError(msg){
 
 const LOADING_RESULT = {loading: true};
 
-export function* setCloudProvidersBrowsersAndDevices(){
+export function* setCloudProvidersBrowsersAndDevices() {
     try {
         const settings = yield select(state => state.settings);
         
@@ -1571,108 +1571,108 @@ export function* setCloudProvidersBrowsersAndDevices(){
         const runtimeSettings = yield select(state => state.test.runtimeSettings);
         const { testProvider } = runtimeSettings;
 
-        if(cloudProviders){
-            if(cloudProviders.lambdaTest && cloudProviders.lambdaTest.inUse && cloudProviders.lambdaTest.user && cloudProviders.lambdaTest.key){
+        if (cloudProviders) {
+            if (cloudProviders.lambdaTest && cloudProviders.lambdaTest.inUse && cloudProviders.lambdaTest.user && cloudProviders.lambdaTest.key) {
                 yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['lambdaTest', cloudProviders.lambdaTest]);
                 yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'lambdaTest'));
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['lambdaTest', cloudProviders.lambdaTest.user, cloudProviders.lambdaTest.key]);
                 
-                if(typeof browsersAndDevicesResult === 'string'){
+                if (typeof browsersAndDevicesResult === 'string') {
                     yield put(settingsActions.setCloudProvidersBrowsersAndDevices(null, 'lambdaTest'));
                     fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
                 } else {
-                    if(browsersAndDevicesResult){
+                    if (browsersAndDevicesResult) {
                         yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'lambdaTest'));
                     }
                 }       
             } else {
                 // set to local if lambdaTest
-                if(testProvider && testProvider === 'lambdaTest'){
+                if (testProvider && testProvider === 'lambdaTest') {
                     yield put(testActions.setTestProvider('Local'));
                 }
             }
 
 
-            if(cloudProviders.sauceLabs && cloudProviders.sauceLabs.inUse){
+            if (cloudProviders.sauceLabs && cloudProviders.sauceLabs.inUse) {
                 yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['sauceLabs', cloudProviders.sauceLabs]);
                 
                 yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'sauceLabs'));
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['sauceLabs']);
         
-                if(typeof browsersAndDevicesResult === 'string'){
+                if (typeof browsersAndDevicesResult === 'string') {
                     yield put(settingsActions.setCloudProvidersBrowsersAndDevices(null, 'sauceLabs'));
                     fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
                 } else {
-                    if(browsersAndDevicesResult){
+                    if (browsersAndDevicesResult) {
                         yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'sauceLabs'));
                     }
                 }
             } else {
                 // set to local if sauceLabs
-                if(testProvider && testProvider === 'sauceLabs'){
+                if (testProvider && testProvider === 'sauceLabs') {
                     yield put(testActions.setTestProvider('Local'));
                 }
             }
 
-            if(cloudProviders.testObject && cloudProviders.testObject.inUse && cloudProviders.testObject.testObjectUsername && cloudProviders.testObject.testobject_api_key){
+            if (cloudProviders.testObject && cloudProviders.testObject.inUse && cloudProviders.testObject.testObjectUsername && cloudProviders.testObject.testobject_api_key) {
                 yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['testObject', cloudProviders.testObject]);
                 
                 yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'testObject'));
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['testObject']);
         
-                if(typeof browsersAndDevicesResult === 'string'){
+                if (typeof browsersAndDevicesResult === 'string') {
                     yield put(settingsActions.setCloudProvidersBrowsersAndDevices(null, 'testObject'));
                     fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
                 } else {
-                    if(browsersAndDevicesResult){
+                    if (browsersAndDevicesResult) {
                         yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'testObject'));
                     }
                 }
             } else {
                 // set to local if testObject
-                if(testProvider && testProvider === 'testObject'){
+                if (testProvider && testProvider === 'testObject') {
                     yield put(testActions.setTestProvider('Local'));
                 }
             }
 
-            if(cloudProviders.perfectoMobile && cloudProviders.perfectoMobile.inUse && cloudProviders.perfectoMobile.host && cloudProviders.perfectoMobile.securityToken){
+            if (cloudProviders.perfectoMobile && cloudProviders.perfectoMobile.inUse && cloudProviders.perfectoMobile.host && cloudProviders.perfectoMobile.securityToken) {
                 
                 yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['perfectoMobile', cloudProviders.perfectoMobile]);
                 
                 yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'perfectoMobile'));
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['perfectoMobile']);
         
-                if(typeof browsersAndDevicesResult === 'string'){
+                if (typeof browsersAndDevicesResult === 'string') {
                     yield put(settingsActions.setCloudProvidersBrowsersAndDevices(null, 'perfectoMobile'));
                     fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
                 } else {
-                    if(browsersAndDevicesResult){
+                    if (browsersAndDevicesResult) {
                         yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'perfectoMobile'));
                     }
                 }
             } else {
                 // set to local if perfectoMobile
-                if(testProvider && testProvider === 'perfectoMobile'){
+                if (testProvider && testProvider === 'perfectoMobile') {
                     yield put(testActions.setTestProvider('Local'));
                 }
             }
 
-            if(cloudProviders.testingBot && cloudProviders.testingBot.inUse){
+            if (cloudProviders.testingBot && cloudProviders.testingBot.inUse) {
                 yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['testingBot', cloudProviders.testingBot]);
                 yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'testingBot'));
                 const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['testingBot']);
         
-                if(typeof browsersAndDevicesResult === 'string'){
+                if (typeof browsersAndDevicesResult === 'string') {
                     yield put(settingsActions.setCloudProvidersBrowsersAndDevices(null, 'testingBot'));
                     fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
                 } else {
-                    if(browsersAndDevicesResult){
+                    if (browsersAndDevicesResult) {
                         yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'testingBot'));
                     }
                 }
             } else {
                 // set to local if testingBot
-                if(testProvider && testProvider === 'testingBot'){
+                if (testProvider && testProvider === 'testingBot') {
                     yield put(testActions.setTestProvider('Local'));
                 }
             }
@@ -1682,18 +1682,18 @@ export function* setCloudProvidersBrowsersAndDevices(){
             // set to local
             yield put(testActions.setTestProvider('Local'));
         }
-    } catch(e){
+    } catch (e) {
         console.log('setCloudProvidersBrowsersAndDevices e', e);
     }
 }
 
-export function* setVisualTestingProviders(){
+export function* setVisualTestingProviders() {
     const settings = yield select(state => state.settings);
     
     const { visualProviders } = settings || {};
 
-    if(visualProviders){
-        if(visualProviders.applitools){
+    if (visualProviders) {
+        if (visualProviders.applitools) {
             yield call(services.mainIpc.call, 'VisualTestingProvidersService', 'updateProviderSettings', ['applitools', visualProviders.applitools]);
         }
     }
@@ -1707,12 +1707,12 @@ function getUnsavedFiles(files, tabs) {
     for (var filePath of Object.keys(files)) {
         const file = files[filePath];
         if (file && file.modified) {
-            if(
+            if (
                 tabs && 
                 tabs.list && 
                 tabs.list.some && 
                 tabs.list.some(({key}) => key === file.path)
-            ){
+            ) {
                 unsavedFiles.push(file);
             }
         }
@@ -1724,7 +1724,7 @@ const getValueByKey = key => {
     let result = false;
 
     try {
-        switch(key){
+        switch (key) {
         case 'container':
             result = {};
             break;
@@ -1734,26 +1734,26 @@ const getValueByKey = key => {
         default:
             result = false;
         }
-    } catch(e) {
+    } catch (e) {
         console.warn('getValueByKey e', e);
     }
 
     return result;
 };
-export function* orAddToRoot({payload}){    
+export function* orAddToRoot({payload}) {    
     const objrepo = (yield select(state => state.objrepo)) || null;
     const { start, end, repoRoot, path } = objrepo;
     
     let safeStart;
     let safeEnd;
 
-    if(!start){
+    if (!start) {
         safeStart = 'const po = ';
     } else {
         safeStart = start;
     }
     
-    if(!end){
+    if (!end) {
         safeEnd = ';module.exports = po;';
     } else {
         safeEnd = end;
@@ -1765,13 +1765,13 @@ export function* orAddToRoot({payload}){
 
         let repoRootCopy;
         
-        if(repoRoot){
+        if (repoRoot) {
             repoRootCopy = { ...repoRoot };
         } else {
             repoRootCopy = {};
         }
         
-        if(repoRootCopy[name]){
+        if (repoRootCopy[name]) {
             notification['error']({
                 message: 'Tree item with this name already exist',
                 description: name,
@@ -1779,7 +1779,7 @@ export function* orAddToRoot({payload}){
         } else {
             const value = getValueByKey(key);
             
-            if(false === value){
+            if (false === value) {
                 notification['error']({
                     message: 'Bad key',
                     description: key,

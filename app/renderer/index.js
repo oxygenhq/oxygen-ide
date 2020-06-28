@@ -28,7 +28,7 @@ if (process.env.NODE_ENV === 'production') {
             release: packageJson.version
         });
         window.Sentry = Sentry;
-    } catch(e) {
+    } catch (e) {
         console.warn('Cannot initialize CrashReporter and Sentry', e);
     }
 }

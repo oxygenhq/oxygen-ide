@@ -56,7 +56,7 @@ export default class ObjectElementCreateDialog extends React.PureComponent<Props
         return null;
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.focusTextInput();
     }
 
@@ -65,9 +65,9 @@ export default class ObjectElementCreateDialog extends React.PureComponent<Props
   };
 
   setTextInputRef = element => {
-      if(element){
+      if (element) {
           this.textInput = element;
-          if(this.textInput && this.textInput.focus){
+          if (this.textInput && this.textInput.focus) {
               this.textInput.focus();
           }
       }
@@ -91,7 +91,7 @@ export default class ObjectElementCreateDialog extends React.PureComponent<Props
   maybeParentNameIsset = () => {
       let result = '';
 
-      if(this.props.parent && this.props.parent.name){
+      if (this.props.parent && this.props.parent.name) {
           result = ' to "'+this.props.parent.name+'"';
       }
 

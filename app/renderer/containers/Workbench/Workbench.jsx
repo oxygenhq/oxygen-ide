@@ -146,34 +146,34 @@ export default class Workbench extends React.Component<Props> {
         this.props.startRecorderWatcher();
     }
 
-    componentDidUpdate(){
-        if(!this.elem){
+    componentDidUpdate() {
+        if (!this.elem) {
             this.elem = document.getElementById('editors-container-wrap');
   
-            if(this.elem && this.elem.addEventListener){
+            if (this.elem && this.elem.addEventListener) {
                 this.elem.addEventListener('keydown', this.keydownCallback);
                 this.elem.addEventListener('keyup', this.keyupCallback);
             }
         }
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         // stop IDE process
-        if(this.props.deactivate){
+        if (this.props.deactivate) {
             this.props.deactivate();
         } else {
             alert('no deactivate');
         }
         const { isRecording } = this.props;
         if (isRecording) {
-            if(this.props.stopRecorder){
+            if (this.props.stopRecorder) {
                 this.props.stopRecorder();
             } else {
                 alert('no stopRecorder');
             }  
         }
         
-        if(this.elem && this.elem.removeEventListener){
+        if (this.elem && this.elem.removeEventListener) {
             this.elem.removeEventListener('keydown', this.keydownCallback);
             this.elem.removeEventListener('keyup', this.keyupCallback);
         }
@@ -189,17 +189,17 @@ export default class Workbench extends React.Component<Props> {
     //       }
     //   }
 
-      if(e.ctrlKey || e.metaKey){
-          if(e.key === '+' || e.key === '=' || e.code === 'NumpadAdd' || e.code  === 'Equal'){
+      if (e.ctrlKey || e.metaKey) {
+          if (e.key === '+' || e.key === '=' || e.code === 'NumpadAdd' || e.code  === 'Equal') {
               e.stopPropagation();
-              if(this.props.zoomIn){
+              if (this.props.zoomIn) {
                   this.props.zoomIn();
               }
           }
       
-          if(e.key === '-' || e.code === 'Minus' || e.code === 'NumpadSubtract'){
+          if (e.key === '-' || e.code === 'Minus' || e.code === 'NumpadSubtract') {
               e.stopPropagation();
-              if(this.props.zoomOut){
+              if (this.props.zoomOut) {
                   this.props.zoomOut();
               }
           }
@@ -259,9 +259,9 @@ export default class Workbench extends React.Component<Props> {
       if (ctrlId === Controls.TEST_RUN) {     
           const { editorActiveFile } = this.props;
 
-          if(editorActiveFile){
+          if (editorActiveFile) {
 
-              if(editorActiveFile && editorActiveFile.path && editorActiveFile.path ==='unknown'){
+              if (editorActiveFile && editorActiveFile.path && editorActiveFile.path ==='unknown') {
                   this.props.createNewRealFile(editorActiveFile);
               } else {
                   this.props.startTest();
@@ -276,7 +276,7 @@ export default class Workbench extends React.Component<Props> {
           }
       
       }
-      else if (ctrlId === Controls.TEST_RUN_ALL){
+      else if (ctrlId === Controls.TEST_RUN_ALL) {
         this.props.startAllTests();
       }
       else if (ctrlId === Controls.TEST_STOP) {
@@ -304,7 +304,7 @@ export default class Workbench extends React.Component<Props> {
           this.props.showNewFileDialog();
       }
       else if (ctrlId === Controls.NEW_FILE) {
-          if(this.props.openFakeFile){
+          if (this.props.openFakeFile) {
               this.props.openFakeFile();
           } else {
               console.warn('no openFakeFile');
@@ -393,7 +393,7 @@ export default class Workbench extends React.Component<Props> {
       }, 500);
   }
 
-  fileExplorer_onMove(oldPath, newPath){
+  fileExplorer_onMove(oldPath, newPath) {
       this.props.move(oldPath, newPath);
   }
 
@@ -475,19 +475,19 @@ export default class Workbench extends React.Component<Props> {
   settingsDialog_onSubmit(generalSettings, providers, visualTesting, runSettings) {
       this.props.hideDialog('DIALOG_SETTINGS');
 
-      if(generalSettings){
+      if (generalSettings) {
         this.props.updateGeneralSettings(generalSettings);    
       }
 
-      if(providers){
+      if (providers) {
         this.props.updateCloudProvidersSettings(providers);    
       }
 
-      if(visualTesting){
+      if (visualTesting) {
         this.props.updateVisualTestingSettings(visualTesting);
       }
 
-      if(runSettings){
+      if (runSettings) {
         this.props.updateRunSettings(runSettings);
       }
   }
@@ -559,7 +559,7 @@ export default class Workbench extends React.Component<Props> {
           }      
       }
           
-      if(!initialized){
+      if (!initialized) {
           return (
               <Initializing/>
           );

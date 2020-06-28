@@ -32,7 +32,7 @@ export default class ObjectElementOrContainerRenameDialog extends React.PureComp
 
         let name = '';
         
-        if(props.parent && props.parent.name){
+        if (props.parent && props.parent.name) {
             name = props.parent.name;
         }
 
@@ -63,7 +63,7 @@ export default class ObjectElementOrContainerRenameDialog extends React.PureComp
         return null;
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.focusTextInput();
     }
 
@@ -72,9 +72,9 @@ export default class ObjectElementOrContainerRenameDialog extends React.PureComp
     };
 
     setTextInputRef = element => {
-        if(element){
+        if (element) {
             this.textInput = element;
-            if(this.textInput && this.textInput.focus){
+            if (this.textInput && this.textInput.focus) {
                 this.textInput.focus();
             }
         }
@@ -93,10 +93,10 @@ export default class ObjectElementOrContainerRenameDialog extends React.PureComp
             
             let typeString = '';
 
-            if(type === 'container'){
+            if (type === 'container') {
                 typeString = 'Container';
             }
-            if(type === 'element'){
+            if (type === 'element') {
                 typeString = 'Element';
             }
             
@@ -109,7 +109,7 @@ export default class ObjectElementOrContainerRenameDialog extends React.PureComp
     maybeParentNameIsset = () => {
         let result = '';
 
-        if(this.props.parent && this.props.parent.name){
+        if (this.props.parent && this.props.parent.name) {
             result = this.props.parent.name;
         }
 
@@ -135,10 +135,10 @@ export default class ObjectElementOrContainerRenameDialog extends React.PureComp
 
         let typeString = '';
 
-        if(type === 'container'){
+        if (type === 'container') {
             typeString = 'Container';
         }
-        if(type === 'element'){
+        if (type === 'element') {
             typeString = 'Element';
         }
 

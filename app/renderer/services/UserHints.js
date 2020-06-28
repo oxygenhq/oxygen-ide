@@ -56,7 +56,7 @@ export default class UserHintsService {
         } else if (message.includes('SELENIUM_RUNTIME_ERROR') &&
             (message.includes('This version of ChromeDriver only supports Chrome version') ||
                 message.includes('Chrome version must be between'))
-        ){
+        ) {
             this.store.dispatch({
                 type: 'SELENIUM_RUNTIME_ERROR',
                 payload: {},

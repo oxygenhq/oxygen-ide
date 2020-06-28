@@ -39,7 +39,7 @@ const FileChangeType = {
 const changeTypeMap = [FileChangeType.UPDATED, FileChangeType.ADDED, FileChangeType.DELETED];
 
 const getFileInfo = (filePath) => {
-    try{
+    try {
         // this function accepts either fs.Stats object or path as string
         const stats = fs.lstatSync(filePath);
         const type = stats.isDirectory() ? 'folder' : (stats.isFile() ? 'file' : 'other');
@@ -51,7 +51,7 @@ const getFileInfo = (filePath) => {
             type,
             ext: path.extname(filePath),
         };
-    } catch(e){
+    } catch (e) {
         //ignore
     }
 };
@@ -105,20 +105,20 @@ export default class FileService extends ServiceBase {
         await this.closeWatcherIfExist();
     }
 
-    closeWatcherIfExist(){
+    closeWatcherIfExist() {
 		if (this.handleNetworkFolderChanges) {
 			this.handleNetworkFolderChanges.kill();
 			this.handleNetworkFolderChanges = undefined;
         }
         
-        if(this.chokidarWatcher && this.chokidarWatcher.close){
+        if (this.chokidarWatcher && this.chokidarWatcher.close) {
             this.chokidarWatcher.close();
             this.watcherOn = false;
         }
     }
 
-    addFolderToWatchers(folder){
-        if(this.subFolders.includes(folder)){
+    addFolderToWatchers(folder) {
+        if (this.subFolders.includes(folder)) {
             // ignore
         } else {
             this.subFolders.push(folder);
@@ -127,8 +127,8 @@ export default class FileService extends ServiceBase {
     }
 
     
-    removeFolderToWatchers(folder){
-        if(Array.isArray(this.subFolders)){
+    removeFolderToWatchers(folder) {
+        if (Array.isArray(this.subFolders)) {
             this.subFolders = this.subFolders.filter((item) => {
                 return !item.startsWith(folder);
             });
@@ -137,7 +137,7 @@ export default class FileService extends ServiceBase {
         }
     }
 
-    processWin32Change(changeType, absolutePathInput, folderPath){
+    processWin32Change(changeType, absolutePathInput, folderPath) {
         // File Change Event (0 Changed, 1 Created, 2 Deleted)
         if (typeof changeType !== 'undefined' && changeType >= 0 && changeType < 3) {
 
@@ -154,18 +154,18 @@ export default class FileService extends ServiceBase {
                 // ignore
             }
 
-            if(evNumber === 0){
+            if (evNumber === 0) {
                 type = 'fileChangeContent';
             }
-            else if(evNumber === 1){
-                if(isDirectory){
+            else if (evNumber === 1) {
+                if (isDirectory) {
                     type = 'dirAdd';
                 } else {
                     type = 'fileAdd';
                 }
             }
-            else if(evNumber === 2){
-                if(isDirectory){
+            else if (evNumber === 2) {
+                if (isDirectory) {
                     type = 'dirUnlink';
                 } else {
                     type = 'fileUnlink';
@@ -178,18 +178,18 @@ export default class FileService extends ServiceBase {
 
     createWatchOnFilesChannel(folderPath, subFolders = null) {
 
-        if(Array.isArray(subFolders)){
-            if(this.chokidarWatcher && this.chokidarWatcher.close){
+        if (Array.isArray(subFolders)) {
+            if (this.chokidarWatcher && this.chokidarWatcher.close) {
                 this.chokidarWatcher.close();
                 this.watcherOn = false;
             }
         }
 
-        if(this.folderPath !== folderPath){
+        if (this.folderPath !== folderPath) {
 
             this.folderPath = folderPath;
 
-            if(this.chokidarWatcher && this.chokidarWatcher.close){
+            if (this.chokidarWatcher && this.chokidarWatcher.close) {
                 this.chokidarWatcher.close();
                 this.watcherOn = false;
             }
@@ -201,7 +201,7 @@ export default class FileService extends ServiceBase {
 
             let saveWatchFolders;
 
-            if(Array.isArray(subFolders)){
+            if (Array.isArray(subFolders)) {
                 saveWatchFolders = [folderPath, ...subFolders];
             } else {
                 saveWatchFolders = folderPath;
@@ -227,11 +227,11 @@ export default class FileService extends ServiceBase {
                 this.handleNetworkFolderChanges = cp.spawn(exePath, args);
 
 
-                if(
+                if (
                     this.handleNetworkFolderChanges &&
                     this.handleNetworkFolderChanges.stdout &&
                     this.handleNetworkFolderChanges.stdout.on
-                ){
+                ) {
                     this.handleNetworkFolderChanges.stdout.on('data', (data) => {
                         var out = new Buffer(data,'utf-8').toString();
                         const eventParts = out.split('|');
@@ -239,9 +239,9 @@ export default class FileService extends ServiceBase {
                             const changeType = Number(eventParts[0]);
                             let absolutePath = eventParts[1];
                             this.processWin32Change(changeType, absolutePath, folderPath);
-                        } else if(eventParts.length === 3){
+                        } else if (eventParts.length === 3) {
                             let doubleEventParts = out.split('\r\n').filter((el) => !!el);
-                            if(doubleEventParts && Array.isArray(doubleEventParts) && doubleEventParts.length > 0){
+                            if (doubleEventParts && Array.isArray(doubleEventParts) && doubleEventParts.length > 0) {
                                 doubleEventParts.map((item) => {
                                     const eventParts = item.split('|');
                                     const changeType = Number(eventParts[0]);
@@ -254,18 +254,18 @@ export default class FileService extends ServiceBase {
                     });
                 }
 
-                if(
+                if (
                     this.handleNetworkFolderChanges &&
                     this.handleNetworkFolderChanges.stderr &&
                     this.handleNetworkFolderChanges.stderr.on
-                ){
+                ) {
                     this.handleNetworkFolderChanges.stderr.on('data', (data) => {
                         var error = new Buffer(data,'utf-8').toString();
                         console.log('handleNetworkFolderChanges stderr error', error);
                     });
                 }
 
-                if(this.handleNetworkFolderChanges && this.handleNetworkFolderChanges.on){
+                if (this.handleNetworkFolderChanges && this.handleNetworkFolderChanges.on) {
                     // Errors
                     this.handleNetworkFolderChanges.on('error', (error) => {
                         console.log('handleNetworkFolderChanges error', error);
@@ -317,7 +317,7 @@ export default class FileService extends ServiceBase {
     }
 
     getFolderContent(folderPath) {
-        try{ 
+        try { 
             let stats = fs.lstatSync(folderPath);
             if (!stats.isDirectory()) {
                 throw Error('Path is pointing to a file instead of folder.');
@@ -348,13 +348,13 @@ export default class FileService extends ServiceBase {
                 ...this.getFileInfo(folderPath),
                 children: children,
             };
-        } catch(e){
+        } catch (e) {
             //ignore
         }
     }
 
     getFileInfo(filePath, fsStats = null) {
-        try{
+        try {
             // this function accepts either fs.Stats object or path as string
             const stats = fsStats ? fsStats : fs.lstatSync(filePath);
             const type = stats.isDirectory() ? 'folder' : (stats.isFile() ? 'file' : 'other');
@@ -366,12 +366,12 @@ export default class FileService extends ServiceBase {
                 type: type,
                 ext: path.extname(filePath),
             };
-        } catch(e){
+        } catch (e) {
             //ignore
         }
     }
 
-    returnFileContent(filePath){
+    returnFileContent(filePath) {
 
         let response;
 
@@ -381,7 +381,7 @@ export default class FileService extends ServiceBase {
 
                 var data = fs.readFileSync(filePath, 'utf8');
 
-                if(!data){
+                if (!data) {
                     // sometimes readFileSync return empty data on not emty file :-?
                     setTimeout(function() { 
                         var data = fs.readFileSync(filePath, 'utf8');
@@ -394,7 +394,7 @@ export default class FileService extends ServiceBase {
             } else {
                 response = false;
             }
-        } catch(err) {
+        } catch (err) {
             Sentry.captureException(err);
             console.log('Error in returnFileContent method with filePath '+filePath+' :', err);
         }
@@ -407,7 +407,7 @@ export default class FileService extends ServiceBase {
 
     getFileContent(filePath) {
         var data = fs.readFileSync(filePath, 'utf8');
-        if(!data){
+        if (!data) {
             // sometimes readFileSync return empty data on not emty file :-?
             setTimeout(function() { 
                 var data = fs.readFileSync(filePath, 'utf8');
@@ -457,7 +457,7 @@ export default class FileService extends ServiceBase {
         });
     }
 
-    move(oldPath, newPath){
+    move(oldPath, newPath) {
         if (!oldPath || !newPath) {
             throw new Error('Invalid arguments.');
         }
@@ -468,7 +468,7 @@ export default class FileService extends ServiceBase {
                     console.warn('error', error);
                 } else {
                     fsExtra.move(oldPath, newPath, error => {
-                        if(error){
+                        if (error) {
                             console.error('error',error);
                         } else {
                             //do nothing, file watcher will do all work

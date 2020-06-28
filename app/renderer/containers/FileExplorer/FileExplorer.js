@@ -55,7 +55,7 @@ export default class FileExplorer extends React.Component<Props> {
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
-        if(this.props.rootPath !== nextProps.rootPath){
+        if (this.props.rootPath !== nextProps.rootPath) {
             this.doRefreshScrollTop();
         }
 
@@ -94,13 +94,13 @@ export default class FileExplorer extends React.Component<Props> {
     })
 
     unWatchFolder = (folderPath) => {
-        if(this.props.unWatchFolder){
+        if (this.props.unWatchFolder) {
             this.props.unWatchFolder(folderPath);
         }
     }
 
     watchFolder = (folderPath) => {
-        if(this.props.watchFolder){
+        if (this.props.watchFolder) {
             this.props.watchFolder(folderPath);
         }
     }
@@ -122,26 +122,26 @@ export default class FileExplorer extends React.Component<Props> {
         let node;
         let dragNode;
 
-        if(
+        if (
             info &&
             info.node  &&
             info.node.props  &&
             info.node.props.nodeInfo
-        ){
+        ) {
             node = info.node.props.nodeInfo;
         }
         
-        if(
+        if (
             info &&
             info.dragNode &&
             info.dragNode.props &&
             info.dragNode.props.nodeInfo
-        ){
+        ) {
             dragNode = info.dragNode.props.nodeInfo;
         }
 
 
-        if(node && dragNode && typeof node.type !=='undefined' && node.type !== 'file'){
+        if (node && dragNode && typeof node.type !=='undefined' && node.type !== 'file') {
 
             const oldPath = dragNode.path;
             const newPath = node.path + path.sep + dragNode.name;
@@ -149,19 +149,19 @@ export default class FileExplorer extends React.Component<Props> {
             const safeOldPath = oldPath.endsWith(path.sep) ? oldPath : oldPath + path.sep;
             const safeNewPath = newPath.endsWith(path.sep) ? newPath : newPath + path.sep;
             
-            if(safeOldPath !== safeNewPath){
+            if (safeOldPath !== safeNewPath) {
                 this.props.onMove(safeOldPath, safeNewPath);
             }
         } else {
             const { rootPath } = this.props;
-            if(rootPath && dragNode){
+            if (rootPath && dragNode) {
                 const oldPath = dragNode.path;
                 const newPath = rootPath + path.sep + dragNode.name;
 
                 const safeOldPath = oldPath.endsWith(path.sep) ? oldPath : oldPath + path.sep;
                 const safeNewPath = newPath.endsWith(path.sep) ? newPath : newPath + path.sep;
                 
-                if(safeOldPath !== safeNewPath){
+                if (safeOldPath !== safeNewPath) {
                     this.props.onMove(safeOldPath, safeNewPath);
                 }
             }

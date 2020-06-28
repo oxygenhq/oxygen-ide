@@ -65,7 +65,7 @@ export default class FileCreateDialog extends React.PureComponent<Props> {
         return null;
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.focusTextInput();
     }
 
@@ -74,9 +74,9 @@ export default class FileCreateDialog extends React.PureComponent<Props> {
     };
 
     setTextInputRef = element => {
-        if(element){
+        if (element) {
             this.textInput = element;
-            if(this.textInput && this.textInput.focus){
+            if (this.textInput && this.textInput.focus) {
                 this.textInput.focus();
             }
         }
@@ -95,7 +95,7 @@ export default class FileCreateDialog extends React.PureComponent<Props> {
 
         let result = e.target.value.match( illegalCharacters );
         
-        if(result){
+        if (result) {
             result = uniq(result);
             const srt = `Char${result.length > 1 ? 's': ''} ${result.join(', ')} is not allowed`;
             message.error(srt);
@@ -129,7 +129,7 @@ export default class FileCreateDialog extends React.PureComponent<Props> {
     }
 
     formSubmit = (e) => {
-        if(e && e.preventDefault){
+        if (e && e.preventDefault) {
             e.preventDefault();
         }
 

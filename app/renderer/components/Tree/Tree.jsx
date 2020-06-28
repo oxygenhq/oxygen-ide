@@ -111,7 +111,7 @@ class Tree extends React.Component {
         defaultSelectedKeys: [],
     };
   
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -333,13 +333,13 @@ class Tree extends React.Component {
         setTimeout(() => {
         // Update drag over node
 
-            if(eventKey){
+            if (eventKey) {
                 this.setState({
                     dragOverNodeKey: eventKey,
                     dropPosition,
                 });
             } else {
-                if(this.props.rootPath){
+                if (this.props.rootPath) {
                     this.setState({
                         dragOverNodeKey: this.props.rootPath,
                         dropPosition,
@@ -612,8 +612,8 @@ class Tree extends React.Component {
 
         this.setUncontrolledState({ expandedKeys });
 
-        if(expanded){
-            if(unWatchFolder){
+        if (expanded) {
+            if (unWatchFolder) {
                 unWatchFolder(eventKey);
             }
         }
@@ -763,17 +763,17 @@ class Tree extends React.Component {
 
     debounceOnDrag = (dragPosition) => {
         const { doRefreshScrollBottom, doRefreshScrollTop, wrap } = this.props;
-        if(dragPosition < 15) {
-            if(doRefreshScrollTop){
+        if (dragPosition < 15) {
+            if (doRefreshScrollTop) {
                 doRefreshScrollTop();
             }
         }
 
-        if(wrap && wrap.current && wrap.current.clientHeight){
+        if (wrap && wrap.current && wrap.current.clientHeight) {
             const wrapHeight = parseInt(wrap.current.clientHeight / 10);
 
-            if(dragPosition > (wrapHeight - 10)) {
-                if(doRefreshScrollBottom){
+            if (dragPosition > (wrapHeight - 10)) {
+                if (doRefreshScrollBottom) {
                     doRefreshScrollBottom();
                 }
             }
@@ -783,7 +783,7 @@ class Tree extends React.Component {
     onDrag = (e) => {
         const dragPosition = parseInt(e.clientY / 10);
 
-        if(this.prev && this.prev !== dragPosition){
+        if (this.prev && this.prev !== dragPosition) {
             this.delayedCallback(dragPosition);
         }
 
@@ -806,7 +806,7 @@ class Tree extends React.Component {
 
         let dragOver;
 
-        if(dragOverNodeKey && rootPath){
+        if (dragOverNodeKey && rootPath) {
             dragOver = dragOverNodeKey === rootPath;
         }
 

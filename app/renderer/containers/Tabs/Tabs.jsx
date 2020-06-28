@@ -42,7 +42,7 @@ class Tabs extends React.Component<Props, void> {
     }
 
   componentDidMount() {
-      if(this.tabsRef){
+      if (this.tabsRef) {
           this.ps = new PerfectScrollbar(this.tabsRef, {
               suppressScrollY: true,
               useBothWheelAxes: true,
@@ -53,14 +53,14 @@ class Tabs extends React.Component<Props, void> {
           e.preventDefault();
           if (this.ps) {
               this.ps.destroy();
-              if(this.tabsRef){
+              if (this.tabsRef) {
                   this.ps = new PerfectScrollbar(this.tabsRef, {
                       suppressScrollY: true,
                       useBothWheelAxes: true,
                   });
               }
           } else {
-              if(this.tabsRef){
+              if (this.tabsRef) {
                   this.ps = new PerfectScrollbar(this.tabsRef, {
                       suppressScrollY: true,
                       useBothWheelAxes: true,
@@ -94,7 +94,7 @@ class Tabs extends React.Component<Props, void> {
       const { active, tabs, recorder, activeTitle } = this.props;
       let activeTab;
 
-      if(active === 'unknown'){
+      if (active === 'unknown') {
           activeTab = active ? tabs.find(x => x.key === active && x.title === activeTitle) : null;
       } else {
           activeTab = active ? tabs.find(x => x.key === active) : null;
@@ -139,12 +139,12 @@ class Tabs extends React.Component<Props, void> {
 
                           const { isRecording, activeFile, activeFileName } = recorder;
 
-                          if(isRecording){
-                              if(activeFile === 'unknown'){
-                                  if(activeFile === tab.key && activeFileName === tab.title){
+                          if (isRecording) {
+                              if (activeFile === 'unknown') {
+                                  if (activeFile === tab.key && activeFileName === tab.title) {
                                       itemClass += ' green-bg';
                                   }
-                              } else if(activeFile === tab.key){
+                              } else if (activeFile === tab.key) {
                                   itemClass += ' green-bg';
                               }
                           }

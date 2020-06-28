@@ -69,14 +69,14 @@ export default class ObjectRepository extends React.PureComponent<Props> {
 
     closeSelectedObject = () => {
         const { closeActive } = this.props;
-        if(closeActive){
+        if (closeActive) {
             closeActive();
         }
     }
 
     closeObjectRepository= () => {
         const { clearObjectRepositoryFile } = this.props;
-        if(clearObjectRepositoryFile){
+        if (clearObjectRepositoryFile) {
             clearObjectRepositoryFile();
         }
     }

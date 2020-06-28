@@ -8,16 +8,16 @@ function requireFromString(src, filename) {
         var m = new Module();
         m._compile(src, filename);
         return m.exports;
-    } catch(e){
+    } catch (e) {
         console.log('orgRequire e', e);
     }
 }
 
-function orgRequire(path){
+function orgRequire(path) {
     try {
         var text = fs.readFileSync(path,'utf8');
         return requireFromString(text, path);
-    } catch(e){
+    } catch (e) {
         console.log('orgRequire e', e);
     }
 }

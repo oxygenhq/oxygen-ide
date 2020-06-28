@@ -48,7 +48,7 @@ export function updateFilesAfterRename(files, oldPath, renamedFile) {
             };
         }
         // in case current file/folder is not impacted by path chance (rename)
-        else if (file && file.path){
+        else if (file && file.path) {
             newFileList[file.path] = file;
         }
     }

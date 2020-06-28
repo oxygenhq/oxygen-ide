@@ -15,7 +15,7 @@ import { zoomIn, zoomOut } from '../../store/settings/actions';
 const checkForBreakpoints = (path, breakpoints) => {
     let result = [];
 
-    if(path && breakpoints && breakpoints[path]){
+    if (path && breakpoints && breakpoints[path]) {
         result = breakpoints[path];
     }
 
@@ -25,18 +25,18 @@ const checkForBreakpoints = (path, breakpoints) => {
 const mapStoreToProps = (state) => {
     let breakpoints;
 
-    if(state && state.test && state.test.breakpoints){
+    if (state && state.test && state.test.breakpoints) {
         breakpoints = state.test.breakpoints;
     }
 
     let disabledBreakpoints;
 
-    if(state && state.test && state.test.disabledBreakpoints){
+    if (state && state.test && state.test.disabledBreakpoints) {
         disabledBreakpoints = state.test.disabledBreakpoints;
     }
 
     let resolvedBreakpoints;
-    if(state && state.test && state.test.resolvedBreakpoints){
+    if (state && state.test && state.test.resolvedBreakpoints) {
         resolvedBreakpoints = state.test.resolvedBreakpoints;
     }
 
@@ -44,22 +44,22 @@ const mapStoreToProps = (state) => {
     let openFiles = Object.keys(state.editor.openFiles).map(path => {
 
 
-        if(path.startsWith('unknownUntitled')){
+        if (path.startsWith('unknownUntitled')) {
             return {
                 ...state.settings.files[path],
                 ...state.editor.openFiles[path]
             };
-        } else if(path.endsWith('(deleted from disk)')){
+        } else if (path.endsWith('(deleted from disk)')) {
 
             let fileData = null;
 
-            if(state.settings.files['unknown'+path]){
+            if (state.settings.files['unknown'+path]) {
                 fileData = { ...state.settings.files['unknown'+path] };
-            } else if(state.settings.files[path]){
+            } else if (state.settings.files[path]) {
                 fileData = { ...state.settings.files[path] };
             }
 
-            if(fileData){
+            if (fileData) {
                 return {
                     ...fileData,
                     ...state.editor.openFiles[path],

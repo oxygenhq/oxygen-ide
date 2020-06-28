@@ -232,7 +232,7 @@ export default (state = defaultState, action) => {
     case ActionTypes.TEST_REMOVE_DEVICE:
         _newDevices = [];
         for (var i = state.devices.length; i--;) {
-            if (state.devices[i].id !== device.id){
+            if (state.devices[i].id !== device.id) {
                 _newDevices.push(state.devices[i]);
             }
         }
@@ -249,7 +249,7 @@ export default (state = defaultState, action) => {
 
     // TEST_UPDATE_BREAKPOINTS
     case ActionTypes.TEST_UPDATE_BREAKPOINTS:
-        if(path === 'unknown'){
+        if (path === 'unknown') {
             return {
                 ...state,
                 breakpoints: {
@@ -270,12 +270,12 @@ export default (state = defaultState, action) => {
     case ActionTypes.TEST_UPDATE_DISABLED_BREAKPOINTS:
 
             let previousDisabledBreakpoints = [];
-            if(
+            if (
                 path &&
                 state.disabledBreakpoints &&
                 state.disabledBreakpoints[path] &&
                 Array.isArray(state.disabledBreakpoints[path]) 
-            ){
+            ) {
                 previousDisabledBreakpoints = state.disabledBreakpoints[path];
             }
 
@@ -289,12 +289,12 @@ export default (state = defaultState, action) => {
 
     case ActionTypes.TEST_UPDATE_RESOLVED_BREAKPOINT:
         let previousResolvedBreakpoints = [];
-        if(
+        if (
             path &&
             state.resolvedBreakpoints &&
             state.resolvedBreakpoints[path] &&
             Array.isArray(state.resolvedBreakpoints[path]) 
-        ){
+        ) {
             previousResolvedBreakpoints = state.resolvedBreakpoints[path];
         }
 
@@ -315,16 +315,16 @@ export default (state = defaultState, action) => {
     }
 
     // TEST_MOVE_BREAKPOINTS_FROM_TMP_FILE_TO_REAL_FILE
-    case ActionTypes.TEST_MOVE_BREAKPOINTS_FROM_TMP_FILE_TO_REAL_FILE:{
+    case ActionTypes.TEST_MOVE_BREAKPOINTS_FROM_TMP_FILE_TO_REAL_FILE: {
         const { tmpFilePath, tmpfileName, realFilePath } = payload;
         const newState = { ...state };
 
-        if(
+        if (
             tmpFilePath && 
         tmpfileName && 
         realFilePath &&
         newState.breakpoints[tmpFilePath+tmpfileName]
-        ){
+        ) {
             newState.breakpoints[realFilePath] = newState.breakpoints[tmpFilePath+tmpfileName];
             delete newState.breakpoints[tmpFilePath+tmpfileName];
         }

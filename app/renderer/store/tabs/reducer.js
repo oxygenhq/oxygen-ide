@@ -22,7 +22,7 @@ export default (state = defaultState, action, dispatch) => {
     switch (action.type) {
     // TABS_SET_ACTIVE
     case ActionTypes.TABS_SET_ACTIVE:
-        if(key === 'unknown' && title && !!title){
+        if (key === 'unknown' && title && !!title) {
             return { 
                 ...state, 
                 //$FlowFixMe
@@ -40,7 +40,7 @@ export default (state = defaultState, action, dispatch) => {
     // TABS_SET_TOUCHED
     case ActionTypes.TABS_SET_TOUCHED:
 
-        if(key === 'unknown'){
+        if (key === 'unknown') {
             _index = state.list.findIndex(x => x.key === key && x.title === title);
         } else {
             _index = state.list.findIndex(x => x.key === key);
@@ -82,7 +82,7 @@ export default (state = defaultState, action, dispatch) => {
     // TABS_REMOVE
     case ActionTypes.TABS_REMOVE:
         let newListAfterRemove;
-        if(title && !!title && key === 'unknown'){
+        if (title && !!title && key === 'unknown') {
             newListAfterRemove = state.list.filter(tab => key === 'unknown' && tab.title !== title);
         } else {
             newListAfterRemove = state.list.filter(tab => tab.key !== key);
@@ -94,7 +94,7 @@ export default (state = defaultState, action, dispatch) => {
 
         let activeTitle;
 
-        if(newActiveTabKey === 'unknown'){
+        if (newActiveTabKey === 'unknown') {
             activeTitle = newListAfterRemove[newListAfterRemove.length - 1].title;
         } else {
             activeTitle = null;

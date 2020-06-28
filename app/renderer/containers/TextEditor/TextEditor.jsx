@@ -33,10 +33,10 @@ type Props = {
 const DEFAULT_EDITOR_LANGUAGE = 'javascript';
 
 const getKey = (file) => {
-    if(file && file.path && file.name && file.path === 'unknown'){
+    if (file && file.path && file.name && file.path === 'unknown') {
         return file.path+file.name;
     }
-    if(file && file.path){
+    if (file && file.path) {
         return file.path;
     }
 
@@ -44,11 +44,11 @@ const getKey = (file) => {
 };
 
 const getVisible = (file, activeFile, activeFileName) => {
-    if(activeFile && file && file.path && file.name && file.path === 'unknown'){
+    if (activeFile && file && file.path && file.name && file.path === 'unknown') {
         return file.path === activeFile && file.name === activeFileName;
     }
 
-    if(activeFile && file && file.path){
+    if (activeFile && file && file.path) {
         return file.path === activeFile;
     }
 
@@ -91,12 +91,12 @@ export default class TextEditor extends React.Component<Props> {
         const { trigger } = payload;
         const editor = this.editors[activeFile];
 
-        if(this.lastTrigger && typeof this.lastTrigger === 'string' && ['find', 'replace'].includes(this.lastTrigger)){
+        if (this.lastTrigger && typeof this.lastTrigger === 'string' && ['find', 'replace'].includes(this.lastTrigger)) {
             try {
                 const closeTriggerLine = 'closeFindWidget';
                 editor.trigger(closeTriggerLine);
                 this.lastTrigger = null;
-            } catch(e){
+            } catch (e) {
                 console.log('lastTrigger e', e);
             }
         }
@@ -146,7 +146,7 @@ export default class TextEditor extends React.Component<Props> {
         } = this.state;
         const self = this;
 
-        if(activeFile === 'welcome'){
+        if (activeFile === 'welcome') {
             return (<Landing/>);
         }
 

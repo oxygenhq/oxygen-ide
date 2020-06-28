@@ -78,7 +78,7 @@ export default (state = DEFAULT_STATE, action) => {
 
     // SET_ACTIVE_FILE
     case types.EDITOR_SET_ACTIVE_FILE: {
-        if(path === 'unknown'){
+        if (path === 'unknown') {
             return { 
                 ...state, 
                 activeFile: path, 
@@ -95,7 +95,7 @@ export default (state = DEFAULT_STATE, action) => {
 
     // ADD_FILE
     case types.EDITOR_ADD_FILE: {
-        if(path === 'unknown'){
+        if (path === 'unknown') {
             return { 
                 ...state, 
                 openFiles: {
@@ -122,7 +122,7 @@ export default (state = DEFAULT_STATE, action) => {
     case types.EDITOR_CLOSE_FILE: {   
         _openFilesClone = {};
         for (var filePath of Object.keys(state.openFiles)) {
-            if(path === 'unknown'){
+            if (path === 'unknown') {
                 if ((filePath !== path+name) && (filePath !== name)) {
                     _openFilesClone[filePath] = state.openFiles[filePath];
                 }
@@ -138,7 +138,7 @@ export default (state = DEFAULT_STATE, action) => {
 
         let newActiveFile = state.activeFile;
 
-        if(path === 'unknown'){
+        if (path === 'unknown') {
             if (path === state.activeFile && name === state.activeFileName) {
                 const fileKeys = Object.keys(_openFilesClone);
                 newActiveFile = fileKeys.length > 0 ? fileKeys[fileKeys.length - 1] : null;
@@ -149,14 +149,14 @@ export default (state = DEFAULT_STATE, action) => {
                 newActiveFile = fileKeys.length > 0 ? fileKeys[fileKeys.length - 1] : null;
             }
         }
-        if(
+        if (
             (newActiveFile && 
         newActiveFile.startsWith && 
         newActiveFile.startsWith('unknown')) || 
         (newActiveFile && 
         newActiveFile.endsWith && 
         newActiveFile.endsWith('(deleted from disk)'))
-        ){
+        ) {
             _newActiveFile = 'unknown';
             _newActiveFileName = newActiveFile;
         } else {
@@ -192,10 +192,10 @@ export default (state = DEFAULT_STATE, action) => {
             ...DEFAULT_OPEN_FILE_STATE,
         };
       
-        if(doUnknown){
+        if (doUnknown) {
 
             // update activeFile if its path has changed
-            if(state.activeFile === path){
+            if (state.activeFile === path) {
                 _newActiveFile = 'unknown';
                 _newActiveFileName = newPath;
             } else {

@@ -36,7 +36,7 @@ global.log = new Logger('debug', 'info');
 let mainWindow = null;
 let mainProc = null;
 
-try{
+try {
     const gotTheLock = app.requestSingleInstanceLock();
   
     if (!gotTheLock) {
@@ -50,11 +50,11 @@ try{
             }
         });
     }
-} catch(e){
+} catch (e) {
     alert('Please, open later (2 sec)');
     console.log(e);
 
-    if(Sentry && Sentry.captureException){
+    if (Sentry && Sentry.captureException) {
         Sentry.captureException(e);
     }
 }
@@ -92,7 +92,7 @@ app.on('ready', async () => {
         },
     });
 
-    if(mainWindow){
+    if (mainWindow) {
         // Prevent refresh
         // @FIXME: it'll cause preventing refreshesh for all windows
         // https://stackoverflow.com/questions/51187602/electron-js-prevent-refresh-for-created-window
@@ -101,7 +101,7 @@ app.on('ready', async () => {
         mainWindow.loadURL(`file://${__dirname}/../renderer/app.html`);
     
         mainWindow.webContents.on('did-finish-load', () => {
-            if(mainWindow){
+            if (mainWindow) {
                 mainWindow.show();
                 mainWindow.focus();
             }
@@ -115,11 +115,11 @@ app.on('ready', async () => {
             disposeMainAndQuit();
         });
         
-        try{
+        try {
             mainProc = new MainProcess(mainWindow);
-        } catch(e){
+        } catch (e) {
         
-            if(Sentry && Sentry.captureException){
+            if (Sentry && Sentry.captureException) {
                 console.log('LOCATION : mainProc = new MainProcess(mainWindow)');
                 Sentry.captureException(e);
             }
@@ -173,16 +173,16 @@ function initializeCrashReporterAndSentry() {
         const newDirectory = path.join(crashesDirectory, 'new');
         const pendingDirectory = path.join(crashesDirectory, 'pending');
         // make sure crashesDirectory and its sub folders exist, otherwise we will get an error while initializing Sentry
-        if (!fs.existsSync(crashesDirectory)){
+        if (!fs.existsSync(crashesDirectory)) {
             fs.mkdirSync(crashesDirectory);
         }
-        if (!fs.existsSync(completedDirectory)){
+        if (!fs.existsSync(completedDirectory)) {
             fs.mkdirSync(completedDirectory);
         }
-        if (!fs.existsSync(newDirectory)){
+        if (!fs.existsSync(newDirectory)) {
             fs.mkdirSync(newDirectory);
         }
-        if (!fs.existsSync(pendingDirectory)){
+        if (!fs.existsSync(pendingDirectory)) {
             fs.mkdirSync(pendingDirectory);
         }
   
@@ -199,21 +199,21 @@ function initializeCrashReporterAndSentry() {
                     Array.isArray(event.exception.values) &&
                     event.exception.values.length > 0
                 ) {
-                    for(var i = 0; i < event.exception.values.length; i++){
-                        if(
+                    for (var i = 0; i < event.exception.values.length; i++) {
+                        if (
                             event.exception.values[i] &&
                             event.exception.values[i].stacktrace &&
                             event.exception.values[i].stacktrace.frames &&
                             Array.isArray(event.exception.values[i].stacktrace.frames) &&
                             event.exception.values[i].stacktrace.frames.length > 0
-                        ){
-                            for(var j = 0; j < event.exception.values[i].stacktrace.frames.length; j++){
+                        ) {
+                            for (var j = 0; j < event.exception.values[i].stacktrace.frames.length; j++) {
                                 const sepBefore = 'app:///main/';
-                                if(
+                                if (
                                     event.exception.values[i].stacktrace.frames[j] &&
                                     event.exception.values[i].stacktrace.frames[j].filename &&
                                     event.exception.values[i].stacktrace.frames[j].filename.startsWith(sepBefore)
-                                ){
+                                ) {
                                     event.exception.values[i].stacktrace.frames[j].filename = normalizeUrl(event.exception.values[i].stacktrace.frames[j].filename);
                                 }
                             }
@@ -226,7 +226,7 @@ function initializeCrashReporterAndSentry() {
         };
 
         Sentry.init(sentryConfig);
-    } catch(e) {
+    } catch (e) {
         console.warn('Cannot initialize CrashReporter and Sentry', e);
     }
 }

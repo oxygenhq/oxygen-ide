@@ -19,7 +19,7 @@ type Props = {
 
 class VisualTestingProvidersSettings extends React.PureComponent<Props> {
   
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             ...DEFAULT_STATE,
@@ -69,7 +69,7 @@ class VisualTestingProvidersSettings extends React.PureComponent<Props> {
         });
     }
   
-    validateFields(){
+    validateFields() {
         const { providers } = this.state;
         
         return new Promise((resolve, reject) => {
@@ -82,13 +82,13 @@ class VisualTestingProvidersSettings extends React.PureComponent<Props> {
         });
     }
     
-    async validateFormFields(){
+    async validateFormFields() {
         const validateFieldsResults = await this.validateFields();
         
         return validateFieldsResults;
     }
     
-    render(){
+    render() {
         
         const {
             providers = {}
@@ -99,7 +99,7 @@ class VisualTestingProvidersSettings extends React.PureComponent<Props> {
         } = providers;
         
 
-        return(
+        return (
             <Form>
                 {/* //////////// APPLITOOLS //////////// */}
                 <Form.Item label="Applitools" {...formItemLayout} extra="Use Applitools to add visual checkpoints." >
@@ -130,8 +130,8 @@ class VisualTestingProvidersSettings extends React.PureComponent<Props> {
 const EnhancedForm =  Form.create()(VisualTestingProvidersSettings);
 
 export default class GeneralSettingsWrap extends React.PureComponent<Props> {
-    render(){
-        return(
+    render() {
+        return (
             <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />
         );
     }

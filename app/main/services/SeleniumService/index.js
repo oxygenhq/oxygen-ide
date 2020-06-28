@@ -44,7 +44,7 @@ export default class SeleniumService extends ServiceBase {
         return await this._detectPortAndStart();
     }
 
-    _detectPortAndStart(){
+    _detectPortAndStart() {
         return detectPort(selSettings.port)
             .then(availablePort => {
                 const seleniumPid = this._startProcess(availablePort);
@@ -115,7 +115,7 @@ export default class SeleniumService extends ServiceBase {
         }
     }
 
-    async getChromeDriverVersionAndChromeVersion(){
+    async getChromeDriverVersionAndChromeVersion() {
         const result = {};
         var chromedriver;
         try {
@@ -184,7 +184,7 @@ export default class SeleniumService extends ServiceBase {
             } else {
                 // if no user placed driver then use, the latest bundled version
                 chromedriver = await this.findLocalChromeDriver(versions[0].driverVersion);
-                if(chromedriver && chromedriver === chromeDriverVersion){
+                if (chromedriver && chromedriver === chromeDriverVersion) {
                     console.log('Using latest bundled ChromeDriver from ' + chromedriver);
                 } else {                    
                     this.notify({
@@ -357,7 +357,7 @@ export default class SeleniumService extends ServiceBase {
         });
     }
 
-    getChromeDriverDownloadUrl(driverVersion){
+    getChromeDriverDownloadUrl(driverVersion) {
         var zipFilename;
         switch (process.platform) {
         case 'win32':
@@ -415,16 +415,16 @@ export default class SeleniumService extends ServiceBase {
         });
     }
 
-    fetchChromeDriver(downloadUrl){
+    fetchChromeDriver(downloadUrl) {
         return new Promise((resolve, reject) => {
-            try{
+            try {
                 fetch(downloadUrl)
                     .then(res => {
                         if (!res.ok) {
                             return new Error('Unable to download ChromeDriver: ' + res.statusText);
                         }
 
-                        if(res && res.buffer){
+                        if (res && res.buffer) {
                             return res.buffer();
                         } else {
                             return new Error('res.buffer is not defined');
@@ -449,16 +449,16 @@ export default class SeleniumService extends ServiceBase {
                         console.log('fetchChromeDriver fetch error', err);
                         resolve(err);
                     });
-            } catch(error){
+            } catch (error) {
                 console.log('fetchChromeDriver error', error);
                 resolve(error);
             }
         });
     }
 
-    decompressZip(driverVersion, zipPath){
+    decompressZip(driverVersion, zipPath) {
         return new Promise((resolve, reject) => {
-            try{
+            try {
                 var driverDir = path.join(this.getDriversRootPath(), 'chromedriver-' + driverVersion);
     
                 var unzip = new DecompressZip(zipPath);
@@ -476,16 +476,16 @@ export default class SeleniumService extends ServiceBase {
                     path: driverDir,
                     strip: 1
                 });
-            } catch(error){
+            } catch (error) {
                 console.log('decompressZip error', error);
                 resolve(error);
             }
         });
     }
 
-    chmodChromeDriver(driverDir){
+    chmodChromeDriver(driverDir) {
         return new Promise((resolve, reject) => {
-            try{
+            try {
                 var driverBin = path.join(driverDir, 'chromedriver' + (process.platform === 'win32' ? '.exe' : ''));
                 // chmod +x on POSIX
                 if (process.platform !== 'win32') {
@@ -501,14 +501,14 @@ export default class SeleniumService extends ServiceBase {
                 } else {
                     resolve(driverBin);
                 }
-            } catch(error){
+            } catch (error) {
                 console.log('chmodChromeDriver error', error);
                 resolve(error);
             }
         });
     }
     
-    async downloadChromeDriver(driverVersion){
+    async downloadChromeDriver(driverVersion) {
         /*eslint-disable */
         return new Promise(async (resolve, reject) => {
 

@@ -24,7 +24,7 @@ export default function onDidChangeModelContent (e) {
         
         let startLineNumber = 0;
 
-        if(
+        if (
             change &&
             change.range &&
             change.range.startLineNumber

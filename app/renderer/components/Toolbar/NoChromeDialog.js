@@ -3,7 +3,7 @@ import { Modal, Button } from 'antd';
 import electron from 'electron';
 
 export default class NoChromeDialog extends React.Component<Props> {
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
@@ -12,21 +12,21 @@ export default class NoChromeDialog extends React.Component<Props> {
   }
 
   handleCancel = () => {
-      if(this.props.hide){
+      if (this.props.hide) {
           this.props.hide();
       }
   }
 
   
   processLink = (event) => {
-      if(event){
+      if (event) {
           event.preventDefault();
       }
       const docsUrl = 'http://docs.oxygenhq.org/download-and-installation/recording-troubleshooting';
       electron.shell.openExternal(docsUrl);
   }
 
-  render(){
+  render() {
     
       return (
           <Modal

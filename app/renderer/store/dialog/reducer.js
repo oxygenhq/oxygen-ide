@@ -57,11 +57,11 @@ export default (state = defaultState, action) => {
     const { payload } = action;
     const { dialog, cache } = payload || {};
 
-    if(action.type === 'RESET'){
+    if (action.type === 'RESET') {
         return defaultState;
     }
 
-    if(action.type === 'FROM_CACHE'){
+    if (action.type === 'FROM_CACHE') {
         return {
             ...defaultState,
             ...cache.dialog

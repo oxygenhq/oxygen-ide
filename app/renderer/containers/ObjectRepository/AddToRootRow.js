@@ -17,7 +17,7 @@ export default class AddToRootRow extends React.PureComponent<Props> {
         };
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.focusTextInput();
     }
   
@@ -26,9 +26,9 @@ export default class AddToRootRow extends React.PureComponent<Props> {
     };
   
     setTextInputRef = element => {
-        if(element){
+        if (element) {
             this.textInput = element;
-            if(this.textInput && this.textInput.focus){
+            if (this.textInput && this.textInput.focus) {
                 this.textInput.focus();
             }
         }
@@ -47,7 +47,7 @@ export default class AddToRootRow extends React.PureComponent<Props> {
             name: '',
             key: null
         }, () => {
-            if(orAddToRoot && name && key){
+            if (orAddToRoot && name && key) {
                 orAddToRoot(name, key);
             } else {
                 console.warn('orAddToRoot && name && key', orAddToRoot, name, key);
@@ -86,7 +86,7 @@ export default class AddToRootRow extends React.PureComponent<Props> {
         }
     }
 
-    render(){
+    render() {
         const { 
             visible,
             key,
@@ -94,15 +94,15 @@ export default class AddToRootRow extends React.PureComponent<Props> {
         } = this.state;
         let title = '';
     
-        if(key){
-            if(key === 'container'){
+        if (key) {
+            if (key === 'container') {
                 title = 'Container';
-            } else if(key === 'array_object'){
+            } else if (key === 'array_object') {
                 title = 'Element';
             }
         }
 
-        return(
+        return (
             <div className="add-to-root-row">
                 <Dropdown overlay={
                     <Menu onClick={this.handleMenuClick}>

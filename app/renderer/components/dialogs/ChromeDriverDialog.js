@@ -12,7 +12,7 @@ type Props = {
 export default class ChromeDriverDialog extends React.PureComponent<Props> {
 
     close = () => {
-        if(this.props.onCancel){
+        if (this.props.onCancel) {
             this.props.onCancel();
         }
     }
@@ -20,10 +20,10 @@ export default class ChromeDriverDialog extends React.PureComponent<Props> {
     download = () => {
         const { chromeVersion, onNoChromeDriverSubmit } = this.props;
 
-        if(chromeVersion){
+        if (chromeVersion) {
             this.props.onSubmit(chromeVersion);
         } else {
-            if(onNoChromeDriverSubmit){
+            if (onNoChromeDriverSubmit) {
                 this.props.onNoChromeDriverSubmit();
             }
         }

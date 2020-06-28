@@ -8,7 +8,7 @@ type Props = {
 
 export default class NeedInstallExtension extends React.PureComponent<Props> {
   close = () => {
-      if(this.props.onClose){
+      if (this.props.onClose) {
           this.props.onClose();
       }
   }

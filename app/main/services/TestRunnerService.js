@@ -109,7 +109,7 @@ export default class TestRunnerService extends ServiceBase {
             if (provider) {
                 const providerCaps = provider.updateCapabilities(testTarget, caps, testName);
 
-                for(var value in providerCaps){
+                for (var value in providerCaps) {
                     caps[value] = providerCaps[value];
                 }
 
@@ -130,7 +130,7 @@ export default class TestRunnerService extends ServiceBase {
             }
         }
 
-        if(runSettings){
+        if (runSettings) {
             for (var runValue in runSettings) {
                 options[runValue] = runSettings[runValue];
             }
@@ -179,7 +179,7 @@ export default class TestRunnerService extends ServiceBase {
             options.delay = stepDelay;
         }
 
-        if(rootPath){
+        if (rootPath) {
             options.rootPath = rootPath;
         }
 
@@ -221,25 +221,25 @@ export default class TestRunnerService extends ServiceBase {
                 provider: 'Local'
             };
 
-            if(caps.browserName){
+            if (caps.browserName) {
                 playStartEventData.browserName = caps.browserName;
             }
-            if(caps.browserVersion){
+            if (caps.browserVersion) {
                 playStartEventData.browserVersion = caps.browserVersion;
             }
-            if(caps.platform){
+            if (caps.platform) {
                 playStartEventData.platform = caps.platform;
             }
-            if(caps['lamda:options']){
+            if (caps['lamda:options']) {
                 playStartEventData.provider = 'Lambdatest';
             }
-            if(caps['testingBot:options']){
+            if (caps['testingBot:options']) {
                 playStartEventData.provider = 'TestingBot';
             }
-            if(caps['sauce:options']){
+            if (caps['sauce:options']) {
                 playStartEventData.provider = 'Saucelabs';
             }
-            if(caps['testObject:options']){
+            if (caps['testObject:options']) {
                 playStartEventData.provider = 'Testobject';
             }
             if (caps['perfectoMobile:options']) {
@@ -274,7 +274,7 @@ export default class TestRunnerService extends ServiceBase {
             message: 'Test finished with status --> CANCELED'
         });
 
-        if(this.reporter && this.reporter.removeListener){
+        if (this.reporter && this.reporter.removeListener) {
             this.reporter.removeListener('runner:start',() => {});
             this.reporter.removeListener('runner:end',() => {});
             this.reporter.removeListener('step:start',() => {});
@@ -286,7 +286,7 @@ export default class TestRunnerService extends ServiceBase {
             this.isStopping = true;
             this.isRunning = false;
             try {
-                if(this.runner.removeListener){
+                if (this.runner.removeListener) {
                     this.runner.removeListener('breakpoint',() => {});
                     this.runner.removeListener('init-done',() => {});
                     this.runner.removeListener('line-update',() => {});
@@ -355,7 +355,7 @@ export default class TestRunnerService extends ServiceBase {
             const result = await runner.run();
             // dispose runner
 
-            if(result && result.status){
+            if (result && result.status) {
                 await runner.dispose(result.status);
             }
         }
@@ -396,7 +396,7 @@ export default class TestRunnerService extends ServiceBase {
         });
     }
 
-    _emitplayStartEvent(playStartEventData){
+    _emitplayStartEvent(playStartEventData) {
         this.notify({
             type: EVENT_SEND_START_DATA,
             data: playStartEventData
@@ -463,7 +463,7 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _emitLogEvent(severity, message) {
-        if(this.runner && this.isRunning){
+        if (this.runner && this.isRunning) {
             this.notify({
                 type: EVENT_LOG_ENTRY,
                 severity: severity,
@@ -473,7 +473,7 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     _emitLineUpdate(time, file, line, primary) {
-        if(this.runner && this.isRunning){
+        if (this.runner && this.isRunning) {
             // console.log('--- debug _emitLineUpdate ---');
             // console.log('line', line);
             // console.log('file', file);
@@ -508,7 +508,7 @@ export default class TestRunnerService extends ServiceBase {
         });
 
         // @params breakpoint
-        if(this.runner && this.runner.on){
+        if (this.runner && this.runner.on) {
             this.runner.on('breakpoint', (breakpoint) => {
                 this._handleBreakpoint(breakpoint);
             });
@@ -542,7 +542,7 @@ export default class TestRunnerService extends ServiceBase {
         });
     }
 
-    _handleBreakpointError(breakpointError){
+    _handleBreakpointError(breakpointError) {
         const {
             message,
             lineNumber,
@@ -562,7 +562,7 @@ export default class TestRunnerService extends ServiceBase {
             primary: true,
         });
 
-        if(message){
+        if (message) {
             this._emitLogEvent(SEVERITY_INFO, message);
         }
     }
@@ -602,7 +602,7 @@ export default class TestRunnerService extends ServiceBase {
             variables: variables
         });
 
-        if(resolved){
+        if (resolved) {
             this.notify({
                 type: EVENT_BREAKPOIN_RESOLVED,
                 time,

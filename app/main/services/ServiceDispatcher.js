@@ -55,7 +55,7 @@ export default class ServiceDispatcher {
             e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: { type: 'METHOD_NOT_FOUND' } });
             return;
         }
-        if(service !== 'ElectronService' && method !== 'updateCache'){
+        if (service !== 'ElectronService' && method !== 'updateCache') {
             console.log(`Service call: ${service}.${method}`, args);
         }
         try {

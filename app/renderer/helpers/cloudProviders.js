@@ -25,7 +25,7 @@ const devicesLevels = [
 
 export const getBrowsersTarget = (tree, pos, level = 0, prevValue = '') => {
     let result = null;
-    if(pos.includes(delimeter)){
+    if (pos.includes(delimeter)) {
         const splitResult = pos.split(delimeter);
         const shifted = splitResult.shift();
         
@@ -48,11 +48,11 @@ export const getBrowsersTarget = (tree, pos, level = 0, prevValue = '') => {
             [key]: item.orTitle
         };
         
-        if(level < browsersLevels.length && Array.isArray(item.children) && item.children.length > 0){
+        if (level < browsersLevels.length && Array.isArray(item.children) && item.children.length > 0) {
             const poss = item.children[item.children.length - 1].orTitle;
             let fillResult = getBrowsersTarget(item.children, poss, level+1, value);
             
-            if(fillResult && typeof fillResult === 'object' && Object.keys(fillResult)){
+            if (fillResult && typeof fillResult === 'object' && Object.keys(fillResult)) {
                 const keys = Object.keys(fillResult);
                 keys.map((key) => {
                     result[key] = fillResult[key];
@@ -68,18 +68,18 @@ export const getBrowsersTarget = (tree, pos, level = 0, prevValue = '') => {
 export const saveBrowserTarget = (target) => {
     let returnResult;
 
-    if(target && typeof target === 'object' && Object.keys(target).length > 0){
+    if (target && typeof target === 'object' && Object.keys(target).length > 0) {
         let result = '';
-        if(target[browserName]){
+        if (target[browserName]) {
             result = target[browserName];
         }
-        if(target[browserVersion]){
+        if (target[browserVersion]) {
             result += delimeter+target[browserVersion];
         }
-        if(target[osName]){
+        if (target[osName]) {
             result += delimeter+target[osName];
         }
-        if(target[osVersion]){
+        if (target[osVersion]) {
             result += delimeter+target[osVersion];
         }
         returnResult = result;
@@ -93,7 +93,7 @@ export const saveBrowserTarget = (target) => {
 export const getDevicesTarget = (tree, pos, level = 0, prevValue = '') => {
     let result = null;
 
-    if(pos.includes(delimeter)){
+    if (pos.includes(delimeter)) {
         const splitResult = pos.split(delimeter);
         const shifted = splitResult.shift();
 
@@ -117,11 +117,11 @@ export const getDevicesTarget = (tree, pos, level = 0, prevValue = '') => {
             [key]: item.orTitle
         };
         
-        if(level < devicesLevels.length && Array.isArray(item.children) && item.children.length > 0){
+        if (level < devicesLevels.length && Array.isArray(item.children) && item.children.length > 0) {
             const poss = item.children[item.children.length - 1].orTitle;
             let fillResult = getDevicesTarget(item.children, poss, level+1, value);
 
-            if(fillResult && typeof fillResult === 'object' && Object.keys(fillResult)){
+            if (fillResult && typeof fillResult === 'object' && Object.keys(fillResult)) {
                 const keys = Object.keys(fillResult);
                 keys.map((key) => {
                     result[key] = fillResult[key];
@@ -135,15 +135,15 @@ export const getDevicesTarget = (tree, pos, level = 0, prevValue = '') => {
 
 
 export const saveDeviceTarget = (target) => {
-    if(target && typeof target === 'object' && Object.keys(target).length > 0){
+    if (target && typeof target === 'object' && Object.keys(target).length > 0) {
         let result = '';
-        if(target[osName]){
+        if (target[osName]) {
             result = target[osName];
         }
-        if(target[deviceName]){
+        if (target[deviceName]) {
             result += delimeter+target[deviceName];
         }
-        if(target[osVersion]){
+        if (target[osVersion]) {
             result += delimeter+target[osVersion];
         }
         return result;

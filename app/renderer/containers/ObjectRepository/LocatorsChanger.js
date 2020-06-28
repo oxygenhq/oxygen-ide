@@ -24,7 +24,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
   onChangeUpdate = (e) => {
       const nexText = e.target.value.trim();
 
-      if(this.props.onChangeUpdate){
+      if (this.props.onChangeUpdate) {
           this.props.onChangeUpdate(nexText);
       }
   }
@@ -35,7 +35,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
           console.error('Locator name cannot be blank!');
           return;
       }
-      if(this.props.addLocator){
+      if (this.props.addLocator) {
           this.props.addLocator(text);
           this.setState({
               text: '',
@@ -47,7 +47,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
   update = () => {
       const { editStr, finishEdit } = this.props;
 
-      if(editStr && finishEdit){
+      if (editStr && finishEdit) {
           finishEdit(editStr);
           this.setState({
               text: ''
@@ -60,7 +60,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
   cancelUpdate = () => {
       const { cancelEdit } = this.props;
 
-      if(cancelEdit){
+      if (cancelEdit) {
           cancelEdit();
       }
   }
@@ -77,7 +77,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
           selectedLocatorName 
       } = this.props;
 
-      if(remove){
+      if (remove) {
           remove(selectedLocatorName);
       }
   }
@@ -88,7 +88,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
           selectedLocatorName 
       } = this.props;
 
-      if(startEdit){
+      if (startEdit) {
           startEdit(selectedLocatorName);
       }
   }
@@ -99,7 +99,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
           selectedLocatorName 
       } = this.props;
     
-      if(moveLocator){
+      if (moveLocator) {
           moveLocator(selectedLocatorName, 'up');
       }
   }
@@ -110,7 +110,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
           selectedLocatorName 
       } = this.props;
     
-      if(moveLocator){
+      if (moveLocator) {
           moveLocator(selectedLocatorName, 'down');
       }
   }
@@ -128,7 +128,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
     
       let child = null;
 
-      if(editing){
+      if (editing) {
           child =  (
               <div className="locators-update-container">
                   <Input 
@@ -150,7 +150,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
           );
       }
 
-      if(addLocator){
+      if (addLocator) {
           child = (
               <div className="locators-changer-container">
                   <Input 

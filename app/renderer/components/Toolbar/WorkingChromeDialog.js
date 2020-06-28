@@ -10,7 +10,7 @@ type Props = {
 };
 
 export default class WorkingChromeDialog extends React.Component<Props> {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -24,14 +24,14 @@ export default class WorkingChromeDialog extends React.Component<Props> {
     }
 
     handleCancel = () => {
-        if(this.props.hide){
+        if (this.props.hide) {
             this.props.hide();
         }
     }
 
   
     processLink = (event) => {
-        if(event){
+        if (event) {
             event.preventDefault();
         }
         const docsUrl = 'http://docs.oxygenhq.org';
@@ -46,30 +46,30 @@ export default class WorkingChromeDialog extends React.Component<Props> {
         this.setState({
             showRecorderMessage: checked
         }, () => {
-            if(changeShowRecorderMessageValue){
+            if (changeShowRecorderMessageValue) {
                 changeShowRecorderMessageValue(checked);
             }
         });
     }
 
-    render(){
+    render() {
 
         const { 
             showRecorderMessage,
             showRecorderMessageInitialy
         } = this.state;
 
-        if(showRecorderMessageInitialy === null){
+        if (showRecorderMessageInitialy === null) {
             // Default value, user never change if
             // do nothing
         }
 
-        if(showRecorderMessageInitialy === true){
+        if (showRecorderMessageInitialy === true) {
             // User dont want to see this dialog
             return null;
         }
 
-        if(showRecorderMessageInitialy === false){
+        if (showRecorderMessageInitialy === false) {
             // User want to see this dialog
             // do nothing
         }

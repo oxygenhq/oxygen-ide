@@ -11,14 +11,14 @@ import React, { Fragment } from 'react';
 
 function handleContextMenuEvent(e, node, menuName) {
     e.preventDefault();
-    if(this.props.setActiveNode){
+    if (this.props.setActiveNode) {
         this.props.setActiveNode(node.path);
     }
-    if(this.props.showContextMenu){
+    if (this.props.showContextMenu) {
 
         let safeNode = null;
 
-        if(node){
+        if (node) {
             safeNode = node;
         }
 
@@ -54,13 +54,13 @@ function renderVariablesTreeNodes(nodes, parentIndex) {
 
         let saveParentIndex = '0';
 
-        if(parentIndex){
+        if (parentIndex) {
             saveParentIndex = parentIndex;
         }
 
         saveParentIndex+='.'+idx;
         
-        if(element.children && element.children.length){
+        if (element.children && element.children.length) {
             return (
                 <Tree.TreeNode
                     hideIcon={true}

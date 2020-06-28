@@ -27,7 +27,7 @@ type Props = {
 
 
 class GeneralSettings extends React.PureComponent<Props> {    
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             ...DEFAULT_STATE,
@@ -108,13 +108,13 @@ class GeneralSettings extends React.PureComponent<Props> {
         });
     }
 
-    async validateFormFields(){
+    async validateFormFields() {
         const validateFieldsResults = await this.validateFields();
         
         return validateFieldsResults;
     }
 
-    render(){
+    render() {
         
         const {
             iterations,
@@ -142,7 +142,7 @@ class GeneralSettings extends React.PureComponent<Props> {
             </button>
         );
 
-        return(
+        return (
             <Form>
                 {envList &&
                 <Form.Item label="Environment" {...formItemLayout} >
@@ -208,8 +208,8 @@ class GeneralSettings extends React.PureComponent<Props> {
 const EnhancedForm =  Form.create()(GeneralSettings);
 
 export default class GeneralSettingsWrap extends React.PureComponent<Props> {
-    render(){
-        return(
+    render() {
+        return (
             <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />
         );
     }

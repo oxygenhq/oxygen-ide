@@ -21,7 +21,7 @@ type Props = {
 
 class CloudProvidersSettings extends React.PureComponent<Props> {
   
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             ...DEFAULT_STATE,
@@ -436,7 +436,7 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
     }
     
 
-    validateFields(){
+    validateFields() {
         const { providers } = this.state;
         
         return new Promise((resolve, reject) => {
@@ -449,14 +449,14 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
         });
     }
     
-    async validateFormFields(){
+    async validateFormFields() {
         const validateFieldsResults = await this.validateFields();
         
         return validateFieldsResults;
     }
 
     processLink = (event) => {
-        if(event){
+        if (event) {
             event.preventDefault();
 
             if (event.target instanceof HTMLAnchorElement) {
@@ -468,7 +468,7 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
         }
     }
     
-    render(){
+    render() {
         
         const {
             providers = {}
@@ -482,7 +482,7 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
             perfectoMobile = {}
         } = providers;
 
-        return(
+        return (
             <Form>
                 {/* //////////// SAUCE LABS //////////// */}
                 <Form.Item label="Sauce Labs" {...formItemLayout} extra="Use Sauce Labs to run your selenium in cloud." >
@@ -692,8 +692,8 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
 const EnhancedForm =  Form.create()(CloudProvidersSettings);
 
 export default class GeneralSettingsWrap extends React.PureComponent<Props> {
-    render(){
-        return(
+    render() {
+        return (
             <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />
         );
     }

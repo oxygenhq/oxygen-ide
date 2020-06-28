@@ -40,31 +40,31 @@ export default function* root() {
     ]);
 }
 
-export function reset(){
+export function reset() {
     canRecord = false;
 }
 
-export function* recorderNewCanRecord({ payload }){
+export function* recorderNewCanRecord({ payload }) {
     const recorder = yield select(state => state.recorder);
     const { waitChromeExtension } = recorder;
     const { event } = payload;
     const { newCanRecord } = event;
 
-    if(newCanRecord !== canRecord){
+    if (newCanRecord !== canRecord) {
         canRecord = newCanRecord;
 
         yield put(recorderActions.changeCanRecord(newCanRecord));
 
-        if(!newCanRecord){
+        if (!newCanRecord) {
             yield put(recorderActions.stopRecorder());
         }
     }
-    if(waitChromeExtension){
+    if (waitChromeExtension) {
         yield put(recorderActions.stopWaitChromeExtension());
     }
 }
 
-export function* stopRecorderAfterFileClose(){
+export function* stopRecorderAfterFileClose() {
     yield put(wbActions.stopRecorder());
     const errorWithFileMessage = 'Recording will stop now because the file was closed';
     notification['error']({
@@ -80,21 +80,21 @@ export function* wbCloseFileSuccess({ payload }) {
 
     const { activeFile, activeFileName, isRecording } = recorder;
 
-    if(isRecording){
-        if(payload && payload.path){
-            if(payload.path === 'unknown') {
-                if(payload.path === activeFile && payload.name === activeFileName){
+    if (isRecording) {
+        if (payload && payload.path) {
+            if (payload.path === 'unknown') {
+                if (payload.path === activeFile && payload.name === activeFileName) {
                     yield stopRecorderAfterFileClose();
                 }
             } else {
-                if(payload.path === activeFile){
+                if (payload.path === activeFile) {
                     yield stopRecorderAfterFileClose();
                 }
             }
         }
     }
 
-    if(tabs.active !== editor.activeFile && tabs.activeTitle !== editor.activeFileName){
+    if (tabs.active !== editor.activeFile && tabs.activeTitle !== editor.activeFileName) {
         yield put(editorActions.setActiveFile(tabs.active, tabs.activeTitle));
     }
 
@@ -105,10 +105,10 @@ export function* wbCloseFileSuccess({ payload }) {
 export function* recorderAddStepChannelInnit({ payload }) {
     const channel = yield actionChannel('RECORDER_SERVICE_ADD_STEP');
 
-    while(true) {
+    while (true) {
         const { payload } = yield take(channel);
 
-        if(payload){
+        if (payload) {
             yield call(handleRequest, payload);
         }
     }
@@ -124,14 +124,14 @@ function* handleRequest(payload) {
     
         const { activeFile, activeFileName, isRecording } = recorder;
     
-        if(!isRecording){
+        if (!isRecording) {
             //ignore messages from RecorderService because recording process not started
             return;
         }
         
         let generatedCode = '';
         const steps = [];    
-        if(event.stepsArray && Array.isArray(event.stepsArray)){
+        if (event.stepsArray && Array.isArray(event.stepsArray)) {
     
             yield all(
                 event.stepsArray.map((item) => call(function () {
@@ -152,7 +152,7 @@ function* handleRequest(payload) {
             );
         }
         
-        if(activeFile === 'unknown'){
+        if (activeFile === 'unknown') {
             
             if (!activeFileName) {
                 yield stopRecorderAfterFileClose();
@@ -169,7 +169,7 @@ function* handleRequest(payload) {
             // current code, before update (make sure to include new line at the end of the content)
             let prevContent = file.content;
     
-            if(!prevContent){
+            if (!prevContent) {
                 prevContent = '';
             }
     
@@ -201,7 +201,7 @@ function* handleRequest(payload) {
             // current code, before update (make sure to include new line at the end of the content)
             let prevContent = file.content;
     
-            if(!prevContent){
+            if (!prevContent) {
                 prevContent = '';
             }
     
@@ -220,7 +220,7 @@ function* handleRequest(payload) {
                 put(recorderActions.addSteps(steps))
             ]);
         }    
-    } catch(e) {
+    } catch (e) {
         yield put(reportError(e));
         console.log('handleRequest e', e);
     }
@@ -244,7 +244,7 @@ export function* startRecorder({ payload }) {
         
         const resp = yield putAndTake(wbActions.openFakeFile());
         
-        if(resp && resp.key && resp.name){
+        if (resp && resp.key && resp.name) {
             const { key, name } = resp;
             
             yield call(services.mainIpc.call, 'AnalyticsService', 'recStart', []);
@@ -265,13 +265,13 @@ export function* stopRecorder({ payload }) {
     let recorded_items_count = 0;
     const recorder = yield select(state => state.recorder);
 
-    if(recorder && recorder.steps && Array.isArray(recorder.steps)){
+    if (recorder && recorder.steps && Array.isArray(recorder.steps)) {
         recorded_items_count = recorder.steps.length;
     }
 
     yield call(services.mainIpc.call, 'AnalyticsService', 'recStop', [recorded_items_count]);
 }
 
-export function* startRecorderWatcher(){
+export function* startRecorderWatcher() {
     yield call(services.mainIpc.call, 'RecorderService', 'watch', []);
 }
