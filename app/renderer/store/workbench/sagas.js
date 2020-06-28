@@ -334,8 +334,8 @@ export function* initialize() {
     yield services.mainIpc.call('CloudProvidersService', 'start').then(() => {});
     yield setCloudProvidersBrowsersAndDevices();
     //start VisualTestingProvidersService
-    services.mainIpc.call('VisualTestingProvidersService', 'start').then(() => {});
-    yield setVisualTestingProviders();
+    services.mainIpc.call('IntegrationProvidersService', 'start').then(() => {});
+    yield setIntegrationProviders();
 }
 
 export function* openFolder({ payload }) {
@@ -1687,14 +1687,14 @@ export function* setCloudProvidersBrowsersAndDevices(){
     }
 }
 
-export function* setVisualTestingProviders(){
+export function* setIntegrationProviders(){
     const settings = yield select(state => state.settings);
     
-    const { visualProviders } = settings || {};
+    const { integrations } = settings || {};
 
-    if(visualProviders){
-        if(visualProviders.applitools){
-            yield call(services.mainIpc.call, 'VisualTestingProvidersService', 'updateProviderSettings', ['applitools', visualProviders.applitools]);
+    if (integrations) {
+        if (integrations.applitools) {
+            yield call(services.mainIpc.call, 'IntegrationProvidersService', 'updateProviderSettings', ['applitools', integrations.applitools]);
         }
     }
 }

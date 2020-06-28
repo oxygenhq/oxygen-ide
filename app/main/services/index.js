@@ -17,7 +17,7 @@ import DeviceDiscoveryService from './DeviceDiscoveryService';
 import RecorderService from './RecorderService';
 import UpdateService from './UpdateService';
 import CloudProvidersService from './CloudProvidersService';
-import VisualTestingProvidersService from './VisualTestingService';
+import IntegrationProvidersService from './IntegrationsService';
 import ProjectService from './ProjectService';
 
 
@@ -33,6 +33,6 @@ export default {
     RecorderService,
     UpdateService,
     CloudProvidersService,
-    VisualTestingProvidersService,
+    IntegrationProvidersService,
     ProjectService,
 };

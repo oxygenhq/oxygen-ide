@@ -10,7 +10,7 @@ import React from 'react';
 import { Tabs, Modal } from 'antd';
 import GeneralSettings from './GeneralSettings';
 import CloudProvidersSettings from './CloudProvidersSettings';
-import VisualTestingSettings from './VisualTestingProvidersSettings';
+import IntegrationsSettings from './IntegrationsSettings';
 import RunSettings from './RunSettings';
 const { TabPane } = Tabs;
 
@@ -61,7 +61,7 @@ export default class SettingsDialog extends React.PureComponent<Props> {
     async handleOk() {
         let generalSettingsResult = null;
         let cloudProvidersResult = null;
-        let visualTestingSettings = null;
+        let integrationsSettings = null;
         let runSettings = null;
         
         if(this.GeneralSettings && this.GeneralSettings.formWrap && this.GeneralSettings.formWrap.validateFormFields){
@@ -72,15 +72,15 @@ export default class SettingsDialog extends React.PureComponent<Props> {
             cloudProvidersResult = await this.CloudProvidersSettings.formWrap.validateFormFields();
         }
         
-        if(this.VisualTestingSettings && this.VisualTestingSettings.formWrap && this.VisualTestingSettings.formWrap.validateFormFields){
-            visualTestingSettings = await this.VisualTestingSettings.formWrap.validateFormFields();
+        if(this.IntegrationsSettings && this.IntegrationsSettings.formWrap && this.IntegrationsSettings.formWrap.validateFormFields){
+            integrationsSettings = await this.IntegrationsSettings.formWrap.validateFormFields();
         }
 
         if(this.RunSettings && this.RunSettings.formWrap && this.RunSettings.formWrap.validateFormFields){
             runSettings = await this.RunSettings.formWrap.validateFormFields();
         }
 
-        this.props.onSubmit(generalSettingsResult, cloudProvidersResult, visualTestingSettings, runSettings);
+        this.props.onSubmit(generalSettingsResult, cloudProvidersResult, integrationsSettings, runSettings);
     }
 
     onTabChange = (key) => {
@@ -93,8 +93,8 @@ export default class SettingsDialog extends React.PureComponent<Props> {
         const {
             generalSettings,
             projectSettings,
+            integrations,
             cloudProviders,
-            visualProviders,
             runSettings,
             visible,
             onCancel,
@@ -127,10 +127,10 @@ export default class SettingsDialog extends React.PureComponent<Props> {
                             visible={ visible }
                         />
                     </TabPane>
-                    <TabPane tab="Visual Testing" key="3">
-                        <VisualTestingSettings
-                            ref={node => (this.VisualTestingSettings = node)}
-                            providers={ visualProviders }
+                    <TabPane tab="Integrations" key="3">
+                        <IntegrationsSettings
+                            ref={node => (this.IntegrationsSettings = node)}
+                            providers={ integrations }
                             visible={ visible }
                         />
                     </TabPane>

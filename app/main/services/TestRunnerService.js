@@ -117,23 +117,17 @@ export default class TestRunnerService extends ServiceBase {
                 options = Object.assign(options, providerOptions);
             }
         }
-        const visualTestingProvidersServiceSvc = this.getService('VisualTestingProvidersService');
-        if (visualTestingProvidersServiceSvc) {
-            const applitoolsProvider = visualTestingProvidersServiceSvc.getProvider('applitools');
+        const integrationProvidersSvc = this.getService('IntegrationProvidersService');
+        if (integrationProvidersSvc) {
+            const applitoolsProvider = integrationProvidersSvc.getProvider('applitools');
             if (applitoolsProvider) {
-                const applitoolsproviderOptions = applitoolsProvider.updateOptions(options);
-                if (applitoolsproviderOptions) {
-                    for (var value2 in applitoolsproviderOptions) {
-                        options[value2] = applitoolsproviderOptions[value2];
-                    }
-                }
+                const applitoolsProviderOptions = applitoolsProvider.updateOptions(options);
+                options = Object.assign(options, applitoolsProviderOptions);
             }
         }
 
-        if(runSettings){
-            for (var runValue in runSettings) {
-                options[runValue] = runSettings[runValue];
-            }
+        if (runSettings && typeof runSettings === 'object') {
+            options = Object.assign(options, runSettings);
         }
         // add local run options, if no cloud provider was selected
         if (!testProvider || !testProvider.id) {

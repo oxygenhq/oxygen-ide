@@ -92,7 +92,7 @@ type Props = {
   renameFile: Function,
   updateRunSettings: Function,
   updateCloudProvidersSettings: Function,
-  updateVisualTestingSettings: Function,
+  updateIntegrationsSettings: Function,
   updateRunSettings: Function,
   startDownloadChromeDriver: Function,
   showDownloadChromeDriverError: Function,
@@ -472,27 +472,27 @@ export default class Workbench extends React.Component<Props> {
       this.props.hideDialog('DIALOG_UPDATE');
   }
   // Settings
-  settingsDialog_onSubmit(generalSettings, providers, visualTesting, runSettings) {
-      this.props.hideDialog('DIALOG_SETTINGS');
+  settingsDialog_onSubmit(generalSettings, providers, integrations, runSettings) {
+    this.props.hideDialog('DIALOG_SETTINGS');
+    console.log('integrations', integrations)
+    if (generalSettings) {
+    this.props.updateGeneralSettings(generalSettings);    
+    }
 
-      if(generalSettings){
-        this.props.updateGeneralSettings(generalSettings);    
-      }
+    if (providers) {
+    this.props.updateCloudProvidersSettings(providers);    
+    }
 
-      if(providers){
-        this.props.updateCloudProvidersSettings(providers);    
-      }
+    if (integrations) {
+    this.props.updateIntegrationsSettings(integrations);
+    }
 
-      if(visualTesting){
-        this.props.updateVisualTestingSettings(visualTesting);
-      }
-
-      if(runSettings){
-        this.props.updateRunSettings(runSettings);
-      }
+    if (runSettings) {
+    this.props.updateRunSettings(runSettings);
+    }
   }
   settingsDialog_onCancel() {
-      this.props.hideDialog('DIALOG_SETTINGS');
+    this.props.hideDialog('DIALOG_SETTINGS');
   }
 
   chromeDrivers_onSubmit = (chromeDriverVersion) => {
@@ -534,7 +534,7 @@ export default class Workbench extends React.Component<Props> {
           objrepoName
       } = this.props;
 
-      const { generalSettings = {}, runSettings = {}, visualProviders = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null, projectSettings = null } = settings;
+      const { generalSettings = {}, runSettings = {}, integrations = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null, projectSettings = null } = settings;
       const { runtimeSettings } = test;
       // sidebars state
       const leftSidebarSize = settings.sidebars.left.size;
@@ -660,7 +660,7 @@ export default class Workbench extends React.Component<Props> {
                     settings={ runtimeSettings }
                     projectSettings={ projectSettings }
                     cloudProviders={ cloudProviders }
-                    visualProviders={ visualProviders }
+                    integrations={ integrations }
                     runSettings={ runSettings }
                     generalSettings={ generalSettings }
                     onSubmit={ ::this.settingsDialog_onSubmit }

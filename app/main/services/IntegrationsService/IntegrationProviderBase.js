@@ -1,4 +1,4 @@
-export default class VisualTestingProviderBase {
+export default class IntegrationProviderBase {
     constructor(settings) {
         this.settings = settings;
     }

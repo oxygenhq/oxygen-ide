@@ -2,7 +2,7 @@
 import * as Providers from './providers';
 import ServiceBase from '../ServiceBase';
 
-export default class VisualTestingProvidersService extends ServiceBase {
+export default class IntegrationProvidersService extends ServiceBase {
     constructor(mainWindow, settings) {
         super(mainWindow, settings);
         this.providers = {};
@@ -20,13 +20,13 @@ export default class VisualTestingProvidersService extends ServiceBase {
     
     start() {
         // initialize each enabled provider
-        const { visualProviders } = this.settings || {};
-        if (!visualProviders) {
+        const { integrations } = this.settings || {};
+        if (!integrations) {
             console.warn('No visual providers defined');
             return;
         }
-        for (var providerName in visualProviders) {
-            const providerSettings = visualProviders[providerName];
+        for (var providerName in integrations) {
+            const providerSettings = integrations[providerName];
             if (!Providers.default.hasOwnProperty(providerName)) {
                 continue;
             }
