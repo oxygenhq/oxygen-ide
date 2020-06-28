@@ -191,7 +191,6 @@
     "source-map-support": "0.5.19",
     "teen_process": "1.15.0",
     "tmp": "0.1.0",
-    "uniqid": "5.2.0",
     "uuid": "3.4.0",
     "winston": "3.2.1",
     "winston-daily-rotate-file": "4.4.2"

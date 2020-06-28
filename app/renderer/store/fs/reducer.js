@@ -6,15 +6,12 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-/* eslint-disable */
-// import uniqid from 'uniqid';
 import { message } from 'antd';
 import * as ActionTypes from './types';
 import subjects from './subjects';
 import * as treeHelpers from '../../helpers/tree';
 import * as fsHelpers from '../../helpers/fs';
 import { success, failure } from '../../helpers/redux';
-import fileFolderSorter from '../../../main/helpers/fileFolderSorter';
 
 const defaultState = {
   isLoading: false,
@@ -30,11 +27,11 @@ const defaultState = {
 export default (state = defaultState, action, dispatch) => {
   const payload = action.payload || {};
   const { path, node, name, response, content, error, fileOrFolder, cache } = payload;
-  let _newActiveNode, _filesClone, _node, _treeDataClone;
+  let _newActiveNode, _node, _treeDataClone;
 
   switch (action.type) {
     case ActionTypes.FS_ADD_FILE_OR_FOLDER: {
-      if(!fileOrFolder){
+      if (!fileOrFolder) {
         return state;
       }
       return { 
@@ -46,11 +43,11 @@ export default (state = defaultState, action, dispatch) => {
     }
 
     case ActionTypes.FS_SET_TREE_ROOT_PATH:
-      if(path){
+      if (path) {
         return {
           ...state, 
           rootPath: path,
-        }
+        };
       } else {
         return state;
       }
@@ -115,7 +112,7 @@ export default (state = defaultState, action, dispatch) => {
         isLoading: true,
       };
     case success(ActionTypes.FS_DELETE):
-      if(!path){
+      if (!path) {
         return state;
       }
       _newActiveNode = state.tree.activeNode === path ? null : state.tree.activeNode;
@@ -196,7 +193,7 @@ export default (state = defaultState, action, dispatch) => {
           _node.children = treeHelpers.mergeChildren(_node.children, treeHelpers.wrap(response));
           _node.isExpanded = true;
           // generate rxjs event
-          subjects["FILE.CHILDREN.LOADED"].next({ path: _node.path, children: response });
+          subjects['FILE.CHILDREN.LOADED'].next({ path: _node.path, children: response });
           _treeDataClone = treeHelpers.updateTree(state.tree.data, _node);
         }
       }
@@ -213,18 +210,18 @@ export default (state = defaultState, action, dispatch) => {
       let errMsg = 'Unknown load node children error';
       let nodePath = 'Unknown nodePath';
 
-      if(error){
+      if (error) {
         errMsg = error.code ? error.code : (error.message ? error.message : error);
       }
 
-      if(node && node.path){
+      if (node && node.path) {
         nodePath = node.path;
       }
 
       // generate rxjs event
-      subjects["FILE.CHILDREN.LOADED"].next({ path: nodePath, error: errMsg });
+      subjects['FILE.CHILDREN.LOADED'].next({ path: nodePath, error: errMsg });
 
-      if(name && nodePath && errMsg){
+      if (name && nodePath && errMsg) {
         // display error to the user
         message.error(`Error creating folder '${name}' in '${nodePath}': ${errMsg}`);
       }
@@ -259,7 +256,7 @@ export default (state = defaultState, action, dispatch) => {
           ...state.files,
           [path]: response
         }
-      }
+      };
 
     // FETCH_FILE_CONTENT
     case ActionTypes.FS_FETCH_FILE_CONTENT:
@@ -278,7 +275,7 @@ export default (state = defaultState, action, dispatch) => {
             content: response,
           }
         }
-      }
+      };
     
     // FETCH_FILE_INFO
     case ActionTypes.FS_FETCH_FILE_INFO:
@@ -341,21 +338,37 @@ export default (state = defaultState, action, dispatch) => {
 
     // TREE_CLEAR
     case ActionTypes.FS_TREE_CLEAR:
-    return {
-      ...state,
-      tree: {     // reset File Explorer tree
-        data: null,
-        activeNode: null,
-      },
-    };
+      return {
+        ...state,
+        tree: {     // reset File Explorer tree
+          data: null,
+          activeNode: null,
+        },
+      };
 
     // SAVE_FILE_SUCCESS
     case success(ActionTypes.FS_SAVE_FILE):
+      if (!path || !state.files.hasOwnProperty(path)) {
+        return state;
+      }
+      return {
+        ...state,
+        isLoading: false,
+        files: {
+          ...state.files,
+          [path]: {
+            ...state.files[path],
+            modified: false,
+          },
+        },
+      };
+
+    
     // SAVE_FILE__AS_SUCCESS
     case success(ActionTypes.FS_SAVE_FILE_AS):
       if (!path || !state.files.hasOwnProperty(path)) {
         return state;
-      }      
+      }
       return {
         ...state,
         isLoading: false,
@@ -372,7 +385,7 @@ export default (state = defaultState, action, dispatch) => {
       return {
         ...defaultState,
         ...cache.fs
-      }
+      };
 
     case 'RESET': {
       return defaultState;

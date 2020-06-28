@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 import { ipcRenderer } from 'electron';
-// import uniqid from 'uniqid';
 import * as types from './types';
 
 const defaultState = {

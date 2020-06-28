@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import { ipcRenderer } from 'electron';
-import uniqid from 'uniqid';
+import uuidv4 from 'uuid/v4';
 
 export const MAIN_SERVICE_EVENT = 'MAIN_SERVICE_EVENT';
 export const MAIN_MENU_EVENT = 'MAIN_MENU_EVENT';
@@ -41,7 +41,7 @@ export default class MainIpcService {
 
     call(service, method, args) {
         let _this = this;
-        const id = uniqid(); //(new Date()).getTime();
+        const id = uuidv4();
 
         /* eslint-disable */
         let promise = new Promise((resolve, reject) => {
