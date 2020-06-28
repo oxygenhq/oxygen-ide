@@ -1,6 +1,6 @@
-import VisualTestingProviderBase from '../VisualTestingProviderBase';
+import IntegrationProviderBase from '../IntegrationProviderBase';
 
-export default class ApplitoolsService extends VisualTestingProviderBase {
+export default class ApplitoolsService extends IntegrationProviderBase {
     constructor(settings) {
         super(settings);
         this.isRunning = false;

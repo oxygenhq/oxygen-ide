@@ -58,7 +58,7 @@ const defaultAppSettings = {
     runSettings: {
         npmGRootExecution: true
     },
-    visualProviders: {
+    integrations: {
         applitools: {
             title: 'Applitools',
             accessKey: null,
@@ -148,7 +148,7 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { projectSettings, value, target, settings, zoom, cache, uuid, providers, browsersAndDevices, testProvider, visualProviders, runSettings, generalSettings } = payload;
+    const { projectSettings, value, target, settings, zoom, cache, uuid, providers, browsersAndDevices, testProvider, integrations, runSettings, generalSettings } = payload;
     switch (action.type) {
     
     // CREATE USER
@@ -349,13 +349,13 @@ export default (state = defaultState, action) => {
             cloudProviders: providers
         };
 
-    case types.UPDATE_VISUAL_PROVIDERS_SETTINGS: 
-        if (!visualProviders || typeof visualProviders !== 'object') {
+    case types.UPDATE_INTEGRATIONS_SETTINGS: 
+        if (!integrations || typeof integrations !== 'object') {
             return state;
         }
         return {
             ...state,
-            visualProviders: visualProviders
+            integrations: integrations
         };
 
     case types.UPDATE_RUN_SETTINGS: 

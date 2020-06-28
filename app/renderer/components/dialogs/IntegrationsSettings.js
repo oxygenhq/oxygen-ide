@@ -17,7 +17,7 @@ type Props = {
     providers: Object | undefined
 };
 
-class VisualTestingProvidersSettings extends React.PureComponent<Props> {
+class IntegrationsSettings extends React.PureComponent<Props> {
   
     constructor(props) {
         super(props);
@@ -96,6 +96,7 @@ class VisualTestingProvidersSettings extends React.PureComponent<Props> {
 
         const {
             applitools = {},
+            /*cucumberStudio = {},*/
         } = providers;
         
 
@@ -106,28 +107,28 @@ class VisualTestingProvidersSettings extends React.PureComponent<Props> {
                     <Switch onChange={ ::this.onUseApplitoolsChange } checked={ applitools.inUse } />
                 </Form.Item>
                 { applitools && applitools.inUse &&
-            <div className="cloud-providers-form-wrap cloud-providers-form-wrap-margin-bottom">
-                <Form.Item label="Applitools Settings" style={ {fontWeight: 'bold'} } {...formItemLayout}/>
-                <Form.Item label="Access Key" {...formItemLayout} >
-                    <Input.Password
-                        value={ applitools.accessKey }
-                        onChange={ (e) => ::this.onChangeApplitoolsAccessKey(e.target.value) }
-                    />
-                </Form.Item>
-                <Form.Item label="Auto Check on Every Action" {...formItemLayout} >
-                    <Checkbox
-                        checked={ applitools.checkOnEveryAction || false }
-                        onChange={ (e) => ::this.onChangeApplitoolsCheckOnEveryAction(e.target.checked) }
-                    />
-                </Form.Item>
-            </div>
+                <div className="cloud-providers-form-wrap cloud-providers-form-wrap-margin-bottom">
+                    <Form.Item label="Applitools Settings" style={ {fontWeight: 'bold'} } {...formItemLayout}/>
+                    <Form.Item label="Access Key" {...formItemLayout} >
+                        <Input.Password
+                            value={ applitools.accessKey }
+                            onChange={ (e) => ::this.onChangeApplitoolsAccessKey(e.target.value) }
+                        />
+                    </Form.Item>
+                    <Form.Item label="Auto Check on Every Action" {...formItemLayout} >
+                        <Checkbox
+                            checked={ applitools.checkOnEveryAction || false }
+                            onChange={ (e) => ::this.onChangeApplitoolsCheckOnEveryAction(e.target.checked) }
+                        />
+                    </Form.Item>
+                </div>
                 }
             </Form>
         );
     }
 }
 
-const EnhancedForm =  Form.create()(VisualTestingProvidersSettings);
+const EnhancedForm =  Form.create()(IntegrationsSettings);
 
 export default class GeneralSettingsWrap extends React.PureComponent<Props> {
     render() {

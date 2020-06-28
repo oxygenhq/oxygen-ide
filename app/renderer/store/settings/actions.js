@@ -129,9 +129,9 @@ export const setLastSessionRootFolder = value => ({
     payload: { value },
 });
 
-export const updateVisualTestingSettings = visualProviders => ({
-    type: types.UPDATE_VISUAL_PROVIDERS_SETTINGS,
-    payload: { visualProviders }
+export const updateIntegrationsSettings = integrations => ({
+    type: types.UPDATE_INTEGRATIONS_SETTINGS,
+    payload: { integrations }
 });
 
 export const updateRunSettings = runSettings => ({
