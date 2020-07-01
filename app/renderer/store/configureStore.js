@@ -71,7 +71,6 @@ const configureStore = (initialState?: counterStateType) => {
 
     // Redux DevTools Configuration
     // If Redux DevTools Extension is installed use it, otherwise use Redux compose
-    /* eslint-disable no-underscore-dangle */
     /*
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
@@ -81,7 +80,6 @@ const configureStore = (initialState?: counterStateType) => {
     : compose;
   */
     const composeEnhancers = compose;
-    /* eslint-enable no-underscore-dangle */
 
     const ignoreTypes = [
         MAIN_MENU_EVENT,
@@ -221,15 +219,14 @@ const configureStore = (initialState?: counterStateType) => {
 const getSettings = (lastState) => {
     if (lastState && lastState.settings) {
         
-        /* eslint-disable */
+        // eslint-disable-next-line no-unused-vars
         const { cache, cloudProvidesBrowsersAndDevices, ...rest } = lastState.settings;
-        /* eslint-anable */
 
         return rest;
     } else {
         return null;
     }
-}
+};
 
 
 export default { configureStore, history, action$ };

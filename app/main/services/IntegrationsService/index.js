@@ -1,4 +1,3 @@
-/* eslint-disable no-prototype-builtins */
 import * as Providers from './providers';
 import ServiceBase from '../ServiceBase';
 

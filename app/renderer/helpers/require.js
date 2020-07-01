@@ -12,8 +12,7 @@
 * This function calls the original 'require' method, omitting Webpack wrapper.
 */
 export default function require(moduleName) {
-    /* eslint-disable */
+    // eslint-disable-next-line no-undef
     const requireFunc = typeof __webpack_require__ === 'function' ? __non_webpack_require__ : require;
     return requireFunc(moduleName);
-    /* eslint-enable */
 }

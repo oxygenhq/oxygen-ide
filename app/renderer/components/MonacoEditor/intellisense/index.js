@@ -10,7 +10,7 @@ import docs from './doc';
 
 const intellisenseJson = docs.init();
 
-const createModuleAndMethods = (jsonData) => { // eslint-disable-line
+const createModuleAndMethods = (jsonData) => {
     let methodArr = [];
     if (Object.keys(jsonData).length === 0) {
         return [];

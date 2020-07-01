@@ -8,7 +8,6 @@
  */
 import PerfectScrollbar from 'perfect-scrollbar';
 
-/* eslint-disable import/prefer-default-export */
 export const initializeScroll = (
     container,
     disableHorizontal = false,

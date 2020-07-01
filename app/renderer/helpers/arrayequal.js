@@ -6,10 +6,9 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-/* eslint-disable */
 
 // Warn if overriding existing method
-if(Array.prototype.equals) {
+if (Array.prototype.equals) {
   console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
 }
 
@@ -36,6 +35,6 @@ Array.prototype.equals = function (array) {
         }           
     }       
     return true;
-}
+};
 // Hide method from for-in loops
-Object.defineProperty(Array.prototype, "equals", {enumerable: false});
+Object.defineProperty(Array.prototype, 'equals', {enumerable: false});

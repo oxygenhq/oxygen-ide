@@ -143,9 +143,7 @@ function disposeMainAndQuit() {
 
     if (mainProc) {
         // dispose main process and all its services
-        /*eslint-disable */
         mainProc.dispose().then(() => app.exit());
-        /*eslint-enable */
         // make sure we set mainProc to null to prevent duplicated calls to this function
         mainProc = null;
     }

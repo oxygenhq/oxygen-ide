@@ -28,7 +28,6 @@ type Props = {
   className: string | undefined
 };
 
-/* eslint-disable react/no-did-update-set-state */
 export default class Panel extends React.Component<Props> {
     props: Props;
 

@@ -19,9 +19,9 @@ function renderTreeNodes(nodes) {
     if (!nodes || !nodes.length || nodes.length === 0) {
         return null;
     }
-    /*eslint-disable */
+    // eslint-disable-next-line no-func-assign
     handleContextMenuEvent = handleContextMenuEvent.bind(this);
-    /*eslint-enable */
+    
     return nodes.map(element => {
         const resolveClassName = element.name === '.emptyfile'
             ? 'hidden-node' : element.type;

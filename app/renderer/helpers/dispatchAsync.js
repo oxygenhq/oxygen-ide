@@ -21,7 +21,7 @@ export default function dispatchAsync(promise, dispatch, type, payload) {
         type: TYPE_REQ,
         payload: Object.assign({}, payload),
     });
-    /* eslint-disable */
+
     promise.then(
         (response)  => dispatch({
             type: TYPE_RSP,
@@ -34,5 +34,4 @@ export default function dispatchAsync(promise, dispatch, type, payload) {
             payload: Object.assign({}, payload, { error }),
         })
     );
-    /* eslint-enable */
 }

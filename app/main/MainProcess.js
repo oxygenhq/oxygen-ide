@@ -9,7 +9,6 @@
 import electron from 'electron';
 import ServiceDispatcher from './services/ServiceDispatcher';
 
-/* eslint-disable class-methods-use-this */
 export default class MainProcess {
     constructor(mainWindow) {
         process.env.ELECTRON = true;

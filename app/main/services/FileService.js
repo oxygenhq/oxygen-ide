@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-/* eslint-disable class-methods-use-this */
 import * as cp from 'child_process';
 import fs from 'fs';
 import fsExtra from 'fs-extra';

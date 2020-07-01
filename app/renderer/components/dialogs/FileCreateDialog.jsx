@@ -89,9 +89,8 @@ export default class FileCreateDialog extends React.PureComponent<Props> {
     }
 
     onChangeName = (e) => {
-        /* eslint-disable */
+        // eslint-disable-next-line no-useless-escape
         const illegalCharacters = /(\\)|(\/)|(\:)|(\;)|(\*)|(\?)|(")|(')|(,)|(\.)|(\<)|(\>)|(\|)/gi;
-        /* eslint-enable */
 
         let result = e.target.value.match( illegalCharacters );
         

@@ -6,7 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import waitForAction from '../helpers/waitForAction';
 
 export default class Workbench {
     constructor(store, action$) {
@@ -27,13 +26,7 @@ export default class Workbench {
         */
     }
     openFolder(path) {
-        /* eslint-disable */
         this.store.dispatch({ type: 'FS_REQUEST' });
-        waitForAction('FS_RESPONSE', this.action$)
-            .then((action) => {
-                console.log('all is right');
-            });
-        /* eslint-enable */
         //action$.ofType(ActionTypes.FS_OPEN_FOLDER_RSP)
         //.mapTo({ type: 'UPS' });
         /*

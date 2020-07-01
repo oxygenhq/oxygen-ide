@@ -133,9 +133,7 @@ export function* handleMainMenuEvents({ payload }) {
         yield editorSubjects['EDITOR.TRIGGER'].next({ trigger: 'replace' });
     }
     else if (cmd === Const.MENU_CMD_HELP_CHECK_UPDATES) {
-        /* eslint-disable */
         yield services.mainIpc.call('UpdateService', 'start', [true]);
-        /* eslint-enable */
     }
     else if (cmd === Const.MENU_CMD_OPEL_LOG_FILE) {
         try {

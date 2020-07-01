@@ -17,9 +17,8 @@ const getVisibleTrees = (trees, searchQuery) => {
         let nameMatch = {};
 
         if (includeInName) {
-            /*eslint-disable */
+            // eslint-disable-next-line no-unused-vars
             const { children, ...data } = t;
-            /*eslint-enable */
             nameMatch = data;
         }
 

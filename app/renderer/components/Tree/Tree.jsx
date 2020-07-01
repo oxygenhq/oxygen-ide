@@ -115,8 +115,7 @@ class Tree extends React.Component {
         super(props);
 
         this.state = {
-        // TODO: Remove this eslint
-            posEntities: {}, // eslint-disable-line react/no-unused-state
+            posEntities: {}, 
             keyEntities: {},
 
             selectedKeys: [],
@@ -548,7 +547,6 @@ class Tree extends React.Component {
     };
 
     onNodeLoad = treeNode => (
-        /* eslint-disable */
         new Promise((resolve) => {
         // We need to get the latest state of loading/loaded keys
             this.setState(({ loadedKeys = [], loadingKeys = [] }) => {
@@ -587,7 +585,6 @@ class Tree extends React.Component {
                 };
             });
         })
-        /* eslint-enable */
     );
 
     onNodeExpand = (e, treeNode) => {
@@ -629,17 +626,15 @@ class Tree extends React.Component {
         // Async Load data
         if (targetExpanded && loadData) {
             const loadPromise = this.onNodeLoad(treeNode);
-            /* eslint-disable */
             return loadPromise ? loadPromise.then(() => {
                 // [Legacy] Refresh logic
                 this.setUncontrolledState({ expandedKeys });
                 loadedKeys.map((item) => {
-                    if(watchFolder){
+                    if (watchFolder) {
                         watchFolder(item);
                     }
                 });
             }) : null;
-            /* eslint-enable */
         }
 
         return null;

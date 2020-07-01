@@ -431,8 +431,7 @@ export default class SeleniumService extends ServiceBase {
                         }
                     })
                     .then(buffer => {
-                        /*eslint-disable */
-                        if(buffer instanceof Error){
+                        if (buffer instanceof Error) {
                             resolve(buffer);
                         } else {
                             var zipPath = tmp.tmpNameSync();
@@ -444,7 +443,6 @@ export default class SeleniumService extends ServiceBase {
                                 resolve(zipPath);
                             });
                         }
-                        /*eslint-enable */
                     }).catch(err => {
                         console.log('fetchChromeDriver fetch error', err);
                         resolve(err);
@@ -509,14 +507,14 @@ export default class SeleniumService extends ServiceBase {
     }
     
     async downloadChromeDriver(driverVersion) {
-        /*eslint-disable */
+        // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
 
-            try{
+            try {
                 const downloadUrl = this.getChromeDriverDownloadUrl(driverVersion);
                 console.log('Downloading ' + downloadUrl);
 
-                if(downloadUrl){
+                if (downloadUrl) {
 
                     let killResult;
                     try {
@@ -526,7 +524,7 @@ export default class SeleniumService extends ServiceBase {
                         resolve(error);
                     }
     
-                    if(killResult){
+                    if (killResult) {
                         let zipPath;
                         try {
                             zipPath = await this.fetchChromeDriver(downloadUrl);
@@ -534,8 +532,8 @@ export default class SeleniumService extends ServiceBase {
                             resolve(error);
                         }
 
-                        if(zipPath){
-                            if(zipPath instanceof Error){
+                        if (zipPath) {
+                            if (zipPath instanceof Error) {
                                 resolve(zipPath);
                             } else {
                                 let driverDir;
@@ -546,8 +544,8 @@ export default class SeleniumService extends ServiceBase {
                                     resolve(error);
                                 }
 
-                                if(driverDir){
-                                    if(driverDir instanceof Error){
+                                if (driverDir) {
+                                    if (driverDir instanceof Error) {
                                         resolve(driverDir);
                                     } else {
                                         let driverBin;
@@ -558,7 +556,7 @@ export default class SeleniumService extends ServiceBase {
                                             resolve(error);
                                         }
 
-                                        if(driverBin){
+                                        if (driverBin) {
                                             // Final stage
                                             resolve(driverBin);
                                         } else {
@@ -578,11 +576,10 @@ export default class SeleniumService extends ServiceBase {
                 } else {
                     resolve(new Error('downloadUrl is not defined', downloadUrl));
                 }
-            } catch(error) {
+            } catch (error) {
                 console.log('downloadChromeDriver error', error);
                 resolve(error);
             }
         });
-        /*eslint-enable */
     }
 }

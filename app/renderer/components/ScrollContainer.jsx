@@ -19,7 +19,6 @@ type Props = {
     children: Function
 };
 
-/* eslint-disable import/prefer-default-export */
 export default class ScrollContainer extends React.Component<Props> {
     componentDidMount() {
         if (!this.scroller) {

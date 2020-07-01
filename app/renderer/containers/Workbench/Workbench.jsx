@@ -9,7 +9,6 @@
 // @flow
 import React, { Fragment } from 'react';
 import {Layout, Icon, Row, Col, message, notification } from 'antd';
-/* eslint-disable react/no-did-update-set-state */
 import updateModals from '../../components/updateModals';
 // Dialogs
 import JavaDialog from '../../components/dialogs/JavaDialog.jsx';

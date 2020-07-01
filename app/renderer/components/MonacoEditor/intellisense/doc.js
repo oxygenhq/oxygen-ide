@@ -10,7 +10,6 @@
  * Exposes module-* documentation as a map of JSON (Doctrine) objects.
  */
 
-/* eslint-disable */
 (function() {
   var fs = require('fs');
   var path = require('path');
@@ -27,6 +26,7 @@
       try {
           var data = fs.readFileSync(file, 'utf8');
           
+          // eslint-disable-next-line no-useless-escape
           var regex = /(\/\*\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)/g;
 
           var commentRaw;
@@ -68,11 +68,13 @@
                           // make sure we don't remove line breaks if preceded by a double space
                           // in order not to lose markdown formatting
                           // (regex with negative look-behind doesn't work for some reason)
-                          tag.description = tag.description.replace(/(  \r\n|  \n)/gm, '  LINEBR')
+                          // eslint-disable-next-line no-regex-spaces
+                          tag.description = tag.description.replace(/(  \r\n|  \n)/gm, '  LINEBR');
                           // remove line breaks
-                          tag.description = tag.description.replace(/(\r\n|\n)/gm, '')
+                          tag.description = tag.description.replace(/(\r\n|\n)/gm, '');
                           // restore line breaks
-                          tag.description = tag.description.replace(/  LINEBR/gm, '  \n')
+                          // eslint-disable-next-line no-regex-spaces
+                          tag.description = tag.description.replace(/  LINEBR/gm, '  \n');
                           return tag.description;
                       }
                   }
@@ -82,7 +84,7 @@
                   {
                       if (tag.title === 'return') {
                           var type = doctrine.type.stringify(tag.type, {compact:true});
-                          type = type.replace(/<|>/ig, function(m){
+                          type = type.replace(/<|>/ig, function(m) {
                               return '&' + (m == '>' ? 'g' : 'l') + 't;';
                           });
 
@@ -106,7 +108,7 @@
                           }
 
                           var type = doctrine.type.stringify(tag.type, {compact:true});
-                          type = type.replace(/<|>/ig, function(m){
+                          type = type.replace(/<|>/ig, function(m) {
                               return '&' + (m == '>' ? 'g' : 'l') + 't;';
                           });
                           

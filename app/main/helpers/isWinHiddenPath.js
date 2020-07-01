@@ -15,7 +15,6 @@ export default function(path) {
     if (process.platform !== 'win32') {
         return false;
     }
-    /*eslint-disable */
+    // eslint-disable-next-line no-useless-escape
     return (/(^\$.*)/g).test(path) || (/(^|\/)\.[^\/\.]/g).test(path);
-    /*eslint-enable */
 }

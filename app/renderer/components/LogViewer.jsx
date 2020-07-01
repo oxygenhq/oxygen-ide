@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 // @flow
-/* eslint-disable react/no-unused-state */
 import React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { message } from 'antd';

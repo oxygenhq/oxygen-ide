@@ -43,7 +43,6 @@ export default class MainIpcService {
         let _this = this;
         const id = uuidv4();
 
-        /* eslint-disable */
         let promise = new Promise((resolve, reject) => {
             try {
                 ipcRenderer.send('MAIN_SERVICE_CALL', {
@@ -54,7 +53,7 @@ export default class MainIpcService {
                 });
             }
             catch (e) { 
-                if(window && window.Sentry && window.Sentry.captureException){
+                if (window && window.Sentry && window.Sentry.captureException) {
                     window.Sentry.captureException(e);
                 }
                 reject(e); 
@@ -62,7 +61,6 @@ export default class MainIpcService {
 
             _this.requests[id] = { resolve, reject };
         });
-        /* eslint-enable */
         
         return promise;
     }

@@ -1,4 +1,3 @@
-/* eslint-disable no-prototype-builtins */
 /*
  * Copyright (C) 2015-2018 CloudBeat Limited
  *

@@ -6,7 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-/* eslint-disable react/no-find-dom-node, no-param-reassign */
 import { findDOMNode } from 'react-dom';
 
 export const cardSource = {
@@ -29,6 +28,7 @@ export const cardTarget = {
         }
 
         // Determine rectangle on screen
+        // eslint-disable-next-line react/no-find-dom-node
         const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
 
         // Get vertical middle

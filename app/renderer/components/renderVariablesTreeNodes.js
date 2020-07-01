@@ -9,31 +9,12 @@
 import Tree from '../components/Tree';
 import React, { Fragment } from 'react';
 
-function handleContextMenuEvent(e, node, menuName) {
-    e.preventDefault();
-    if (this.props.setActiveNode) {
-        this.props.setActiveNode(node.path);
-    }
-    if (this.props.showContextMenu) {
-
-        let safeNode = null;
-
-        if (node) {
-            safeNode = node;
-        }
-
-        this.props.showContextMenu(menuName, e, safeNode);
-    }
-}
-
 function renderVariablesTreeNodes(nodes, parentIndex) {
 
     if (!nodes || !nodes.length || nodes.length == 0) {
         return null;
     }
-    /*eslint-disable */
-    handleContextMenuEvent = handleContextMenuEvent.bind(this);
-    /*eslint-enable */
+
     return nodes.map((element, idx) => {
         const resolveClassName = element.name === '.emptyfile' ? 'hidden-node' : element.type;
         

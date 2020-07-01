@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 // @flow
-/* eslint-disable react/no-unused-state */
 import { Icon, Select, Input, TreeSelect, Tooltip } from 'antd';
 import React, { Fragment } from 'react';
 import '../../css/toolbar.scss';

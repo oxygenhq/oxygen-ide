@@ -23,7 +23,6 @@ type Props = {
   onResize: (number) => void
 };
 
-/* eslint-disable react/no-did-update-set-state */
 export default class Sidebar extends React.Component<Props> {
   props: Props;
 

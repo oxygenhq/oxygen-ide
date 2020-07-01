@@ -1,5 +1,3 @@
-/* eslint-disable promise/always-return */
-/* eslint-disable promise/catch-or-return */
 /*
  * Copyright (C) 2015-present CloudBeat Limited
  *
@@ -517,9 +515,9 @@ export default class TestRunnerService extends ServiceBase {
                 if (err.type && err.message) {
                     message = `${err.type} - ${err.message}`;
                 } else if (err.type) {
-                    message = err.type;
+                    message += ` ${err.type}`;
                 } else if (err.message) {
-                    message = err.message; // eslint-disable-line
+                    message += ` ${err.message}`;
                 }
                 if (err.line) {
                     message += ` at line ${err.line}`;

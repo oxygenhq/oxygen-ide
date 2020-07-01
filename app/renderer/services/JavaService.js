@@ -18,9 +18,8 @@ const javaversion = (callback) => {
         cp.on('close', (code) => {
             // Java 8 or lower: 1.6.0_23, 1.7.0, 1.7.0_80, 1.8.0_211
             // Java 9 or higher: 9.0.1, 11.0.4, 12, 12.0.1
-            /* eslint-disable */
+            // eslint-disable-next-line no-useless-escape
             var matches = output.match(/"(\d+\.?\d+)[\._\-\d+]*"/);
-            /* eslint-enable */
             let javaVersion = matches ? matches[1] : null;
             if (!javaVersion) {
                 console.error('java -version mismatch error:\n' + output);
