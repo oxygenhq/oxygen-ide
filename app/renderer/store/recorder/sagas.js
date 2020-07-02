@@ -129,6 +129,7 @@ function* handleRequest(payload) {
             return;
         }
         
+        let preGeneratedCode = '';
         let generatedCode = '';
         const steps = [];    
         if (event.stepsArray && Array.isArray(event.stepsArray)) {
@@ -152,8 +153,10 @@ function* handleRequest(payload) {
             );
         }
         
+        let filePath;
+
         if (activeFile === 'unknown') {
-            
+            filePath = activeFile+activeFileName;
             if (!activeFileName) {
                 yield stopRecorderAfterFileClose();
                 return;
@@ -172,21 +175,14 @@ function* handleRequest(payload) {
             if (!prevContent) {
                 prevContent = '';
             }
-    
-            if (!prevContent.endsWith('\n') && prevContent !== '') {
-                prevContent += '\n';
-            }
             // prepend web.init if it doesn't exist in the script
             if (prevContent.indexOf('web.init') === -1) {
-                prevContent += 'web.init();\n';
+                preGeneratedCode += '\nweb.init();';
             }
     
-            const newContent = `${prevContent}${generatedCode}`;
-            yield all([
-                put(wbActions.onContentUpdate(activeFile, newContent, activeFileName)),
-                put(recorderActions.addSteps(steps))
-            ]);
+            yield put(recorderActions.addSteps(steps));
         } else {
+            filePath = activeFile;
             if (!activeFile) {
                 yield stopRecorderAfterFileClose();
                 return;
@@ -204,22 +200,24 @@ function* handleRequest(payload) {
             if (!prevContent) {
                 prevContent = '';
             }
-    
-            if (!prevContent.endsWith('\n') && prevContent !== '') {
-                prevContent += '\n';
-            }
             // prepend web.init if it doesn't exist in the script
             if (prevContent.indexOf('web.init') === -1) {
-                prevContent += 'web.init();\n';
+                preGeneratedCode += '\nweb.init();';
             }
-            const newContent = `${prevContent}${generatedCode}`;
             
             // append newly recorded content
-            yield all([
-                put(wbActions.onContentUpdate(activeFile, newContent)),
-                put(recorderActions.addSteps(steps))
-            ]);
+            yield put(recorderActions.addSteps(steps));
         }    
+    
+        const elem = document.getElementById('editors-container-wrap');
+        const addContentEvent = new CustomEvent('addContentEvent', {
+            detail: {
+                filePath: filePath,
+                generatedCode: preGeneratedCode+'\n'+generatedCode
+            }
+        });
+        elem.dispatchEvent(addContentEvent);
+
     } catch (e) {
         yield put(reportError(e));
         console.log('handleRequest e', e);

@@ -77,7 +77,6 @@ export default class MonacoEditor extends React.Component<Props> {
         this.editorContainer = undefined;
         this.__current_value = props.value;
         this.elem = null;
-        this.on = 0;
 
         this.state = {
             // editorClass holds an optional class name which will be added to editor's container DIV 
@@ -91,6 +90,29 @@ export default class MonacoEditor extends React.Component<Props> {
         } catch (e) {
             console.log('monaco editor e', e);
         }
+
+        this.elem = document.getElementById('editors-container-wrap');
+        this.elem.addEventListener('addContentEvent', (event) => {            
+            const {
+                filePath,
+                fileName,
+            } = this.props;
+
+            if (
+                filePath &&
+                event.detail && 
+                event.detail.filePath && 
+                (filePath === event.detail.filePath || filePath+fileName === event.detail.filePath) && 
+                this.editor && 
+                this.editor.getModel()
+            ) {
+                
+                this.editor.getModel().applyEdits([{
+                    range: monaco.Range.fromPositions(this.editor.getPosition()),
+                    text: event.detail.generatedCode
+                }]);
+            }
+        });
     }
 
     shouldComponentUpdate(nextProps, nextState) {    
@@ -211,6 +233,10 @@ export default class MonacoEditor extends React.Component<Props> {
 
     componentWillUnmount() {
         this.destroyMonaco();
+
+        if (this.elem) {
+            this.elem.removeEventListener('addContentEvent', () => {});
+        }
     }
     
     addLnToLnArray(ln) {
