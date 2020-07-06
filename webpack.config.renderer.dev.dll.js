@@ -8,10 +8,12 @@ import merge from 'webpack-merge';
 import baseConfig from './webpack.config.base';
 import { dependencies } from './package.json';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
+import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 
 CheckNodeEnv('development');
 
 const dist = path.resolve(process.cwd(), 'dll');
+const publicPath = dist+'/';
 
 export default merge.smart(baseConfig, {
     mode: 'development',
@@ -218,6 +220,7 @@ export default merge.smart(baseConfig, {
     output: {
         library: 'renderer',
         path: dist,
+        publicPath: publicPath,
         filename: '[name].dev.dll.js',
         libraryTarget: 'var'
     },
@@ -249,6 +252,17 @@ export default merge.smart(baseConfig, {
                     path: path.resolve(process.cwd(), 'dll'),
                 },
             },
+        }),
+                     
+        new MonacoWebpackPlugin({
+            languages: ['javascript', 'typescript', 'json', 'xml'],
+            features: [
+            'accessibilityHelp', 'bracketMatching', 'caretOperations', 'clipboard', 'codeAction', 'comment',
+            'contextmenu', 'coreCommands', 'cursorUndo', 'find', 'folding', 'fontZoom', 'format',
+            'gotoError', 'gotoLine', 'gotoSymbol', 'hover', 'inPlaceReplace', 'linesOperations', 'links',
+            'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 'rename',
+            'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 'transpose',
+            'wordHighlighter', 'wordOperations', 'wordPartOperations']
         }),
     ],
 });
