@@ -200,6 +200,15 @@ export default class TestRunnerService extends ServiceBase {
                     }
                 }
 
+                if (config && config.specs) {
+                    if (oxConfigFile && mainFilePath && mainFilePath === oxConfigFile) {
+                        // ignore
+                    } else {
+                        // override specs from config file to run single feature file
+                        config.specs = [mainFilePath];
+                    }
+                }
+
                 const oxConfigOptions = await cliutil.generateTestOptions(config, argv);
                 if (oxConfigOptions) {
                     // merge IDE and project options (IDE options override project options)
