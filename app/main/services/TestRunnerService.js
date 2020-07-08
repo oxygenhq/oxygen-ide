@@ -193,7 +193,8 @@ export default class TestRunnerService extends ServiceBase {
 
                 if (config && config.suites) {
                     if (oxConfigFile && mainFilePath && mainFilePath === oxConfigFile) {
-                        // use suites from config file if user run config file
+                        // delete synthetic suites generated for script file mode
+                        delete options.suites;
                     } else {
                         delete config.suites;
                     }
