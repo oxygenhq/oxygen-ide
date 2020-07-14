@@ -56,6 +56,7 @@ export default class TestRunnerService extends ServiceBase {
         const {
             paramFilePath, 
             paramMode,
+            useAllParameters,
             iterations,
             reopenSession,
             env,
@@ -73,7 +74,13 @@ export default class TestRunnerService extends ServiceBase {
         let testsuite = null;
 
         try {
-            testsuite = await oxutil.generateTestSuiteFromJSFile(mainFilePath, paramFilePath, paramMode, true);
+            let saveParamMode = paramMode;
+
+            if (useAllParameters) {
+                saveParamMode = 'all';
+            }
+
+            testsuite = await oxutil.generateTestSuiteFromJSFile(mainFilePath, paramFilePath, saveParamMode, true);
         } catch (e) {
             // could get exception only if param file loading fails
             this._emitLogEvent(SEVERITY_ERROR, `Test failed: Unable to load parameters file: ${e.message}`);
@@ -82,8 +89,11 @@ export default class TestRunnerService extends ServiceBase {
             this.runner = null;
             return;
         }
-        // set iterations count
-        testsuite.cases[0].iterationCount = iterations;
+        
+        if (!useAllParameters) {
+            // set iterations count
+            testsuite.cases[0].iterationCount = iterations;
+        }
         const casesBreakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
         testsuite.cases[0].breakpoints = casesBreakpoints;
         // prepare launch options and capabilities

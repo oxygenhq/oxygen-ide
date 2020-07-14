@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Form, Input, Select, InputNumber, Switch } from 'antd';
+import { Form, Input, Select, InputNumber, Switch, Checkbox  } from 'antd';
 const { Option } = Select;
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
@@ -10,6 +10,7 @@ const DEFAULT_STATE = {
     useParams: false,
     paramFilePath: null,
     paramMode: 'sequential',
+    useAllParameters: false
 };
 
 // form layout settings
@@ -34,6 +35,7 @@ class GeneralSettings extends React.PureComponent<Props> {
             iterations: props.settings.iterations || 1,
             env: props.settings.env || null,
             paramMode: props.settings.paramMode || 'sequential',
+            useAllParameters: props.settings.useAllParameters || false,
             paramFilePath: props.settings.paramFilePath || null,
             reopenSession: props.settings.reopenSession || false,
             useParams: props.settings.paramFilePath != null,
@@ -88,8 +90,14 @@ class GeneralSettings extends React.PureComponent<Props> {
         });
     }
 
+    useAllParametersChange = (e) => {
+        this.setState({
+            useAllParameters: e.target.checked
+        });
+    }
+
     validateFields = () => {
-        const { iterations, useParams, paramMode, reopenSession, env } = this.state;
+        const { iterations, useParams, paramMode, reopenSession, env, useAllParameters } = this.state;
 
         return new Promise((resolve, reject) => {
             this.props.form.validateFields((err, values) => {
@@ -97,12 +105,15 @@ class GeneralSettings extends React.PureComponent<Props> {
                     return;
                 }
 
+                const paramFilePath = useParams ? values.paramFilePath : null;
+
                 resolve({
                     iterations: iterations,
                     paramMode: paramMode,
                     reopenSession: reopenSession,
-                    paramFilePath: useParams ? values.paramFilePath : null,
+                    paramFilePath: paramFilePath,
                     env: env || null,
+                    useAllParameters: paramFilePath ? useAllParameters : false
                 });
             });   
         });
@@ -122,6 +133,7 @@ class GeneralSettings extends React.PureComponent<Props> {
             useParams,
             reopenSession,
             env,
+            useAllParameters
         } = this.state;
         const { projectSettings } = this.props;
         const { getFieldDecorator } = this.props.form;
@@ -157,12 +169,25 @@ class GeneralSettings extends React.PureComponent<Props> {
                     </Select>
                 </Form.Item>
                 }
-                <Form.Item label="Iterations" {...formItemLayout} >
+                <Form.Item label="Iterations" {...formItemLayout} className="iterations-section" >
                     <InputNumber
+                        disabled={useAllParameters}
                         min={1}
                         value={ iterations }
                         onChange={ (e) => ::this.onChangeIterations(e) }
                     />
+                    {
+                        useParams &&
+                        <Checkbox 
+                            name='useAllParameters'
+                            checked={useAllParameters}
+                            onChange={this.useAllParametersChange}
+                        >
+                            Use all parameters
+                            <br></br>
+                            (match parameters count)
+                        </Checkbox >
+                    }
                 </Form.Item>
                 <Form.Item label="Re-Open Session" {...formItemLayout} extra="Create (re-open) a new or use an existing Selenium session on next iteration." >
                     <Switch onChange={ ::this.onReopenSessionChange } checked={ reopenSession } />

@@ -80,3 +80,29 @@
 .cloud-providers-form-wrap-margin-bottom {
   margin-bottom: 15px;
 }
+
+.iterations-section {
+  height: 43px;
+
+  & .ant-form-item-control-wrapper {
+    display: flex;
+    align-items: center;
+    height: 43px;
+  }
+
+  & .ant-form-item-children {
+    display: flex;
+    align-items: center;
+  }
+
+  & .ant-checkbox-wrapper{
+    display: flex;
+    align-items: center;
+    height: 43px;
+    margin-left: 20px;
+  }
+
+  & .ant-checkbox + span {
+    line-height: 20px;
+  }
+}
