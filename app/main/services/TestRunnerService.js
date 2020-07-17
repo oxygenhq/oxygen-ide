@@ -263,6 +263,7 @@ export default class TestRunnerService extends ServiceBase {
 
         // initialize Oxygen Runner
         try {
+            this._killIEWebdriver();
             this.reporter = new ReportAggregator(options);            
             await this._launchTest(options, caps);
         } catch (e) {
@@ -348,6 +349,22 @@ export default class TestRunnerService extends ServiceBase {
             this.runner = null;
             this.mainFilePath = null;
             this.isRunning = false;
+        }
+    }
+
+    _killIEWebdriver() {
+        if (process.platform !== 'win32') {
+            return false;
+        }
+        try {
+            cp.execSync(`WMIC PROCESS WHERE "COMMANDLINE LIKE '%iexplore.exe%'" CALL TERMINATE`);
+            //cp.execSync(`WMIC PROCESS WHERE "COMMANDLINE LIKE '%selenium-%\\\\IEDriverServer.exe%'" CALL TERMINATE`);
+            cp.execSync(`WMIC PROCESS WHERE "COMMANDLINE LIKE '%win32\\\\IEDriverServer_x86.exe%'" CALL TERMINATE`);
+            return true;
+        }
+        catch (e) {
+            console.error('Unable to kill IE webdriver:', e);
+            return false;
         }
     }
 
