@@ -11,6 +11,7 @@ import path from 'path';
 import moment from 'moment';
 import detectPort from 'detect-port';
 import ServiceBase from './ServiceBase';
+import cp from 'child_process';
 
 // Events
 const EVENT_LOG_ENTRY = 'LOG_ENTRY';
@@ -357,8 +358,9 @@ export default class TestRunnerService extends ServiceBase {
             return false;
         }
         try {
+            // eslint-disable-next-line quotes
             cp.execSync(`WMIC PROCESS WHERE "COMMANDLINE LIKE '%iexplore.exe%'" CALL TERMINATE`);
-            //cp.execSync(`WMIC PROCESS WHERE "COMMANDLINE LIKE '%selenium-%\\\\IEDriverServer.exe%'" CALL TERMINATE`);
+            // eslint-disable-next-line quotes
             cp.execSync(`WMIC PROCESS WHERE "COMMANDLINE LIKE '%win32\\\\IEDriverServer_x86.exe%'" CALL TERMINATE`);
             return true;
         }
@@ -368,7 +370,7 @@ export default class TestRunnerService extends ServiceBase {
         }
     }
 
-    async _launchTest(opts, caps) {       
+    async _launchTest(opts, caps) {
         const runner = this.runner = this._instantiateRunner(opts);
         if (!runner) {
             const framework = opts.framework;
