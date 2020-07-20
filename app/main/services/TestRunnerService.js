@@ -262,11 +262,12 @@ export default class TestRunnerService extends ServiceBase {
             this._emitplayStartEvent(playStartEventData);
         }
 
+        let errorMatched;
         // initialize Oxygen Runner
         try {
             this._killIEWebdriver();
             this.reporter = new ReportAggregator(options);            
-            await this._launchTest(options, caps);
+            errorMatched = await this._launchTest(options, caps);
         } catch (e) {
             // the error at .init stage can be caused by parallel call to .kill() method
             // make sure in case we are in the middle of stopping the test to ignore any error at this stage
@@ -278,6 +279,16 @@ export default class TestRunnerService extends ServiceBase {
             this.isRunning = false;
             // dispose Oxygen Runner and mark the state as not running, before updating the UI
             await this.dispose();            
+        }
+
+        if (errorMatched && runSettings.retryCount && runSettings.retryCount > 0) {
+            runSettings.retryCount--;
+            this.notify({
+                type: EVENT_LOG_ENTRY,
+                severity: SEVERITY_INFO,
+                message: `Error matched. Re-running test. Attempts remained: ${runSettings.retryCount+1}.`,
+            });
+            await this.start(mainFilePath, breakpoints, runtimeSettings, runSettings);
         }
     }
 
@@ -371,6 +382,7 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     async _launchTest(opts, caps) {
+        let result;
         const runner = this.runner = this._instantiateRunner(opts);
         if (!runner) {
             const framework = opts.framework;
@@ -383,7 +395,7 @@ export default class TestRunnerService extends ServiceBase {
             await runner.init(opts, caps, this.reporter);   
             // run test 
             this._emitLogEvent(SEVERITY_INFO, 'Running test...');
-            const result = await runner.run();
+            result = await runner.run();
             // dispose runner
 
             if (result && result.status) {
@@ -410,6 +422,69 @@ export default class TestRunnerService extends ServiceBase {
         finally {
             this.runner = null;
         }
+        
+        return await this._checkForRetry(result);
+    }
+
+    async _checkForRetry(result) {
+        let errorMatched = false;
+
+        if (
+            result &&
+            result.status &&
+            result.status === 'failed'
+        ) {
+            if (
+                result.options &&
+                result.options.retryCount &&
+                result.options.retryMsgs &&
+                Array.isArray(result.options.retryMsgs) &&
+                parseInt(result.options.retryCount) > 0
+            ) {
+                if (
+                    result.suites &&
+                    Array.isArray(result.suites) && 
+                    result.suites.length > 0
+                ) {
+                    result.suites.map((suiteIterationItem) => {
+                        if (
+                            suiteIterationItem && 
+                            Array.isArray(suiteIterationItem) && 
+                            suiteIterationItem.length > 0
+                        ) {
+                            suiteIterationItem.map((suite) => {
+                                if (
+                                    suite.cases &&
+                                    Array.isArray(suite.cases) && 
+                                    suite.cases.length > 0
+                                ) {
+                                    suite.cases.map((caze) => {
+                                        if (
+                                            caze &&
+                                            caze.failure &&
+                                            (caze.failure.message || caze.failure.type)
+                                        ) {
+                                            result.options.retryMsgs.map((matchStr) => {
+                                                if (
+                                                    matchStr.includes(caze.failure.message) ||
+                                                    matchStr.includes(caze.failure.type) || 
+                                                    matchStr === caze.failure.message ||
+                                                    matchStr === caze.failure.type
+                                                ) {
+                                                    errorMatched = true;
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            } 
+        }
+
+        return errorMatched;
     }
 
     _instantiateRunner(opts) {

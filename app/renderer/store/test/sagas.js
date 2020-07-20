@@ -431,6 +431,10 @@ export function* startTest({ payload }) {
     const { breakpoints, runtimeSettings } = yield select(state => state.test);
     const { runSettings, generalSettings } = yield select(state => state.settings);
 
+    // TODO add ui 
+    // runSettings.retryCount = 2;
+    // runSettings.retryMsgs = ['ASSERT_ERROR', 'element not found'];
+
     const editor = yield select(state => state.editor);
 
     let file;
