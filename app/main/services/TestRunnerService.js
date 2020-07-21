@@ -14,6 +14,7 @@ import path from 'path';
 import moment from 'moment';
 import detectPort from 'detect-port';
 import ServiceBase from './ServiceBase';
+import cp from 'child_process';
 
 // Events
 const EVENT_LOG_ENTRY = 'LOG_ENTRY';
@@ -258,6 +259,7 @@ export default class TestRunnerService extends ServiceBase {
 
         // initialize Oxygen Runner
         try {
+            this._killIEWebdriver();
             this.reporter = new ReportAggregator(options);            
             await this._launchTest(options, caps);
         } catch (e) {
@@ -348,6 +350,23 @@ export default class TestRunnerService extends ServiceBase {
             this.runner = null;
             this.mainFilePath = null;
             this.isRunning = false;
+        }
+    }
+
+    _killIEWebdriver() {
+        if (process.platform !== 'win32') {
+            return false;
+        }
+        try {
+            // eslint-disable-next-line quotes
+            cp.execSync(`WMIC PROCESS WHERE "COMMANDLINE LIKE '%iexplore.exe%'" CALL TERMINATE`);
+            // eslint-disable-next-line quotes
+            cp.execSync(`WMIC PROCESS WHERE "COMMANDLINE LIKE '%win32\\\\IEDriverServer_x86.exe%'" CALL TERMINATE`);
+            return true;
+        }
+        catch (e) {
+            console.error('Unable to kill IE webdriver:', e);
+            return false;
         }
     }
 
