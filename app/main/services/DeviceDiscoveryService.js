@@ -206,6 +206,8 @@ export default class DeviceDiscoveryService extends ServiceBase {
             // if adb could not be found then stop the service as there is no point running it again
             if (e.message && e.message.startsWith("Could not find 'adb")) {
                 this.adbPresent = false;
+            } else if (e.message && e.message.includes('shell getprop ro.build.version.release')) { 
+                this.adbPresent = false;
             } else {
                 Sentry.captureException(e);
             }
