@@ -12,7 +12,7 @@
 * WiX Toolset installed and added to the %PATH%. 
 * ```npm --add-python-to-path='true' --debug install --global windows-build-tools``` from ```cmd``` with admin rights.
 * [Optional. Required for DB support] Windows SDK
-
+* [Optional. Canvas node-rebuild] https://github.com/Automattic/node-canvas/wiki/Installation:-Windows
 #### Linux
 * [Optional. Required for DB support] unixodbc binaries and development libraries:  
 Debian/Ubuntu - `sudo apt-get install unixodbc unixodbc-dev`  
