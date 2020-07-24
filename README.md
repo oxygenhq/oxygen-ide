@@ -25,3 +25,4 @@ RedHat/CentOS - `sudo dnf install unixODBC unixODBC-devel`
    export APPLE_ID_USR=YOUR_APPLE_ID
    export APPLE_ID_PWD=APPLE_PASSWORD
    ```
+* [Optional. Canvas node-rebuild] https://github.com/Automattic/node-canvas/wiki/Installation:-Mac-OS-X
