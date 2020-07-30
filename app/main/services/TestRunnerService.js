@@ -102,9 +102,6 @@ export default class TestRunnerService extends ServiceBase {
         let caps = {};
         options.suites = [testsuite];
         options.debugPortIde = dbgPort;
-        if (env) {
-            options.env = env;
-        }
         options.require = {
             allow: true,
             allowGlobal: true
