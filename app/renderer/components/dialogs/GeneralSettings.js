@@ -133,7 +133,8 @@ class GeneralSettings extends React.PureComponent<Props> {
             useParams,
             reopenSession,
             env,
-            useAllParameters
+            useAllParameters,
+            paramMode
         } = this.state;
         const { projectSettings } = this.props;
         const { getFieldDecorator } = this.props.form;
@@ -216,6 +217,7 @@ class GeneralSettings extends React.PureComponent<Props> {
                         </Form.Item>
                         <Form.Item label="Read Next Row" {...formItemLayout} >
                             <Select 
+                                value={paramMode}
                                 defaultValue="sequential"
                                 onChange={ (e) => ::this.onChangeParamMode(e) }
                             >
