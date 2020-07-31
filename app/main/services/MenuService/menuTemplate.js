@@ -144,7 +144,6 @@ export default (cmdHandler, settings) => {
             }
         ]
     });
-    const viewEventLogChecked = _isSelected(Const.MENU_CMD_VIEW_EVENT_LOG, settings);
     template.push({
         label: '&View',
         submenu: [
@@ -165,11 +164,9 @@ export default (cmdHandler, settings) => {
                 click() { cmdHandler(Const.MENU_CMD_VIEW_SETTINGS); }
             },
             {
-                label: 'Event Log',
+                label: 'Toggle Event Log',
                 accelerator: 'CommandOrControl+Shift+L',
-                type: 'checkbox',
-                checked: viewEventLogChecked,
-                click() { cmdHandler(Const.MENU_CMD_VIEW_EVENT_LOG, !viewEventLogChecked); }
+                click() { cmdHandler(Const.MENU_CMD_VIEW_EVENT_LOG); }
             },
             {
                 label: 'DevTools',
@@ -242,11 +239,3 @@ export default (cmdHandler, settings) => {
 //     }
 //     return true;
 // }
-
-function _isSelected(ctrlId, settings) {
-    const state = settings && settings.hasOwnProperty(ctrlId) ? settings[ctrlId] : null;
-    if (state && state.hasOwnProperty('selected')) {
-        return state.selected;
-    }
-    return true;
-}

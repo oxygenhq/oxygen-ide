@@ -197,9 +197,8 @@ export function* handleMainMenuEvents({ payload }) {
         yield showDeleteFileDialog({});
     }
     else if (cmd === Const.MENU_CMD_VIEW_EVENT_LOG) {
-        if (args && args.length > 0 && typeof args[0] === 'boolean') {
-            yield put(settingsActions.setLoggerVisible(args[0]));
-        }        
+        const visible = yield select(state => state.settings.logger.visible);
+        yield put(settingsActions.setLoggerVisible(!visible));
     }
     else if (cmd === Const.MENU_CMD_VIEW_SETTINGS) {
         yield put(wbActions.showDialog('DIALOG_SETTINGS'));
