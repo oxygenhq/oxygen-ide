@@ -146,9 +146,9 @@ export default class FileExplorer extends React.Component<Props> {
             const oldPath = dragNode.path;
             const newPath = node.path + path.sep + dragNode.name;
 
-            const safeOldPath = oldPath.endsWith(path.sep) ? oldPath : oldPath + path.sep;
-            const safeNewPath = newPath.endsWith(path.sep) ? newPath : newPath + path.sep;
-            
+            const safeOldPath = oldPath.endsWith(path.sep) ? oldPath : dragNode.type === 'file' ? oldPath : oldPath + path.sep;
+            const safeNewPath = newPath.endsWith(path.sep) ? newPath : dragNode.type === 'file' ? newPath : newPath + path.sep;
+
             if (safeOldPath !== safeNewPath) {
                 this.props.onMove(safeOldPath, safeNewPath);
             }

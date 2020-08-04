@@ -277,7 +277,7 @@ export default class FileService extends ServiceBase {
                         console.log('signal', signal);
                     });
                 }
-        }
+            }
 
             this.chokidarWatcher = chokidar.watch(saveWatchFolders, {
                 ignored: ['**/node_modules/**/*', '**/node_modules/**/**/*', '**/.git/**/*', '*.gz'],
@@ -471,6 +471,7 @@ export default class FileService extends ServiceBase {
                             console.error('error',error);
                         } else {
                             //do nothing, file watcher will do all work
+                            resolve('done');
                         }
                     });
                 }
