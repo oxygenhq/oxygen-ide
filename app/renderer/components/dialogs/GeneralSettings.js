@@ -131,7 +131,7 @@ class GeneralSettings extends React.PureComponent<Props> {
             iterations,
             paramFilePath,
             useParams,
-            reopenSession,
+            // reopenSession,
             env,
             useAllParameters,
             paramMode
@@ -190,9 +190,9 @@ class GeneralSettings extends React.PureComponent<Props> {
                         </Checkbox >
                     }
                 </Form.Item>
-                <Form.Item label="Re-Open Session" {...formItemLayout} extra="Create (re-open) a new or use an existing Selenium session on next iteration." >
+                {/* <Form.Item label="Re-Open Session" {...formItemLayout} extra="Create (re-open) a new or use an existing Selenium session on next iteration." >
                     <Switch onChange={ ::this.onReopenSessionChange } checked={ reopenSession } />
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item label="Use Parameter File" {...formItemLayout} extra="Use parameter file (CSV or Excel) to run data-driven tests." >
                     <Switch onChange={ ::this.onUseParamsChange } checked={ useParams } />
                 </Form.Item>
