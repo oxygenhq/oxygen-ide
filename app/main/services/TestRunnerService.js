@@ -219,6 +219,21 @@ export default class TestRunnerService extends ServiceBase {
 
                 const oxConfigOptions = await cliutil.generateTestOptions(config, argv);
                 if (oxConfigOptions) {
+                    if (oxConfigOptions.suites && Array.isArray(oxConfigOptions.suites) && oxConfigOptions.suites.length > 0) {
+                        oxConfigOptions.suites.map((suite, suiteIdx) => {
+                            if (suite && suite.cases && Array.isArray(suite.cases) && suite.cases.length > 0) {
+                                suite.cases.map((caze, cazeIdx) => {
+                                    if (caze && caze.path) {
+                                        if (breakpoints && Object.keys(breakpoints)) {
+                                            const casesBreakpoints = this._convertBreakpointsToOxygenFormat(breakpoints);
+                                            oxConfigOptions.suites[suiteIdx]['cases'][cazeIdx]['breakpoints'] = casesBreakpoints;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+
                     // merge IDE and project options (IDE options override project options)
                     options = { ...oxConfigOptions, ...options};
                 }
