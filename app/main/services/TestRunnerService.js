@@ -197,7 +197,16 @@ export default class TestRunnerService extends ServiceBase {
                 if (env) {
                     argv.env = env;
                 }
-                const config = await cliutil.getConfigurations(targetFile, argv, this.mainFilePath);
+                let config;
+                try {
+                    config = await cliutil.getConfigurations(targetFile, argv, this.mainFilePath);
+                } catch (e) {
+                    this.notify({
+                        type: EVENT_LOG_ENTRY,
+                        severity: SEVERITY_ERROR,
+                        message: e.message,
+                    });
+                }
 
                 if (config && config.suites) {
                     if (oxConfigFile && mainFilePath && mainFilePath === oxConfigFile) {
@@ -217,7 +226,18 @@ export default class TestRunnerService extends ServiceBase {
                     }
                 }
 
-                const oxConfigOptions = await cliutil.generateTestOptions(config, argv);
+                let oxConfigOptions;
+                
+                try {
+                    oxConfigOptions = await cliutil.generateTestOptions(config, argv); 
+                } catch (e) {
+                    this.notify({
+                        type: EVENT_LOG_ENTRY,
+                        severity: SEVERITY_ERROR,
+                        message: e.message,
+                    });
+                }
+
                 if (oxConfigOptions) {
                     if (oxConfigOptions.suites && Array.isArray(oxConfigOptions.suites) && oxConfigOptions.suites.length > 0) {
                         oxConfigOptions.suites.map((suite, suiteIdx) => {

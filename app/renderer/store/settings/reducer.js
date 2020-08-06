@@ -395,6 +395,12 @@ export default (state = defaultState, action) => {
             projectSettings: projectSettings
         };
     
+    case types.LOAD_PROJECT_SETTINGS_FAILURE:
+        return {
+            ...state,
+            projectSettings: null
+        };
+
     default:
         return state;
     }

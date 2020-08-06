@@ -103,6 +103,7 @@ export default class ElectronService extends ServiceBase {
             return result;
         } catch (e) {
             console.log('orgRequire moduleRequire e', e);
+            throw e;
         }
     }
 
