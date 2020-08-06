@@ -107,7 +107,7 @@ export default function* root() {
 }
 
 export function* handleMainMenuEvents({ payload }) { 
-    const { cmd, args } = payload;
+    const { cmd } = payload;
     if (!cmd) {
         return;
     }

@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { all, put, select, takeLatest, call } from 'redux-saga/effects';
+import { all, put, select, takeLatest, call, delay } from 'redux-saga/effects';
 import { default as pathNode } from 'path';
 import ActionTypes from '../types';
 import * as fsActions from './actions';
@@ -582,6 +582,11 @@ export function* move({ payload }) {
         return;
     } else {
         yield call(services.mainIpc.call, 'FileService', 'move', [oldPath, newPath]);
+        yield delay(1000);
+        yield put(fsActions.treeLoadNodeChildren(pathNode.dirname(oldPath), true));
+
+        yield delay(1000);
+        yield put(fsActions.treeLoadNodeChildren(pathNode.dirname(newPath), true));
     }
 }
 
