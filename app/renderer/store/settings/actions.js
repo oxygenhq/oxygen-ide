@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import * as types from './types';
-import { success } from '../../helpers/redux';
+import { success, failure } from '../../helpers/redux';
 
 /* Create User  */
 export const createUser = (uuid) => {
@@ -162,4 +162,9 @@ export const loadProjectSettings = (path) => ({
 export const _loadProjectSettings_Success = (path, settings) => ({
     type: success(types.LOAD_PROJECT_SETTINGS),
     payload: { path, projectSettings: settings },
+});
+
+export const _loadProjectSettings_Failure = (path) => ({
+    type: failure(types.LOAD_PROJECT_SETTINGS),
+    payload: { path },
 });

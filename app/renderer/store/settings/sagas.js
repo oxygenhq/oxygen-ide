@@ -16,6 +16,7 @@ import * as settingsActions from './actions';
 import { reportError } from '../sentry/actions';
 import * as Const from '../../../const';
 import { MAIN_MENU_EVENT } from '../../services/MainIpc';
+import * as loggerActions from '../logger/actions';
 
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
@@ -39,9 +40,20 @@ export default function* root() {
 
 export function* loadProjectSettings({ payload }) {
     const { path } = payload;
-    const settings = yield call(services.mainIpc.call, 'ProjectService', 'getProjectSettings', [path]);
-    // report success
-    yield put(settingsActions._loadProjectSettings_Success(path, settings));
+    try {
+        const settingsRetVal = yield services.mainIpc.call('ProjectService', 'getProjectSettings', [path]);
+
+        if (typeof settingsRetVal === 'string' && settingsRetVal.startsWith('Error: ')) {
+           yield put(loggerActions.addLog(settingsRetVal, 'ERROR', 'general'));
+           // report success
+           yield put(settingsActions._loadProjectSettings_Failure(path));
+        } else {
+            // report success
+            yield put(settingsActions._loadProjectSettings_Success(path, settingsRetVal));
+        }
+    } catch (e) {
+        console.log('~~loadProjectSettings e', e);
+    }
 }
 
 export function* testUpdateBreakpoints({ payload }) {

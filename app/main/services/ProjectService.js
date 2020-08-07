@@ -17,9 +17,12 @@ export default class ProjectService extends ServiceBase {
     async getProjectSettings(projectPath) {
         const target = cliutil.processTargetPath(projectPath);
         const argv = {};
-        const config = await cliutil.getConfigurations(target, argv);
-        
+        let config;
+        try {
+            config = await cliutil.getConfigurations(target, argv);
+        } catch (e) {
+            return e.message;
+        }
         return config || null;
     }
-
 }
