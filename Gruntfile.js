@@ -131,6 +131,8 @@ module.exports = function(grunt) {
                             '!monaco-editor/esm/**',
                             '!codepage/bits/**',
                             '!moment/src/**',
+                            '!moment/locale/**',
+                            '!lighthouse/lighthouse-core/lib/i18n/**',
                             '!intl/locale-data/jsonp/**',
                             '!chromedriver/**',
                             '!geckodriver/**']),

@@ -24,7 +24,7 @@ module.exports = function(grunt) {
                 '*.txt',
                 'gruntfile.js',
                 'quick-test.js',
-                '*.c', '*.cpp',
+                '*.c', '*.cpp', '*.cc', '*.h',
                 '*.d.ts', '*.d.ts.map',
                 'yarn.lock', 'package-lock.json',
                 '*.html', '*.htm', '*.png', '*.map'],
