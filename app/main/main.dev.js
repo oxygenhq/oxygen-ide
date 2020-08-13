@@ -88,7 +88,8 @@ app.on('ready', async () => {
         width: 1024,
         height: 728,
         webPreferences: {
-            webSecurity: false
+            webSecurity: false,
+            nodeIntegration: true
         },
     });
 
