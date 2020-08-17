@@ -80,6 +80,13 @@ export default (state = defaultState, action) => {
             resolvedBreakpoints: {},
         };
 
+    case success(ActionTypes.TEST_START): 
+        return {
+            ...state,
+            disabledBreakpoints: {},
+            resolvedBreakpoints: {},
+        };
+
     // TEST_START_FAILURE
     case failure(ActionTypes.TEST_START):
         if (error && error.type === ActionTypes.TEST_ERR_MAIN_SCRIPT_NOT_SAVED) {
@@ -93,6 +100,8 @@ export default (state = defaultState, action) => {
             ...state,
             isRunning: false,
             isPaused: false,
+            disabledBreakpoints: {},
+            resolvedBreakpoints: {},
         };
 
     // TEST_CONTINUE
