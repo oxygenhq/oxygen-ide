@@ -217,9 +217,12 @@ export default class ElectronService extends ServiceBase {
             };
             dialog.showSaveDialog(
                 this.mainWindow, 
-                options, 
-                (savedFilePath) => resolve(savedFilePath)
-            );
+                options
+            ).then(result => {
+                resolve(result.filePath);
+            }).catch(err => {
+                reject(err);
+            });
         });
     }
     showOpenDialog(dialogType = 'openFile', multiSelections = false, filters = null) {
@@ -231,9 +234,12 @@ export default class ElectronService extends ServiceBase {
                         multiSelections ? 'multiSelections' : null,
                     ],
                     filters: filters
-                },
-                (selectedPaths) => resolve(selectedPaths)
-            );
+                }
+            ).then(result => {
+                resolve(result.filePaths);
+            }).catch(err => {
+                reject(err);
+            });
         });
     }
 
@@ -252,8 +258,10 @@ export default class ElectronService extends ServiceBase {
                 buttons: buttons,
                 title: title,
                 message: message
-            },(response) => {
-                resolve(response);
+            }).then(result => {
+                resolve(result.response);
+            }).catch(err => {
+                reject(err);
             });
         });
     }
