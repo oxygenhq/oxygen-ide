@@ -39,6 +39,7 @@ export default class TestRunnerService extends ServiceBase {
     }
     
     async start(mainFilePath, breakpoints, runtimeSettings, runSettings) {
+        let processingError;
         if (this.runner) {
             throw Error('Previous test is still running. Stop the previous test before calling "start" method.');
         }
@@ -232,11 +233,7 @@ export default class TestRunnerService extends ServiceBase {
                 try {
                     oxConfigOptions = await cliutil.generateTestOptions(config, argv); 
                 } catch (e) {
-                    this.notify({
-                        type: EVENT_LOG_ENTRY,
-                        severity: SEVERITY_ERROR,
-                        message: e.message,
-                    });
+                    processingError = e;
                 }
 
                 if (oxConfigOptions) {
@@ -297,9 +294,13 @@ export default class TestRunnerService extends ServiceBase {
 
         // initialize Oxygen Runner
         try {
-            this._killIEWebdriver();
-            this.reporter = new ReportAggregator(options);            
-            await this._launchTest(options, caps);
+            if (!processingError) {
+                this._killIEWebdriver();
+                this.reporter = new ReportAggregator(options);            
+                await this._launchTest(options, caps);
+            } else {
+                this._emitTestEnded(null, processingError);
+            }
         } catch (e) {
             // the error at .init stage can be caused by parallel call to .kill() method
             // make sure in case we are in the middle of stopping the test to ignore any error at this stage
@@ -519,14 +520,9 @@ export default class TestRunnerService extends ServiceBase {
             this._emitLogEvent(severity, `Test finished with status --> ${status}.`);
         }
 
-        const errorObj = {
-            message: error && error.message
-        };
-
         this.notify({
             type: EVENT_TEST_ENDED,
             result: result,
-            error: errorObj,
         });
     }
 
