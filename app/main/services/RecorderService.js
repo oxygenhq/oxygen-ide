@@ -83,9 +83,9 @@ export default class RecorderService extends ServiceBase {
                 console.error('Unable to open ' + hostname + ':' + PORT_HTTP, e);
             }
 
-            try{
-                this.httpsSrv.listen(PORT_HTTPS, hostname, function(){ });
-            } catch (e){
+            try {
+                this.httpsSrv.listen(PORT_HTTPS, hostname, function() { });
+            } catch (e) {
                 console.log('httpsSrv listen e', e);
             }
         });
@@ -173,7 +173,7 @@ export default class RecorderService extends ServiceBase {
                 } else {
                     try {
                         self._emit(JSON.parse(body));
-                    } catch(e){
+                    } catch (e) {
                         console.log('body JSON.parse e', e);
                         console.log('body', body);
                     }
