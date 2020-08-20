@@ -26,6 +26,7 @@ const EVENT_SEND_START_DATA = 'SEND_START_DATA';
 // Severities
 const SEVERITY_ERROR = 'ERROR';
 const SEVERITY_INFO = 'INFO';
+const SEVERITY_PASSED = 'PASSED';
 
 export default class TestRunnerService extends ServiceBase {
     constructor() {
@@ -469,8 +470,11 @@ export default class TestRunnerService extends ServiceBase {
     _emitTestEnded(result, error, noLog = false) {
         this.finished = true;
         if (!noLog) {
-            const status = result && result.status ? result.status.toUpperCase() : 'FAILED';
+            const status = result && result.status ? result.status.toUpperCase() : 'FAILED'; 
+            let severity = SEVERITY_PASSED;
+
             if (error) {
+                severity = SEVERITY_ERROR;
                 if (typeof error === 'string') {
                     this.notify({
                         type: EVENT_LOG_ENTRY,
@@ -501,6 +505,7 @@ export default class TestRunnerService extends ServiceBase {
                 }
             }
             else if (result && result.failure) {
+                severity = SEVERITY_ERROR;
                 const loc = this._getLocationInfo(result.failure.location);
                 const message = result.failure.message ? ` "${result.failure.message}"` : '';
                 const locStr = loc && loc.line && loc.file && loc.file === this.mainFilePath ? ` at line ${loc.line}` : '';
@@ -511,7 +516,7 @@ export default class TestRunnerService extends ServiceBase {
                     message: `Test failed: [${result.failure.type}]${message}${locStr}`
                 });
             }
-            this._emitLogEvent(SEVERITY_INFO, `Test finished with status --> ${status}.`);
+            this._emitLogEvent(severity, `Test finished with status --> ${status}.`);
         }
 
         const errorObj = {
