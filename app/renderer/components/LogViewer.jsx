@@ -50,6 +50,7 @@ export default class LogViewer extends React.PureComponent<Props> {
         if (logs && logs.map) {
             logs.map((log) => {
                 const message = log.message || 'null';
+                const severity = log.severity || 'INFO';
                 const messageSplit = message.split('\n');
 
                 if (messageSplit && messageSplit.map) {
@@ -65,13 +66,15 @@ export default class LogViewer extends React.PureComponent<Props> {
 
                         lines.push({
                             message: item,
-                            timestamp: log.timestamp+''+i
+                            timestamp: log.timestamp+''+i,
+                            severity: severity
                         });
                     });
                 } else {
                     lines.push({
                         message: log.message,
-                        timestamp: log.timestamp
+                        timestamp: log.timestamp,
+                        severity: severity
                     });
                 }
             });
@@ -111,6 +114,7 @@ export default class LogViewer extends React.PureComponent<Props> {
             if (logs && logs.map) {
                 logs.map((log) => {
                     const message = log.message || 'null';
+                    const severity = log.severity || 'INFO';
                     const messageSplit = message.split('\n');
   
                     if (messageSplit && messageSplit.map) {
@@ -126,13 +130,15 @@ export default class LogViewer extends React.PureComponent<Props> {
 
                             lines.push({
                                 message: item,
-                                timestamp: log.timestamp+''+i
+                                timestamp: log.timestamp+''+i,
+                                severity: severity
                             });
                         });
                     } else {
                         lines.push({
                             message: log.message,
-                            timestamp: log.timestamp
+                            timestamp: log.timestamp,
+                            severity: severity
                         });
                     }
                 });
@@ -158,152 +164,164 @@ export default class LogViewer extends React.PureComponent<Props> {
         document.removeEventListener('mousedown', this.handleClickOutside);
     }
 
-  onKeyPressed = e => {
-      if (e.key === 'Meta') {
-          this.setState({
-              keyKeys: ['Meta']
-          });
-      }
+    onKeyPressed = e => {
+        if (e.key === 'Meta') {
+            this.setState({
+                keyKeys: ['Meta']
+            });
+        }
 
-      if (e.key.toLowerCase() === 'a' && this.state.keyKeys[0] === 'Meta') {
-          const keys = [...this.state.keyKeys];
-          keys.push('a');
-          this.setState({
-              keyKeys: [...keys],
-              selected: true
-          });
-      }
+        if (e.key.toLowerCase() === 'a' && this.state.keyKeys[0] === 'Meta') {
+            const keys = [...this.state.keyKeys];
+            keys.push('a');
+            this.setState({
+                keyKeys: [...keys],
+                selected: true
+            });
+        }
 
-      if (e.key.toLowerCase() === 'c' && this.state.keyKeys[0] === 'Meta') {
-          const keys = [...this.state.keyKeys];
-          keys.push('c');
-          this.setState({
-              keyKeys: [...keys],
-              copyValue: this.loggerRef.current.innerText
-          });
-      }
-  }
+        if (e.key.toLowerCase() === 'c' && this.state.keyKeys[0] === 'Meta') {
+            const keys = [...this.state.keyKeys];
+            keys.push('c');
+            this.setState({
+                keyKeys: [...keys],
+                copyValue: this.loggerRef.current.innerText
+            });
+        }
+    }
 
-  handleClickOutside = (event) => {
-      if (this.state.selected && this.loggerRef && !this.loggerRef.current.contains(event.target)) {
-          this.setState({
-              keyKeys: [],
-              selected: false
-          });
-      }
-  }
+    handleClickOutside = (event) => {
+        if (this.state.selected && this.loggerRef && !this.loggerRef.current.contains(event.target)) {
+            this.setState({
+                keyKeys: [],
+                selected: false
+            });
+        }
+    }
 
-  copyClicked = () => {
+    copyClicked = () => {
 
-      const { lines } = this.state;
+        const { lines } = this.state;
 
-      if (!this.state.copyValue) {
-          let copyValue = '';
+        if (!this.state.copyValue) {
+            let copyValue = '';
 
-          if (lines && lines.length && lines.length > 0) {
-              lines.map((line) => {
-                  copyValue+=line.message+os.EOL;
-              });
-          }
-      
-          if (copyValue) {
-              this.setState({
-                  keyKeys: ['Meta', 'c'],
-                  copyValue: copyValue
-              });
-          } else {
-              message.error('Nothing to copy');
-          }
-      }
-  }
+            if (lines && lines.length && lines.length > 0) {
+                lines.map((line) => {
+                    copyValue+=line.message+os.EOL;
+                });
+            }
+        
+            if (copyValue) {
+                this.setState({
+                    keyKeys: ['Meta', 'c'],
+                    copyValue: copyValue
+                });
+            } else {
+                message.error('Nothing to copy');
+            }
+        }
+    }
 
-  render() {
-      const { height } = this.props;
-      const { refreshScroll, selected, copyValue, lines, maxWidth } = this.state;
-    
-      const getRowHeight = ({index}) => {
-          if (index) {
-              return 15;
-          } else {
-              return 20;
-          }
-      };
+    render() {
+        const { height } = this.props;
+        const { refreshScroll, selected, copyValue, lines, maxWidth } = this.state;
+        
+        const getRowHeight = ({index}) => {
+            if (index) {
+                return 15;
+            } else {
+                return 20;
+            }
+        };
 
-      const cellRenderer = ({
-          columnIndex,
-          key,
-          rowIndex,
-          style,
-      }) => {
-          const line = lines[rowIndex];
-      
-          return (
-              <div 
-                  className="auto-sizer-wrapper-row" 
-                  style={{...style, paddingTop: rowIndex ? '0px': '5px'}}
-                  key={key}
-              >
-                  {line.message}
-              </div>
-          );
-      };
+        const cellRenderer = ({
+            columnIndex,
+            key,
+            rowIndex,
+            style,
+        }) => {
+            const line = lines[rowIndex];
 
-      const columnWidth = 10+7.3*maxWidth;
+            let color = 'rgba(0, 0, 0, 0.65)';
 
-      return (
-          <div className="logs-container">
-              <ScrollContainer
-                  refreshScroll={refreshScroll}
-                  classes="scroller"
-              >
-                  {() => (
-                      <div
-                          ref={this.loggerRef}
-                          className={`logger-textarea ${selected ? 'selected' : ''} `}
-                          onKeyDown={this.onKeyPressed}
-                          tabIndex="1"
-                          style={{
-                              height: height - 32,
-                              minHeight: height - 32,
-                          }}
-                      >
-                          <div 
-                              className="auto-sizer-wrapper"
-                              style={{
-                                  height: height - 32,
-                                  minHeight: height - 32,
-                              }}
-                          >
-                              <AutoSizer>
-                                  {({width, height}) => (
-                                      <Grid
-                                          className="auto-sizer-wrapper-list"
-                                          height={height}
-                                          rowCount={lines.length}
-                                          rowHeight={getRowHeight}
-                                          cellRenderer={cellRenderer}
-                                          columnCount={1}
-                                          columnWidth={columnWidth}
-                                          width={width}
-                                          scrollToRow={lines.length-1}
-                                          scrollToIndex={lines.length-1}
-                                      />
-                                  )}
-                              </AutoSizer>
-                          </div>
-                      </div>
-                  )}
-              </ScrollContainer>
-              <CopyToClipboard text={copyValue}>
-                  <button
-                      className="copy-btn"
-                      ref={this.buttonRef}
-                      onClick={this.copyClicked}
-                  >
-            Copy
-                  </button>
-              </CopyToClipboard>
-          </div>
-      );
-  }
+            if (line && line.severity) {
+                if (line.severity === 'ERROR') {
+                    color = '#a8071a';
+                }
+                
+                if (line.severity === 'PASSED') {
+                    color = '#237804';
+                }
+            }
+
+            return (
+                <div 
+                    className="auto-sizer-wrapper-row" 
+                    style={{...style, paddingTop: rowIndex ? '0px': '5px', color: color }}
+                    key={key}
+                >
+                    {line.message}
+                </div>
+            );
+        };
+
+        const columnWidth = 10+7.3*maxWidth;
+
+        return (
+            <div className="logs-container">
+                <ScrollContainer
+                    refreshScroll={refreshScroll}
+                    classes="scroller"
+                >
+                    {() => (
+                        <div
+                            ref={this.loggerRef}
+                            className={`logger-textarea ${selected ? 'selected' : ''} `}
+                            onKeyDown={this.onKeyPressed}
+                            tabIndex="1"
+                            style={{
+                                height: height - 32,
+                                minHeight: height - 32,
+                            }}
+                        >
+                            <div 
+                                className="auto-sizer-wrapper"
+                                style={{
+                                    height: height - 32,
+                                    minHeight: height - 32,
+                                }}
+                            >
+                                <AutoSizer>
+                                    {({width, height}) => (
+                                        <Grid
+                                            className="auto-sizer-wrapper-list"
+                                            height={height}
+                                            rowCount={lines.length}
+                                            rowHeight={getRowHeight}
+                                            cellRenderer={cellRenderer}
+                                            columnCount={1}
+                                            columnWidth={columnWidth}
+                                            width={width}
+                                            scrollToRow={lines.length-1}
+                                            scrollToIndex={lines.length-1}
+                                        />
+                                    )}
+                                </AutoSizer>
+                            </div>
+                        </div>
+                    )}
+                </ScrollContainer>
+                <CopyToClipboard text={copyValue}>
+                    <button
+                        className="copy-btn"
+                        ref={this.buttonRef}
+                        onClick={this.copyClicked}
+                    >
+                Copy
+                    </button>
+                </CopyToClipboard>
+            </div>
+        );
+    }
 }
