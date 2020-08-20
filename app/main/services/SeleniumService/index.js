@@ -26,7 +26,7 @@ const selSettings = cfg.selenium;
 const ON_SELENIUM_STARTED = 'SELENIUM_STARTED';
 const ON_SELENIUM_STOPPED = 'SELENIUM_STOPPED';
 const ON_CHROME_DRIVER_ERROR = 'ON_CHROME_DRIVER_ERROR';
-
+const CHROMEDRIVER_FOLDER_START = 'chromedriver-';
 const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.googleapis.com';
 
 export default class SeleniumService extends ServiceBase {
@@ -184,7 +184,7 @@ export default class SeleniumService extends ServiceBase {
             } else {
                 // if no user placed driver then use, the latest bundled version
                 chromedriver = await this.findLocalChromeDriver(versions[0].driverVersion);
-                if (chromedriver && chromedriver === chromeDriverVersion) {
+                if (chromedriver) {
                     console.log('Using latest bundled ChromeDriver from ' + chromedriver);
                 } else {                    
                     this.notify({
@@ -350,7 +350,18 @@ export default class SeleniumService extends ServiceBase {
                     return res.buffer();
                 })
                 .then(body => {
-                    const version = new Buffer(body,'utf-8').toString();
+                    let version;
+                    if (body && body.toString) {
+                        const bodyToString = body.toString();
+
+                        if (bodyToString) {
+                            version = bodyToString;
+                        } else {
+                            version = new Buffer(body,'utf-8').toString();
+                        }
+                    } else {
+                        version = new Buffer(body,'utf-8').toString();
+                    }
                     resolve(version);
                 })
                 .catch(err => reject(err));
@@ -377,11 +388,55 @@ export default class SeleniumService extends ServiceBase {
         return path.resolve(app.getPath('userData'), 'drivers');
     }
 
+    getDirectories = (source) => {
+        return fs.readdirSync(source, { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name);
+    }
+
+    cmpVersions = (a, b) => {
+        var i, diff;
+        var regExStrip0 = /(\.0+)+$/;
+        var segmentsA = a.replace(regExStrip0, '').split('.');
+        var segmentsB = b.replace(regExStrip0, '').split('.');
+        var l = Math.min(segmentsA.length, segmentsB.length);
+    
+        for (i = 0; i < l; i++) {
+            diff = parseInt(segmentsA[i], 10) - parseInt(segmentsB[i], 10);
+            if (diff) {
+                return diff;
+            }
+        }
+        return segmentsA.length - segmentsB.length;
+    }
+
     getChromeDriverBinnaryPath(driverVersion) {
-        return path.join(
-            this.getDriversRootPath(),
-            driverVersion ? 'chromedriver-' + driverVersion : '',
+        let saveDriverVersion = driverVersion;
+        const rootPath = this.getDriversRootPath();
+        const directories = this.getDirectories(rootPath);
+        
+        if (directories && Array.isArray(directories) && directories.length > 0) {
+            const directoriesVersions = directories.map((item) => item.replace(CHROMEDRIVER_FOLDER_START, ''));
+
+            if (directoriesVersions.includes(saveDriverVersion)) {
+                // ignore
+            } else {
+                directoriesVersions.push(saveDriverVersion);
+            }
+            
+            const directoriesVersionsSorted = directoriesVersions.sort(this.cmpVersions).filter((el) => !!el);
+    
+            if (directoriesVersionsSorted[directoriesVersionsSorted.length-1] !== saveDriverVersion) {
+                saveDriverVersion = directoriesVersionsSorted[directoriesVersionsSorted.length-1];
+            }
+        }
+
+        const pathBydriverVersion = path.join(
+            rootPath,
+            saveDriverVersion ? CHROMEDRIVER_FOLDER_START + saveDriverVersion : '',
             'chromedriver' + (process.platform === 'win32' ? '.exe' : ''));
+
+        return pathBydriverVersion;
     }
 
     // kill any active chromedriver processes
@@ -457,7 +512,7 @@ export default class SeleniumService extends ServiceBase {
     decompressZip(driverVersion, zipPath) {
         return new Promise((resolve, reject) => {
             try {
-                var driverDir = path.join(this.getDriversRootPath(), 'chromedriver-' + driverVersion);
+                var driverDir = path.join(this.getDriversRootPath(), CHROMEDRIVER_FOLDER_START + driverVersion);
     
                 var unzip = new DecompressZip(zipPath);
     
