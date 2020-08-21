@@ -250,7 +250,7 @@ export default class SeleniumService extends ServiceBase {
         // on stderr 'data'
         proc.stderr.on('data', (data) => {
             // FIXME: check why all logs from Selenium are written to srderr instead of stdout!!!
-            this._emitLogEvent(data.toString(), ServiceBase.SEVERITY_ERROR);
+            this._emitLogEvent(data.toString(), ServiceBase.SEVERITY_INFO);
         });
         // on stdout 'data'
         proc.stdout.on('data', (data) => {
