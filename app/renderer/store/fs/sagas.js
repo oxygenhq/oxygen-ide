@@ -150,7 +150,7 @@ export function* handleServiceEvents({ payload }) {
                             'showConfirmFileChangeBox',
                             [
                                 'Oxygen-ide',
-                                'Fike has changed on disk. Do yo want to reload it?',
+                                'File has changed on disk. Do yo want to reload it?',
                                 ['Cancel', 'Reload']
                             ]
                         );

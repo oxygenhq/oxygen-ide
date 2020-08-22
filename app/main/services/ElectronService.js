@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ export default class ElectronService extends ServiceBase {
 
     require(moduleName) {
         return new Promise((resolve, reject) => {
-            try {                
+            try {
                 let pathToFile; 
 
                 if (process.env.NODE_ENV === 'development') {
@@ -210,11 +210,11 @@ export default class ElectronService extends ServiceBase {
 
     showSaveDialog(title = null, defaultPath = null, filters = null) {
         return new Promise((resolve, reject) => {
-            const options = {
-                title,
-                defaultPath,
-                filters
-            };
+            const options = Object.assign({},
+              title && {title},
+              defaultPath && {defaultPath},
+              filters && {filters},
+            );
             dialog.showSaveDialog(
                 this.mainWindow, 
                 options
@@ -225,7 +225,7 @@ export default class ElectronService extends ServiceBase {
             });
         });
     }
-    showOpenDialog(dialogType = 'openFile', multiSelections = false, filters = null) {
+    showOpenDialog(dialogType, multiSelections = false, filters = null) {
         return new Promise((resolve, reject) => {
             dialog.showOpenDialog(this.mainWindow, 
                 {
