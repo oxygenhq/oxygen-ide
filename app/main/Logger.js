@@ -235,7 +235,7 @@ export default class Logger {
             }
             prepError(args);
             const log = _log.error.bind(_log);
-            const ret = _log.apply(log, args);
+            const ret = log.apply(log, args);
             showDialog(args[0], args.length === 2 ? args[1] : '', 'error');
             return ret;
         };
