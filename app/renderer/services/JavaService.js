@@ -27,7 +27,6 @@ const javaversion = (callback) => {
             return callback(javaVersion);
         });
     } catch (e) {
-
         if (window && window.Sentry && window.Sentry.captureException) {
             window.Sentry.captureException(e);
         }
@@ -45,7 +44,7 @@ export default class JavaService {
             javaversion((version) => {
                 if (version) {
                     var ver = version.split('.');
-                    if (ver[0] == 1 && ver[1] != 8 /*lower than 1.8*/ || ver[0] > 10 /*higher than 10*/) {
+                    if (ver[0] == 1 && ver[1] != 8 /*lower than 1.8*/ || ver[0] > 11 /*higher than 11*/) {
                         window.dispatch({
                             type: JAVA_BAD_VERSION,
                             payload: {

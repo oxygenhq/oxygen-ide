@@ -31,7 +31,7 @@ export default class JavaDialog extends React.PureComponent<Props> {
 
       if (javaError.reason === 'bad-version') {
           title = 'Unsupported Java version';
-          message = (<p>Oxygen IDE requires Java 8-10 version.<br/>Your version: {javaError.version}.<br/><br/>Install <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE.</p>);
+          message = (<p>Oxygen IDE requires Java 8-11 version.<br/>Your version: {javaError.version}.<br/><br/>Install <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE.</p>);
       } else {
           title = 'Unable to find Java';
           message = (<p>Install <a onClick={this.processLink}>Java 8</a> and restart Oxygen IDE.</p>);

@@ -136,17 +136,6 @@
         <Property Id="WixShellExecTarget" Value="[#fil29E2B7C2878787B81283DC106FD94D4C]" />
         <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
 
-        <Property Id="JAVA_VER_64">
-          <RegistrySearch Id="JRE_VER_REGSEARCH_64" Root="HKLM" Key="SOFTWARE\JavaSoft\Java Runtime Environment" Name="CurrentVersion" Type="raw" Win64="yes" />
-        </Property>
-        <Property Id="JAVA_VER_32">
-          <RegistrySearch Id="JRE_VER_REGSEARCH_32" Root="HKLM" Key="SOFTWARE\JavaSoft\Java Runtime Environment" Name="CurrentVersion" Type="raw" Win64="no" />
-        </Property>
-
-        <Condition Message="Java Runtime Environment is not installed.&#xD;&#xA;&#xD;&#xA;Please download and install JRE 8 from:&#xD;&#xA;https://www.java.com/en/download">
-            <![CDATA[Installed OR JAVA_VER_32 OR JAVA_VER_64]]>
-        </Condition>
-
         <util:CloseApplication Id="CloseChrome"
                                CloseMessage="no"
                                Target="chrome.exe"
