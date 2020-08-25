@@ -1,5 +1,34 @@
 # CHANGELOG
 
+## v1.19.0 (2020-08-25)
+
+#### :tada: New Feature
+* Environment selection UI (see Settings) for oxygen.conf based projects.
+* Support for recording scripts starting from a specific line in script.
+* 'Use all parameters' option.
+* Kill any open IE instances before starting a test.
+* Colorize test statuses and errors
+
+#### :beetle: Bug Fix
+* Number of issues related to file management.
+* Number of issues with breakpoints and current line indicator.
+* Script becomes editable during execution if breakpoint is added or removed.
+* Search & Replace not working properly.
+* oxygen.conf/env/po.js content not updating after edit
+* Failed tests marked as passed during certain errors.
+* Allow Java 11.
+
+#### :nail_care: Polish
+* Execute mobile device discovery only in mobile mode.
+* Improve handling of invalid oxygen.conf/env/po.js.
+* Improve loading of user added ChromeDriver versions.
+
+#### :house: Internal
+* Update oxygen-cli from v1.4.0 to v1.8.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update bundled ChromeDrivers.
+* Update GeckoDriver to v0.27.0.
+* Update packages.
+ 
 ## v1.18.0 (2020-06-08)
 
 #### :tada: New Feature

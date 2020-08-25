@@ -1,7 +1,7 @@
 {
   "name": "oxygenide",
   "productName": "Oxygen IDE",
-  "version": "1.19.0-rc.6",
+  "version": "1.19.0",
   "description": "IDE for Oxygen automation framework.",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
