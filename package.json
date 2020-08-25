@@ -146,7 +146,7 @@
     "@emotion/styled": "10.0.27",
     "@sentry/webpack-plugin": "1.11.1",
     "antd": "3.26.12",
-    "appium-adb": "7.24.0",
+    "appium-adb": "7.30.1",
     "chrome-launcher": "0.13.4",
     "clean-stack": "2.2.0",
     "core-js": "3.6.4",
