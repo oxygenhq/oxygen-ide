@@ -14,11 +14,28 @@ export default function loggerSetup() {
 
     // prefix messages so we know they came from renderer process
     global.log = {};
-    const prefix = (args) => { args[0] = '[R] ' + args[0]; };
-    global.log.info = (...args) => { prefix(args); return _log.info.apply(global.log, args); };
-    global.log.warn = (...args) => { prefix(args); return _log.warn.apply(global.log, args); };
-    global.log.error = (...args) => { prefix(args); return _log.error.apply(global.log, args); };
-    global.log.debug = (...args) => { prefix(args); return _log.debug.apply(global.log, args); };
+
+    const prefix = (args) => { 
+        let monacoError = false;
+        if (args && Array.isArray(args) && args.length > 0) {
+            args.map((arg) => {
+                if (arg && arg.includes) {
+                    if (arg.includes('monaco-editor')) {
+                        monacoError = true;
+                    }
+                }
+            });
+        }
+
+        args[0] = '[R]' + args[0];
+        
+        return monacoError;
+    };
+
+    global.log.info = (...args) => { const monacoError = prefix(args); if (!monacoError) { return _log.info.apply(global.log, args); } };
+    global.log.warn = (...args) => { const monacoError = prefix(args); if (!monacoError) { return _log.warn.apply(global.log, args); } };
+    global.log.error = (...args) => { const monacoError = prefix(args); if (!monacoError) { return _log.error.apply(global.log, args); } else { return _log.info.apply(global.log, [util.inspect(args)]); } };
+    global.log.debug = (...args) => { const monacoError = prefix(args); if (!monacoError) { return _log.debug.apply(global.log, args); } };
 
     process.on('uncaughtException', error => {
         // ignore Monaco Editor error related to jsonMode.js
