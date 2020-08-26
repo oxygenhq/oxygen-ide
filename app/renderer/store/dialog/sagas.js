@@ -20,8 +20,8 @@ export function* handleServiceEvents({ payload }) {
     if (!event) {
         return;
     }
-    if (service === 'SeleniumService') {
-        yield handleSeleniumServiceEvent(event);
+    if (['SeleniumService','TestRunnerService'].includes(service)) {
+        yield handleOnChromeDriverErrorEvent(event);
     }
 }
 
@@ -66,8 +66,7 @@ function* showDownloadChromeDriverFailed() {
     }
 }
 
-function* handleSeleniumServiceEvent(event) {
-
+function* handleOnChromeDriverErrorEvent(event) {
     if (event && event.type === 'ON_CHROME_DRIVER_ERROR') {
         yield put(actions.setParamstoDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, {
             chromeDriverVersion: event.chromeDriverVersion,
