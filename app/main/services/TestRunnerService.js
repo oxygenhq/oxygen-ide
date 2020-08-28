@@ -516,6 +516,14 @@ export default class TestRunnerService extends ServiceBase {
                     severity: SEVERITY_ERROR,
                     message: `Test failed: [${result.failure.type}]${message}${locStr}`
                 });
+
+                if (result.failure.type && result.failure.type === 'CHROMEDRIVER_ERROR') {
+                    this.notify({
+                        type: 'ON_CHROME_DRIVER_ERROR',
+                        chromeVersion: null,
+                        chromeDriverVersion: null
+                    });
+                }
             }
             this._emitLogEvent(severity, `Test finished with status --> ${status}.`);
         }
