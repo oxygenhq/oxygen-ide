@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.19.0 (2020-08-25)
+## v1.19.0 (2020-08-30)
 
 #### :tada: New Feature
 * Environment selection UI (see Settings) for oxygen.conf based projects.
@@ -24,7 +24,7 @@
 * Improve loading of user added ChromeDriver versions.
 
 #### :house: Internal
-* Update oxygen-cli from v1.4.0 to v1.8.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update oxygen-cli from v1.4.0 to v1.8.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 * Update bundled ChromeDrivers.
 * Update GeckoDriver to v0.27.0.
 * Update packages.
