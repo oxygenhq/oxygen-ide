@@ -18,6 +18,7 @@ import DecompressZip from 'decompress-zip';
 import { versions } from './chromedriver-versions.json';
 import fetch from 'node-fetch';
 import ServiceBase from '../ServiceBase';
+import glob from 'glob';
 
 import cfg from '../../config.json';
 const selSettings = cfg.selenium;
@@ -115,41 +116,6 @@ export default class SeleniumService extends ServiceBase {
         }
     }
 
-    async getChromeDriverVersionAndChromeVersion() {
-        const result = {};
-        var chromedriver;
-        try {
-            const chromeVersion = await this.getChromeVersion();
-            console.log('Found Chrome version: ' + chromeVersion);
-
-            result.chromeVersion = chromeVersion;
-
-            var chromeDriverVersion = await this.getChromeDriverVersion(chromeVersion);
-            console.log('Required ChromeDriver version: ' + chromeDriverVersion);
-
-            result.chromeDriverVersion = chromeDriverVersion;
-
-            chromedriver = await this.findLocalChromeDriver(chromeDriverVersion);
-
-
-            if (chromedriver) {
-                console.log('Found matching ChromeDriver at ' + chromedriver);
-
-                result.error = false;
-                
-            } else {
-                console.log('Not Found matching ChromeDriver at ' + chromedriver);
-                result.error = true;
-            }
-        } catch (e) {
-            console.warn('Failure setting up ChromeDriver', e);
-            result.error = true;
-        }
-
-        return result;
-    }
-
-
     async _startProcess(port) {
         let cwd;
         if (process.env.NODE_ENV === 'production') {
@@ -175,10 +141,10 @@ export default class SeleniumService extends ServiceBase {
                 throw new Error('Cannot find it localy');
             }
         } catch (e) {
-            console.warn('Failure setting up ChromeDriver', e);
+            console.warn('Failure setting up ChromeDriver.', e);
             // if something bad happens, check if user has placed the driver manually
-            // findLocalChromeDriver without arguments will try to resolve driver located at the root folder
-            chromedriver = await this.findLocalChromeDriver();
+            // getChromeDriverBinPathExact without arguments will try to resolve driver located at the root folder
+            chromedriver = await this.getChromeDriverBinPathExact();
             if (chromedriver) {
                 console.log('Using user placed ChromeDriver from ' + chromedriver);
             } else {
@@ -186,7 +152,7 @@ export default class SeleniumService extends ServiceBase {
                 chromedriver = await this.findLocalChromeDriver(versions[0].driverVersion);
                 if (chromedriver) {
                     console.log('Using latest bundled ChromeDriver from ' + chromedriver);
-                } else {                    
+                } else {
                     this.notify({
                         type: ON_CHROME_DRIVER_ERROR,
                         chromeVersion: chromeDriverVersion,
@@ -292,7 +258,7 @@ export default class SeleniumService extends ServiceBase {
     getChromeVersion() {
         return new Promise((resolve, reject) => {
             const installations = chromeFinder[process.platform]();
-            
+
             if (installations && installations.length > 0) {
                 console.log('Found Chrome at: ', installations);
                 if (process.platform === 'win32') {
@@ -333,7 +299,7 @@ export default class SeleniumService extends ServiceBase {
         return new Promise((resolve, reject) => {
             // try getting the version from a local version map file
             for (var version of versions) {
-                if (version.chromeMin >= chromeVersion && version.chromeMax <= chromeVersion) {
+                if (version.chromeMin <= chromeVersion && version.chromeMax >= chromeVersion) {
                     resolve(version.driverVersion);
                     return;
                 }
@@ -394,49 +360,43 @@ export default class SeleniumService extends ServiceBase {
         .map(dirent => dirent.name);
     }
 
-    cmpVersions = (a, b) => {
-        var i, diff;
-        var regExStrip0 = /(\.0+)+$/;
-        var segmentsA = a.replace(regExStrip0, '').split('.');
-        var segmentsB = b.replace(regExStrip0, '').split('.');
-        var l = Math.min(segmentsA.length, segmentsB.length);
-    
-        for (i = 0; i < l; i++) {
-            diff = parseInt(segmentsA[i], 10) - parseInt(segmentsB[i], 10);
-            if (diff) {
-                return diff;
-            }
-        }
-        return segmentsA.length - segmentsB.length;
+    // find path to exact chromedriver version
+    // or to the user placed binary in the root folder if driverVersion is falsy
+    getChromeDriverBinPathExact(driverVersion) {
+        return new Promise((resolve, reject) => {
+            const driverBin = path.join(this.getDriversRootPath(),
+                driverVersion ? CHROMEDRIVER_FOLDER_START + driverVersion : '',
+                'chromedriver' + (process.platform === 'win32' ? '.exe' : ''));
+            fs.access(driverBin, err => {
+                if (err) {
+                    resolve(null);
+                    return;
+                }
+                resolve(driverBin);
+            });
+        });
     }
 
-    getChromeDriverBinnaryPath(driverVersion) {
-        let saveDriverVersion = driverVersion;
-        const rootPath = this.getDriversRootPath();
-        const directories = this.getDirectories(rootPath);
-        
-        if (directories && Array.isArray(directories) && directories.length > 0) {
-            const directoriesVersions = directories.map((item) => item.replace(CHROMEDRIVER_FOLDER_START, ''));
+    // find path to the highest available BUILD version. E.g 85.0.4183.xx
+    getChromeDriverBinPathApprox(driverVersion) {
+        const segments = driverVersion.split('.');
+        const globVersion = `${segments[0]}.${segments[1]}.${segments[2]}.*`;
 
-            if (directoriesVersions.includes(saveDriverVersion)) {
-                // ignore
-            } else {
-                directoriesVersions.push(saveDriverVersion);
-            }
-            
-            const directoriesVersionsSorted = directoriesVersions.sort(this.cmpVersions).filter((el) => !!el);
-    
-            if (directoriesVersionsSorted[directoriesVersionsSorted.length-1] !== saveDriverVersion) {
-                saveDriverVersion = directoriesVersionsSorted[directoriesVersionsSorted.length-1];
-            }
-        }
-
-        const pathBydriverVersion = path.join(
-            rootPath,
-            saveDriverVersion ? CHROMEDRIVER_FOLDER_START + saveDriverVersion : '',
-            'chromedriver' + (process.platform === 'win32' ? '.exe' : ''));
-
-        return pathBydriverVersion;
+        return new Promise((resolve, reject) => {
+            const approx = path.join(this.getDriversRootPath(), CHROMEDRIVER_FOLDER_START + globVersion);
+            glob(approx, (err, files) => {
+                if (err || files.length === 0) {
+                    resolve(null);
+                    return;
+                }
+                files.sort((a, b) => {
+                    var buidVerA = parseInt(path.basename(a).split('.')[3], 10);
+                    var buidVerB = parseInt(path.basename(b).split('.')[3], 10);
+                    return buidVerA - buidVerB;
+                });
+                resolve(path.join(files[files.length - 1], 'chromedriver' + (process.platform === 'win32' ? '.exe' : '')));
+            });
+        });
     }
 
     // kill any active chromedriver processes
@@ -457,17 +417,16 @@ export default class SeleniumService extends ServiceBase {
     }
 
     // return path to the driver binary if exists or null otherwise
-    findLocalChromeDriver(driverVersion) {
-        return new Promise((resolve, reject) => {
-            var driverBin = this.getChromeDriverBinnaryPath(driverVersion);
-            fs.access(driverBin, err => {
-                if (err) {
-                    resolve(null);
-                    return;
-                }
-                resolve(driverBin);
-            });
-        });
+    async findLocalChromeDriver(driverVersion) {
+        if (!driverVersion) {
+            return;
+        }
+        // for Chrome 73+
+        if (driverVersion.split('.').length > 2) {
+            return await this.getChromeDriverBinPathApprox(driverVersion);
+        } else {
+            return await this.getChromeDriverBinPathExact(driverVersion);
+        }
     }
 
     fetchChromeDriver(downloadUrl) {
