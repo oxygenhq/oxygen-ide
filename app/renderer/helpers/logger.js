@@ -20,7 +20,7 @@ export default function loggerSetup() {
         if (args && Array.isArray(args) && args.length > 0) {
             args.map((arg) => {
                 if (arg && arg.includes) {
-                    if (arg.includes('monaco-editor')) {
+                    if (arg.includes('monaco-editor') || arg.includes('ts.worker.js') || arg.includes('Debug Failure')) {
                         monacoError = true;
                     }
                 }
