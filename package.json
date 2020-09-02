@@ -27,7 +27,7 @@
     "test-e2e": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r @babel/register ./internals/scripts/RunTests.js e2e",
     "test-watch": "npm test -- --watch"
   },
-  "browserslist": "electron 4.2",
+  "browserslist": "electron 6.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/oxygenhq/oxygen-ide.git"
@@ -104,12 +104,12 @@
     "electron": "7.3.2",
     "electron-rebuild": "1.11.0",
     "eslint": "6.8.0",
-    "eslint-plugin-compat": "3.5.1",
-    "eslint-plugin-flowtype": "4.6.0",
-    "eslint-plugin-import": "2.20.1",
-    "eslint-plugin-jest": "23.8.2",
+    "eslint-plugin-compat": "3.8.0",
+    "eslint-plugin-flowtype": "4.7.0",
+    "eslint-plugin-import": "2.22.0",
+    "eslint-plugin-jest": "23.20.0",
     "eslint-plugin-promise": "4.2.1",
-    "eslint-plugin-react": "7.18.3",
+    "eslint-plugin-react": "7.20.6",
     "file-loader": "4.3.0",
     "flow-bin": "0.120.0",
     "flow-runtime": "0.17.0",
