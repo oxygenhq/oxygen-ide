@@ -49,7 +49,6 @@ export default {
                     plugins: [
                         '@babel/transform-modules-commonjs',
                         ['@babel/plugin-proposal-class-properties', { 'loose': true }],
-                        '@babel/plugin-syntax-class-properties',
                         '@babel/plugin-transform-runtime',
                         '@babel/plugin-proposal-function-bind',
                     ]

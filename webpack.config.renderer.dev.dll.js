@@ -43,7 +43,6 @@ export default merge.smart(baseConfig, {
                             // renderer process. The 'transform-*' plugins must be included
                             // before react-hot-loader/babel
                             ['@babel/plugin-proposal-class-properties', { 'loose': true }],
-                            '@babel/plugin-syntax-class-properties',
                             '@babel/plugin-transform-classes',
                             'react-hot-loader/babel'
                         ],
