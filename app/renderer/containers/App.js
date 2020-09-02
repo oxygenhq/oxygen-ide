@@ -9,7 +9,6 @@
 // @flow
 import React from 'react';
 import { Provider } from 'react-redux';
-import { ConnectedRouter } from 'react-router-redux';
 import Workbench from './Workbench';
 
 type Props = {
@@ -21,9 +20,7 @@ export default class App extends React.Component<Props> {
     render() {
         return (
             <Provider store={this.props.store}>
-                <ConnectedRouter history={this.props.history}>
-                    <Workbench />
-                </ConnectedRouter>
+                <Workbench />
             </Provider>
         );
     }
