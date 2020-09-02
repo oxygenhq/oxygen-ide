@@ -19,7 +19,8 @@ import { putAndTake } from '../../helpers/saga';
 import * as treeHelpers from '../../helpers/tree';
 import fileSubjects from '../../store/fs/subjects';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
-
+import uniqWith from 'lodash/uniqWith';
+import isEqual from 'lodash/isEqual';
 import * as tabActions from '../tabs/actions';
 import * as editorActions from '../editor/actions';
 import ServicesSingleton from '../../services';
@@ -281,9 +282,25 @@ export function* treeOpenFolder({ payload }) {
 export function* fromCache({ payload }) {
     const { cache } = payload;
     const { fs } = cache;
-    const { rootPath } = fs;
+    const { rootPath, files } = fs;
     if (rootPath) {
-        yield call(services.mainIpc.call, 'FileService', 'createWatchOnFilesChannel', [rootPath]);
+        const watchArray = [];
+
+        if (files && Object.keys(files)) {
+            for (var fPath of Object.keys(files)) {
+                const file = files[fPath];
+
+                if (file && file.modified && file.parentPath) {
+                    if (watchArray.includes(file.parentPath)) {
+                        // ignore
+                    } else {
+                        watchArray.push(file.parentPath);
+                    }
+                }
+            }
+        }
+
+        yield call(services.mainIpc.call, 'FileService', 'createWatchOnFilesChannel', [rootPath, watchArray]);
     }
     yield put(workbenchActions._restoreFromCache_Success());
 }
@@ -351,7 +368,7 @@ export function* initializeSuccess() {
 
                             } else {
                                 // not in root folder
-                                
+
                                 const resp = call(
                                     services.mainIpc.call,
                                     'FileService',
@@ -399,8 +416,11 @@ export function* initializeSuccess() {
 
                     try {
                         if (fileContentArray && Array.isArray(fileContentArray) && fileContentArray.length > 0) {
-                            const filesResults = yield all(fileContentArray);
+                            let filesResults = yield all(fileContentArray);
+                            const tabsList = yield select(state => state.tabs.list);
     
+                            filesResults = uniqWith(filesResults, isEqual);
+
                             filesResults.map(file => {
                                 if (
                                     file && 
@@ -408,12 +428,20 @@ export function* initializeSuccess() {
                                     typeof file.content === 'string'
                                 ) {
                                     // file exist
-                                    
-                                    const pRes = all([
-                                        put(fsActions._fetchFileContent_Success(file.filePath, file.content))
-                                    ]);
 
-                                    allResults.push(pRes);
+                                    if (
+                                        tabsList && 
+                                        tabsList.some && 
+                                        tabsList.some(({key, touched}) => key === file.filePath && touched)
+                                    ) {
+                                        // ingore, file edited in ide
+                                    } else {
+                                        const pRes = all([
+                                            put(fsActions._fetchFileContent_Success(file.filePath, file.content))
+                                        ]);
+    
+                                        allResults.push(pRes);
+                                    }
                                 } else {
                                     let unlinkedFileContent = fs.files[file.filePath]['content']|| '';
                                     const pathSplit = file.filePath.split(pathLib.sep);

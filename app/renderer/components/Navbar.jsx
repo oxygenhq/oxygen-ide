@@ -8,8 +8,8 @@
  */
 // @flow
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { Icon } from 'antd';
+// import { NavLink } from 'react-router-dom';
+// import { Icon } from 'antd';
 
 import '../css/navbar.scss';
 
@@ -19,21 +19,22 @@ export default class Navbar extends React.Component<Props> {
   props: Props;
 
   render() {
-      return (
-          <div className="asidenav">
-              <NavLink exact activeClassName="selected" to="/">
-                  <Icon type="home" />
-              </NavLink>
-              {/* <NavLink exact activeClassName="selected" to="/oxyide">
-          <Icon type="star" />
-        </NavLink> */}
-              <NavLink exact activeClassName="selected" to="/counter">
-                  <Icon type="star-o" />
-              </NavLink>
-              <NavLink exact activeClassName="selected" to="/user">
-                  <Icon type="user" />
-              </NavLink>
-          </div>
-      );
+      return null;
+    //   return (
+    //       <div className="asidenav">
+    //           <NavLink exact activeClassName="selected" to="/">
+    //               <Icon type="home" />
+    //           </NavLink>
+    //           {/* <NavLink exact activeClassName="selected" to="/oxyide">
+    //       <Icon type="star" />
+    //     </NavLink> */}
+    //           <NavLink exact activeClassName="selected" to="/counter">
+    //               <Icon type="star-o" />
+    //           </NavLink>
+    //           <NavLink exact activeClassName="selected" to="/user">
+    //               <Icon type="user" />
+    //           </NavLink>
+    //       </div>
+    //   );
   }
 }
