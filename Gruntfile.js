@@ -11,9 +11,6 @@ var cp = require('child_process');
 var path = require('path');
 
 module.exports = function(grunt) {
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-chmod');
-
     grunt.loadTasks('./tools/grunt-tasks');
 
     var defaultTasks = [];
