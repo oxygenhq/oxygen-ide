@@ -56,7 +56,7 @@ const defaultAppSettings = {
         env: null
     },
     runSettings: {
-        npmGRootExecution: true
+        npmGRootExecution: false
     },
     integrations: {
         applitools: {
