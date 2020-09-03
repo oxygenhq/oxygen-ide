@@ -509,7 +509,7 @@ export default class TestRunnerService extends ServiceBase {
                 severity = SEVERITY_ERROR;
                 const loc = this._getLocationInfo(result.failure.location);
                 const message = result.failure.message ? ` "${result.failure.message}"` : '';
-                const locStr = loc && loc.line && loc.file  ? ` at file ${loc.file} at line ${loc.line}` : '';
+                const locStr = loc && loc.line && loc.file  ? ` at ${loc.file} line ${loc.line}` : '';
                 
                 this.notify({
                     type: EVENT_LOG_ENTRY,
@@ -605,7 +605,7 @@ export default class TestRunnerService extends ServiceBase {
 
                 if (err.location) {
                     const loc = this._getLocationInfo(err.location);
-                    const locStr = loc && loc.line && loc.file  ? ` at file ${loc.file} at line ${loc.line}` : '';
+                    const locStr = loc && loc.line && loc.file  ? ` at ${loc.file} line ${loc.line}` : '';
                     message += locStr;
                 }
 
