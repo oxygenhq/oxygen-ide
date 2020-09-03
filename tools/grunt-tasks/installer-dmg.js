@@ -5,7 +5,6 @@
 var path = require('path');
 var appdmg = require('appdmg');
 var chalk = require('chalk');
-var repeatString = require('repeat-string');
 var cp = require('child_process');
 
 module.exports = function (grunt) {
@@ -45,7 +44,7 @@ module.exports = function (grunt) {
             emitter.on('progress', function (info) {
                 if (info.type === 'step-begin') {
                     var line = '[' + (info.current <= 9 ? ' ' : '') + info.current + '/' + info.total + '] ' + info.title + '...';
-                    grunt.log.write(line + repeatString(' ', 45 - line.length));
+                    grunt.log.write(line + ' '.repeat(45 - line.length));
                 }
 
                 if (info.type === 'step-end') {

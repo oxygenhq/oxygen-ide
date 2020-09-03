@@ -16,7 +16,6 @@
   ],
   "plugins": [
     "@babel/transform-modules-commonjs",
-    "@babel/plugin-syntax-import-meta",
     ["@babel/plugin-proposal-class-properties", { "loose": true }],
     "@babel/plugin-proposal-function-bind",
     ["@babel/plugin-transform-runtime",
@@ -51,9 +50,7 @@
         "@babel/preset-react"
       ],
       "plugins": [
-        "@babel/plugin-syntax-import-meta",
         ["@babel/plugin-proposal-class-properties", { "loose": true }],
-        "@babel/plugin-proposal-json-strings",
         "@babel/plugin-proposal-function-bind",
         ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": "css" }],
         "add-module-exports",
