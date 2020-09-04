@@ -54,8 +54,9 @@ export default class LogViewer extends React.PureComponent<Props> {
                 const messageSplit = message.split('\n');
 
                 if (messageSplit && messageSplit.map) {
-                    messageSplit.map((item, i) => {
-          
+                    messageSplit.map((inputItem, i) => {
+                        const item = inputItem.replace(/\t/g,'    ');
+
                         if (
                             item &&
                             item.length &&
@@ -118,8 +119,9 @@ export default class LogViewer extends React.PureComponent<Props> {
                     const messageSplit = message.split('\n');
   
                     if (messageSplit && messageSplit.map) {
-                        messageSplit.map((item, i) => {
-              
+                        messageSplit.map((inputItem, i) => {
+                            const item = inputItem.replace(/\t/g,'    ');
+
                             if (
                                 item &&
                                 item.length &&
