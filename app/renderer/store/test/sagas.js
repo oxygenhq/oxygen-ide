@@ -134,7 +134,24 @@ function* deviceDiscoveryServiceSaveStart() {
     }
 }
 
+function checkFileNameForUpperLoverCases (filename, rootPath) {
+    if (filename.startsWith(rootPath)) {
+        //ignore, all is ok
+        return filename;
+    } else {
+        const filenameUpperCase = filename.toUpperCase();
+
+        if (filenameUpperCase.startsWith(rootPath.toUpperCase())) {
+            const substring = filename.substring(rootPath.length);
+            return rootPath+substring;
+        } else {
+            return filename;
+        }
+    }
+}
+
 function* handleTestRunnerServiceEvent(event) {
+    const rootPath = yield select(state => state.fs.rootPath);
     if (event.type === 'LOG_ENTRY') {
         yield put(loggerActions.addLog(event.message, event.severity, 'general'));
     }
@@ -187,7 +204,8 @@ function* handleTestRunnerServiceEvent(event) {
         }
     }
     else if (event.type === 'LINE_UPDATE') {
-        yield put(testActions.onLineUpdate(event.time, event.file, event.line, event.primary));
+        const resolvedFileName = checkFileNameForUpperLoverCases(event.file, rootPath);
+        yield put(testActions.onLineUpdate(event.time, resolvedFileName, event.line, event.primary));
     }
     else if (event.type === 'BREAKPOINT') {
 
@@ -199,13 +217,16 @@ function* handleTestRunnerServiceEvent(event) {
             variables = event.variables;
         }
 
-        yield put(testActions.onBreakpoint(event.file, event.line, variables));
+        const resolvedFileName = checkFileNameForUpperLoverCases(event.file, rootPath);
+        yield put(testActions.onBreakpoint(resolvedFileName, event.line, variables));
     }
     else if (event.type === 'BREAKPOIN_DEACTIVATE') {
-        yield put(testActions.onDisabledBreakpoint(event.file, event.line));
+        const resolvedFileName = checkFileNameForUpperLoverCases(event.file, rootPath);
+        yield put(testActions.onDisabledBreakpoint(resolvedFileName, event.line));
     }
     else if (event.type === 'BREAKPOIN_RESOLVED') {
-        yield put(testActions.onResolvedBreakpoint(event.file, event.line));
+        const resolvedFileName = checkFileNameForUpperLoverCases(event.file, rootPath);
+        yield put(testActions.onResolvedBreakpoint(resolvedFileName, event.line));
     }
     else if (event.type === 'SEND_START_DATA') {
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', [event.data]);
