@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## v1.19.2 (2020-09-16)
+
+#### :house: Internal
+* Update oxygen-cli from v1.9.0 to v1.10.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+
+## v1.19.1 [not released publicly] (2020-09-09)
+
+#### :beetle: Bug Fix
+* Number of crashes related to script editor.
+* File not reloaded when changed outside the IDE.
+* Breakpoints not working with UNC paths.
+
+#### :nail_care: Polish
+* Make `npm -g root` execution disabled by default.
+
+#### :house: Internal
+* Update oxygen-cli from v1.8.2 to v1.9.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Do not pack oxygen-cli into ASAR.
+* Update packages.
+
 ## v1.19.0 (2020-08-30)
 
 #### :tada: New Feature
