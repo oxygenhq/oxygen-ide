@@ -103,7 +103,12 @@ export default class RecorderService extends ServiceBase {
             request.on('end', function () {
                 response.end();
                 setTimeout(function() {
-                    self._emit(JSON.parse(body));
+                    try {
+                        self._emit(JSON.parse(body));
+                    } catch (e) {
+                        console.log('RecorderService bad body :', body);
+                        Sentry.captureException(e);
+                    }
 
                     // For stress test
                     // for(var i = 1; i < 500; i++){
