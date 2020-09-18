@@ -237,45 +237,47 @@ export default class DeviceDiscoveryService extends ServiceBase {
     async _updateIOSDevices(timestamp) {
         try {
             const connectedDevices = await this._iosGetAvailableDevices();
-            for (var i = 0; i < connectedDevices.length; i++) {
-                var devInfoStr = connectedDevices[i];
-                var info = this._extractIOSDeviceInfo(devInfoStr);
-                if (info == null)
-                    continue;
-                var uuid = info.uuid;
-                var realDevice = devInfoStr.indexOf('(Simulator)') == -1;
-                var isTablet = devInfoStr.indexOf('iPad') > -1;
-                // previously seen device
-                if (this.devices[uuid]) {
-                    this.devices[uuid].new = this.devices[uuid].connected == false;
-                    this.devices[uuid].connected = true;
-                    this.devices[uuid].timestamp = timestamp;
-                } else {
-                    // add new device
-                    this.devices[uuid] = {
-                        id: uuid,
-                        name: `${info.name} [iOS ${info.version}]`,
-                        connected: true,
-                        new: true,
-                        real: realDevice,
-                        tablet: isTablet,
-                        timestamp: timestamp,
-                        ios: true,
-                        android: false,
-                        info: {
-                            name: info.name,
-                            os: {
-                                name: 'iOS',
-                                version: info.version
-                            },
-                            product: {
-                                brand: 'Apple',
-                                manufacturer: 'Apple',
-                                model: info.name,    // this should give us a unique model id for iOS device
-                                code: 'n/a'
+            if (Array.isArray(connectedDevices)) {
+                for (var i = 0; i < connectedDevices.length; i++) {
+                    var devInfoStr = connectedDevices[i];
+                    var info = this._extractIOSDeviceInfo(devInfoStr);
+                    if (info == null)
+                        continue;
+                    var uuid = info.uuid;
+                    var realDevice = devInfoStr.indexOf('(Simulator)') == -1;
+                    var isTablet = devInfoStr.indexOf('iPad') > -1;
+                    // previously seen device
+                    if (this.devices[uuid]) {
+                        this.devices[uuid].new = this.devices[uuid].connected == false;
+                        this.devices[uuid].connected = true;
+                        this.devices[uuid].timestamp = timestamp;
+                    } else {
+                        // add new device
+                        this.devices[uuid] = {
+                            id: uuid,
+                            name: `${info.name} [iOS ${info.version}]`,
+                            connected: true,
+                            new: true,
+                            real: realDevice,
+                            tablet: isTablet,
+                            timestamp: timestamp,
+                            ios: true,
+                            android: false,
+                            info: {
+                                name: info.name,
+                                os: {
+                                    name: 'iOS',
+                                    version: info.version
+                                },
+                                product: {
+                                    brand: 'Apple',
+                                    manufacturer: 'Apple',
+                                    model: info.name,    // this should give us a unique model id for iOS device
+                                    code: 'n/a'
+                                }
                             }
-                        }
-                    };
+                        };
+                    }
                 }
             }
         }
@@ -326,10 +328,14 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 throw new Error(`Failed getting devices, err: ${err}.`);
             }
         }
-        let devices = lines.filter((line) => {
-            // https://regex101.com/r/aE6aS3/6
-            return /^.+ \(\d+\.(\d+\.)?\d+( Simulator)?\) \[.+\]( \(Simulator\))?$/.test(line);
-        });
+        let devices = [];
+
+        if (lines && lines.filter) {
+            devices = lines.filter((line) => {
+                // https://regex101.com/r/aE6aS3/6
+                return /^.+ \(\d+\.(\d+\.)?\d+( Simulator)?\) \[.+\]( \(Simulator\))?$/.test(line);
+            });
+        }
         return devices;
     }
         
