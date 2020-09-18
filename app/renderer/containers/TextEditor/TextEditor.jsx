@@ -91,14 +91,16 @@ export default class TextEditor extends React.Component<Props> {
         const { trigger } = payload;
         const editor = this.editors[activeFile];
 
-        if (editor.editor) {
+        if (editor && editor.editor) {
             editor.editor.focus();
         }
 
         if (this.lastTrigger && typeof this.lastTrigger === 'string' && ['find', 'replace'].includes(this.lastTrigger)) {
             try {
                 const closeTriggerLine = 'closeFindWidget';
-                editor.trigger(closeTriggerLine);
+                if (editor) {
+                    editor.trigger(closeTriggerLine);
+                }
                 this.lastTrigger = null;
             } catch (e) {
                 console.log('lastTrigger e', e);
