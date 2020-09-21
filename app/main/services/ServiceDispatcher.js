@@ -61,8 +61,19 @@ export default class ServiceDispatcher {
         try {
             const retval = methodRef.apply(serviceRef, args);
             Promise.resolve(retval)
-                .then( result => e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, retval: result }) )
-                .catch( err => { e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: err }); console.error(err); } );
+                .then( result => {
+                    e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, retval: result });
+                })
+                .catch( err => {
+                    try {
+                        console.log(err);
+                        e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: err });
+                    } catch (e) {
+                        // to avoid Unhandled Promise Rejection. Error: Object has been destroyed
+                        // for example if user close ide when test run
+                        console.log('sender.send error:', e);
+                    }
+                });
         }
         catch (error) {
             // dont send Error object as it's won't be properly serialized
