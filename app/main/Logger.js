@@ -260,7 +260,11 @@ export default class Logger {
                 return;
             }
 
-            console.warn('Unhandled Error.', error);
+            if (error.code === 'EPERM') {
+                console.info('Unhandled Error.', error);
+            } else {
+                console.warn('Unhandled Error.', error);
+            }
         });
 
         process.on('unhandledRejection', error => {

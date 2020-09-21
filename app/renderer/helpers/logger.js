@@ -49,7 +49,7 @@ export default function loggerSetup() {
             return;
         }
 
-        global.log.error('Unhandled Error.', util.inspect(error));
+        global.log.error('[R] Unhandled Error.', util.inspect(error));
     });
 
     process.on('unhandledRejection', error => {
