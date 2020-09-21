@@ -60,6 +60,9 @@ export default class Logger {
         this.logFileName = 'oxygenide-%DATE%.log';
         
         try {
+            const userData = app.getPath('userData');
+            app.setAppLogsPath(path.join(userData, 'logs'));
+
             this.logsPath = app.getPath('logs');
             this.logFilePath = path.resolve(app.getPath('logs'), this.logFileName);
         } catch (err) {
