@@ -315,7 +315,7 @@ class Tree extends React.Component {
         // Skip if drag node is self
         if (
             this.dragNode.props.eventKey === eventKey &&
-        dropPosition === 0
+            dropPosition === 0
         ) {
             this.setState({
                 dragOverNodeKey: '',
@@ -337,13 +337,6 @@ class Tree extends React.Component {
                     dragOverNodeKey: eventKey,
                     dropPosition,
                 });
-            } else {
-                if (this.props.rootPath) {
-                    this.setState({
-                        dragOverNodeKey: this.props.rootPath,
-                        dropPosition,
-                    });
-                }
             }
 
             // Side effect for delay drag
