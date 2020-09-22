@@ -135,16 +135,5 @@
 
         <Property Id="WixShellExecTarget" Value="[#fil29E2B7C2878787B81283DC106FD94D4C]" />
         <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
-
-        <util:CloseApplication Id="CloseChrome"
-                               CloseMessage="no"
-                               Target="chrome.exe"
-                               RebootPrompt="no"
-                               PromptToContinue="yes"
-                               Description="Chrome needs to be closed before the installation can proceed. Please close Chrome manually."/>
-
-        <InstallExecuteSequence>
-            <Custom Action="WixCloseApplications" Before="LaunchConditions"></Custom>
-        </InstallExecuteSequence>
     </Product>
 </Wix>
