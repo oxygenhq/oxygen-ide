@@ -25,7 +25,13 @@ if (process.env.NODE_ENV === 'production') {
     try {
         Sentry.init({
             dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893',
-            release: packageJson.version
+            release: packageJson.version,
+            integrations: function(integrations) {
+              return integrations.filter(function(integration) {
+                  console.log('integration', integration);
+                return integration.name !== 'GlobalHandlers';
+              });
+            }
         });
         window.Sentry = Sentry;
     } catch (e) {

@@ -49,10 +49,31 @@ export default function loggerSetup() {
             return;
         }
 
+        if (
+            error &&
+            error.message &&
+            typeof error.message === 'string' &&
+            error.message.includes('monaco-editor') || error.message.includes('ts.worker.js') || error.message.includes('Debug Failure')
+        ) {
+            console.warn('uncaughtException');
+            console.warn(error.message);
+            console.warn(error);
+            return;
+        } 
+
         global.log.error('Unhandled Error.', util.inspect(error));
+        console.warn('window && window.Sentry && window.Sentry.captureException', window.Sentry.captureException);
+        if (window && window.Sentry && window.Sentry.captureException) {
+            window.Sentry.captureException(error);
+        }
     });
 
     process.on('unhandledRejection', error => {
+        console.warn('unhandledRejection');
+        console.warn(error);
         global.log.warn('Unhandled Promise Rejection.', util.inspect(error));
+        if (window && window.Sentry && window.Sentry.captureException) {
+            window.Sentry.captureException(error);
+        }
     });
 }
