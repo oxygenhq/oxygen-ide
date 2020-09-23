@@ -472,7 +472,12 @@ export default class MonacoEditor extends React.Component<Props> {
         editor.onMouseDown((e) => {
             const { target: { element, position } } = e;
 
-            if (element.className === 'line-numbers' && language !== 'feature') {
+            if (
+                element.className &&
+                element.className.includes &&
+                element.className.includes('line-numbers') &&
+                language !== 'feature'
+            ) {
                 // select the entire line if the user clicks on line number panel
                 const ln = position.lineNumber;
                 editor.setSelection(new monaco.Selection(1, 2, 1, 2));
