@@ -208,6 +208,10 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 this.adbPresent = false;
             } else if (e.message && e.message.includes('shell getprop ro.build.version.release')) { 
                 this.adbPresent = false;
+            } else if (e.message && e.message.includes('exited with code 3221225794')) {
+                //ignore, user error
+            } else if (e.message && e.message.includes('timed out after')) {
+                //ignore, user error
             } else {
                 Sentry.captureException(e);
             }
