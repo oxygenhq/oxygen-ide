@@ -110,6 +110,15 @@ const defaultAppSettings = {
             videoRecording: false,
             inUse: false,
         },
+        browserStack: {
+            title: 'BrowserStack',
+            key: null,
+            secret: null,
+            debug: false,
+            networkLogs: false,
+            recordVideo: false,
+            inUse: false
+        }
     },
     cloudProvidesBrowsersAndDevices: null,
     lastSession: {
@@ -336,6 +345,10 @@ export default (state = defaultState, action) => {
                 lambdaTest: {
                     ...saveCloudProvidersDestruction('lambdaTest', defaultState),
                     ...saveCloudProvidersDestruction('lambdaTest', cache.settings),
+                },
+                browserStack: {
+                    ...saveCloudProvidersDestruction('browserStack', defaultState),
+                    ...saveCloudProvidersDestruction('browserStack', cache.settings),
                 }
             }
         };

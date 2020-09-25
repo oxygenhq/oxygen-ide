@@ -1674,6 +1674,26 @@ export function* setCloudProvidersBrowsersAndDevices() {
                 }
             }
 
+            if (cloudProviders.browserStack && cloudProviders.browserStack.inUse) {
+                yield call(services.mainIpc.call, 'CloudProvidersService', 'updateProviderSettings', ['browserStack', cloudProviders.browserStack]);
+                yield put(settingsActions.setCloudProvidersBrowsersAndDevices(LOADING_RESULT, 'browserStack'));
+                const browsersAndDevicesResult = yield call(services.mainIpc.call, 'CloudProvidersService', 'getBrowsersAndDevices', ['browserStack']);
+
+                if (typeof browsersAndDevicesResult === 'string') {
+                    yield put(settingsActions.setCloudProvidersBrowsersAndDevices(null, 'browserStack'));
+                    fetchCloudBrowsersAndDevicesError(browsersAndDevicesResult);
+                } else {
+                    if (browsersAndDevicesResult) {
+                        yield put(settingsActions.setCloudProvidersBrowsersAndDevices(browsersAndDevicesResult, 'browserStack'));
+                    }
+                }
+            } else {
+                // set to local if testingBot
+                if (testProvider && testProvider === 'browserStack') {
+                    yield put(testActions.setTestProvider('Local'));
+                }
+            }
+            
 
         } else {
             // set to local

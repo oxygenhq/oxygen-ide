@@ -3,6 +3,7 @@ import TestObjectService from './TestObjectService';
 import LambdaTestService from './LambdaTestService';
 import TestingBotService from './TestingBotService';  
 import PerfectoMobileService from './PerfectoMobileService';  
+import BrowserStackService from './BrowserStackService';  
 
 export default {
     sauceLabs: SauceLabsService,
@@ -10,4 +11,5 @@ export default {
     lambdaTest: LambdaTestService,
     testingBot: TestingBotService,
     perfectoMobile: PerfectoMobileService,
+    browserStack: BrowserStackService,
 };

@@ -52,7 +52,7 @@ export function* loadProjectSettings({ payload }) {
             yield put(settingsActions._loadProjectSettings_Success(path, settingsRetVal));
         }
     } catch (e) {
-        console.log('~~loadProjectSettings e', e);
+        console.log('loadProjectSettings e', e);
     }
 }
 

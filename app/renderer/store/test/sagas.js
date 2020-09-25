@@ -84,6 +84,8 @@ function* setTestMode({payload}) {
                         browser = 'chrome';
                     } else if (testProvider === 'perfectoMobile') {
                         browser = 'Chrome';
+                    } else if (testProvider === 'browserStack') {
+                        browser = 'chrome';
                     }
 
                     if (browser && providerData.browsersTree) {
