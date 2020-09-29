@@ -509,8 +509,18 @@ export default class TestRunnerService extends ServiceBase {
                 severity = SEVERITY_ERROR;
                 const loc = this._getLocationInfo(result.failure.location);
                 const message = result.failure.message ? ` "${result.failure.message}"` : '';
-                const locStr = loc && loc.line && loc.file  ? ` at ${loc.file} line ${loc.line}` : '';
+                let locStr = loc && loc.line && loc.file  ? ` at ${loc.file} line ${loc.line}` : '';
                 
+                if (result.failure.cucumberLocation) {
+                    const cucumberParts = result.failure.cucumberLocation.split(':');
+                    const cucumberFile = cucumberParts[0];
+                    const cucumberLine = cucumberParts[1];
+
+                    if (cucumberFile && cucumberLine) {
+                        locStr += `
+Cucumber file ${cucumberFile} line ${cucumberLine}`;
+                    }
+                }
                 this.notify({
                     type: EVENT_LOG_ENTRY,
                     severity: SEVERITY_ERROR,
@@ -605,7 +615,18 @@ export default class TestRunnerService extends ServiceBase {
 
                 if (err.location) {
                     const loc = this._getLocationInfo(err.location);
-                    const locStr = loc && loc.line && loc.file  ? ` at ${loc.file} line ${loc.line}` : '';
+                    let locStr = loc && loc.line && loc.file  ? ` at ${loc.file} line ${loc.line}` : '';
+                    if (err.cucumberLocation) {
+                        const cucumberParts = err.cucumberLocation.split(':');
+                        const cucumberFile = cucumberParts[0];
+                        const cucumberLine = cucumberParts[1];
+
+                        if (cucumberFile && cucumberLine) {
+                            locStr += `
+Cucumber file ${cucumberFile} line ${cucumberLine}`;
+                        }
+                    }
+
                     message += locStr;
                 }
 
