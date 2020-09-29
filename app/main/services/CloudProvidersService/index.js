@@ -166,7 +166,6 @@ export default class CloudProvidersService extends ServiceBase {
             }
         }
         else if (providerName === 'sauceLabs') {
-            console.log('~~browsersAndDevices sauceLabs', Object.keys(browsersAndDevices));
 
             if (browsersAndDevices.browsers && Array.isArray(browsersAndDevices.browsers) && browsersAndDevices.browsers.length > 0) {
                 // console.log('~~browsersAndDevices sauceLabs browsers', Object.keys(browsersAndDevices.browsers));
@@ -310,6 +309,42 @@ export default class CloudProvidersService extends ServiceBase {
                     });
 
                 }
+            }
+        }
+        else if (providerName === 'browserStack') {
+            if (browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0 && providerName) {
+                browsersAndDevices.map((item) => {
+                    if (item) {
+                        if (item.real_mobile) {
+                            // device
+                            devices.push(new DeviceInfo({
+                                apiName: item.os,
+                                id: item.device,
+                                name: item.device,
+                                version: item.os_version,
+                                osName: item.os,
+                                osVersion: item.os_version
+                            }));
+                        } else {
+                            // browser
+                            if (item.browser && item.browser === 'firefox' && parseInt(item.browser_version) < 59) {
+                                // ignore  < 59
+                            } else if (item.browser && item.browser === 'chrome' && parseInt(item.browser_version) < 43) {
+                                // ignore  < 43
+                            } else if (item.browser && item.browser === 'opera') {
+                                // ignore OperaDriver is not supported
+                            } else {
+                                browsers.push(new BrowserInfo({
+                                    apiName: item.browser,
+                                    name: item.browser,
+                                    version: item.browser_version,
+                                    osName: item.os,
+                                    osVersion: item.os_version
+                                }));
+                            }
+                        }
+                    }
+                });
             }
         }
         else if (browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0 && providerName) {
@@ -590,6 +625,9 @@ export default class CloudProvidersService extends ServiceBase {
                         return this.sortToBrowsersAndDevice(browsersAndDevices.platforms.Desktop, providerName);
                     } else if (providerName === 'testingBot') {
                         // testingBot
+                        return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
+                    } else if (providerName === 'browserStack') {
+                        // browserStack
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                     } else {
                         console.log('ProviderName', providerName);

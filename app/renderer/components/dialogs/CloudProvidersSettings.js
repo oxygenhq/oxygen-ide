@@ -267,6 +267,48 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
         });
     }
   
+    onChangeBrowserStackKey(value) {
+        const { providers = {} } = this.state || {};
+        const { browserStack = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                browserStack: {
+                    ...browserStack,
+                    key: value,
+                }
+            }
+        });
+    }
+
+    onChangeBrowserStackSecret(value) {
+        const { providers = {} } = this.state || {};
+        const { browserStack = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                browserStack: {
+                    ...browserStack,
+                    secret: value,
+                }
+            }
+        });
+    }
+
+    onChangeBrowserStackBuildName(value) {
+        const { providers = {} } = this.state || {};
+        const { browserStack = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                browserStack: {
+                    ...browserStack,
+                    build: value,
+                }
+            }
+        });
+    }
+
     onChangeTestingBotSecret(value) {
         const { providers = {} } = this.state || {};
         const { testingBot = {} } = providers;
@@ -303,6 +345,20 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                 ...this.state.providers,
                 testingBot: {
                     ...testingBot,
+                    inUse: value,
+                }
+            }
+        });
+    }
+
+    onUseBrowserStackChange(value) {
+        const { providers = {} } = this.state || {};
+        const { browserStack = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                browserStack: {
+                    ...browserStack,
                     inUse: value,
                 }
             }
@@ -435,6 +491,47 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
         });
     }
     
+    onChangeBrowserStackDebug (value) {
+        const { providers = {} } = this.state || {};
+        const { browserStack = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                browserStack: {
+                    ...browserStack,
+                    debug: value,
+                }
+            }
+        });
+    }
+
+    onChangeBrowserStackNetworkLogs (value) {
+        const { providers = {} } = this.state || {};
+        const { browserStack = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                browserStack: {
+                    ...browserStack,
+                    networkLogs: value,
+                }
+            }
+        });
+    }
+
+    onChangeBrowserStackRecordVideo (value) {
+        const { providers = {} } = this.state || {};
+        const { browserStack = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                browserStack: {
+                    ...browserStack,
+                    recordVideo: value,
+                }
+            }
+        });
+    }    
 
     validateFields() {
         const { providers } = this.state;
@@ -479,7 +576,8 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
             testObject = {},
             testingBot = {},
             lambdaTest = {},
-            perfectoMobile = {}
+            perfectoMobile = {},
+            browserStack = {}
         } = providers;
 
         return (
@@ -683,7 +781,55 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                             />
                         </Form.Item>
                     </div>
-                }            
+                }     
+
+                      
+                {/* //////////// BrowserStack //////////// */} 
+                <Form.Item label="BrowserStack" {...formItemLayout} extra="Use BrowserStack to run your tests in cloud." >
+                    <Switch onChange={ ::this.onUseBrowserStackChange } checked={ browserStack.inUse } />
+                </Form.Item>      
+                {
+                    browserStack && browserStack.inUse &&
+                    <div className="cloud-providers-form-wrap">
+                        <Form.Item label="BrowserStack Settings" style={ {fontWeight: 'bold'} } {...formItemLayout}/>
+                        <Form.Item label="Key" {...formItemLayout} >
+                            <Input.Password
+                                value={ browserStack.key }
+                                onChange={ (e) => ::this.onChangeBrowserStackKey(e.target.value) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Secret" {...formItemLayout} >
+                            <Input.Password
+                                value={ browserStack.secret }
+                                onChange={ (e) => ::this.onChangeBrowserStackSecret(e.target.value) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Build Name" {...formItemLayout} >
+                            <Input
+                                value={ browserStack.build }
+                                onChange={ (e) => ::this.onChangeBrowserStackBuildName(e.target.value) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Debug" {...formItemLayout} >
+                            <Checkbox
+                                checked={ browserStack.debug || false }
+                                onChange={ (e) => ::this.onChangeBrowserStackDebug(e.target.checked) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Network Logs" {...formItemLayout} >
+                            <Checkbox
+                                checked={ browserStack.networkLogs || false }
+                                onChange={ (e) => ::this.onChangeBrowserStackNetworkLogs(e.target.checked) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Record Video" {...formItemLayout} >
+                            <Checkbox
+                                checked={ browserStack.recordVideo || false }
+                                onChange={ (e) => ::this.onChangeBrowserStackRecordVideo(e.target.checked) }
+                            />
+                        </Form.Item>
+                    </div>
+                }
             </Form>
         );
     }
