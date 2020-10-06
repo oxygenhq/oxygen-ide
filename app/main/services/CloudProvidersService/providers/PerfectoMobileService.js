@@ -207,6 +207,7 @@ export default class PerfectoMobileService extends CloudProviderBase {
 
             caps.location = this.settings.location;
         } else {
+            caps.enableAppiumBehavior = true;
             if (target.osName) {
                 caps.platformName = target.osName;
             }
@@ -243,7 +244,6 @@ export default class PerfectoMobileService extends CloudProviderBase {
             }
         }
 
-        caps.enableAppiumBehavior = true;
 
         caps['perfectoMobile:options'] = {
             name: testName || null
