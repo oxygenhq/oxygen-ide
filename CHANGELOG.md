@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## v1.20.0 (2020-10-xx)
+
+#### :tada: New Feature
+* Added support for BrowserStack provider.
+
+#### :beetle: Bug Fix
+* Fixed logs being saved at an incorrect location.
+* Fixed multiple entries being erroneously highlighted in the file tree in certain situations.
+* Various other fixes.
+
+#### :nail_care: Polish
+* Do not ask to close Chrome during installation on Windows.
+* Print more detailed failure information for Cucumber tests.
+
+#### :house: Internal
+* Update oxygen-cli from v1.10.0 to v1.13.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update dependencies.
+
 ## v1.19.2 (2020-09-16)
 
 #### :house: Internal
