@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import TextEditor from './TextEditor.jsx';
 import * as editorActions from '../../store/editor/actions';
-import { zoomIn, zoomOut } from '../../store/settings/actions';
+import { zoomIn, zoomOut, handleMainMenuEvent } from '../../store/settings/actions';
 
 const checkForBreakpoints = (path, breakpoints) => {
     let result = [];
@@ -92,7 +92,7 @@ const mapStoreToProps = (state) => {
 };
   
 const mapDispatchToProps = (dispatch) => (
-    bindActionCreators({ ...editorActions, zoomIn, zoomOut } , dispatch)
+    bindActionCreators({ ...editorActions, zoomIn, zoomOut, handleMainMenuEvent } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(TextEditor);

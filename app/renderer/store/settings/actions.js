@@ -168,3 +168,11 @@ export const _loadProjectSettings_Failure = (path) => ({
     type: failure(types.LOAD_PROJECT_SETTINGS),
     payload: { path },
 });
+
+export const handleMainMenuEvent = (cmd = null, args = null) => ({
+    type: 'MAIN_MENU_EVENT',
+    payload: {
+        cmd: cmd,
+        args: args
+    }
+});
