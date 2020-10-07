@@ -67,7 +67,8 @@ type Props = {
     onValueChange: Function,
     onSelectionChange: Function,
     onBreakpointsUpdate: Function,
-    setFatureLanguageLoaded: Function
+    setFatureLanguageLoaded: Function,
+    handleMainMenuEvent: Function
 };
 
 export default class MonacoEditor extends React.Component<Props> {
@@ -293,7 +294,6 @@ export default class MonacoEditor extends React.Component<Props> {
     }
 
     editorDidMount(editor) {
-        this.props.editorDidMount(editor, monaco);
         this.editor.layout();
 
         if (this.props.fontSize && this.props.breakpoints && Array.isArray(this.props.breakpoints) && this.props.breakpoints.length > 0) {     
@@ -301,6 +301,13 @@ export default class MonacoEditor extends React.Component<Props> {
                 helpers.addBreakpointMarker(this.editor, item, this.props.fontSize, this.props.disabledBreakpoints, this.props.resolvedBreakpoints);
             });
         }
+
+        this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_L, () => {
+            this.props.handleMainMenuEvent('MENU_CMD_VIEW_EVENT_LOG');
+        });
+        this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_I, () => {
+            // do nothing, to avoid double execution
+        });
     }
 
     trigger(trigger) {

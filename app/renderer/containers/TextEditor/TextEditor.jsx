@@ -27,7 +27,8 @@ type Props = {
   activeFile: null | object,
   openFiles: null | {[key: string]: Object},
   onBreakpointsUpdate: (Array<any>) => void,
-  onContentUpdate: (string, string) => void
+  onContentUpdate: (string, string) => void,
+  handleMainMenuEvent: Function
 };
 
 const DEFAULT_EDITOR_LANGUAGE = 'javascript';
@@ -189,6 +190,7 @@ export default class TextEditor extends React.Component<Props> {
                             onValueChange={this.handleValueChange}
                             onSelectionChange={this.handleSelectionChange}
                             setFatureLanguageLoaded={this.setFatureLanguageLoaded}
+                            handleMainMenuEvent={this.props.handleMainMenuEvent}
                         />
                     );
                 })}
