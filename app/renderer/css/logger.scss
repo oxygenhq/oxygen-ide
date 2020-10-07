@@ -14,13 +14,13 @@
   width: 100%;
 
   .dragline {
-    position: relative;
+    height: 10px;
+    background: transparent;
+    position: absolute;
     z-index: 9;
     margin-top: -1px;
     display: block;
     width: 100%;
-    height: 2px;
-    background: none;
     border: none;
     cursor: row-resize;
     outline: none;
