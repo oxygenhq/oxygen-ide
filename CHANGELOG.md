@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.20.0 (2020-10-xx)
+## v1.20.0 (2020-10-08)
 
 #### :tada: New Feature
 * Added support for BrowserStack provider.
@@ -8,6 +8,8 @@
 #### :beetle: Bug Fix
 * Fixed logs being saved at an incorrect location.
 * Fixed multiple entries being erroneously highlighted in the file tree in certain situations.
+* Fixed CTRL + SHIFT + L/I handling when focus on monaco editor.
+* Fixed logger dragline.
 * Various other fixes.
 
 #### :nail_care: Polish
@@ -16,6 +18,7 @@
 
 #### :house: Internal
 * Update oxygen-cli from v1.10.0 to v1.13.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver 86.
 * Update dependencies.
 
 ## v1.19.2 (2020-09-16)
