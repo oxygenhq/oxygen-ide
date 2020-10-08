@@ -1,6 +1,11 @@
 {
   "versions": [
     {
+      "driverVersion": "86.0.4240.22",
+      "chromeMax": 86,
+      "chromeMin": 86
+    },
+    {
       "driverVersion": "85.0.4183.87",
       "chromeMax": 85,
       "chromeMin": 85
