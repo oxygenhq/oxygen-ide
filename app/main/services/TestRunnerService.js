@@ -109,6 +109,7 @@ export default class TestRunnerService extends ServiceBase {
             allowGlobal: true
         };
         options.reopenSession = reopenSession || false;
+        options.disableScreenshot = true;
         const cloudProviderSvc = this.getService('CloudProvidersService');
 
         if (cloudProviderSvc && testProvider && testProvider.id) {
