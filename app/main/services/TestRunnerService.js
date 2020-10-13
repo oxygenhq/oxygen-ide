@@ -636,10 +636,8 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
         }
 
 
-        this.reporter.on('log', ({ level, msg, src }) => {    
-            if (src && src !== 'system') {
-                this._emitLogEvent(level ? level.toUpperCase() : SEVERITY_INFO, msg);
-            }
+        this.reporter.on('log', ({ level, msg, src }) => {
+            this._emitLogEvent(level ? level.toUpperCase() : SEVERITY_INFO, msg);
         });
     }
 
