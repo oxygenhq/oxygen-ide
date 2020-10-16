@@ -99,7 +99,7 @@ export default class LambdaTestService extends CloudProviderBase {
         caps.visual = this.settings.takeScreenshots || false;
         caps.video = this.settings.videoRecording || false;
 
-        caps['lamda:options'] = {
+        caps['lambda:options'] = {
             name: testName || null
         };
 
