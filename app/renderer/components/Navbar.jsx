@@ -8,33 +8,25 @@
  */
 // @flow
 import React from 'react';
-// import { NavLink } from 'react-router-dom';
-// import { Icon } from 'antd';
+import { Icon } from 'antd';
 
 import '../css/navbar.scss';
 
-type Props = {};
+type Props = {
+    testRunning: boolean
+};
 
 export default class Navbar extends React.Component<Props> {
-  props: Props;
+    props: Props;
 
-  render() {
-      return null;
-    //   return (
-    //       <div className="asidenav">
-    //           <NavLink exact activeClassName="selected" to="/">
-    //               <Icon type="home" />
-    //           </NavLink>
-    //           {/* <NavLink exact activeClassName="selected" to="/oxyide">
-    //       <Icon type="star" />
-    //     </NavLink> */}
-    //           <NavLink exact activeClassName="selected" to="/counter">
-    //               <Icon type="star-o" />
-    //           </NavLink>
-    //           <NavLink exact activeClassName="selected" to="/user">
-    //               <Icon type="user" />
-    //           </NavLink>
-    //       </div>
-    //   );
-  }
+    render() {
+        const { testRunning } = this.props;
+
+        return (
+            <div className="asidenav">
+                <Icon type="folder" className={`${testRunning ? '' : 'active'}`} />
+                <Icon type="bug" className={`${testRunning ? 'active' : ''}`} />
+            </div>
+        );
+    }
 }

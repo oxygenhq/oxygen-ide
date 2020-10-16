@@ -10,6 +10,27 @@
   overflow: hidden;
 }
 */
+
+.asidenav {
+  display: flex;
+  flex-direction: column;
+
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAArCAIAAADdd86NAAAAAXNSR…MDAxMQAwHL////gRSUR7wgqj6sPKyCqDbQTQmqtcT7FgDDukHAYsJz6QAAAABJRU5ErkJggg==);
+  background-repeat: repeat-x;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.asidenav i {
+  padding: 5px;
+  font-size: 18px;
+  margin: 10px;
+  border-radius: 3px;
+}
+
+.asidenav i.active {
+  background-color: #fff
+}
+
 .asidenav a {
   font-size: 25px;
   padding: 13px 0;
