@@ -21,6 +21,12 @@ const EVENT_BREAKPOIN_RESOLVED = 'BREAKPOIN_RESOLVED';
 const EVENT_LINE_UPDATE = 'LINE_UPDATE';
 const EVENT_TEST_STARTED = 'TEST_STARTED';
 const EVENT_TEST_ENDED = 'TEST_ENDED';
+const EVENT_STEP_STARTED = 'STEP_STARTED';
+const EVENT_STEP_ENDED = 'STEP_ENDED';
+const EVENT_CASE_STARTED = 'CASE_STARTED';
+const EVENT_CASE_ENDED = 'CASE_ENDED';
+const EVENT_SUITE_STARTED = 'SUITE_STARTED';
+const EVENT_SUITE_ENDED = 'SUITE_ENDED';
 const EVENT_SEND_START_DATA = 'SEND_START_DATA';
 
 // Severities
@@ -554,7 +560,56 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
             });
         }
     }
+    _emitStepStart(rid, step) {
+        this.notify({
+            type: EVENT_STEP_STARTED,
+            rid,
+            step: step,
+        });
+    }
 
+    _emitStepEnd(rid, stepId, result) {
+        this.notify({
+            type: EVENT_STEP_ENDED,
+            rid,
+            stepId: stepId,
+            result: result
+        });
+    }
+
+    _emitCaseStart(rid, caze) {
+        this.notify({
+            type: EVENT_CASE_STARTED,
+            rid, 
+            case: caze,
+        });
+    }
+
+    _emitCaseEnd(rid, caseId, result) {
+        this.notify({
+            type: EVENT_CASE_ENDED,
+            rid,
+            caseId: caseId,
+            result: result,
+        });
+    }
+
+    _emitSuiteStart(rid, suite) {
+        this.notify({
+            type: EVENT_CASE_STARTED,
+            rid,
+            suite: suite,
+        });
+    }
+
+    _emitSuiteEnd(rid, suiteId, result) {
+        this.notify({
+            type: EVENT_SUITE_ENDED,
+            rid,
+            suiteId: suiteId,
+            result: result
+        });
+    }
     _emitLineUpdate(time, file, line, primary) {
         if (this.runner && this.isRunning) {
             // console.log('--- debug _emitLineUpdate ---');
@@ -587,7 +642,28 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
                 // determine if this the primary file or not (so we can open the relevant tab)
                 const primary = this.mainFilePath === loc.file;
                 this._emitLineUpdate(step.time, loc.file, loc.line, primary);
-            }            
+            }           
+            this._emitStepStart(rid, step); 
+        });
+
+        this.reporter.on('step:end', ({ rid, result }) => {
+            this._emitStepEnd(rid, result.id || result._id, result);
+        });
+
+        this.reporter.on('case:start', ({ rid, suiteId, caseId, case: caze }) => {
+            this._emitCaseStart(rid, caze);             
+        });
+
+        this.reporter.on('case:end', ({ rid, suiteId, caseId, result }) => {
+            this._emitCaseEnd(rid, caseId, result);             
+        });
+
+        this.reporter.on('suite:start', ({ rid, suiteId, suite }) => {
+            this._emitSuiteStart(rid, suite);             
+        });
+
+        this.reporter.on('suite:end', ({ rid, suiteId, result }) => {
+            this._emitSuiteEnd(rid, suiteId, result); 
         });
 
         // @params breakpoint

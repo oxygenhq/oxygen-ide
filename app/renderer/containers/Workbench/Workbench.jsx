@@ -695,7 +695,7 @@ export default class Workbench extends React.Component<Props> {
                   onButtonClick={ ::this.handleToolbarButtonClick }
                   onValueChange={ ::this.handleToolbarValueChange } />
               <Row style={{ display: 'flex' }}>
-                  <Col style={{ display: 'none' }} className="sideNavClass">
+                  <Col style={{ display: 'block' }} className="sideNavClass">
                       <Navbar />
                   </Col>
 
