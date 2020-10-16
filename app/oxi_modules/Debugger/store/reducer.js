@@ -12,10 +12,13 @@ import * as ActionTypes from './types';
 
 const defaultState = {
     runners: {},
+    events: [],
+    mode: 'default'
 };
 
 export default (state = defaultState, action) => {
-    // const payload = action.payload || {};
+    const payload = action.payload || {};
+    const { event, mode } = payload;
     // const { rid, stepId, suiteId, caseId, case: caze, step, suite } = payload;
 
     switch (action.type) {
@@ -31,6 +34,25 @@ export default (state = defaultState, action) => {
         return {
             ...state,
         };
+
+    // DBG_ADD_EVENT
+    case ActionTypes.DBG_ADD_EVENT: {
+        return {
+            ...state,
+            events: [
+                ... state.events,
+                event
+            ]
+        };
+    }
+
+    // DBG_ADD_EVENT
+    case ActionTypes.DBG_CHANGE_MODE: {
+        return {
+            ...state,
+            mode: mode
+        };
+    }
 
     default:
         return state;

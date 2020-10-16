@@ -31,6 +31,7 @@ import ChromeDriverDownloadingFailedDialog from '../../components/dialogs/Chrome
 import TextEditor from '../TextEditor';
 import Tabs from '../Tabs';
 import FileExplorer from '../FileExplorer';
+import TestExplorer from '../TestExplorer';
 import Logger from '../Logger';
 import Toolbar from '../../components/Toolbar/index.jsx';
 import Navbar from '../../components/Navbar.jsx';
@@ -109,7 +110,9 @@ type Props = {
   isChromeExtensionEnabled: boolean,
   waitChromeExtension: boolean,
   stopWaitChromeExtension: Function,
-  updateGeneralSettings: Function
+  updateGeneralSettings: Function,
+  mode: string,
+  changeMode: Function
 };
 
 // set global message position
@@ -530,8 +533,11 @@ export default class Workbench extends React.Component<Props> {
             objrepoPath,
             editorActiveFile,
             editorActiveFilePossibleRepoPath,
-            objrepoName
+            objrepoName,
+            mode
         } = this.props;
+
+        console.log('~~mode', mode);
 
         const { generalSettings = {}, runSettings = {}, integrations = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null, projectSettings = null } = settings;
         const { runtimeSettings } = test;
@@ -704,95 +710,114 @@ export default class Workbench extends React.Component<Props> {
                     <Col style={{ display: 'block' }} className="sideNavClass">
                         <Navbar 
                             testRunning={ test.isRunning }
+                            changeMode={ this.props.changeMode }
                         />
                     </Col>
 
-                    <Col style={{ width: '100%' }}>
-                        <Layout className="ide-main">
-                            <Sidebar 
-                                align="left"
-                                size={ leftSidebarSize } 
-                                visible={ leftSidebarVisible } 
-                                onResize={ (size) => ::this.handleSidebarResize('left', size) }
-                            >
-                                <FileExplorer 
-                                    onSelect={ ::this.fileExplorer_onSelect } 
-                                    onCreate={ ::this.fileExplorer_onCreate }
-                                    onRename={ ::this.fileExplorer_onRename }
-                                    onDelete={ ::this.fileExplorer_onDelete }
-                                    onMove={ ::this.fileExplorer_onMove }
-                                />
-                            </Sidebar>
-                            <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
-                                <Header className="tabs-container">{/*headerBar*/}
-                                    <Row>
-                                        <Col className="sidebar-trigger">                      
-                                            <Icon
-                                                title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
-                                                className="trigger"
-                                                type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
-                                                onClick={ () => ::this.toggleSidebarVisible('left') }
-                                                style={{ paddingLeft: 15, cursor: 'pointer' }}
-                                            />
-                                        </Col>
-                                        <Col className="tabs-bar-container">
-                                            <Tabs 
-                                                onChange={ this.handleTabChange } 
-                                                onClose={ this.handleTabClose } 
-                                            />
-                                        </Col>
-                                        {
-                                            objrepoPath && editorActiveFile && editorActiveFilePossibleRepoPath && objrepoPath === editorActiveFilePossibleRepoPath &&
+                    {
+                        mode === 'default' &&
+                        <Col style={{ width: '100%' }}>
+                            <Layout className="ide-main">
+                                <Sidebar 
+                                    align="left"
+                                    size={ leftSidebarSize } 
+                                    visible={ leftSidebarVisible } 
+                                    onResize={ (size) => ::this.handleSidebarResize('left', size) }
+                                >
+                                    <FileExplorer 
+                                        onSelect={ ::this.fileExplorer_onSelect } 
+                                        onCreate={ ::this.fileExplorer_onCreate }
+                                        onRename={ ::this.fileExplorer_onRename }
+                                        onDelete={ ::this.fileExplorer_onDelete }
+                                        onMove={ ::this.fileExplorer_onMove }
+                                    />
+                                </Sidebar>
+                                <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
+                                    <Header className="tabs-container">{/*headerBar*/}
+                                        <Row>
                                             <Col className="sidebar-trigger">                      
                                                 <Icon
-                                                    title={!rightSidebarVisible ? 'Show Object Repository' : 'Hide Object Repository'}
+                                                    title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
                                                     className="trigger"
-                                                    type={!rightSidebarVisible ? 'menu-unfold' : 'menu-fold'}
-                                                    onClick={ () => ::this.toggleSidebarVisible('right') }
-                                                    style={{ paddingLeft: 15, cursor: 'pointer', transform: 'rotate(180deg)' }}
+                                                    type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
+                                                    onClick={ () => ::this.toggleSidebarVisible('left') }
+                                                    style={{ paddingLeft: 15, cursor: 'pointer' }}
                                                 />
                                             </Col>
-                                        }
-                                    </Row>
-                                </Header>
-                                <div className="editor-container">
-                                    <div id="editors-container-wrap">
-                                        <TextEditor
-                                            onBreakpointsUpdate={::this.handleBreakpointsUpdate}
-                                            onContentUpdate={::this.handleFileContentUpdate}
+                                            <Col className="tabs-bar-container">
+                                                <Tabs 
+                                                    onChange={ this.handleTabChange } 
+                                                    onClose={ this.handleTabClose } 
+                                                />
+                                            </Col>
+                                            {
+                                                objrepoPath && editorActiveFile && editorActiveFilePossibleRepoPath && objrepoPath === editorActiveFilePossibleRepoPath &&
+                                                <Col className="sidebar-trigger">                      
+                                                    <Icon
+                                                        title={!rightSidebarVisible ? 'Show Object Repository' : 'Hide Object Repository'}
+                                                        className="trigger"
+                                                        type={!rightSidebarVisible ? 'menu-unfold' : 'menu-fold'}
+                                                        onClick={ () => ::this.toggleSidebarVisible('right') }
+                                                        style={{ paddingLeft: 15, cursor: 'pointer', transform: 'rotate(180deg)' }}
+                                                    />
+                                                </Col>
+                                            }
+                                        </Row>
+                                    </Header>
+                                    <div className="editor-container">
+                                        <div id="editors-container-wrap">
+                                            <TextEditor
+                                                onBreakpointsUpdate={::this.handleBreakpointsUpdate}
+                                                onContentUpdate={::this.handleFileContentUpdate}
+                                            />
+                                        </div>
+                                        <Logger
+                                            visible={loggerVisible}
+                                            onHide={::this.logger_onHide}
                                         />
                                     </div>
-                                    <Logger
-                                        visible={loggerVisible}
-                                        onHide={::this.logger_onHide}
-                                    />
-                                </div>
+                                </Layout>
+                                { 
+                                    rightSidebarComponent === 'settings' && 
+                                    <Sidebar 
+                                        align="right"
+                                        size={ rightSidebarSize } 
+                                        visible={ rightSidebarVisible } 
+                                        onResize={ (size) => ::this.handleSidebarResize('right', size) }
+                                    >
+                                        <Settings />
+                                    </Sidebar>
+                                }
+                                { 
+                                    objrepoName &&
+                                    <Sidebar 
+                                        align="right"
+                                        size={ rightSidebarSize } 
+                                        visible={ rightSidebarVisible } 
+                                        onResize={ (size) => ::this.handleSidebarResize('right', size) }
+                                    >
+                                        { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
+                                        { rightSidebarComponent === 'obj-repo-not-valid' && <ObjectRepositoryNotValid /> } 
+                                    </Sidebar>
+                                }
                             </Layout>
-                            { 
-                                rightSidebarComponent === 'settings' && 
+                        </Col>
+                    }
+                    {
+                        mode === 'debug' &&
+                        <Col style={{ width: '100%' }}>
+                            <Layout className="ide-main">
                                 <Sidebar 
-                                    align="right"
-                                    size={ rightSidebarSize } 
-                                    visible={ rightSidebarVisible } 
-                                    onResize={ (size) => ::this.handleSidebarResize('right', size) }
+                                    align="left"
+                                    size={ leftSidebarSize } 
+                                    visible={ leftSidebarVisible } 
+                                    onResize={ (size) => ::this.handleSidebarResize('left', size) }
                                 >
-                                    <Settings />
+                                    <TestExplorer/> 
                                 </Sidebar>
-                            }
-                            { 
-                                objrepoName &&
-                                <Sidebar 
-                                    align="right"
-                                    size={ rightSidebarSize } 
-                                    visible={ rightSidebarVisible } 
-                                    onResize={ (size) => ::this.handleSidebarResize('right', size) }
-                                >
-                                    { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
-                                    { rightSidebarComponent === 'obj-repo-not-valid' && <ObjectRepositoryNotValid /> } 
-                                </Sidebar>
-                            }
-                        </Layout>
-                    </Col>
+                            </Layout>
+                        </Col>
+                    }
                 </Row>
           </div>
       );

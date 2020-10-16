@@ -16,6 +16,7 @@ import recorder from './recorder/sagas';
 import settings from './settings/sagas';
 import objrepo from './obj-repo/sagas';
 import dealog from './dialog/sagas';
+import debuggerModule from '../../oxi_modules/Debugger/store/sagas';
 
 // services
 import ServicesSingleton from '../services';
@@ -34,6 +35,7 @@ export default function* root() {
         fork(settings),
         fork(objrepo),
         fork(dealog),
+        fork(debuggerModule)
     ];
     // check if any service has saga functions as well
     if (services && Object.keys(services).length > 0) {

@@ -17,7 +17,7 @@ import rootSaga from './sagas';
 import { UNIVERSAL_ERROR, SET_USER_ID_TO_SENTRY } from '../store/sentry/types';
 import  * as fsActionTypes from './fs/types';
 import  * as settingsActionTypes from './settings/types';
-import { MAIN_MENU_EVENT, MAIN_SERVICE_EVENT, MAIN_SERVICE_LOG  } from '../services/MainIpc';
+import { MAIN_MENU_EVENT, MAIN_SERVICE_EVENT, MAIN_SERVICE_LOG } from '../services/MainIpc';
 
 
 import ServicesSingleton from '../services';

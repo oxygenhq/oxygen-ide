@@ -19,6 +19,7 @@ import dialog from './dialog/reducer';
 import wb from './workbench/reducer';
 import recorder from './recorder/reducer';
 import objrepo from './obj-repo/reducer';
+import debuggerModule from '../../oxi_modules/Debugger/store/reducer';
 
 const rootReducer = combineReducers({
     tree,
@@ -31,7 +32,8 @@ const rootReducer = combineReducers({
     dialog,
     wb,
     recorder,
-    objrepo
+    objrepo,
+    debuggerModule
 });
 
 export default rootReducer;

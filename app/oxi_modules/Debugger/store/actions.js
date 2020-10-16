@@ -20,3 +20,18 @@ export const stepEnd = (rid, stepId, result) => ({
     type: ActionTypes.DBG_STEP_END,
     payload: { rid, stepId, result },
 });
+
+// add event
+export const addEvent = (event) => ({
+    type: ActionTypes.DBG_ADD_EVENT,
+    payload: {
+        event
+    }
+});
+
+export const changeMode = (mode) =>  ({
+    type: ActionTypes.DBG_CHANGE_MODE,
+    payload: {
+        mode
+    }
+});

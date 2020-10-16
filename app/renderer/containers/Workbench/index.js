@@ -15,6 +15,7 @@ import * as settingsActions from '../../store/settings/actions';
 import { stopWaitChromeExtension } from '../../store/recorder/actions';
 import { move } from '../../store/fs/actions';
 import { startDownloadChromeDriver, showDownloadChromeDriverError } from '../../store/dialog/actions';
+import { changeMode } from '../../../oxi_modules/Debugger/store/actions';
 
 const mapStoreToProps = (state) => {
     const activeNode = state.fs.tree.activeNode;
@@ -58,12 +59,22 @@ const mapStoreToProps = (state) => {
         rootPath: rootPath,
         objrepoPath : state.objrepo.path,
         objrepoName : state.objrepo.name,
-        editorActiveFilePossibleRepoPath: editorActiveFilePossibleRepoPath
+        editorActiveFilePossibleRepoPath: editorActiveFilePossibleRepoPath,
+        mode: state.debuggerModule.mode,
     };
 };
   
 const mapDispatchToProps = (dispatch) => (
-    bindActionCreators({ ...wbActions, ...testActions, ...settingsActions, move, stopWaitChromeExtension, startDownloadChromeDriver, showDownloadChromeDriverError } , dispatch)
+    bindActionCreators({
+        ...wbActions,
+        ...testActions,
+        ...settingsActions,
+        move,
+        stopWaitChromeExtension,
+        startDownloadChromeDriver,
+        showDownloadChromeDriverError,
+        changeMode
+    } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Workbench);

@@ -9,3 +9,5 @@
  */
 export const DBG_STEP_START = 'DBG_STEP_START';
 export const DBG_STEP_END = 'DBG_STEP_END';
+export const DBG_ADD_EVENT = 'DBG_ADD_EVENT';
+export const DBG_CHANGE_MODE = 'DBG_CHANGE_MODE';

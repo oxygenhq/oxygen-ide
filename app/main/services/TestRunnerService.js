@@ -596,7 +596,7 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
 
     _emitSuiteStart(rid, suite) {
         this.notify({
-            type: EVENT_CASE_STARTED,
+            type: EVENT_SUITE_STARTED,
             rid,
             suite: suite,
         });
@@ -658,7 +658,9 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
             this._emitCaseEnd(rid, caseId, result);             
         });
 
-        this.reporter.on('suite:start', ({ rid, suiteId, suite }) => {
+        this.reporter.on('suite:start', (input) => {
+            console.log('~~ suite:start input', input);
+            const { rid, suiteId, suite } = input;
             this._emitSuiteStart(rid, suite);             
         });
 

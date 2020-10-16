@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import { all, select, takeLatest, call } from 'redux-saga/effects';
-import { MAIN_SERVICE_EVENT } from './MainIpc.js';
+import { MAIN_SERVICE_EVENT } from '../../../renderer/services/MainIpc';
 
 export default class TestDebugService {
     store = null;
@@ -30,6 +30,9 @@ export default class TestDebugService {
     *_onMainServiceEvent({ payload }) {
         const { event, service } = payload;
         const { message, severity, type } = event;
+
+        console.log('~~ TestDebugSetvice payload', payload);
+
         if (service === 'TestRunnerService' && type === 'LOG_ENTRY') {
             yield this._analyzeTestRunnerLogs(message, severity);
         }
