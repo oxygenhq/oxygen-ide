@@ -274,7 +274,7 @@ export default class TestRunnerService extends ServiceBase {
             if (caps.platform) {
                 playStartEventData.platform = caps.platform;
             }
-            if (caps['lamda:options']) {
+            if (caps['lambda:options']) {
                 playStartEventData.provider = 'Lambdatest';
             }
             if (caps['testingBot:options']) {
