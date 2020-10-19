@@ -49,17 +49,21 @@ export function* handleServiceEvents({ payload }) {
             yield put(actions.addEvent(event));
         }
 
-        if (type ===  'STEP_STARTED') {
+        if (type === 'STEP_STARTED') {
             console.log('~~ TestDebugSetvice e STEP_STARTED', event);
             yield put(actions.addEvent(event));
         }
 
-        if (type ===  'CASE_ENDED') {
+        if (type === 'STEP_ENDED') {
+            yield put(actions.addEvent(event));
+        }
+
+        if (type === 'CASE_ENDED') {
             console.log('~~ TestDebugSetvice e CASE_ENDED', event);
             yield put(actions.addEvent(event));
         }
 
-        if (type ===  'SUITE_ENDED') {
+        if (type === 'SUITE_ENDED') {
             console.log('~~ TestDebugSetvice e SUITE_ENDED', event);
             yield put(actions.addEvent(event));
         }        

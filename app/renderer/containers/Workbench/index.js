@@ -61,6 +61,7 @@ const mapStoreToProps = (state) => {
         objrepoName : state.objrepo.name,
         editorActiveFilePossibleRepoPath: editorActiveFilePossibleRepoPath,
         mode: state.debuggerModule.mode,
+        testEvents: state.debuggerModule.events,
     };
 };
   

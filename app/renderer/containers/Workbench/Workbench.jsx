@@ -112,7 +112,8 @@ type Props = {
   stopWaitChromeExtension: Function,
   updateGeneralSettings: Function,
   mode: string,
-  changeMode: Function
+  changeMode: Function,
+  testEvents: Array
 };
 
 // set global message position
@@ -534,7 +535,8 @@ export default class Workbench extends React.Component<Props> {
             editorActiveFile,
             editorActiveFilePossibleRepoPath,
             objrepoName,
-            mode
+            mode,
+            testEvents
         } = this.props;
 
         console.log('~~mode', mode);
@@ -813,7 +815,9 @@ export default class Workbench extends React.Component<Props> {
                                     visible={ leftSidebarVisible } 
                                     onResize={ (size) => ::this.handleSidebarResize('left', size) }
                                 >
-                                    <TestExplorer/> 
+                                    <TestExplorer
+                                        testEvents={ testEvents }
+                                    /> 
                                 </Sidebar>
                             </Layout>
                         </Col>

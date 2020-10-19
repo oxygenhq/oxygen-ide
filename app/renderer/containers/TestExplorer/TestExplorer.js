@@ -12,6 +12,7 @@ import { Tooltip } from 'antd';
 import Tree from '../../components/Tree';
 import Panel from '../../components/Panel.jsx';
 import fsSubjects from '../../store/fs/subjects';
+import { renderTestTreeNodes, groupNodes, buildTree } from './renderTestTreeNodes';
 import '../../components/Tree/assets/index.css';
 
 type Props = {
@@ -23,7 +24,8 @@ type Props = {
   unWatchFolder: Function,
   watchFolder: Function,
   onMove: Function,
-  rootPath: string | null
+  rootPath: string | null,
+  testEvents: Array
 };
 
 export default class FileExplorer extends React.Component<Props> {
@@ -124,11 +126,14 @@ export default class FileExplorer extends React.Component<Props> {
 
     render() {
         const { refreshScroll, refreshScrollBottom } = this.state;
+        const { testEvents } = this.props;
         const headerTitle = (
             <Tooltip title={'Test Explorer'}>
                 <span>{'Test Explorer'}</span>
             </Tooltip>
         );
+        let nodes = groupNodes(testEvents);
+        nodes = buildTree(nodes);
 
         return (
             <Panel
@@ -146,6 +151,7 @@ export default class FileExplorer extends React.Component<Props> {
                     checkable={false}
                     autoExpandParent
                 >
+                    { renderTestTreeNodes.apply(this, [nodes]) }
                 </Tree>
             </Panel>
         );

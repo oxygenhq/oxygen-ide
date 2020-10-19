@@ -636,7 +636,8 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
             this._emitTestEnded(result);
         });
 
-        this.reporter.on('step:start', ({ rid, step }) => {
+        this.reporter.on('step:start', (input) => {
+            const { rid, step } = input;
             const loc = this._getLocationInfo(step.location);
             if (loc) {
                 // determine if this the primary file or not (so we can open the relevant tab)
@@ -646,11 +647,14 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
             this._emitStepStart(rid, step); 
         });
 
-        this.reporter.on('step:end', ({ rid, result }) => {
-            this._emitStepEnd(rid, result.id || result._id, result);
+        this.reporter.on('step:end', (input) => {
+            const { rid, step } = input;
+
+            this._emitStepEnd(rid, step.sid, step);
         });
 
-        this.reporter.on('case:start', ({ rid, suiteId, caseId, case: caze }) => {
+        this.reporter.on('case:start', (input) => {
+            const { rid, case: caze } = input;
             this._emitCaseStart(rid, caze);             
         });
 
@@ -659,8 +663,7 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
         });
 
         this.reporter.on('suite:start', (input) => {
-            console.log('~~ suite:start input', input);
-            const { rid, suiteId, suite } = input;
+            const { rid, suite } = input;
             this._emitSuiteStart(rid, suite);             
         });
 
