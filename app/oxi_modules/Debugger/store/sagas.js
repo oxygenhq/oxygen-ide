@@ -40,17 +40,14 @@ export function* handleServiceEvents({ payload }) {
 
     if (service === 'TestRunnerService') {
         if (type === 'SUITE_STARTED') {
-            console.log('~~ TestDebugSetvice e SUITE_STARTED', event);
             yield put(actions.addEvent(event));
         }
 
         if (type === 'CASE_STARTED') {
-            console.log('~~ TestDebugSetvice e CASE_STARTED', event);
             yield put(actions.addEvent(event));
         }
 
         if (type === 'STEP_STARTED') {
-            console.log('~~ TestDebugSetvice e STEP_STARTED', event);
             yield put(actions.addEvent(event));
         }
 
@@ -59,12 +56,10 @@ export function* handleServiceEvents({ payload }) {
         }
 
         if (type === 'CASE_ENDED') {
-            console.log('~~ TestDebugSetvice e CASE_ENDED', event);
             yield put(actions.addEvent(event));
         }
 
         if (type === 'SUITE_ENDED') {
-            console.log('~~ TestDebugSetvice e SUITE_ENDED', event);
             yield put(actions.addEvent(event));
         }        
     }
