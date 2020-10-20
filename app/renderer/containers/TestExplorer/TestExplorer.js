@@ -25,7 +25,8 @@ type Props = {
   watchFolder: Function,
   onMove: Function,
   rootPath: string | null,
-  testEvents: Array
+  testEvents: Array,
+  setSelected: Function
 };
 
 export default class FileExplorer extends React.Component<Props> {
@@ -124,6 +125,23 @@ export default class FileExplorer extends React.Component<Props> {
         });
     }
 
+    onSelectNode = (selectedKeys, info) => {
+        const { nodeInfo } = info.node.props;
+
+        delete nodeInfo.children;
+
+        const type = nodeInfo.type;
+        let id;
+
+        if (type === 'case') {
+            id = nodeInfo.cid;
+        } else {
+            id = nodeInfo.sid;
+        }
+
+        this.props.setSelected(type, id);
+    }
+
     render() {
         const { refreshScroll, refreshScrollBottom } = this.state;
         const { testEvents } = this.props;
@@ -147,9 +165,9 @@ export default class FileExplorer extends React.Component<Props> {
             >
                 <Tree
                     showLine
-                    draggable
                     checkable={false}
                     autoExpandParent
+                    onSelect={this.onSelectNode}
                 >
                     { renderTestTreeNodes.apply(this, [nodes]) }
                 </Tree>

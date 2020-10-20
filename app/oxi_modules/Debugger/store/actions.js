@@ -29,9 +29,24 @@ export const addEvent = (event) => ({
     }
 });
 
-export const changeMode = (mode) =>  ({
+export const changeMode = (mode) => ({
     type: ActionTypes.DBG_CHANGE_MODE,
     payload: {
         mode
     }
+});
+
+export const setSelected = (type, id) => ({
+    type: ActionTypes.DBG_SET_SET_SELECTED,
+    payload: {
+        selected: {
+            type: type,
+            id: id,
+        }
+    }
+});
+
+export const cleanup = () => ({
+    type: ActionTypes.DBG_CLEANUP,
+    payload: {}
 });

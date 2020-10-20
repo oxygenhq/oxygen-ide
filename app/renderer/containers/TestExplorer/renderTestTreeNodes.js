@@ -155,7 +155,7 @@ export function renderTestTreeNodes(nodes, parentIndex) {
                 hideIcon={true}
                 nodeInfo={element}
                 title={theTitle}
-                key={idx}
+                key={saveParentIndex}
                 className={resolveClassName}
                 dataRef={element}
                 style={{ userSelect: 'none' }}

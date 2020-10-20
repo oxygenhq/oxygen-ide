@@ -32,6 +32,7 @@ import TextEditor from '../TextEditor';
 import Tabs from '../Tabs';
 import FileExplorer from '../FileExplorer';
 import TestExplorer from '../TestExplorer';
+import TestSelectedExplorer from '../TestExplorer/TestSelectedExplorer';
 import Logger from '../Logger';
 import Toolbar from '../../components/Toolbar/index.jsx';
 import Navbar from '../../components/Navbar.jsx';
@@ -113,7 +114,9 @@ type Props = {
   updateGeneralSettings: Function,
   mode: string,
   changeMode: Function,
-  testEvents: Array
+  setSelected: Function,
+  testEvents: Array,
+  testSelected: Object
 };
 
 // set global message position
@@ -536,7 +539,8 @@ export default class Workbench extends React.Component<Props> {
             editorActiveFilePossibleRepoPath,
             objrepoName,
             mode,
-            testEvents
+            testEvents,
+            testSelected
         } = this.props;
 
         console.log('~~mode', mode);
@@ -817,8 +821,37 @@ export default class Workbench extends React.Component<Props> {
                                 >
                                     <TestExplorer
                                         testEvents={ testEvents }
+                                        setSelected={ this.props.setSelected }
                                     /> 
                                 </Sidebar>
+                                <Layout className="ide-editors">
+                                    <Header className="tabs-container">{/*headerBar*/}
+                                        <Row>
+                                            <Col className="sidebar-trigger">                      
+                                                <Icon
+                                                    title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
+                                                    className="trigger"
+                                                    type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
+                                                    onClick={ () => ::this.toggleSidebarVisible('left') }
+                                                    style={{ paddingLeft: 15, cursor: 'pointer' }}
+                                                />
+                                            </Col>
+                                        </Row>
+                                    </Header>
+                                    <div className="editor-container">
+                                        <div id="editors-container-wrap">
+                                            <TestSelectedExplorer
+                                                testSelected = { testSelected }
+                                                testEvents = { testEvents }
+                                            />
+                                        </div>
+                                        <Logger
+                                            visible={loggerVisible}
+                                            onHide={::this.logger_onHide}
+                                        />
+                                    </div>
+                                    
+                                </Layout>
                             </Layout>
                         </Col>
                     }

@@ -28,10 +28,14 @@ export default function* root() {
     yield all([
         takeLatest(ActionTypes.DBG_STEP_START, stepStart),
         takeLatest(ActionTypes.DBG_STEP_END, stepEnd),
-        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents)
+        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
+        takeLatest('TEST_START', handleTestStart),
     ]);
 }
 
+export function* handleTestStart() {
+    yield put(actions.cleanup());
+}
 
 export function* handleServiceEvents({ payload }) {
     console.log('~~ TestDebugSetvice payload', payload);

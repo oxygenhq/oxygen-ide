@@ -11,3 +11,5 @@ export const DBG_STEP_START = 'DBG_STEP_START';
 export const DBG_STEP_END = 'DBG_STEP_END';
 export const DBG_ADD_EVENT = 'DBG_ADD_EVENT';
 export const DBG_CHANGE_MODE = 'DBG_CHANGE_MODE';
+export const DBG_SET_SET_SELECTED = 'DBG_SET_SET_SELECTED';
+export const DBG_CLEANUP = 'DBG_CLEANUP';
