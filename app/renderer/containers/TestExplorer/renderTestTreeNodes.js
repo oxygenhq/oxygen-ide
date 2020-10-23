@@ -1,6 +1,9 @@
 // @flow
 import React, { Fragment } from 'react';
 import Tree from '../../components/Tree';
+import { Icon } from 'antd';
+import IconOk from './IconOk';
+import IconError from './IconError';
 
 const getSteps = (inputNodes, cid) => {
     const result = [];
@@ -109,9 +112,37 @@ export function renderTestTreeNodes(nodes, parentIndex) {
     }
     
     return nodes.map((element, idx) => {
-        const resolveClassName = element.name === '.emptyfile' ? 'hidden-node' : element.type;        
+        const resolveClassName = element.name === '.emptyfile' ? 'hidden-node' : element.type;    
+        
+        let icon = (
+            <span style={{
+                height: '14px',
+                width: '14px',
+                verticalAlign: 'super',
+                marginRight: '2px',
+                display: 'inline-block'
+            }}>
+                <Icon type="loading" />
+            </span>
+        );
+
+        if (element && element.status) {
+            if (element.status === 'passed') {
+                icon = (<IconOk className="tree-icon tree-icon-success"/>);
+            } else {
+                icon = (<IconError className="tree-icon tree-icon-failed"/>);
+            }
+        }
+
         let theTitle = (
             <Fragment>
+                <span style={{
+                    display: 'inline-block',
+                    verticalAlign: 'sub',
+                    height: '14px'
+                }}>
+                    {icon}
+                </span>
                 <span style={{color: '#0000ff'}}>{element.name}</span>
                 {' '}
                 :

@@ -59,6 +59,17 @@
   display: inline-block;
 }
 
+.tree-icon {
+  width: 16px;
+  height: 16px;
+}
+.tree-icon-success {
+  fill: #66BB69;
+}
+.tree-icon-failed {
+  fill: #E53934;
+}
+
 .rc-tree li span.rc-tree-switcher,
 .rc-tree li span.rc-tree-checkbox,
 .rc-tree li span.rc-tree-iconEle {
