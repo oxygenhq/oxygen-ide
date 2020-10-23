@@ -146,8 +146,8 @@ export default class FileExplorer extends React.Component<Props> {
         const { refreshScroll, refreshScrollBottom } = this.state;
         const { testEvents } = this.props;
         const headerTitle = (
-            <Tooltip title={'Test Explorer'}>
-                <span>{'Test Explorer'}</span>
+            <Tooltip title={'Test Debugger'}>
+                <span>{'Test Debugger'}</span>
             </Tooltip>
         );
         let nodes = groupNodes(testEvents);
