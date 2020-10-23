@@ -16,7 +16,6 @@ import { MAIN_SERVICE_EVENT } from '../../../renderer/services/MainIpc';
 /* Types */
 import * as ActionTypes from './types';
 import * as actions from './actions';
-console.log('~~ActionTypes', ActionTypes);
 /* Services */
 // import ServicesSingleton from '../../services';
 // const services = ServicesSingleton();
@@ -30,11 +29,17 @@ export default function* root() {
         takeLatest(ActionTypes.DBG_STEP_END, stepEnd),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
         takeLatest('TEST_START', handleTestStart),
+        takeLatest('TEST_START_SUCCESS', handleTestEnd),
     ]);
 }
 
 export function* handleTestStart() {
     yield put(actions.cleanup());
+    yield put(actions.changeMode('debug'));
+}
+
+export function* handleTestEnd() {
+    yield put(actions.changeMode('default'));
 }
 
 export function* handleServiceEvents({ payload }) {
