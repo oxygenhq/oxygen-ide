@@ -602,7 +602,7 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
             
             
             this.runner.on('test-error', (err) => {
-                let message = null;
+                let message = '';
                 if (err.type && err.message) {
                     message = `${err.type} - ${err.message}`;
                 } else if (err.type) {
