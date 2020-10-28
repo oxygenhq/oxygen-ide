@@ -26,13 +26,13 @@ import ChromeDriverDialog from '../../components/dialogs/ChromeDriverDialog';
 import ChromeDriverDownloadingDialog from '../../components/dialogs/ChromeDriverDownloadingDialog';
 import ChromeDriverDownloadingSuccessDialog from '../../components/dialogs/ChromeDriverDownloadingSuccessDialog';
 import ChromeDriverDownloadingFailedDialog from '../../components/dialogs/ChromeDriverDownloadingFailedDialog';
+import { groupNodes, buildTree } from '../TestExplorer/renderTestTreeNodes';
 
 // Other components
 import TextEditor from '../TextEditor';
 import Tabs from '../Tabs';
 import FileExplorer from '../FileExplorer';
 import TestExplorer from '../TestExplorer';
-import TestSelectedExplorer from '../TestExplorer/TestSelectedExplorer';
 import Logger from '../Logger';
 import Toolbar from '../../components/Toolbar/index.jsx';
 import Navbar from '../../components/Navbar.jsx';
@@ -116,7 +116,8 @@ type Props = {
   changeMode: Function,
   setSelected: Function,
   testEvents: Array,
-  testSelected: Object
+  testSelected: Object,
+  setNodeInTreeSelected: Function
 };
 
 // set global message position
@@ -543,8 +544,6 @@ export default class Workbench extends React.Component<Props> {
             testSelected
         } = this.props;
 
-        console.log('~~mode', mode);
-
         const { generalSettings = {}, runSettings = {}, integrations = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null, projectSettings = null } = settings;
         const { runtimeSettings } = test;
         // sidebars state
@@ -574,6 +573,13 @@ export default class Workbench extends React.Component<Props> {
             return (
                 <Initializing/>
             );
+        }
+
+        let testEventsNodes;
+        if (mode === 'debug') {
+            
+            testEventsNodes = groupNodes(testEvents);
+            testEventsNodes = buildTree(testEventsNodes);
         }
 
         return (
@@ -715,21 +721,20 @@ export default class Workbench extends React.Component<Props> {
                 <Row style={{ display: 'flex' }}>
                     <Col style={{ display: 'block' }} className="sideNavClass">
                         <Navbar 
-                            testRunning={ test.isRunning }
+                            mode={ mode }
                             changeMode={ this.props.changeMode }
                         />
                     </Col>
-
-                    {
-                        mode === 'default' &&
-                        <Col style={{ width: '100%' }}>
-                            <Layout className="ide-main">
-                                <Sidebar 
-                                    align="left"
-                                    size={ leftSidebarSize } 
-                                    visible={ leftSidebarVisible } 
-                                    onResize={ (size) => ::this.handleSidebarResize('left', size) }
-                                >
+                    <Col style={{ width: '100%' }}>
+                        <Layout className="ide-main">
+                            <Sidebar 
+                                align="left"
+                                size={ leftSidebarSize } 
+                                visible={ leftSidebarVisible } 
+                                onResize={ (size) => ::this.handleSidebarResize('left', size) }
+                            >
+                                {
+                                    mode === 'default' &&
                                     <FileExplorer 
                                         onSelect={ ::this.fileExplorer_onSelect } 
                                         onCreate={ ::this.fileExplorer_onCreate }
@@ -737,124 +742,88 @@ export default class Workbench extends React.Component<Props> {
                                         onDelete={ ::this.fileExplorer_onDelete }
                                         onMove={ ::this.fileExplorer_onMove }
                                     />
-                                </Sidebar>
-                                <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
-                                    <Header className="tabs-container">{/*headerBar*/}
-                                        <Row>
-                                            <Col className="sidebar-trigger">                      
-                                                <Icon
-                                                    title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
-                                                    className="trigger"
-                                                    type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
-                                                    onClick={ () => ::this.toggleSidebarVisible('left') }
-                                                    style={{ paddingLeft: 15, cursor: 'pointer' }}
-                                                />
-                                            </Col>
-                                            <Col className="tabs-bar-container">
-                                                <Tabs 
-                                                    onChange={ this.handleTabChange } 
-                                                    onClose={ this.handleTabClose } 
-                                                />
-                                            </Col>
-                                            {
-                                                objrepoPath && editorActiveFile && editorActiveFilePossibleRepoPath && objrepoPath === editorActiveFilePossibleRepoPath &&
-                                                <Col className="sidebar-trigger">                      
-                                                    <Icon
-                                                        title={!rightSidebarVisible ? 'Show Object Repository' : 'Hide Object Repository'}
-                                                        className="trigger"
-                                                        type={!rightSidebarVisible ? 'menu-unfold' : 'menu-fold'}
-                                                        onClick={ () => ::this.toggleSidebarVisible('right') }
-                                                        style={{ paddingLeft: 15, cursor: 'pointer', transform: 'rotate(180deg)' }}
-                                                    />
-                                                </Col>
-                                            }
-                                        </Row>
-                                    </Header>
-                                    <div className="editor-container">
-                                        <div id="editors-container-wrap">
-                                            <TextEditor
-                                                onBreakpointsUpdate={::this.handleBreakpointsUpdate}
-                                                onContentUpdate={::this.handleFileContentUpdate}
-                                            />
-                                        </div>
-                                        <Logger
-                                            visible={loggerVisible}
-                                            onHide={::this.logger_onHide}
-                                        />
-                                    </div>
-                                </Layout>
-                                { 
-                                    rightSidebarComponent === 'settings' && 
-                                    <Sidebar 
-                                        align="right"
-                                        size={ rightSidebarSize } 
-                                        visible={ rightSidebarVisible } 
-                                        onResize={ (size) => ::this.handleSidebarResize('right', size) }
-                                    >
-                                        <Settings />
-                                    </Sidebar>
                                 }
-                                { 
-                                    objrepoName &&
-                                    <Sidebar 
-                                        align="right"
-                                        size={ rightSidebarSize } 
-                                        visible={ rightSidebarVisible } 
-                                        onResize={ (size) => ::this.handleSidebarResize('right', size) }
-                                    >
-                                        { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
-                                        { rightSidebarComponent === 'obj-repo-not-valid' && <ObjectRepositoryNotValid /> } 
-                                    </Sidebar>
-                                }
-                            </Layout>
-                        </Col>
-                    }
-                    {
-                        mode === 'debug' &&
-                        <Col style={{ width: '100%' }}>
-                            <Layout className="ide-main">
-                                <Sidebar 
-                                    align="left"
-                                    size={ leftSidebarSize } 
-                                    visible={ leftSidebarVisible } 
-                                    onResize={ (size) => ::this.handleSidebarResize('left', size) }
-                                >
+                                {
+                                    mode === 'debug' &&
                                     <TestExplorer
+                                        testSelected = { testSelected }
                                         testEvents={ testEvents }
+                                        testEventsNodes={ testEventsNodes }
                                         setSelected={ this.props.setSelected }
+                                        setNodeInTreeSelected={ this.props.setNodeInTreeSelected }
                                     /> 
-                                </Sidebar>
-                                <Layout className="ide-editors">
-                                    <Header className="tabs-container">{/*headerBar*/}
-                                        <Row>
+                                }
+                            </Sidebar>
+                            <Layout className="ide-editors">{/*ideScreenEditorHolder*/}
+                                <Header className="tabs-container">{/*headerBar*/}
+                                    <Row>
+                                        <Col className="sidebar-trigger">                      
+                                            <Icon
+                                                title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
+                                                className="trigger"
+                                                type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
+                                                onClick={ () => ::this.toggleSidebarVisible('left') }
+                                                style={{ paddingLeft: 15, cursor: 'pointer' }}
+                                            />
+                                        </Col>
+                                        <Col className="tabs-bar-container">
+                                            <Tabs 
+                                                onChange={ this.handleTabChange } 
+                                                onClose={ this.handleTabClose } 
+                                            />
+                                        </Col>
+                                        {
+                                            objrepoPath && editorActiveFile && editorActiveFilePossibleRepoPath && objrepoPath === editorActiveFilePossibleRepoPath &&
                                             <Col className="sidebar-trigger">                      
                                                 <Icon
-                                                    title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
+                                                    title={!rightSidebarVisible ? 'Show Object Repository' : 'Hide Object Repository'}
                                                     className="trigger"
-                                                    type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
-                                                    onClick={ () => ::this.toggleSidebarVisible('left') }
-                                                    style={{ paddingLeft: 15, cursor: 'pointer' }}
+                                                    type={!rightSidebarVisible ? 'menu-unfold' : 'menu-fold'}
+                                                    onClick={ () => ::this.toggleSidebarVisible('right') }
+                                                    style={{ paddingLeft: 15, cursor: 'pointer', transform: 'rotate(180deg)' }}
                                                 />
                                             </Col>
-                                        </Row>
-                                    </Header>
-                                    <div className="editor-container">
-                                        <div id="editors-container-wrap">
-                                            <TestSelectedExplorer
-                                                testSelected = { testSelected }
-                                                testEvents = { testEvents }
-                                            />
-                                        </div>
-                                        <Logger
-                                            visible={loggerVisible}
-                                            onHide={::this.logger_onHide}
+                                        }
+                                    </Row>
+                                </Header>
+                                <div className="editor-container">
+                                    <div id="editors-container-wrap">
+                                        <TextEditor
+                                            onBreakpointsUpdate={::this.handleBreakpointsUpdate}
+                                            onContentUpdate={::this.handleFileContentUpdate}
                                         />
                                     </div>
-                                    
-                                </Layout>
+                                    <Logger
+                                        visible={loggerVisible}
+                                        onHide={::this.logger_onHide}
+                                    />
+                                </div>
                             </Layout>
-                        </Col>
-                    }
+                            { 
+                                rightSidebarComponent === 'settings' && 
+                                <Sidebar 
+                                    align="right"
+                                    size={ rightSidebarSize } 
+                                    visible={ rightSidebarVisible } 
+                                    onResize={ (size) => ::this.handleSidebarResize('right', size) }
+                                >
+                                    <Settings />
+                                </Sidebar>
+                            }
+                            { 
+                                objrepoName &&
+                                <Sidebar 
+                                    align="right"
+                                    size={ rightSidebarSize } 
+                                    visible={ rightSidebarVisible } 
+                                    onResize={ (size) => ::this.handleSidebarResize('right', size) }
+                                >
+                                    { rightSidebarComponent === 'obj-repo' && <ObjectRepository /> } 
+                                    { rightSidebarComponent === 'obj-repo-not-valid' && <ObjectRepositoryNotValid /> } 
+                                </Sidebar>
+                            }
+                        </Layout>
+                    </Col>
                 </Row>
           </div>
       );

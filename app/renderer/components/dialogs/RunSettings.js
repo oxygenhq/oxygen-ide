@@ -29,6 +29,16 @@ class RunSettings extends React.PureComponent<Props> {
             }
         });
     }
+
+    onSwitchToDebuggerExecutionChange(value) {
+        const { runSettings = {} } = this.state || {};
+        this.setState({
+            runSettings: {
+                ...runSettings,
+                switchToDebugger: value,
+            }
+        });
+    }
   
     validateFields() {
         const { runSettings } = this.state;
@@ -57,7 +67,8 @@ class RunSettings extends React.PureComponent<Props> {
         } = this.state;
 
         const {
-            npmGRootExecution
+            npmGRootExecution,
+            switchToDebugger
         } = runSettings;
 
         return (
@@ -65,6 +76,11 @@ class RunSettings extends React.PureComponent<Props> {
                 {/* //////////// APPLITOOLS //////////// */}
                 <Form.Item label="“npm -g root” execution" {...formItemLayout} extra="Enable/disable “npm -g root” execution" >
                     <Switch onChange={ ::this.onNpmGRootExecutionChange } checked={ npmGRootExecution } />
+                </Form.Item>
+                
+                {/* //////////// APPLITOOLS //////////// */}
+                <Form.Item label="Switch to Debugger" {...formItemLayout} extra="Automatically switch to Debugger when running test">
+                    <Switch onChange={ ::this.onSwitchToDebuggerExecutionChange } checked={ switchToDebugger } />
                 </Form.Item>
             </Form>
         );

@@ -116,6 +116,7 @@ export default class TestRunnerService extends ServiceBase {
         };
         options.reopenSession = reopenSession || false;
         options.disableScreenshot = true;
+        options.unableScreenshotAfterEachStep = true;
         const cloudProviderSvc = this.getService('CloudProvidersService');
 
         if (cloudProviderSvc && testProvider && testProvider.id) {

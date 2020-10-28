@@ -31,8 +31,6 @@ export default class TestDebugService {
         const { event, service } = payload;
         const { message, severity, type } = event;
 
-        console.log('~~ TestDebugSetvice payload', payload);
-
         if (service === 'TestRunnerService' && type === 'LOG_ENTRY') {
             yield this._analyzeTestRunnerLogs(message, severity);
         }

@@ -15,7 +15,7 @@ import * as settingsActions from '../../store/settings/actions';
 import { stopWaitChromeExtension } from '../../store/recorder/actions';
 import { move } from '../../store/fs/actions';
 import { startDownloadChromeDriver, showDownloadChromeDriverError } from '../../store/dialog/actions';
-import { changeMode, setSelected } from '../../../oxi_modules/Debugger/store/actions';
+import { changeMode, setSelected, setNodeInTreeSelected } from '../../../oxi_modules/Debugger/store/actions';
 
 const mapStoreToProps = (state) => {
     const activeNode = state.fs.tree.activeNode;
@@ -76,7 +76,8 @@ const mapDispatchToProps = (dispatch) => (
         startDownloadChromeDriver,
         showDownloadChromeDriverError,
         changeMode,
-        setSelected
+        setSelected,
+        setNodeInTreeSelected
     } , dispatch)
 );
 

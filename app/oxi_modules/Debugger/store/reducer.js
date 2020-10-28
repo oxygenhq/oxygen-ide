@@ -55,14 +55,22 @@ export default (state = defaultState, action) => {
         };
     }
 
-    // DBG_ADD_EVENT
-    case ActionTypes.DBG_SET_SET_SELECTED: {
+    // DBG_SET_SELECTED
+    case ActionTypes.DBG_SET_SELECTED: {
         return {
             ...state,
             selected: selected
         };
     }
-
+    
+    // DBG_SET_SELECTED
+    case ActionTypes.DBG_SET_SELECTED_NODE: {
+        return {
+            ...state,
+            selected: selected
+        };
+    }
+    
     // DBG_CLEANUP
     case ActionTypes.DBG_CLEANUP: {
         return {

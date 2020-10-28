@@ -13,7 +13,7 @@ import { Icon } from 'antd';
 import '../css/navbar.scss';
 
 type Props = {
-    testRunning: boolean,
+    mode: string,
     changeMode: Function
 };
 
@@ -22,7 +22,7 @@ export default class Navbar extends React.Component<Props> {
 
     render() {
         const {
-            testRunning,
+            mode,
             changeMode
         } = this.props;
 
@@ -30,14 +30,14 @@ export default class Navbar extends React.Component<Props> {
             <div className="asidenav">
                 <Icon
                     type="folder"
-                    className={`${testRunning ? '' : 'active'}`}
+                    className={`${mode === 'default' ? 'active' : ''}`}
                     onClick={() => {
                         changeMode('default');
                     }}
                 />
                 <Icon
                     type="bug"
-                    className={`${testRunning ? 'active' : ''}`}
+                    className={`${mode === 'debug' ? 'active' : ''}`}
                     onClick={() => {
                         changeMode('debug');
                     }}

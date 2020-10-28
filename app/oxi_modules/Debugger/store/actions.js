@@ -37,7 +37,17 @@ export const changeMode = (mode) => ({
 });
 
 export const setSelected = (type, id) => ({
-    type: ActionTypes.DBG_SET_SET_SELECTED,
+    type: ActionTypes.DBG_SET_SELECTED,
+    payload: {
+        selected: {
+            type: type,
+            id: id,
+        }
+    }
+});
+
+export const setNodeInTreeSelected = (type, id) => ({
+    type: ActionTypes.DBG_SET_SELECTED_NODE,
     payload: {
         selected: {
             type: type,

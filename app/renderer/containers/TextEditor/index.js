@@ -88,6 +88,8 @@ const mapStoreToProps = (state) => {
         fontSize: state.settings.fontSize,
         openFiles: openFiles, //state.editor.openFiles,
         waitUpdateBreakpoints: state.test.waitUpdateBreakpoints,
+        testEvents: state.debuggerModule.events,
+        testSelected: state.debuggerModule.selected,
     };
 };
   

@@ -37,26 +37,26 @@ const getSelected = (testEvents, testSelected) => {
         testEvents.map((item) => {
             if (testSelected.type === 'suite') {
                 if (item.type === 'SUITE_STARTED' && testSelected.id === item.suite.sid) {
-                    result = item.suite;
+                    result = {...item.suite};
                 }
                 if (item.type === 'SUITE_ENDED' && testSelected.id === item.result.sid) {
-                    result = item.result;
+                    result = {...item.result};
                 }    
             }
             if (testSelected.type === 'case') {
                 if (item.type === 'CASE_STARTED' && testSelected.id === item.case.cid) {
-                    result = item.case;
+                    result = {...item.case};
                 }
                 if (item.type === 'CASE_ENDED' && testSelected.id === item.result.cid) {
-                    result = item.result;
+                    result = {...item.result};
                 }        
             }
             if (testSelected.type === 'step') {
                 if (item.type === 'STEP_STARTED' && testSelected.id === item.step.sid) {
-                    result = item.step;
+                    result = {...item.step};
                 }
                 if (item.type === 'STEP_ENDED' && testSelected.id === item.result.sid) {
-                    result = item.result;
+                    result = {...item.result};
                 }
             }
         });
@@ -150,10 +150,39 @@ export default class TextEditor extends React.Component<Props> {
 
         const selected = getSelected(testEvents, testSelected);
 
+        let screenshot;
+
+        if (selected && selected.screenshot) {
+            screenshot = `${selected.screenshot}`;
+            delete selected.screenshot;
+        } else {
+            screenshot = null;
+        }
+
         return (
             <Fragment>
                 { 
-                    selected &&
+                    selected && screenshot &&
+                    <div style={{ height: '100%', width: '100%' }}>
+                        <div style={{ height: '50%', width: '100%' }}>
+                            <MonacoEditor
+                                value={JSON.stringify(selected, null, 2)}
+                                language={'json'}
+                                editorReadOnly={true}
+                                fontSize={fontSize}
+                                handleMainMenuEvent={this.props.handleMainMenuEvent}
+                                breakpoints={[]}
+                                disabledBreakpoints={[]}
+                                resolvedBreakpoints={[]}   
+                            />
+                        </div>
+                        <div style={{ height: '50%', width: '100%' }}>
+                            <img style={{ width: '100%', height: 'auto', display: 'block'}} src={`data:image/png;base64,${screenshot}`}/>
+                        </div>
+                    </div>
+                }
+                { 
+                    selected && !screenshot &&
                     <MonacoEditor
                         value={JSON.stringify(selected, null, 2)}
                         language={'json'}

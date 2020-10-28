@@ -13,7 +13,7 @@ import { Icon } from 'antd';
 
 import MonacoEditor from '../../components/MonacoEditor/index.jsx';
 import '../../css/editor.scss';
-
+import TestSelectedExplorer from '../TestExplorer/TestSelectedExplorer';
 import SupportedExtensions from '../../helpers/file-extensions';
 import editorSubjects from '../../store/editor/subjects';
 import fileSubjects from '../../store/fs/subjects';
@@ -28,7 +28,9 @@ type Props = {
   openFiles: null | {[key: string]: Object},
   onBreakpointsUpdate: (Array<any>) => void,
   onContentUpdate: (string, string) => void,
-  handleMainMenuEvent: Function
+  handleMainMenuEvent: Function,
+  testEvents: Array,
+  testSelected: Object
 };
 
 const DEFAULT_EDITOR_LANGUAGE = 'javascript';
@@ -146,8 +148,11 @@ export default class TextEditor extends React.Component<Props> {
             editorReadOnly, 
             fontSize,
             activeFileName,
-            waitUpdateBreakpoints
+            waitUpdateBreakpoints,
+            testSelected,
+            testEvents
         } = this.props;
+
         const {
             featureLanguageLoaded
         } = this.state;
@@ -155,6 +160,13 @@ export default class TextEditor extends React.Component<Props> {
 
         if (activeFile === 'welcome') {
             return (<Landing/>);
+        }
+        if (activeFile === 'debugger') {
+            return (
+                <TestSelectedExplorer
+                    testSelected = { testSelected }
+                    testEvents = { testEvents }
+                />);
         }
 
         return (

@@ -185,6 +185,9 @@ class Tree extends React.Component {
         };
 
         function needSync(name) {
+            if (name === 'expandedKeys') {
+                return true;
+            }
             return (!prevProps && name in props) || (prevProps && prevProps[name] !== props[name]);
         }
 
@@ -276,6 +279,7 @@ class Tree extends React.Component {
         else if (needSync('loadedKeys')) {
             newState.loadedKeys = props.loadedKeys;
         }
+        
         return newState;
     }
 
@@ -581,7 +585,7 @@ class Tree extends React.Component {
     );
 
     onNodeExpand = (e, treeNode) => {
-        let { expandedKeys, loadedKeys } = this.state;
+        let { expandedKeys = [], loadedKeys, selectedKeys = [] } = this.state;
         const { onExpand, loadData, unWatchFolder, watchFolder } = this.props;
         const { eventKey, expanded } = treeNode.props;
 
@@ -613,6 +617,8 @@ class Tree extends React.Component {
                 node: treeNode,
                 expanded: targetExpanded,
                 nativeEvent: e.nativeEvent,
+                expandedKeys: expandedKeys,
+                selectedKeys: selectedKeys
             });
         }
 

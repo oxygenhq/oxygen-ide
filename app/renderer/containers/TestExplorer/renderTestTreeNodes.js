@@ -156,13 +156,15 @@ export function renderTestTreeNodes(nodes, parentIndex) {
             </Fragment>
         );
 
-        let saveParentIndex = '0';
+        let saveParentIndex = '';
 
-        if (parentIndex) {
-            saveParentIndex = parentIndex;
-        }
+        saveParentIndex += element.type+'.';
 
-        saveParentIndex+='.'+idx;
+        if (element.cid && element.type === 'case') {
+            saveParentIndex += element.cid;
+        } else if (element.sid) {
+            saveParentIndex += element.sid;
+        }      
 
         if (element.children && element.children.length) {
             return (

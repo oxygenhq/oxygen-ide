@@ -6,8 +6,10 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { all, takeLatest, put } from 'redux-saga/effects';
+import { all, takeLatest, put, select } from 'redux-saga/effects';
 import { MAIN_SERVICE_EVENT } from '../../../renderer/services/MainIpc';
+import * as tabActions from '../../../renderer/store/tabs/actions';
+import * as editorActions from '../../../renderer/store/editor/actions';
 
 /* Helpers */
 // import { putAndTake } from '../../../renderer/helpers/saga';
@@ -27,6 +29,7 @@ export default function* root() {
     yield all([
         takeLatest(ActionTypes.DBG_STEP_START, stepStart),
         takeLatest(ActionTypes.DBG_STEP_END, stepEnd),
+        takeLatest(ActionTypes.DBG_SET_SELECTED, openDebugTab),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
         takeLatest('TEST_START', handleTestStart),
         takeLatest('TEST_START_SUCCESS', handleTestEnd),
@@ -35,15 +38,21 @@ export default function* root() {
 
 export function* handleTestStart() {
     yield put(actions.cleanup());
-    yield put(actions.changeMode('debug'));
+    
+    const switchToDebugger = yield select(state => state.settings.runSettings.switchToDebugger);
+    if (switchToDebugger) {
+        yield put(actions.changeMode('debug'));
+    }
 }
 
 export function* handleTestEnd() {
-    yield put(actions.changeMode('default'));
+    const switchToDebugger = yield select(state => state.settings.runSettings.switchToDebugger);
+    if (switchToDebugger) {
+        yield put(actions.changeMode('default'));
+    }
 }
 
 export function* handleServiceEvents({ payload }) {
-    console.log('~~ TestDebugSetvice payload', payload);
     const { service, event } = payload;
     const { type } = event;
 
@@ -72,6 +81,13 @@ export function* handleServiceEvents({ payload }) {
             yield put(actions.addEvent(event));
         }        
     }
+}
+
+export function* openDebugTab({ payload }) {
+    yield put(tabActions.addTab('debugger', 'Debugger'));
+    yield put(tabActions.setActiveTab('debugger', 'Debugger'));
+    yield put(editorActions.setActiveFile('debugger', 'Debugger'));
+    yield put(editorActions.addFile('debugger', 'Debugger'));
 }
 
 export function* stepStart() {
