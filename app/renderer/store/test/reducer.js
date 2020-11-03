@@ -46,6 +46,7 @@ const defaultState = {
     ],
     devices: [],
     emulators: Const.CHROME_EMULATED_DEVICES,
+    winApps: Const.WIN_APPS,
     variables: null
 };
 
@@ -184,6 +185,8 @@ export default (state = defaultState, action) => {
         }
         else if (value === 'resp') {
             newTestTarget = state.emulators.length > 0 ? state.emulators[0] : null;
+        } else if (value === 'win') {
+            newTestTarget = state.winApps.length > 0 ? state.winApps[0]['key'] : null;
         }
 
         return {

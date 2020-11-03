@@ -175,6 +175,9 @@ export default class TestRunnerService extends ServiceBase {
                 // @FIXME: this option should be exposed in reports settings
                 options.screenshots = 'never';
                 caps.browserName = testTarget;
+            } else if (testMode === 'win') {
+                caps.platformName = 'Windows';
+                caps.app = testTarget;
             }
         }
             

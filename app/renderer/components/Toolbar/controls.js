@@ -18,6 +18,7 @@ export const REDO = 'REDO';
 export const TEST_MODE_WEB = 'TEST_MODE_WEB';
 export const TEST_MODE_MOB = 'TEST_MODE_MOB';
 export const TEST_MODE_RESP = 'TEST_MODE_RESP';
+export const TEST_MODE_WIN = 'TEST_MODE_WIN';
 export const TEST_STEP_DELAY = 'TEST_STEP_DELAY';
 export const TEST_TARGET = 'TEST_TARGET';
 export const TEST_PROVIDER = 'TEST_PROVIDER';

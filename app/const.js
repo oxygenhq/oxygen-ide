@@ -94,3 +94,30 @@ export const CHROME_EMULATED_DEVICES = [
     'Laptop with HiDPI',
     'Laptop with MDPI',
 ];
+
+export const WIN_APPS = [
+    {
+        key: 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App',
+        name: 'Calculator'
+    },
+    {
+        key: 'Microsoft.WindowsAlarms_8wekyb3d8bbwe!App',
+        name: 'AlarmClock'
+    },
+    {
+        key: 'C:\\Windows\\System32\\notepad.exe',
+        name: 'Notepad'
+    },
+    {
+        key: 'C:\\Windows\\System32\\mspaint.exe',
+        name: 'Paint'
+    },
+    {
+        key: 'Microsoft.MSPaint_8wekyb3d8bbwe!Microsoft.MSPaint',
+        name: 'Paint3D'
+    },
+    {
+        key: 'Microsoft.MicrosoftStickyNotes_8wekyb3d8bbwe!App',
+        name: 'StickyNotes'
+    },
+];
