@@ -1,12 +1,12 @@
 # CHANGELOG
 
-## v1.20.1 (2020-10-xx)
+## v1.20.1 (2020-11-10)
 
 #### :beetle: Bug Fix
-* Issues with test execution on LambdaTest.
+* Number of issues related to test execution on cloud providers.
 
 #### :house: Internal
-* Update oxygen-cli from v1.13.1 to v1.13.5. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update oxygen-cli from v1.13.1 to v1.14.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 
 ## v1.20.0 (2020-10-08)
 
