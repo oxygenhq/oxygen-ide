@@ -11,6 +11,8 @@ export default function* root() {
     yield all([
         takeLatest(ActionTypes.DIALOG_START_DOWNLOAD_CHROME_DRIVER, startDownloadChromeDriver),
         takeLatest(ActionTypes.DIALOG_SHOW_DOWNLOADING_CHROME_DRIVER_FAILED, showDownloadChromeDriverFailed),
+        takeLatest(ActionTypes.DIALOG_START_DOWNLOAD_EDGE_DRIVER, startDownloadEdgeDriver),
+        takeLatest(ActionTypes.DIALOG_SHOW_DOWNLOADING_EDGE_DRIVER_FAILED, showDownloadEdgeDriverFailed),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents)
     ]);
 }
@@ -66,6 +68,46 @@ function* showDownloadChromeDriverFailed() {
     }
 }
 
+function* startDownloadEdgeDriver({ payload }) {
+    const { edgeDriverVersion } = payload;
+
+    if (edgeDriverVersion) {
+        yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER));
+        try {
+            const result = yield services.mainIpc.call('SeleniumService', 'downloadEdgeDriver', [edgeDriverVersion]);
+    
+            if (result) {
+                if (typeof result === 'object') {
+                    //error object
+                    const path = yield services.mainIpc.call('SeleniumService', 'getDriversRootPath');
+                    if (path) {
+                        yield put(actions.hideDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER));
+                        yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER_FAILED, {path}));
+                    }
+                } else {
+                    yield put(actions.hideDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER));
+                    yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER_SUCCESS));
+                }
+            }
+        } catch (e) {
+            yield put(reportError(e));
+            console.warn('startDownloadEDGEDriver error in saga', e);
+            const path = yield services.mainIpc.call('SeleniumService', 'getDriversRootPath');
+            if (path) {
+                yield put(actions.hideDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER));
+                yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER_FAILED, {path}));
+            }
+        }
+    }
+}
+
+function* showDownloadEdgeDriverFailed() {
+    const path = yield services.mainIpc.call('SeleniumService', 'getDriversRootPath');
+    if (path) {
+        yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER_FAILED, {path}));
+    }
+}
+
 function* handleOnChromeDriverErrorEvent(event) {
     if (event && event.type === 'ON_CHROME_DRIVER_ERROR') {
         yield put(actions.setParamstoDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, {
@@ -73,5 +115,17 @@ function* handleOnChromeDriverErrorEvent(event) {
             chromeVersion: event.chromeVersion
         }));
         yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, event));
+    }
+    if (event && event.type === 'ON_EDGE_DRIVER_ERROR') {
+        yield put(actions.setParamstoDialog(ActionTypes.DIALOG_INCORECT_EDGE_DRIVER_VERSION, {
+            edgeDriverVersion: event.edgeDriverVersion,
+            edgeVersion: event.edgeVersion
+        }));
+        yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_EDGE_DRIVER_VERSION, event));
+    }
+    if (event && event.type === 'ON_EDGE_FINDED') {
+        yield put({
+            type: 'ON_EDGE_FINDED'
+        });
     }
 }
