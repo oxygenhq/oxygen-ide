@@ -189,8 +189,6 @@ function initializeCrashReporterAndSentry() {
             dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893',
             release: packageJson.version,
             beforeSend(event) {
-                // console.log('~~~event', JSON.stringify(event, null, 2));
-
                 if (
                     event &&
                     event.exception &&

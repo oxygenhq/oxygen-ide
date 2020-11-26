@@ -15,6 +15,7 @@ import NoChromeDialog from './NoChromeDialog';
 import WorkingChromeDialog from './WorkingChromeDialog';
 import { type DeviceInfo } from '../../types/DeviceInfo';
 import { type CloudProvider } from '../../types/CloudProvider';
+import { type WinApp } from '../../types/WinApp';
 import { type BrowserInfo } from '../../types/BrowserInfo';
 import { getBrowsersTarget, saveBrowserTarget, getDevicesTarget, saveDeviceTarget } from '../../helpers/cloudProviders';
 
@@ -30,6 +31,7 @@ type Props = {
     browsers: Array<BrowserInfo>,
     devices: Array<DeviceInfo>,
     emulators: Array<string>,
+    winApps: Array<WinApp>,
     providers: Array<CloudProvider>,
     controlsState: { [string]: ControlState },
     onValueChange: (string, string) => void,
@@ -153,6 +155,7 @@ export default class Toolbar extends React.Component<Props> {
             devices, 
             browsers, 
             emulators, 
+            winApps,
             providers = [],
             testProvider = null,
             stepDelay,
@@ -396,6 +399,21 @@ export default class Toolbar extends React.Component<Props> {
                     )
                 }
                 {
+                    (!providersUnabled || testProvider === 'Local') && (
+                        <span key='win' className={cloudProviderTestMode === 'win' ? 'control selectable active' : 'control selectable'}>
+                            <Icon
+                                onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_WIN) }
+                                style={{ 
+                                    ...getOpacity(this._isEnabled(Controls.TEST_MODE_WIN)),
+                                    marginRight: 0 
+                                }}
+                                title="Windows Mode"
+                                type="windows"
+                            />
+                        </span>
+                    )
+                }
+                {
                     cloudProvidesBrowsersAndDevicesEnabled && cloudProviderTestMode === 'web' && browsersTree &&
                         <TreeSelect
                             className="control select"
@@ -446,6 +464,13 @@ export default class Toolbar extends React.Component<Props> {
                             testMode === 'resp' && emulators.map((emulator) => (
                                 <Option key={emulator} value={emulator}>
                                     {emulator}
+                                </Option>
+                            ))
+                        }
+                        {
+                            testMode === 'win' && winApps.map((app) => (
+                                <Option key={app.key} value={app.key}>
+                                    {app.name}
                                 </Option>
                             ))
                         }

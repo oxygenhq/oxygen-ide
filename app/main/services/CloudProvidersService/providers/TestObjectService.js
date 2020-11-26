@@ -100,12 +100,9 @@ export default class TestObjectService extends CloudProviderBase {
         let devicesPromises = [];
 
         let devicesIds = await this.getDevices();
-        // console.log('~~devicesIds', devicesIds);
 
-        //OELG_TODO region support
+        //TODO region support
         devicesIds = devicesIds['US'];
-
-        // console.log('~~devicesIds', JSON.stringify(devicesIds, null, 2));
 
         if (devicesIds && Array.isArray(devicesIds) && devicesIds.length > 0) {
             devicesPromises = await devicesIds.map(async(item, idx) => {
@@ -113,10 +110,7 @@ export default class TestObjectService extends CloudProviderBase {
                 try {
                     const device = await this.getDevice(item);
     
-                    // console.log('~~idx', idx);
-                    // console.log('~~device', device);
-    
-                    //OELG_TODO region support
+                    //TODO region support
                     if (device && device['US']) {
                         devices.push(device['US']);
                         return device['US'];
@@ -128,11 +122,7 @@ export default class TestObjectService extends CloudProviderBase {
             });
         }
         
-        // console.log('~~devices1', devicesPromises);
-
         await Promise.all(devicesPromises);
-
-        // console.log('~~devices2', Object.keys(devices));
 
         return {
             devices: devices

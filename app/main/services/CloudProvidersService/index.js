@@ -168,8 +168,6 @@ export default class CloudProvidersService extends ServiceBase {
         else if (providerName === 'sauceLabs') {
 
             if (browsersAndDevices.browsers && Array.isArray(browsersAndDevices.browsers) && browsersAndDevices.browsers.length > 0) {
-                // console.log('~~browsersAndDevices sauceLabs browsers', Object.keys(browsersAndDevices.browsers));
-
                 browsersAndDevices.browsers.map((item) => {
                     if (browsersNames.includes(item.api_name)) {
 
@@ -231,11 +229,7 @@ export default class CloudProvidersService extends ServiceBase {
         }
         else if (providerName === 'testObject') {
             if (browsersAndDevices.devices) {
-                // console.log('~~browsersAndDevices sauceLabs devices', Object.keys(browsersAndDevices.devices));
-
                 if (browsersAndDevices.devices && Array.isArray(browsersAndDevices.devices) && browsersAndDevices.devices.length > 0) {
-                    // console.log('~~device[0]', browsersAndDevices.devices[0]);
-
                     browsersAndDevices.devices.map((item) => {
                         if (item.deviceFamily && item.deviceFamily.toLowerCase && devicesNames.includes(item.deviceFamily.toLowerCase())) {
 
