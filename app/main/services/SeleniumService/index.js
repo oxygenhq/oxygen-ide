@@ -225,6 +225,13 @@ export default class SeleniumService extends ServiceBase {
         // on 'exit'
         proc.on('exit', (code) => {
             console.log('Selenium process finished.');
+
+            if (code) {
+                this._emitLogEvent('Selenium process finished with code: '+ code);
+            } else {
+                this._emitLogEvent('Selenium process finished without any code');
+            }
+
             if (code === 1) {
                 // logGeneral.add('ERROR', 'Selenium couldn\'t be started.
                 // See the Selenium Server log for more details.');
