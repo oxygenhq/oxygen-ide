@@ -40,7 +40,10 @@ const MONACO_DEFAULT_OPTIONS = {
     minimap: {
         enabled: false,
     },
-    theme: 'oxygen-theme'
+    theme: 'oxygen-theme',
+    suggest: {
+        showFiles: false
+    }
 };
 
 type Props = {
