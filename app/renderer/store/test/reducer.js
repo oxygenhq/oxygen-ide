@@ -383,6 +383,19 @@ export default (state = defaultState, action) => {
             },
         };
 
+    case 'ON_EDGE_FINDED': {
+        return {
+            ...state,
+            browsers: [
+                ...state.browsers,
+                {
+                    name: 'Microsoft Edge',
+                    id: 'MicrosoftEdge',
+                }
+            ]
+        };
+    }
+
     case 'FROM_CACHE': 
         return {
             ...defaultState,

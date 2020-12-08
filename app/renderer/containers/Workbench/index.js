@@ -8,13 +8,13 @@
  */
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import Workbench from './Workbench.jsx';
+import Workbench from './Workbench.js';
 import * as wbActions from '../../store/workbench/actions';
 import * as testActions from '../../store/test/actions';
 import * as settingsActions from '../../store/settings/actions';
 import { stopWaitChromeExtension } from '../../store/recorder/actions';
 import { move } from '../../store/fs/actions';
-import { startDownloadChromeDriver, showDownloadChromeDriverError } from '../../store/dialog/actions';
+import { startDownloadChromeDriver, showDownloadChromeDriverError, startDownloadEdgeDriver, showDownloadEdgeDriverError } from '../../store/dialog/actions';
 
 const mapStoreToProps = (state) => {
     const activeNode = state.fs.tree.activeNode;
@@ -63,7 +63,17 @@ const mapStoreToProps = (state) => {
 };
   
 const mapDispatchToProps = (dispatch) => (
-    bindActionCreators({ ...wbActions, ...testActions, ...settingsActions, move, stopWaitChromeExtension, startDownloadChromeDriver, showDownloadChromeDriverError } , dispatch)
+    bindActionCreators({ 
+        ...wbActions, 
+        ...testActions, 
+        ...settingsActions, 
+        move, 
+        stopWaitChromeExtension, 
+        startDownloadChromeDriver, 
+        showDownloadChromeDriverError,
+        startDownloadEdgeDriver,
+        showDownloadEdgeDriverError
+    } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Workbench);

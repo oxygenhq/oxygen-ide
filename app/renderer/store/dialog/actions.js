@@ -32,3 +32,13 @@ export const showDownloadChromeDriverError = () => ({
     type: types.DIALOG_SHOW_DOWNLOADING_CHROME_DRIVER_FAILED,
     payload: {  },
 });
+
+export const startDownloadEdgeDriver = (edgeDriverVersion) => ({
+    type: types.DIALOG_START_DOWNLOAD_EDGE_DRIVER,
+    payload: { edgeDriverVersion },
+});
+
+export const showDownloadEdgeDriverError = () => ({
+    type: types.DIALOG_SHOW_DOWNLOADING_EDGE_DRIVER_FAILED,
+    payload: {  },
+});
