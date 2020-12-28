@@ -44,7 +44,7 @@ export default class JavaService {
             javaversion((version) => {
                 if (version) {
                     var ver = version.split('.');
-                    if (ver[0] == 1 && ver[1] != 8 /*lower than 1.8*/ || ver[0] > 11 /*higher than 11*/) {
+                    if (ver[0] === '1' && ver[1] !== '8' /*lower than 1.8*/ ) {
                         window.dispatch({
                             type: JAVA_BAD_VERSION,
                             payload: {
