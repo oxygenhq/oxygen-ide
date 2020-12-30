@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v1.21.0 (2020-xx-xx)
+
+#### :tada: New Feature
+* Preliminary support for MS Edge.
+* Allow latest Java versions.
+
+#### :nail_care: Polish
+* Do not list irrelevant files in code auto completion suggestions.
+
+#### :house: Internal
+* Update oxygen-cli from v1.14.0 to v1.15.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver 87.
+* Bundle GeckoDriver 0.28.0.
+
 ## v1.20.1 (2020-11-10)
 
 #### :beetle: Bug Fix
