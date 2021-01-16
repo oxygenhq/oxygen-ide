@@ -61,6 +61,10 @@ export function win32() {
   return installations;
 }
 
+export function linux() {
+  return null;
+}
+
 function sort(installations, priorities) {
   const defaultPriority = 10;
   return installations
