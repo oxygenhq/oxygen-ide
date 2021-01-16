@@ -145,25 +145,29 @@ export default class SeleniumService extends ServiceBase {
             edgeDriver = await this.findLocalEdgeDriver(edgeDriverVersion);
             if (edgeDriver) {
                 console.log('Found matching EdgeDriver at ', edgeDriver);
-                
                 this.notify({
                     type: ON_EDGE_FINDED
                 });
             } else {
                 throw new Error('Cannot find it localy');
             }
-        } catch (e) {            
+        } catch (e) {
+            if (process.platform === 'linux') {
+                console.log('Failure setting up EdgeDriver: Edge is not supported on Linux.');
+                return null;
+            }
+
             console.warn('Failure setting up EdgeDriver.', e);
             // if something bad happens, check if user has placed the driver manually
             // getEdgeDriverBinPathExact without arguments will try to resolve driver located at the root folder
             edgeDriver = await this.getEdgeDriverBinPathExact();
             if (edgeDriver) {
-                console.log('Using user placed ChromeDriver from ' + edgeDriver);
+                console.log('Using user placed EdgeDriver from ' + edgeDriver);
             } else {
                 // if no user placed driver then use, the latest bundled version
                 edgeDriver = await this.findLocalEdgeDriver(edgeVersions[0].driverVersion);
                 if (edgeDriver) {
-                    console.log('Using latest bundled ChromeDriver from ' + edgeDriver);
+                    console.log('Using latest bundled EdgeDriver from ' + edgeDriver);
                 } else {
                     this.notify({
                         type: ON_EDGE_DRIVER_ERROR,
