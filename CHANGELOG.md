@@ -1,10 +1,13 @@
 # CHANGELOG
 
-## v1.21.0 (2020-xx-xx)
+## v1.21.0 (2020-01-16)
 
 #### :tada: New Feature
 * Preliminary support for MS Edge.
 * Allow latest Java versions.
+
+#### :beetle: Bug Fix
+* Unable to stop test soemtimes while paused on a break point.
 
 #### :nail_care: Polish
 * Do not list irrelevant files in code auto completion suggestions.
@@ -12,7 +15,7 @@
 #### :house: Internal
 * Update oxygen-cli from v1.14.0 to v1.15.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 * Bundle ChromeDriver 87.
-* Bundle GeckoDriver 0.28.0.
+* Bundle GeckoDriver 0.29.0.
 
 ## v1.20.1 (2020-11-10)
 
