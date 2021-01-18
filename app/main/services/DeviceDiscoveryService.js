@@ -15,6 +15,7 @@ import { exec } from 'teen_process';
 const DEVICE_CONNECTED = 'DEVICE_CONNECTED';
 const DEVICE_DISCONNECTED = 'DEVICE_DISCONNECTED';
 const XCODE_ERROR = 'XCODE_ERROR';
+const ANDROID_HOME_ERROR = 'ANDROID_HOME_ERROR';
 const DEVICE_MONITOR_INTERVAL = 10000;
 const INST_STALL_TIMEOUT = 16000;
 
@@ -212,6 +213,16 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 //ignore, user error
             } else if (e.message && e.message.includes('timed out after')) {
                 //ignore, user error
+            } else if (e.message && e.message.includes('Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported.')) {
+                if (this.errorAndroidHomeErrorSended) {
+                    // ignore, send only once
+                } else {
+                    this.notify({
+                        type: ANDROID_HOME_ERROR,
+                        message: e.message,
+                    });
+                    this.errorAndroidHomeErrorSended = true;
+                }
             } else {
                 Sentry.captureException(e);
             }

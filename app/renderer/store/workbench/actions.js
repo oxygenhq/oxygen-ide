@@ -73,6 +73,21 @@ export const cleanXCodeError = () => {
     };
 };
 
+export const setAndroidHomeError = (message) => {
+    return {
+        type: ActionTypes.WB_SET_ANDROID_HOME_ERROR,
+        payload: {
+            message: message
+        }
+    };
+};
+
+export const cleanAndroidHomeError = () => {
+    return {
+        type: ActionTypes.WB_CLEAN_ANDROID_HOME_ERROR
+    };
+};
+
 /* createNewRealFile */
 
 export const createNewRealFile = (fakeFile=null) => {

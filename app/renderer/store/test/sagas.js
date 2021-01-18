@@ -259,6 +259,8 @@ function* handleDeviceDiscoveryServiceEvent(event) {
         yield put(testActions.removeDevice(event.device));
     } else if (event.type === 'XCODE_ERROR') {
         yield put(wbActions.setXCodeError());
+    } else if (event.type === 'ANDROID_HOME_ERROR') {
+        yield put(wbActions.setAndroidHomeError(event.message));
     }
 }
 
