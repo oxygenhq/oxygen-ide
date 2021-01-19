@@ -13,6 +13,7 @@ import updateModals from '../../components/updateModals';
 // Dialogs
 import JavaDialog from '../../components/dialogs/JavaDialog.jsx';
 import XCodeDialog from '../../components/dialogs/XCodeDialog.jsx';
+import AndroidHomeErrorDialog from '../../components/dialogs/AndroidHomeErrorDialog.jsx';
 import FileRenameDialog from '../../components/dialogs/FileRenameDialog.jsx';
 import FileCreateDialog from '../../components/dialogs/FileCreateDialog.jsx';
 import ObjectElementCreateDialog from '../../components/dialogs/ObjectElementCreateDialog.jsx';
@@ -104,11 +105,13 @@ type Props = {
     dialog: Object,
     javaError: Object | undefined,
     xCodeError: Object | undefined,
+    androidHomeError: string | undefined,
     initialized: boolean,
     changeShowRecorderMessageValue: Function,
     canRecord: boolean,
     cleanJavaError: Function,
     cleanXCodeError: Function,
+    cleanAndroidHomeError: Function,
     objrepoPath: string | null,
     editorActiveFilePossibleRepoPath: string | null,
     objrepoName: string | null,
@@ -552,10 +555,12 @@ export default class Workbench extends React.Component<Props> {
             dialog, 
             javaError, 
             xCodeError, 
+            androidHomeError,
             initialized, 
             changeShowRecorderMessageValue, 
             cleanJavaError, 
             cleanXCodeError,
+            cleanAndroidHomeError,
             objrepoPath,
             editorActiveFile,
             editorActiveFilePossibleRepoPath,
@@ -607,6 +612,13 @@ export default class Workbench extends React.Component<Props> {
                     <XCodeDialog 
                         clean={cleanXCodeError}
                         xCodeError={xCodeError}
+                    />
+                }
+                {
+                    androidHomeError &&
+                    <AndroidHomeErrorDialog
+                        androidHomeError={androidHomeError}
+                        clean={cleanAndroidHomeError}
                     />
                 }
                 {
