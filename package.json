@@ -98,7 +98,7 @@
     "concurrently": "5.1.0",
     "cross-env": "7.0.2",
     "css-loader": "3.4.2",
-    "electron": "7.3.2",
+    "electron": "9.4.0",
     "electron-rebuild": "1.11.0",
     "eslint": "6.8.0",
     "eslint-plugin-compat": "3.8.0",
