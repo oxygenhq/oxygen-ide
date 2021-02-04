@@ -296,7 +296,9 @@ export default class TestRunnerService extends ServiceBase {
         // initialize Oxygen Runner
         try {
             if (!processingError) {
-                this._killIEWebdriver();
+                if (caps && caps.browserName && caps.browserName === 'ie') {
+                    this._killIEWebdriver();
+                }
                 this.reporter = new ReportAggregator(options);            
                 await this._launchTest(options, caps);
             } else {
