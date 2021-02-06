@@ -168,6 +168,9 @@ export default class SeleniumService extends ServiceBase {
                 edgeDriver = await this.findLocalEdgeDriver(edgeVersions[0].driverVersion);
                 if (edgeDriver) {
                     console.log('Using latest bundled EdgeDriver from ' + edgeDriver);
+                    this.notify({
+                        type: ON_EDGE_FINDED
+                    });
                 } else {
                     this.notify({
                         type: ON_EDGE_DRIVER_ERROR,
