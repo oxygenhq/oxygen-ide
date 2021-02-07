@@ -14,8 +14,8 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
-    "chokidar": "3.5.0",
-    "oxygen-cli": "1.15.0",
+    "chokidar": "3.5.1",
+    "oxygen-cli": "1.16.0-beta.2",
     "xml2json": "0.12.0"
   },
   "@comment dependencies": [

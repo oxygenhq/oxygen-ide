@@ -80,6 +80,18 @@ module.exports = function(grunt) {
         }
     }
 
+    // exclude mitmdump
+    if (process.platform === 'win32') {
+        prodDeps.push('!@oxygenhq/mitmproxy-node/mitmproxy/mitmdump-linux');
+        prodDeps.push('!@oxygenhq/mitmproxy-node/mitmproxy/mitmdump-darwin');
+    } else if (process.platform === 'darwin') {
+        prodDeps.push('!@oxygenhq/mitmproxy-node/mitmproxy/mitmdump-linux');
+        prodDeps.push('!@oxygenhq/mitmproxy-node/mitmproxy/mitmdump.exe');
+    } else {
+        prodDeps.push('!@oxygenhq/mitmproxy-node/mitmproxy/mitmdump-darwin');
+        prodDeps.push('!@oxygenhq/mitmproxy-node/mitmproxy/mitmdump.exe');
+    }
+
     grunt.initConfig({
         rebrand: {
             name: pkg.name,
