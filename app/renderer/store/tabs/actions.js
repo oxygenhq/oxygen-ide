@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 import * as ActionTypes from './types';
+import { success } from '../../helpers/redux';
 
 export const addTab = (key, title) => {
     return {
@@ -19,6 +20,17 @@ export const removeTab = (key, title = null) => {
     return {
         type: ActionTypes.TABS_REMOVE,
         payload: { key, title },
+    };
+};
+
+export const removeTabSuccess = ({newListAfterRemove, newActiveTabKey, activeTitle}) => {
+    return {
+        type: success(ActionTypes.TABS_REMOVE),
+        payload: { 
+            newListAfterRemove: newListAfterRemove,
+            newActiveTabKey: newActiveTabKey,
+            activeTitle: activeTitle,
+        }
     };
 };
 
