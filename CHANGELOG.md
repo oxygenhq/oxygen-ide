@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v1.22.0 (2020-01-16)
+
+#### :beetle: Bug Fix
+* Edge not shown in the browser menu despite of being available for execution.
+* Terminate Internet Explorer only when target browser is Internet Explorer.
+
+#### :house: Internal
+* Update oxygen-cli from v1.15.0 to v1.16.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver and EdgeDriver 88.
+
 ## v1.21.0 (2020-01-16)
 
 #### :tada: New Feature
