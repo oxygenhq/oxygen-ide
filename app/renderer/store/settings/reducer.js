@@ -53,7 +53,8 @@ const defaultAppSettings = {
         paramFilePath: null,
         reopenSession: false,
         useParams: false,
-        env: null
+        env: null,
+        useIntellisense: true
     },
     runSettings: {
         npmGRootExecution: false

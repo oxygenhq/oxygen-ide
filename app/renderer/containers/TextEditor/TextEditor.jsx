@@ -25,6 +25,7 @@ type Props = {
   activeFileName: string | null,
   fontSize: number,
   activeFile: null | object,
+  useIntellisense: boolean,
   openFiles: null | {[key: string]: Object},
   onBreakpointsUpdate: (Array<any>) => void,
   onContentUpdate: (string, string) => void,
@@ -146,7 +147,8 @@ export default class TextEditor extends React.Component<Props> {
             editorReadOnly, 
             fontSize,
             activeFileName,
-            waitUpdateBreakpoints
+            waitUpdateBreakpoints,
+            useIntellisense
         } = this.props;
         const {
             featureLanguageLoaded
@@ -186,6 +188,7 @@ export default class TextEditor extends React.Component<Props> {
                             featureLanguageLoaded={featureLanguageLoaded}
                             filePath={file.path}
                             fileName={file.name}
+                            useIntellisense={useIntellisense}
                             onBreakpointsUpdate={this.onBreakpointsUpdate}
                             onValueChange={this.handleValueChange}
                             onSelectionChange={this.handleSelectionChange}

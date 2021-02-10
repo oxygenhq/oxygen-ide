@@ -8,6 +8,7 @@ const DEFAULT_STATE = {
     iterations: 1,
     reopenSession: false,
     useParams: false,
+    useIntellisense: true,
     paramFilePath: null,
     paramMode: 'sequential',
     useAllParameters: false
@@ -30,6 +31,15 @@ type Props = {
 class GeneralSettings extends React.PureComponent<Props> {    
     constructor(props) {
         super(props);
+        let useIntellisense = true;
+
+        if (
+            props.settings &&
+            props.settings.useIntellisense === false
+        ) {
+            useIntellisense = false;
+        }
+
         this.state = {
             ...DEFAULT_STATE,
             iterations: props.settings.iterations || 1,
@@ -39,6 +49,7 @@ class GeneralSettings extends React.PureComponent<Props> {
             paramFilePath: props.settings.paramFilePath || null,
             reopenSession: props.settings.reopenSession || false,
             useParams: props.settings.paramFilePath != null,
+            useIntellisense: useIntellisense,
         };
     }
     
@@ -78,6 +89,12 @@ class GeneralSettings extends React.PureComponent<Props> {
         });
     }
 
+    onUseIntellisenseChange(value) {
+        this.setState({
+            useIntellisense: value,
+        });
+    }
+
     onReopenSessionChange(value) {
         this.setState({
             reopenSession: value,
@@ -97,7 +114,7 @@ class GeneralSettings extends React.PureComponent<Props> {
     }
 
     validateFields = () => {
-        const { iterations, useParams, paramMode, reopenSession, env, useAllParameters } = this.state;
+        const { iterations, useParams, useIntellisense, paramMode, reopenSession, env, useAllParameters } = this.state;
 
         return new Promise((resolve, reject) => {
             this.props.form.validateFields((err, values) => {
@@ -112,6 +129,7 @@ class GeneralSettings extends React.PureComponent<Props> {
                     paramMode: paramMode,
                     reopenSession: reopenSession,
                     paramFilePath: paramFilePath,
+                    useIntellisense: useIntellisense,
                     env: env || null,
                     useAllParameters: paramFilePath ? useAllParameters : false
                 });
@@ -131,6 +149,7 @@ class GeneralSettings extends React.PureComponent<Props> {
             iterations,
             paramFilePath,
             useParams,
+            useIntellisense,
             // reopenSession,
             env,
             useAllParameters,
@@ -227,6 +246,9 @@ class GeneralSettings extends React.PureComponent<Props> {
                         </Form.Item>
                     </Fragment>
                 }
+                <Form.Item label="Enable Intellisense" {...formItemLayout} extra="Enable/Disable Intellisense feature" >
+                    <Switch onChange={ ::this.onUseIntellisenseChange } checked={ useIntellisense } />
+                </Form.Item>
             </Form>
         );
     }
