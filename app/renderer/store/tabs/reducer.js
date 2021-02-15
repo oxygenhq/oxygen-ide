@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 import * as ActionTypes from './types';
+import { success } from '../../helpers/redux';
 
 const defaultState = {
     isLoading: false,
@@ -16,7 +17,7 @@ const defaultState = {
 };
 
 export default (state = defaultState, action, dispatch) => {
-    const { key, title, newKey, newTitle, fromIndex, toIndex, value, cache } = action.payload || {};
+    const { key, title, newKey, newTitle, fromIndex, toIndex, value, cache, newListAfterRemove, newActiveTabKey, activeTitle } = action.payload || {};
     let _index, _newActive, _newList;
 
     switch (action.type) {
@@ -80,27 +81,7 @@ export default (state = defaultState, action, dispatch) => {
         };
     
     // TABS_REMOVE
-    case ActionTypes.TABS_REMOVE:
-        let newListAfterRemove;
-        if (title && !!title && key === 'unknown') {
-            newListAfterRemove = state.list.filter(tab => key === 'unknown' && tab.title !== title);
-        } else {
-            newListAfterRemove = state.list.filter(tab => tab.key !== key);
-        }
-        let newActiveTabKey = state.active;
-        if (newActiveTabKey === key) {
-            newActiveTabKey = newListAfterRemove.length > 0 ? newListAfterRemove[newListAfterRemove.length - 1].key : null;
-        }
-
-        let activeTitle;
-
-        if (newActiveTabKey === 'unknown') {
-            activeTitle = newListAfterRemove[newListAfterRemove.length - 1].title;
-        } else {
-            activeTitle = null;
-        }
-
-      
+    case success(ActionTypes.TABS_REMOVE):
         return { 
             ...state, 
             list: newListAfterRemove,
