@@ -19,6 +19,7 @@ import UpdateService from './UpdateService';
 import CloudProvidersService from './CloudProvidersService';
 import IntegrationProvidersService from './IntegrationsService';
 import ProjectService from './ProjectService';
+import JavaService from './JavaService';
 
 
 export default {
@@ -35,4 +36,5 @@ export default {
     CloudProvidersService,
     IntegrationProvidersService,
     ProjectService,
+    JavaService
 };

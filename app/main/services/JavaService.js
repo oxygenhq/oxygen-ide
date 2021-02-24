@@ -1,5 +1,14 @@
+
+import ServiceBase from './ServiceBase';
+import * as Sentry from '@sentry/electron';
 export const JAVA_NOT_FOUND = 'JAVA_NOT_FOUND';
 export const JAVA_BAD_VERSION = 'JAVA_BAD_VERSION';
+
+const reportErrorToSentry = (error) => {
+    if (Sentry && Sentry.captureException) {
+        Sentry.captureException(error);
+    }
+};
 
 const javaversion = (callback) => {
     try {
@@ -7,6 +16,7 @@ const javaversion = (callback) => {
         const cp = require('child_process').spawn('java', ['-version']);
         cp.on('error', (err) => {
             console.error('java -version child process error. ', err);
+            reportErrorToSentry(err);
             return callback(null);
         });
         cp.stdout.on('data', (data) => {
@@ -22,30 +32,32 @@ const javaversion = (callback) => {
             var matches = output.match(/"(\d+\.?\d+)[\._\-\d+]*"/);
             let javaVersion = matches ? matches[1] : null;
             if (!javaVersion) {
-                console.error('java -version mismatch error:\n' + output);
+                const errorMessage = 'java -version mismatch error:\n' + output;
+                console.error(errorMessage);
+                
+                const e = new Error(errorMessage);
+                reportErrorToSentry(e);
             }
             return callback(javaVersion);
         });
     } catch (e) {
-        if (window && window.Sentry && window.Sentry.captureException) {
-            window.Sentry.captureException(e);
-        }
-
-        console.error('java -version spawn error. ', e);
+        console.error(e);
+        reportErrorToSentry(e);
     }
 };
 
-export default class JavaService {
-    constructor(store) {
+export default class JavaService extends ServiceBase {
+    constructor(mainWindow) {
+        super(mainWindow);
     }
 
     checkJavaVersion() {
-        if (window && window.dispatch) {
+        try {
             javaversion((version) => {
                 if (version) {
                     var ver = version.split('.');
                     if (ver[0] === '1' && ver[1] !== '8' /*lower than 1.8*/ ) {
-                        window.dispatch({
+                        this.notify({
                             type: JAVA_BAD_VERSION,
                             payload: {
                                 version: version
@@ -53,11 +65,14 @@ export default class JavaService {
                         });
                     }
                 } else {
-                    window.dispatch({
+                    this.notify({
                         type: JAVA_NOT_FOUND
                     });
                 }
             });
+        } catch (e) {
+            console.error(e);
+            reportErrorToSentry(e);
         }
     }
 }

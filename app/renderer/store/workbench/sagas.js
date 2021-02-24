@@ -48,7 +48,6 @@ import { success } from '../../helpers/redux';
 
 import ActionTypes from '../types';
 import { MAIN_MENU_EVENT, MAIN_SERVICE_EVENT } from '../../services/MainIpc';
-import { JAVA_NOT_FOUND, JAVA_BAD_VERSION } from '../../services/JavaService';
 
 import ServicesSingleton from '../../services';
 import editorSubjects from '../editor/subjects';
@@ -99,8 +98,6 @@ export default function* root() {
         takeLatest(success(ActionTypes.FS_DELETE), handleFileDelete),      
         takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
-        takeLatest(JAVA_NOT_FOUND, handleJavaNotFound),
-        takeLatest(JAVA_BAD_VERSION, handleJavaBadVersion),
         takeLatest(ActionTypes.WB_OR_ADD_TO_ROOT, orAddToRoot),
         takeLatest(ActionTypes.UPDATE_CLOUD_PROVIDERS_SETTINGS, setCloudProvidersBrowsersAndDevices)
     ]);
@@ -212,12 +209,21 @@ export function* handleServiceEvents({ payload }) {
     if (!event) {
         return;
     }
+
     if (service === 'UpdateService') {
         yield handleUpdateServiceEvent(event);
+    } else if (service === 'JavaService') {
+        if (event && event.type) {
+            if (event.type === 'JAVA_NOT_FOUND') {
+                yield handleJavaNotFound(event);
+            } else if (event.type === 'JAVA_BAD_VERSION') {
+                yield handleJavaBadVersion(event);
+            }
+        }
     }
 }
 
-export function* handleJavaNotFound(inner) {
+export function* handleJavaNotFound() {
     yield put(wbActions.setJavaError({
         reason: 'not-found'
     }));
@@ -269,10 +275,9 @@ export function* initialize() {
         yield putAndTake(wbActions.restoreFromCache(appSettings.cache));
 
         try {
-            yield call(services.javaService.checkJavaVersion);
+            yield call(services.mainIpc.call, 'JavaService', 'checkJavaVersion');
         } catch (error) {
             console.warn('Failure checking Java', error);
-            
             yield put(reportError(error));
             
         }
