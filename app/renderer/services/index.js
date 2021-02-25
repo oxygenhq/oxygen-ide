@@ -7,12 +7,10 @@
  * (at your option) any later version.
  */
 import MainIpcService from './MainIpc';
-import JavaService from './JavaService';
 import UserHintsService from './UserHints';
 
 const services = {
     mainIpc: new MainIpcService(),
-    javaService: new JavaService(),
     userHints: new UserHintsService(),
 };
 export function configureServices(store, action$) {
