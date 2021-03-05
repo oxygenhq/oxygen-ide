@@ -137,14 +137,19 @@ class Tabs extends React.Component<Props, void> {
                             let itemClass = activeTab && activeTab.key === tab.key && activeTab.title === tab.title ?
                                 'tabItemElem activeTabitem' : 'tabItemElem';
 
-                            const { isRecording, activeFile, activeFileName } = recorder;
+                            console.log('~~recorder', recorder);
+                            const {
+                                isRecordingChrome,
+                                activeFileChrome,
+                                activeFileName
+                            } = recorder;
 
-                            if (isRecording) {
-                                if (activeFile === 'unknown') {
-                                    if (activeFile === tab.key && activeFileName === tab.title) {
+                            if (isRecordingChrome) {
+                                if (activeFileChrome === 'unknown') {
+                                    if (activeFileChrome === tab.key && activeFileName === tab.title) {
                                         itemClass += ' green-bg';
                                     }
-                                } else if (activeFile === tab.key) {
+                                } else if (activeFileChrome === tab.key) {
                                     itemClass += ' green-bg';
                                 }
                             }

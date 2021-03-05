@@ -22,7 +22,8 @@ import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
 
-let canRecord = false;
+let canRecordChrome = false;
+let canRecordFirefox = false;
 
 /**
  * Recorder Sagas
@@ -35,25 +36,27 @@ export default function* root() {
         takeLatest(success(ActionTypes.WB_CLOSE_FILE), wbCloseFileSuccess),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
         takeLatest('RECORDER_START_SUCCESS', recorderAddStepChannelInnit),
-        takeLatest('RECORDER_NEW_CAN_RECORD', recorderNewCanRecord),
+        takeLatest('CHROME_RECORDER_NEW_CAN_RECORD', chromeRecorderNewCanRecord),
+        takeLatest('FIREFOX_RECORDER_NEW_CAN_RECORD', firefoxRecorderNewCanRecord),
         takeLatest('RESET', reset)
     ]);
 }
 
 export function reset() {
-    canRecord = false;
+    canRecordChrome = false;
+    canRecordFirefox = false;
 }
 
-export function* recorderNewCanRecord({ payload }) {
+export function* chromeRecorderNewCanRecord({ payload }) {
     const recorder = yield select(state => state.recorder);
     const { waitChromeExtension } = recorder;
     const { event } = payload;
     const { newCanRecord } = event;
 
-    if (newCanRecord !== canRecord) {
-        canRecord = newCanRecord;
+    if (newCanRecord !== canRecordChrome) {
+        canRecordChrome = newCanRecord;
 
-        yield put(recorderActions.changeCanRecord(newCanRecord));
+        yield put(recorderActions.changeChromeCanRecord(newCanRecord));
 
         if (!newCanRecord) {
             yield put(recorderActions.stopRecorder());
@@ -61,6 +64,26 @@ export function* recorderNewCanRecord({ payload }) {
     }
     if (waitChromeExtension) {
         yield put(recorderActions.stopWaitChromeExtension());
+    }
+}
+
+export function* firefoxRecorderNewCanRecord({ payload }) {
+    const recorder = yield select(state => state.recorder);
+    const { waitFirefoxExtension } = recorder;
+    const { event } = payload;
+    const { newCanRecord } = event;
+
+    if (newCanRecord !== canRecordFirefox) {
+        canRecordFirefox = newCanRecord;
+
+        yield put(recorderActions.changeFirefoxCanRecord(newCanRecord));
+
+        if (!newCanRecord) {
+            yield put(recorderActions.stopRecorder());
+        }
+    }
+    if (waitFirefoxExtension) {
+        yield put(recorderActions.stopWaitFireFirefoxExtension());
     }
 }
 
@@ -78,9 +101,9 @@ export function* wbCloseFileSuccess({ payload }) {
     const editor = yield select(state => state.editor);
     const tabs = yield select(state => state.tabs);
 
-    const { activeFile, activeFileName, isRecording } = recorder;
+    const { activeFile, activeFileName, isRecordingChrome } = recorder;
 
-    if (isRecording) {
+    if (isRecordingChrome) {
         if (payload && payload.path) {
             if (payload.path === 'unknown') {
                 if (payload.path === activeFile && payload.name === activeFileName) {
@@ -122,9 +145,9 @@ function* handleRequest(payload) {
     
         const recorder = yield select(state => state.recorder);
     
-        const { activeFile, activeFileName, isRecording } = recorder;
+        const { activeFile, activeFileName, isRecordingChrome } = recorder;
     
-        if (!isRecording) {
+        if (!isRecordingChrome) {
             //ignore messages from RecorderService because recording process not started
             return;
         }
@@ -234,6 +257,15 @@ export function handleServiceEvents({ payload }) {
 }
 
 export function* startRecorder({ payload }) {
+    console.log('~~startRecorder', payload);
+    const { browserName } = payload;
+
+    let RecorderServiceMethod = 'startChrome';
+
+    if (browserName && browserName === 'firefox') {
+        RecorderServiceMethod = 'startFirefox';
+    }
+    
     const editor = yield select(state => state.editor);
     const { activeFile, activeFileName } = editor;
     
@@ -245,17 +277,23 @@ export function* startRecorder({ payload }) {
         if (resp && resp.key && resp.name) {
             const { key, name } = resp;
             
+            console.log('~~AnalyticsService recStart');
             yield call(services.mainIpc.call, 'AnalyticsService', 'recStart', []);
-            yield call(services.mainIpc.call, 'RecorderService', 'start', []);
-            yield put(recorderActions._startRecorder_Success(key, name));
+            console.log('~~RecorderService start 1');
+            yield call(services.mainIpc.call, 'RecorderService', RecorderServiceMethod, []);
+            console.log('~~_startRecorder_Success');
+            yield put(recorderActions._startRecorder_Success(key, name, browserName));
         } else {
             yield put(recorderActions._startRecorder_Failure(undefined, { code: 'NO_ACTIVE_FILE' }));
             return;
         }
     } else {
+        console.log('~~AnalyticsService recStart');
         yield call(services.mainIpc.call, 'AnalyticsService', 'recStart', []);
-        yield call(services.mainIpc.call, 'RecorderService', 'start', []);
-        yield put(recorderActions._startRecorder_Success(activeFile, activeFileName));
+        console.log('~~RecorderService start 2');
+        yield call(services.mainIpc.call, 'RecorderService', RecorderServiceMethod, []);
+        console.log('~~_startRecorder_Success');
+        yield put(recorderActions._startRecorder_Success(activeFile, activeFileName, browserName));
     }
 }
 

@@ -1213,7 +1213,8 @@ export function* handleFileDelete({ payload }) {
 }
 
 export function* startRecorder({ payload }) {
-    const { error } = yield putAndTake(recorderActions.startRecorder());
+    const { browserName } = payload;
+    const { error } = yield putAndTake(recorderActions.startRecorder(browserName));
     if (error && error.code && error.code === 'NO_ACTIVE_FILE') {
         yield call(services.mainIpc.call, 'ElectronService', 'showErrorBox', ['Test Recorder', 'Please open or create a script file before starting the recorder.']);
     }

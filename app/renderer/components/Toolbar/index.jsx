@@ -18,6 +18,70 @@ import { type CloudProvider } from '../../types/CloudProvider';
 import { type BrowserInfo } from '../../types/BrowserInfo';
 import { getBrowsersTarget, saveBrowserTarget, getDevicesTarget, saveDeviceTarget } from '../../helpers/cloudProviders';
 
+const iconStyle = {
+    position: 'absolute',
+    fontSize: '60%',
+    top: '21px',
+    marginLeft: '6px'
+};
+
+const selectedIconStyle = {
+    color: 'black',
+    marginLeft: '6px',
+    top: '28px',
+    fontSize: '50%'
+};
+
+type browserIcon = {
+    selected: boolean
+};
+
+const FirefoxIcon = (props: browserIcon) => {
+    const {
+        selected
+    } = props;
+
+    let selectedStyles = {};
+
+    if (selected) {
+        selectedStyles = selectedIconStyle;
+    }
+
+    return (
+        <span 
+            style={{
+                ...iconStyle,
+                color: 'orange',
+                ...selectedStyles
+            }}
+            className="fas fa-firefox"
+        ></span>
+    );
+};
+
+const ChromeIcon = (props: browserIcon) => {
+    const {
+        selected
+    } = props;
+
+    let selectedStyles = {};
+
+    if (selected) {
+        selectedStyles = selectedIconStyle;
+    }
+
+    return (
+        <span 
+            style={{
+                ...iconStyle,
+                color: '#e8f5e9',
+                ...selectedStyles
+            }}
+            className="fas fa-chrome"
+        ></span>
+    );
+};
+
 type ControlState = {
     visible?: boolean,
     enabled?: boolean
@@ -36,9 +100,11 @@ type Props = {
     onButtonClick: (string) => void,
     changeShowRecorderMessageValue: Function,
     testProvider: string | null,
-    canRecord: boolean,
+    canRecordChrome: boolean,
+    canRecordFirefox: boolean,
     testRunning: boolean,
     waitChromeExtension: boolean,
+    waitFirefoxExtension: boolean,
     showRecorderMessage: boolean | null,
     isChromeExtensionEnabled: boolean | null,
     cloudProvidesBrowsersAndDevices: object | null
@@ -56,7 +122,8 @@ export default class Toolbar extends React.Component<Props> {
     constructor(props) {
         super(props);
         this.state = {
-            canRecord: false,
+            canRecordChrome: false,
+            canRecordFirefox: false,
             showWorkingChromeDialog: false
         };
     }
@@ -125,11 +192,19 @@ export default class Toolbar extends React.Component<Props> {
         });
     }
 
-    showWorkingOxygenExtensionModal = () => {
+    showWorkingOxygenExtensionModalChrome = () => {
         this.setState({
             showWorkingChromeDialog: true
         }, () => {
-            this.handleClickEvent(Controls.TEST_RECORD);
+            this.handleClickEvent(Controls.TEST_RECORD_CHROME);
+        });
+    }
+
+    showWorkingOxygenExtensionModalFirefox = () => {
+        this.setState({
+            showWorkingChromeDialog: true
+        }, () => {
+            this.handleClickEvent(Controls.TEST_RECORD_FIREFOX);
         });
     }
 
@@ -156,13 +231,17 @@ export default class Toolbar extends React.Component<Props> {
             providers = [],
             testProvider = null,
             stepDelay,
-            canRecord,
+            canRecordChrome,
+            canRecordFirefox,
             testRunning,
             waitChromeExtension,
+            waitFirefoxExtension = true,
             showRecorderMessage,
             changeShowRecorderMessageValue,
             cloudProvidesBrowsersAndDevices = {}
         } = this.props;
+
+        console.log('~~waitFirefoxExtension', waitFirefoxExtension);
 
         let testTarget = this.props.testTarget;
 
@@ -243,7 +322,7 @@ export default class Toolbar extends React.Component<Props> {
                     <NoChromeDialog hide={this.hideNoChromeDialog}/>
                 }
 
-                { showWorkingChromeDialog && this._isSelected(Controls.TEST_RECORD) &&
+                { showWorkingChromeDialog && this._isSelected(Controls.TEST_RECORD_CHROME) &&
                     <WorkingChromeDialog 
                         changeShowRecorderMessageValue={changeShowRecorderMessageValue}
                         showRecorderMessage={showRecorderMessage}
@@ -551,33 +630,72 @@ export default class Toolbar extends React.Component<Props> {
                 { (waitChromeExtension || testRunning) &&
                     <span
                         style={{ ...getOpacity(false), fontFamily: 'FontAwesome' }}
-                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active fas fa-microphone' : 'control selectable fas fa-microphone' }
+                        className={ this._isSelected(Controls.TEST_RECORD_CHROME) ? 'control selectable active fas fa-microphone' : 'control selectable fas fa-microphone' }
                         title="Record"
                     >
+                        <ChromeIcon selected={this._isSelected(Controls.TEST_RECORD_CHROME)}/>
                     </span>
                 }
 
                 { 
-                    !(waitChromeExtension || testRunning) && !canRecord && 
+                    !(waitChromeExtension || testRunning) && !canRecordChrome && 
                     <span
-                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable not-work active fas fa-microphone-slash' : 'control selectable not-work fas fa-microphone-slash' }
+                        className={ this._isSelected(Controls.TEST_RECORD_CHROME) ? 'control selectable not-work active fas fa-microphone-slash' : 'control selectable not-work fas fa-microphone-slash' }
                         style={{ fontFamily: 'FontAwesome' }}
                         title="Record"
                         onClick={ this.showNotWorkingOxygenExtensionModal }
                     >
+                        <ChromeIcon selected={this._isSelected(Controls.TEST_RECORD_CHROME)} />
                     </span>
                 }
 
                 { 
-                    !(waitChromeExtension || testRunning) && canRecord &&
+                    !(waitChromeExtension || testRunning) && canRecordChrome &&
                     <span
-                        className={ this._isSelected(Controls.TEST_RECORD) ? 'control selectable active green-bg fas fa-microphone' : 'control selectable fas fa-microphone' }
+                        className={ this._isSelected(Controls.TEST_RECORD_CHROME) ? 'control selectable active green-bg fas fa-microphone' : 'control selectable fas fa-microphone' }
                         style={{ fontFamily: 'FontAwesome' }}
                         title="Record"
-                        onClick={ this.showWorkingOxygenExtensionModal }
+                        onClick={ this.showWorkingOxygenExtensionModalChrome }
                     >
+                        <ChromeIcon selected={this._isSelected(Controls.TEST_RECORD_CHROME)}/>
                     </span>
                 }
+
+                {
+                    (waitFirefoxExtension || testRunning) &&
+                    <span
+                        style={{ ...getOpacity(false), fontFamily: 'FontAwesome' }}
+                        className={ this._isSelected(Controls.TEST_RECORD_FIREFOX) ? 'control selectable active fas fa-microphone' : 'control selectable fas fa-microphone' }
+                        title="Record"
+                    >
+                        <FirefoxIcon selected={this._isSelected(Controls.TEST_RECORD_FIREFOX)}/>
+                    </span>
+                }
+
+                { 
+                    !(waitFirefoxExtension || testRunning) && !canRecordFirefox && 
+                    <span
+                        className={ this._isSelected(Controls.TEST_RECORD_FIREFOX) ? 'control selectable not-work active fas fa-microphone-slash' : 'control selectable not-work fas fa-microphone-slash' }
+                        style={{ fontFamily: 'FontAwesome' }}
+                        title="Record"
+                        onClick={ this.showNotWorkingOxygenExtensionModal }
+                    >
+                        <FirefoxIcon selected={this._isSelected(Controls.TEST_RECORD_FIREFOX)}/>
+                    </span>
+                }
+
+                { 
+                    !(waitFirefoxExtension || testRunning) && canRecordFirefox &&
+                    <span
+                        className={ this._isSelected(Controls.TEST_RECORD_FIREFOX) ? 'control selectable active orange-bg fas fa-microphone' : 'control selectable fas fa-microphone' }
+                        style={{ fontFamily: 'FontAwesome' }}
+                        title="Record"
+                        onClick={ this.showWorkingOxygenExtensionModalFirefox }
+                    >
+                        <FirefoxIcon selected={this._isSelected(Controls.TEST_RECORD_FIREFOX)}/>
+                    </span>
+                }
+
 
                 <span style={{ marginLeft: 'auto' }}>
                     <span 

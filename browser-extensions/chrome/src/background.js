@@ -6,7 +6,22 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-const IDE_URL_HTTP = 'http://localhost:7778';
+
+// set diferent port for chrome and firefox
+let portValue;
+
+// for chrome
+// portValue = 7778;
+
+// for firefox
+portValue = 7788;
+
+console.log('port : ', portValue);
+
+const IDE_URL_HTTP = 'http://localhost:'+portValue;
+// store one browser instanse for chrome and firefox
+const browserInstanse = chrome || browser;
+console.log('browserInstanse : ', browserInstanse);
 
 const SETTINGS_DEBUG = 'SETTINGS_DEBUG';
 
@@ -109,9 +124,9 @@ let port;
 chrome.contextMenus.onClicked.addListener((info) => {
     if (info.menuItemId === SETTINGS_DEBUG) {
         debuggingEnabled = info.checked;
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        browserInstanse.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs && tabs.length >= 1) {
-                chrome.tabs.sendMessage(tabs[0].id, { cmd: info.menuItemId, settings: { debuggingEnabled: debuggingEnabled } });
+                browserInstanse.tabs.sendMessage(tabs[0].id, { cmd: info.menuItemId, settings: { debuggingEnabled: debuggingEnabled } });
             }
         });
     } else {
@@ -152,9 +167,9 @@ function checkIfRecordingIsActive() {
         isIdeRecording = false;
     } finally {
         if (isIdeRecording && !isIdeRecordingPrev) {
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            browserInstanse.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                 if (tabs && tabs.length >= 1) {
-                    chrome.tabs.sendMessage(tabs[0].id, { cmd: 'INJECT_RECORDER', settings: { debuggingEnabled: debuggingEnabled } });
+                    browserInstanse.tabs.sendMessage(tabs[0].id, { cmd: 'INJECT_RECORDER', settings: { debuggingEnabled: debuggingEnabled } });
                 }
             });
         }

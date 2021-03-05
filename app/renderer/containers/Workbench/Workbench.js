@@ -58,7 +58,8 @@ type Props = {
     initialize: Function,
     startRecorderWatcher: Function,
     deactivate: Function,
-    isRecording: boolean,
+    isRecordingChrome: boolean,
+    isRecordingFirefox: boolean,
     stopRecorder: Function,
     zoomIn: Function,
     zoomOut: Function,
@@ -108,7 +109,8 @@ type Props = {
     androidHomeError: string | undefined,
     initialized: boolean,
     changeShowRecorderMessageValue: Function,
-    canRecord: boolean,
+    canRecordChrome: boolean,
+    canRecordFirefox: boolean,
     cleanJavaError: Function,
     cleanXCodeError: Function,
     cleanAndroidHomeError: Function,
@@ -117,6 +119,7 @@ type Props = {
     objrepoName: string | null,
     isChromeExtensionEnabled: boolean,
     waitChromeExtension: boolean,
+    waitFirefoxExtension: boolean,
     stopWaitChromeExtension: Function,
     updateGeneralSettings: Function,
     showDownloadEdgeDriverError: Function,
@@ -174,8 +177,8 @@ export default class Workbench extends React.Component<Props> {
         } else {
             alert('no deactivate');
         }
-        const { isRecording } = this.props;
-        if (isRecording) {
+        const { isRecordingChrome } = this.props;
+        if (isRecordingChrome) {
             if (this.props.stopRecorder) {
                 this.props.stopRecorder();
             } else {
@@ -319,13 +322,22 @@ export default class Workbench extends React.Component<Props> {
                 console.warn('no openFakeFile');
             }
         }
-        else if (ctrlId === Controls.TEST_RECORD) {
-            const { isRecording } = this.props;
-            if (isRecording) {
+        else if (ctrlId === Controls.TEST_RECORD_CHROME) {
+            const { isRecordingChrome } = this.props;
+            if (isRecordingChrome) {
                 this.props.stopRecorder();  
             }
             else {
-                this.props.startRecorder();
+                this.props.startRecorder('chrome');
+            }
+        }
+        else if (ctrlId === Controls.TEST_RECORD_FIREFOX) {
+            const { isRecordingChrome } = this.props;
+            if (isRecordingChrome) {
+                this.props.stopRecorder();  
+            }
+            else {
+                this.props.startRecorder('firefox');
             }
         }
         else if (ctrlId === Controls.TEST_SETTINGS) {
@@ -353,11 +365,17 @@ export default class Workbench extends React.Component<Props> {
     }
 
     getToolbarControlsState() {
-        const { test, isRecording, editorActiveFile } = this.props;
+        const {
+            test,
+            isRecordingChrome,
+            isRecordingFirefox,
+            editorActiveFile
+        } = this.props;
+        console.log('~~isRecordingChrome', isRecordingChrome);
         return {
             [Controls.TEST_RUN]: {
                 visible: !test.isRunning,
-                enabled: !isRecording && 
+                enabled: !isRecordingChrome && 
                     !!editorActiveFile && 
                     editorActiveFile.ext && 
                     ['.js', '.feature'].includes(editorActiveFile.ext)
@@ -372,8 +390,11 @@ export default class Workbench extends React.Component<Props> {
             [Controls.TEST_CONTINUE]: {
                 visible: test.isPaused,
             },
-            [Controls.TEST_RECORD]: {
-                selected: isRecording,
+            [Controls.TEST_RECORD_CHROME]: {
+                selected: isRecordingChrome,
+            },
+            [Controls.TEST_RECORD_FIREFOX]: {
+                selected: isRecordingFirefox,
             },
             [Controls.TEST_SETTINGS]: {
                 selected: false,
@@ -759,9 +780,11 @@ export default class Workbench extends React.Component<Props> {
                 {updateModals.call(this)}
                 <Toolbar
                     testRunning={ test.isRunning }
-                    canRecord={ this.props.canRecord }
+                    canRecordChrome={ this.props.canRecordChrome }
+                    canRecordFirefox={ this.props.canRecordFirefox }
                     isChromeExtensionEnabled={ this.props.isChromeExtensionEnabled }
                     waitChromeExtension={ this.props.waitChromeExtension }
+                    waitFirefoxExtension={ this.props.waitFirefoxExtension }
                     stopWaitChromeExtension={ this.props.stopWaitChromeExtension }
                     testMode={ runtimeSettings.testMode }
                     testTarget={ runtimeSettings.testTarget }

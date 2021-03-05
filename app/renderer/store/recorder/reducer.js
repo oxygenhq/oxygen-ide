@@ -10,18 +10,28 @@ import * as ActionTypes from './types';
 import { success } from '../../helpers/redux';
 
 const defaultState = {
-    canRecord: false,
-    isRecording: false,
+    canRecordChrome: false,
+    canRecordFirefox: false,
+    isRecordingChrome: false,
     isChromeExtensionEnabled: false,
     waitChromeExtension: true,
+    waitFirefoxExtension: true,
     activeFile: null,
     activeFileName: null,
-    steps: [],
+    steps: []
 };
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { path, step, steps, value, cache, name } = payload;
+    const {
+        path,
+        step,
+        steps,
+        value,
+        cache,
+        name,
+        browserName
+    } = payload;
 
     switch (action.type) {
     case ActionTypes.RECORDER_STOP_WAIT_CHROME_EXTENSION : {
@@ -30,11 +40,24 @@ export default (state = defaultState, action) => {
             waitChromeExtension: false
         };
     }
-
-    case ActionTypes.RECORDER_CHANGE_CAN_RECORD : {
+    case ActionTypes.RECORDER_STOP_WAIT_FIREFOX_EXTENSION : {
         return {
             ...state,
-            canRecord: value
+            waitFirefoxExtension: false
+        };
+    }
+
+    case ActionTypes.RECORDER_CHROME_CHANGE_CAN_RECORD : {
+        return {
+            ...state,
+            canRecordChrome: value
+        };
+    }
+
+    case ActionTypes.RECORDER_FIREFOX_CHANGE_CAN_RECORD: {
+        return {
+            ...state,
+            canRecordFirefox: value
         };
     }
 
@@ -46,20 +69,32 @@ export default (state = defaultState, action) => {
     }
 
     // RECORDER_START
-    case success(ActionTypes.RECORDER_START):
+    case success(ActionTypes.RECORDER_START): {
+
+        let isRecordingName = 'Chrome';
+        if (browserName && browserName === 'firefox') {
+            isRecordingName = 'Firefox';
+        }
+
         return {
             ...state,
-            isRecording: true,
-            activeFile: path,
-            activeFileName: name
+            ['isRecording' + isRecordingName]: true,
+            ['activeFile' + isRecordingName]: path,
+            ['activeFileName' + isRecordingName]: name,
         };
+    }
 
     // RECORDER_STOP
-    case ActionTypes.RECORDER_STOP:
+    case ActionTypes.RECORDER_STOP: {
+        let isRecordingName = 'Chrome';
+        if (browserName && browserName === 'firefox') {
+            isRecordingName = 'Firefox';
+        }
         return {
             ...state,
-            isRecording: false,
+            ['isRecording' + isRecordingName]: false,
         };
+    }
 
     // RECORDER_SET_ACTIVE_FILE
     case ActionTypes.RECORDER_REPLACE_FILE_CREDENTIALS:

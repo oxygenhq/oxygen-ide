@@ -362,9 +362,9 @@ export const showNewFileDialog = () => ({
     payload: null,
 });
 /* startRecorder */
-export const startRecorder = () => ({
+export const startRecorder = (browserName) => ({
     type: ActionTypes.WB_START_RECORDER,
-    payload: { },
+    payload: { browserName: browserName },
 });
 /* stopRecorder */
 export const stopRecorder = () => ({

@@ -26,5 +26,6 @@ export const TEST_RUN_ALL = 'TEST_RUN_ALL';
 export const TEST_CONTINUE = 'TEST_CONTINUE';
 export const TEST_STOP = 'TEST_STOP';
 export const TEST_STOPING = 'TEST_STOPING';
-export const TEST_RECORD = 'TEST_RECORD';
+export const TEST_RECORD_CHROME = 'TEST_RECORD_CHROME';
+export const TEST_RECORD_FIREFOX = 'TEST_RECORD_FIREFOX';
 export const TEST_SETTINGS = 'TEST_SETTINGS';

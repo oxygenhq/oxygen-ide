@@ -9,10 +9,16 @@
 import * as ActionTypes from './types';
 import { success, failure } from '../../helpers/redux';
 
-export const changeCanRecord = (newCanRecord) => ({
-    type: ActionTypes.RECORDER_CHANGE_CAN_RECORD,
+export const changeChromeCanRecord = (newCanRecord) => ({
+    type: ActionTypes.RECORDER_CHROME_CHANGE_CAN_RECORD,
     payload: { value: newCanRecord },
 });
+
+export const changeFirefoxCanRecord = (newCanRecord) => ({
+    type: ActionTypes.RECORDER_FIREFOX_CHANGE_CAN_RECORD,
+    payload: { value: newCanRecord },
+});
+
 
 // stop wait chrome extension
 export const stopWaitChromeExtension = () => ({
@@ -20,20 +26,28 @@ export const stopWaitChromeExtension = () => ({
     payload: null,
 });
 
-// startRecorder
-export const startRecorder = () => ({
-    type: ActionTypes.RECORDER_START,
+// stop wait chrome extension
+export const stopWaitFireFirefoxExtension = () => ({
+    type: ActionTypes.RECORDER_STOP_WAIT_FIREFOX_EXTENSION,
     payload: null,
 });
 
-export const _startRecorder_Success = (path, name = null) => ({
-    type: success(ActionTypes.RECORDER_START),
-    payload: { path, name },
+// startRecorder
+export const startRecorder = (browserName) => ({
+    type: ActionTypes.RECORDER_START,
+    payload: {
+        browserName: browserName
+    },
 });
 
-export const _startRecorder_Failure = (path, error) => ({
+export const _startRecorder_Success = (path, name = null, browserName) => ({
+    type: success(ActionTypes.RECORDER_START),
+    payload: { path, name, browserName },
+});
+
+export const _startRecorder_Failure = (path, error, browserName) => ({
     type: failure(ActionTypes.RECORDER_START),
-    payload: { path, error },
+    payload: { path, error, browserName },
 });
 
 // stopRecorder

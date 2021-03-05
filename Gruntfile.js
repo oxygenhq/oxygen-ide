@@ -45,14 +45,18 @@ module.exports = function(grunt) {
         defaultTasks.push('installer-dmg');
     }
 
-    grunt.registerTask('default', defaultTasks);
+    // defaultTasks.push('concat-files-chrome-ext');
+    // defaultTasks.push('concat-files-firefox-ext');
 
+    grunt.registerTask('default', defaultTasks);
     grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'strip-comments:chrome-ext']);
+    grunt.registerTask('firefox-ext', ['clean:firefox-ext', 'copy:firefox-ext', 'concat-files', 'strip-comments:firefox-ext']);
 
     const OUTDIR = 'dist/temp';
     const RESOURCES = process.platform === 'darwin' ? '/Electron.app/Contents/Resources' : '/resources';
     const CHROME_EXT_SRC = 'browser-extensions/chrome/src/';
     const CHROME_EXT_DIST = 'browser-extensions/chrome/dist/';
+    const FIREFOX_EXT_DIST = 'browser-extensions/firefox/dist/';
     const SENTRY_BROWSER_SRC = 'app/node_modules/@sentry/browser';
     const SENTRY_BROWSER_DIST = 'dist/temp/resources/app/node_modules/@sentry/browser';
     const RECORDER = 'browser-extensions/recorder/';
@@ -109,7 +113,8 @@ module.exports = function(grunt) {
         },
         clean: {
             ide: [OUTDIR],
-            'chrome-ext': [CHROME_EXT_DIST]
+            'chrome-ext': [CHROME_EXT_DIST],
+            'firefox-ext': [FIREFOX_EXT_DIST]
         },
         'copy-files': {
             src: 'node_modules/electron/dist',
@@ -124,8 +129,18 @@ module.exports = function(grunt) {
                 RECORDER + 'engineXpath.js'],
             dest: [CHROME_EXT_DIST + 'recorder.js']
         },
+        // 'concat-files': {
+        //     src: [RECORDER + 'utils.js',
+        //         RECORDER + 'elementFinder.js',
+        //         RECORDER + 'locatorCss.js',
+        //         RECORDER + 'locatorBuilders.js',
+        //         RECORDER + 'recorder.js',
+        //         RECORDER + 'engineXpath.js'],
+        //     dest: [FIREFOX_EXT_DIST + 'recorder.js']
+        // },
         'strip-comments': {
-            'chrome-ext': CHROME_EXT_DIST + '*.js'
+            'chrome-ext': CHROME_EXT_DIST + '*.js',
+            'firefox-ext': FIREFOX_EXT_DIST + '*.js'
         },
         copy: {
             main: {
@@ -215,6 +230,15 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: CHROME_EXT_SRC, src: ['**'], 
                         dest: CHROME_EXT_DIST
+                    }
+                ]
+            },
+            'firefox-ext': {
+                files: [
+                    { 
+                        expand: true, 
+                        cwd: CHROME_EXT_SRC, src: ['**'], 
+                        dest: FIREFOX_EXT_DIST
                     }
                 ]
             }

@@ -18,8 +18,8 @@ describe('Store: recorder', () => {
         beforeAll(() => {
             state = store.getState().recorder;
         });    
-        it('should have "isRecording" property equal to "false"', () => {
-            expect(state.isRecording).toEqual(false);
+        it('should have "isRecordingChrome" property equal to "false"', () => {
+            expect(state.isRecordingChrome).toEqual(false);
         });
         it('should have "activeFile" property equal to "null"', () => {
             expect(state.activeFile).toBeNull();
@@ -35,9 +35,9 @@ describe('Store: recorder', () => {
             console.dir(newState);
             state = store.getState().recorder;      
         }); 
-        it('should have "isRecording" property equal to "true"', () => {
+        it('should have "isRecordingChrome" property equal to "true"', () => {
             setTimeout(() => {
-                expect(state.isRecording).toEqual(true);
+                expect(state.isRecordingChrome).toEqual(true);
             }, 1000);
       
         });   

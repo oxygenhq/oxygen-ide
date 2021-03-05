@@ -59,9 +59,14 @@ const configureStore = (initialState?: counterStateType) => {
             collapsed: true,      
             predicate: (getState, action) => !((
                 action.payload && 
-        action.payload.event && 
-        action.payload.event.type && 
-        ['CHROME_EXTENSION_ENABLED', 'RECORDER_NEW_CAN_RECORD'].includes(action.payload.event.type)
+                action.payload.event && 
+                action.payload.event.type && 
+                [
+                    'CHROME_EXTENSION_ENABLED',
+                    'FIREFOX_EXTENSION_ENABLED',
+                    'CHROME_RECORDER_NEW_CAN_RECORD',
+                    'FIREFOX_RECORDER_NEW_CAN_RECORD'
+                ].includes(action.payload.event.type)
             ))
         }));
     }

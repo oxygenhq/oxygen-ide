@@ -92,12 +92,18 @@ export default class MainIpcService {
                 payload: { ...event },
             });    
         }
-        else if (event && event.event && event.event.type === 'RECORDER_NEW_CAN_RECORD') {
+        else if (event && event.event && event.event.type === 'CHROME_RECORDER_NEW_CAN_RECORD') {
             this.store.dispatch({
-                type: 'RECORDER_NEW_CAN_RECORD',
+                type: 'CHROME_RECORDER_NEW_CAN_RECORD',
                 payload: { ...event },
             });    
         }
+        else if (event && event.event && event.event.type === 'FIREFOX_RECORDER_NEW_CAN_RECORD') {
+            this.store.dispatch({
+                type: 'FIREFOX_RECORDER_NEW_CAN_RECORD',
+                payload: { ...event },
+            });    
+        }        
         
         else if (event.type === 'LOG_ENTRY') {
             this.store.dispatch({
