@@ -126,7 +126,7 @@ export default class FileService extends ServiceBase {
     }
 
     
-    removeFolderToWatchers(folder) {
+    removeFolderFromWatchers(folder) {
         if (Array.isArray(this.subFolders)) {
             this.subFolders = this.subFolders.filter((item) => {
                 return !item.startsWith(folder);
