@@ -48,6 +48,7 @@ const mapStoreToProps = (state) => {
         xCodeError: state.wb.xCodeError,
         androidHomeError: state.wb.androidHomeError,
         isRecordingChrome: state.recorder.isRecordingChrome,
+        isRecordingFirefox: state.recorder.isRecordingFirefox,
         canRecordChrome: state.recorder.canRecordChrome,
         canRecordFirefox: state.recorder.canRecordFirefox,
         isChromeExtensionEnabled: state.recorder.isChromeExtensionEnabled,

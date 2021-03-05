@@ -35,7 +35,7 @@ export default function* root() {
         takeLatest(ActionTypes.RECORDER_START_WATCHER, startRecorderWatcher),
         takeLatest(success(ActionTypes.WB_CLOSE_FILE), wbCloseFileSuccess),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
-        takeLatest('RECORDER_START_SUCCESS', recorderAddStepChannelInnit),
+        takeLatest(success(ActionTypes.RECORDER_START), recorderAddStepChannelInnit),
         takeLatest('CHROME_RECORDER_NEW_CAN_RECORD', chromeRecorderNewCanRecord),
         takeLatest('FIREFOX_RECORDER_NEW_CAN_RECORD', firefoxRecorderNewCanRecord),
         takeLatest('RESET', reset)
@@ -101,16 +101,38 @@ export function* wbCloseFileSuccess({ payload }) {
     const editor = yield select(state => state.editor);
     const tabs = yield select(state => state.tabs);
 
-    const { activeFile, activeFileName, isRecordingChrome } = recorder;
+    const { 
+        isRecordingChrome,
+        activeFileChrome,
+        activeFileNameChrome,
+
+        isRecordingFirefox,
+        activeFileFirefox,
+        activeFileNameFirefox
+    } = recorder;
 
     if (isRecordingChrome) {
         if (payload && payload.path) {
             if (payload.path === 'unknown') {
-                if (payload.path === activeFile && payload.name === activeFileName) {
+                if (payload.path === activeFileChrome && payload.name === activeFileNameChrome) {
                     yield stopRecorderAfterFileClose();
                 }
             } else {
-                if (payload.path === activeFile) {
+                if (payload.path === activeFileChrome) {
+                    yield stopRecorderAfterFileClose();
+                }
+            }
+        }
+    }
+
+    if (isRecordingFirefox) {
+        if (payload && payload.path) {
+            if (payload.path === 'unknown') {
+                if (payload.path === activeFileFirefox && payload.name === activeFileNameFirefox) {
+                    yield stopRecorderAfterFileClose();
+                }
+            } else {
+                if (payload.path === activeFileFirefox) {
                     yield stopRecorderAfterFileClose();
                 }
             }
@@ -140,15 +162,36 @@ export function* recorderAddStepChannelInnit({ payload }) {
 
 function* handleRequest(payload) {
     try {
-
         const { event } = payload;
-    
         const recorder = yield select(state => state.recorder);
+        const {
+            isRecordingChrome,
+            activeFileChrome,
+            activeFileNameChrome,
+
+            isRecordingFirefox,
+            activeFileFirefox,
+            activeFileNameFirefox,
+        } = recorder;
+
+        // const { activeFile, activeFileName, isRecordingChrome } = recorder;
     
-        const { activeFile, activeFileName, isRecordingChrome } = recorder;
-    
-        if (!isRecordingChrome) {
+        if (!isRecordingChrome && !isRecordingFirefox) {
             //ignore messages from RecorderService because recording process not started
+            return;
+        }
+
+        let activeFile;
+        let activeFileName;
+
+        if (isRecordingChrome && event.browserName === 'chrome') {
+            activeFile = activeFileChrome;
+            activeFileName = activeFileNameChrome;
+        } else if (isRecordingFirefox && event.browserName === 'firefox') {
+            activeFile = activeFileFirefox;
+            activeFileName = activeFileNameFirefox;
+        } else {
+            //ignore messages from RecorderService because browserName and recording mode miss match
             return;
         }
         
@@ -257,7 +300,6 @@ export function handleServiceEvents({ payload }) {
 }
 
 export function* startRecorder({ payload }) {
-    console.log('~~startRecorder', payload);
     const { browserName } = payload;
 
     let RecorderServiceMethod = 'startChrome';
@@ -277,22 +319,16 @@ export function* startRecorder({ payload }) {
         if (resp && resp.key && resp.name) {
             const { key, name } = resp;
             
-            console.log('~~AnalyticsService recStart');
             yield call(services.mainIpc.call, 'AnalyticsService', 'recStart', []);
-            console.log('~~RecorderService start 1');
             yield call(services.mainIpc.call, 'RecorderService', RecorderServiceMethod, []);
-            console.log('~~_startRecorder_Success');
             yield put(recorderActions._startRecorder_Success(key, name, browserName));
         } else {
             yield put(recorderActions._startRecorder_Failure(undefined, { code: 'NO_ACTIVE_FILE' }));
             return;
         }
     } else {
-        console.log('~~AnalyticsService recStart');
         yield call(services.mainIpc.call, 'AnalyticsService', 'recStart', []);
-        console.log('~~RecorderService start 2');
         yield call(services.mainIpc.call, 'RecorderService', RecorderServiceMethod, []);
-        console.log('~~_startRecorder_Success');
         yield put(recorderActions._startRecorder_Success(activeFile, activeFileName, browserName));
     }
 }

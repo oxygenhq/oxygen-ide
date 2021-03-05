@@ -367,9 +367,9 @@ export const startRecorder = (browserName) => ({
     payload: { browserName: browserName },
 });
 /* stopRecorder */
-export const stopRecorder = () => ({
+export const stopRecorder = (browserName) => ({
     type: ActionTypes.WB_STOP_RECORDER,
-    payload: { },
+    payload: { browserName },
 });
 
 /* startRecorderWatcher */

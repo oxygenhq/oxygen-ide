@@ -51,9 +51,9 @@ export const _startRecorder_Failure = (path, error, browserName) => ({
 });
 
 // stopRecorder
-export const stopRecorder = () => ({
+export const stopRecorder = (browserName) => ({
     type: ActionTypes.RECORDER_STOP,
-    payload: { },
+    payload: { browserName },
 });
 
 // setActiveFile

@@ -9,7 +9,7 @@ type Props = {
   hide: Function
 };
 
-export default class WorkingChromeDialog extends React.Component<Props> {
+export default class WorkingFirefoxExtensionDialog extends React.Component<Props> {
     constructor(props) {
         super(props);
 
@@ -28,7 +28,6 @@ export default class WorkingChromeDialog extends React.Component<Props> {
             this.props.hide();
         }
     }
-
   
     processLink = (event) => {
         if (event) {
@@ -77,7 +76,7 @@ export default class WorkingChromeDialog extends React.Component<Props> {
 
         return (
             <Modal
-                title="Recording started"
+                title="Recording started on Firefox"
                 visible={true}
                 onCancel={this.handleCancel}
                 footer={
@@ -86,15 +85,19 @@ export default class WorkingChromeDialog extends React.Component<Props> {
                             className="dont-show-again-contol"
                             checked={showRecorderMessage}
                             onChange={this.onChange}
-                        >Do not show this message again</Checkbox>
+                        >
+                            Do not show this message again
+                        </Checkbox>
                         <Button
                             type="primary"
                             onClick={this.handleOk}
-                        >Ok</Button>
+                        >
+                            Ok
+                        </Button>
                     </Fragment>
                 }
             >
-                <p>To start recording go to Chrome browser, open a new tab, and go to the required site.</p>
+                <p>To start recording go to Firefox browser, open a new tab, and go to the required site.</p>
             </Modal>
         );
     }

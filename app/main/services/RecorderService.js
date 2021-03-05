@@ -75,7 +75,6 @@ export default class RecorderService extends ServiceBase {
     }
 
     startFirefox() {
-        console.log('~~startFirefox');
         // prevent starting the recorder twice
         if (this.firefoxHttpSrv) {
             return;
@@ -152,7 +151,7 @@ export default class RecorderService extends ServiceBase {
                 response.end();
                 setTimeout(function() {
                     try {
-                        self._emit(JSON.parse(body));
+                        self._emit(JSON.parse(body), 'chrome');
                     } catch (e) {
                         console.log('RecorderService bad body :', body);
                         Sentry.captureException(e);
@@ -211,7 +210,7 @@ export default class RecorderService extends ServiceBase {
                 response.end();
                 setTimeout(function() {
                     try {
-                        self._emit(JSON.parse(body));
+                        self._emit(JSON.parse(body), 'firefox');
                     } catch (e) {
                         console.log('RecorderService bad body :', body);
                         Sentry.captureException(e);
@@ -238,7 +237,7 @@ export default class RecorderService extends ServiceBase {
         }
     }
 
-    _emit = (steps) => {
+    _emit = (steps, browserName) => {
         setTimeout(() => {
     
             let stepsArray = [];
@@ -252,6 +251,7 @@ export default class RecorderService extends ServiceBase {
     
             this.notify({
                 type: RECORDER_EVENT,
+                browserName: browserName,
                 stepsArray
             });
             

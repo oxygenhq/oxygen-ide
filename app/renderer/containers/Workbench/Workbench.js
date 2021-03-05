@@ -177,10 +177,15 @@ export default class Workbench extends React.Component<Props> {
         } else {
             alert('no deactivate');
         }
-        const { isRecordingChrome } = this.props;
-        if (isRecordingChrome) {
+        const {
+            isRecordingChrome,
+            isRecordingFirefox
+        } = this.props;
+
+        if (isRecordingChrome || isRecordingFirefox) {
             if (this.props.stopRecorder) {
-                this.props.stopRecorder();
+                this.props.stopRecorder('chrome');
+                this.props.stopRecorder('firefox');
             } else {
                 alert('no stopRecorder');
             }  
@@ -325,16 +330,16 @@ export default class Workbench extends React.Component<Props> {
         else if (ctrlId === Controls.TEST_RECORD_CHROME) {
             const { isRecordingChrome } = this.props;
             if (isRecordingChrome) {
-                this.props.stopRecorder();  
+                this.props.stopRecorder('chrome');  
             }
             else {
                 this.props.startRecorder('chrome');
             }
         }
         else if (ctrlId === Controls.TEST_RECORD_FIREFOX) {
-            const { isRecordingChrome } = this.props;
-            if (isRecordingChrome) {
-                this.props.stopRecorder();  
+            const { isRecordingFirefox } = this.props;
+            if (isRecordingFirefox) {
+                this.props.stopRecorder('firefox');  
             }
             else {
                 this.props.startRecorder('firefox');
@@ -371,11 +376,13 @@ export default class Workbench extends React.Component<Props> {
             isRecordingFirefox,
             editorActiveFile
         } = this.props;
-        console.log('~~isRecordingChrome', isRecordingChrome);
+
         return {
             [Controls.TEST_RUN]: {
                 visible: !test.isRunning,
-                enabled: !isRecordingChrome && 
+                enabled:
+                    !isRecordingChrome && 
+                    !isRecordingFirefox && 
                     !!editorActiveFile && 
                     editorActiveFile.ext && 
                     ['.js', '.feature'].includes(editorActiveFile.ext)

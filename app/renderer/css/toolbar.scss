@@ -64,7 +64,12 @@
 
 .appTollbar .control.selectable.active.orange-bg,
 .tabs-bar-wrapper .tabItemElem.orange-bg {
-  background-color: orange;
+  background-color: #ffa6008e;
+}
+
+.appTollbar .control.selectable.active.green-bg.orange-bg,
+.tabs-bar-wrapper .tabItemElem.green-bg.orange-bg {
+  background: linear-gradient(180deg, #e8f5e9 50%, #ffa6008e 50%);
 }
 
 .appTollbar button.control.button {

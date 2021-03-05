@@ -11,76 +11,26 @@ import { Icon, Select, Input, TreeSelect, Tooltip } from 'antd';
 import React, { Fragment } from 'react';
 import '../../css/toolbar.scss';
 import * as Controls from './controls';
-import NoChromeDialog from './NoChromeDialog';
-import WorkingChromeDialog from './WorkingChromeDialog';
+
+import NoChromeExtensionFindedDialog from './NoChromeExtensionFindedDialog';
+import NoFirefoxExtensionFindedDialog from './NoFirefoxExtensionFindedDialog';
+import WorkingChromeExtensionDialog from './WorkingChromeExtensionDialog';
+import WorkingFirefoxExtensionDialog from './WorkingFirefoxExtensionDialog';
+import {
+    ChromeWaitIcon,
+    FirefoxWaitIcon,
+    ChromeNotAvailableIcon,
+    FirefoxNotAvailableIcon,
+    ChromAvailableIcon,
+    FirefoxAvailableIcon
+}  from './microphoneIcons';
+
+
 import { type DeviceInfo } from '../../types/DeviceInfo';
 import { type CloudProvider } from '../../types/CloudProvider';
 import { type BrowserInfo } from '../../types/BrowserInfo';
 import { getBrowsersTarget, saveBrowserTarget, getDevicesTarget, saveDeviceTarget } from '../../helpers/cloudProviders';
 
-const iconStyle = {
-    position: 'absolute',
-    fontSize: '60%',
-    top: '21px',
-    marginLeft: '6px'
-};
-
-const selectedIconStyle = {
-    color: 'black',
-    marginLeft: '6px',
-    top: '28px',
-    fontSize: '50%'
-};
-
-type browserIcon = {
-    selected: boolean
-};
-
-const FirefoxIcon = (props: browserIcon) => {
-    const {
-        selected
-    } = props;
-
-    let selectedStyles = {};
-
-    if (selected) {
-        selectedStyles = selectedIconStyle;
-    }
-
-    return (
-        <span 
-            style={{
-                ...iconStyle,
-                color: 'orange',
-                ...selectedStyles
-            }}
-            className="fas fa-firefox"
-        ></span>
-    );
-};
-
-const ChromeIcon = (props: browserIcon) => {
-    const {
-        selected
-    } = props;
-
-    let selectedStyles = {};
-
-    if (selected) {
-        selectedStyles = selectedIconStyle;
-    }
-
-    return (
-        <span 
-            style={{
-                ...iconStyle,
-                color: '#e8f5e9',
-                ...selectedStyles
-            }}
-            className="fas fa-chrome"
-        ></span>
-    );
-};
 
 type ControlState = {
     visible?: boolean,
@@ -122,23 +72,58 @@ export default class Toolbar extends React.Component<Props> {
     constructor(props) {
         super(props);
         this.state = {
-            canRecordChrome: false,
-            canRecordFirefox: false,
-            showWorkingChromeDialog: false
+            showNoChromeExtensionFindedDialog: false,
+            showNoFirefoxExtensionFindedDialog: false,
+
+            showWorkingChromeExtensionDialog: false,
+            showWorkingFirefoxExtensionDialog: false
         };
     }
-
-    hideNoChromeDialog = () => {
+    hideNoChromeExtensionFindedDialog = () => {
         this.setState({
-            showNoChromeDialog: false
+            showNoChromeExtensionFindedDialog: false
+        });
+    }
+    hideNoFirefoxExtensionFindedDialog = () => {
+        this.setState({
+            showNoFirefoxExtensionFindedDialog: false
+        });
+    }
+    hideWorkingChromeExtensioDialog = () => {
+        this.setState({
+            showWorkingChromeExtensionDialog: false
+        });
+    }
+    hideWorkinggFirefoxExtensioDialog = () => {
+        this.setState({
+            showWorkingFirefoxExtensionDialog: false
+        });
+    }
+    showNotWorkingOxygenExtensionModalChrome = () => {
+        this.setState({
+            showNoChromeExtensionFindedDialog: true
+        });
+    }
+    showNotWorkingOxygenExtensionModalFirefox = () => {
+        this.setState({
+            showNoFirefoxExtensionFindedDialog: true
+        });
+    }
+    showWorkingOxygenExtensionModalChrome = () => {
+        this.setState({
+            showWorkingChromeExtensionDialog: true
+        }, () => {
+            this.handleClickEvent(Controls.TEST_RECORD_CHROME);
+        });
+    }
+    showWorkingOxygenExtensionModalFirefox = () => {
+        this.setState({
+            showWorkingFirefoxExtensionDialog: true
+        }, () => {
+            this.handleClickEvent(Controls.TEST_RECORD_FIREFOX);
         });
     }
 
-    hideWorkingChromeDialog = () => {
-        this.setState({
-            showWorkingChromeDialog: false
-        });
-    }
 
     handleClickEvent(ctrlId) {
         if (this._isEnabled(ctrlId) && this._isVisible(ctrlId) && this.props.onButtonClick) {
@@ -186,28 +171,6 @@ export default class Toolbar extends React.Component<Props> {
         return classNames;
     }
 
-    showNotWorkingOxygenExtensionModal = () => {
-        this.setState({
-            showNoChromeDialog: true
-        });
-    }
-
-    showWorkingOxygenExtensionModalChrome = () => {
-        this.setState({
-            showWorkingChromeDialog: true
-        }, () => {
-            this.handleClickEvent(Controls.TEST_RECORD_CHROME);
-        });
-    }
-
-    showWorkingOxygenExtensionModalFirefox = () => {
-        this.setState({
-            showWorkingChromeDialog: true
-        }, () => {
-            this.handleClickEvent(Controls.TEST_RECORD_FIREFOX);
-        });
-    }
-
     handleBrowsersTreeValueChange = (browsersTree, value, label, extra) => {
         if (value) {
             const target = getBrowsersTarget(browsersTree, value);
@@ -241,10 +204,14 @@ export default class Toolbar extends React.Component<Props> {
             cloudProvidesBrowsersAndDevices = {}
         } = this.props;
 
-        console.log('~~waitFirefoxExtension', waitFirefoxExtension);
+        const {
+            showNoChromeExtensionFindedDialog,
+            showNoFirefoxExtensionFindedDialog,
+            showWorkingChromeExtensionDialog,
+            showWorkingFirefoxExtensionDialog
+        } = this.state;
 
         let testTarget = this.props.testTarget;
-
         let browsersTree = null;
         let devicesTree = null;
         let currentCloudProvidesBrowsersAndDevices = null;
@@ -265,18 +232,10 @@ export default class Toolbar extends React.Component<Props> {
             }
         }
 
-        const {
-            showNoChromeDialog,
-            showWorkingChromeDialog
-        } = this.state;
         // prevDevice and iOSAndroidSeparator are used to add a separator between Android and iOS devices
         let prevDevice = null;
-        const iOSAndroidSeparator = (
-            <Option key='-' value='-'>---------------</Option>
-        );
-
+        const iOSAndroidSeparator = (<Option key='-' value='-'>---------------</Option>);
         const providersUnabled = (Array.isArray(providers) && providers.length > 0);
-
         const cloudProvidesBrowsersAndDevicesEnabled = currentCloudProvidesBrowsersAndDevices;
         const cloudProvidesBrowsersEnabled = cloudProvidesBrowsersAndDevicesEnabled && browsersTree && Array.isArray(browsersTree) && browsersTree.length > 0;
         const cloudProvidesDevicesEnabled = cloudProvidesBrowsersAndDevicesEnabled && devicesTree && Array.isArray(devicesTree) && devicesTree.length > 0;
@@ -318,18 +277,36 @@ export default class Toolbar extends React.Component<Props> {
 
         return (
             <div className="appTollbar">
-                { typeof showNoChromeDialog !== 'undefined' && showNoChromeDialog && 
-                    <NoChromeDialog hide={this.hideNoChromeDialog}/>
-                }
-
-                { showWorkingChromeDialog && this._isSelected(Controls.TEST_RECORD_CHROME) &&
-                    <WorkingChromeDialog 
-                        changeShowRecorderMessageValue={changeShowRecorderMessageValue}
-                        showRecorderMessage={showRecorderMessage}
-                        hide={this.hideWorkingChromeDialog}
+                {
+                    showNoChromeExtensionFindedDialog && 
+                    <NoChromeExtensionFindedDialog
+                        hide={ this.hideNoChromeExtensionFindedDialog }
                     />
                 }
-
+                {
+                    showWorkingChromeExtensionDialog &&
+                    // this._isSelected(Controls.TEST_RECORD_CHROME) &&
+                    <WorkingChromeExtensionDialog
+                        changeShowRecorderMessageValue={ changeShowRecorderMessageValue }
+                        showRecorderMessage={ showRecorderMessage }
+                        hide={ this.hideWorkingChromeExtensioDialog }
+                    />
+                }
+                {
+                    showNoFirefoxExtensionFindedDialog && 
+                    <NoFirefoxExtensionFindedDialog
+                        hide={ this.hideNoFirefoxExtensionFindedDialog }
+                    />
+                }
+                {
+                    showWorkingFirefoxExtensionDialog &&
+                    // this._isSelected(Controls.TEST_RECORD_FIREFOX) &&
+                    <WorkingFirefoxExtensionDialog
+                        changeShowRecorderMessageValue={ changeShowRecorderMessageValue }
+                        showRecorderMessage={ showRecorderMessage }
+                        hide={ this.hideWorkinggFirefoxExtensioDialog }
+                    />
+                }
                 { this._isVisible(Controls.NEW_FILE) && (
                     <Icon
                         className="control button"
@@ -628,74 +605,49 @@ export default class Toolbar extends React.Component<Props> {
 
                 <div className="separator" />
                 { (waitChromeExtension || testRunning) &&
-                    <span
-                        style={{ ...getOpacity(false), fontFamily: 'FontAwesome' }}
-                        className={ this._isSelected(Controls.TEST_RECORD_CHROME) ? 'control selectable active fas fa-microphone' : 'control selectable fas fa-microphone' }
-                        title="Record"
-                    >
-                        <ChromeIcon selected={this._isSelected(Controls.TEST_RECORD_CHROME)}/>
-                    </span>
+                    <ChromeWaitIcon
+                        selected={this._isSelected(Controls.TEST_RECORD_CHROME)}
+                    />
                 }
 
                 { 
-                    !(waitChromeExtension || testRunning) && !canRecordChrome && 
-                    <span
-                        className={ this._isSelected(Controls.TEST_RECORD_CHROME) ? 'control selectable not-work active fas fa-microphone-slash' : 'control selectable not-work fas fa-microphone-slash' }
-                        style={{ fontFamily: 'FontAwesome' }}
-                        title="Record"
-                        onClick={ this.showNotWorkingOxygenExtensionModal }
-                    >
-                        <ChromeIcon selected={this._isSelected(Controls.TEST_RECORD_CHROME)} />
-                    </span>
+                    !(waitChromeExtension || testRunning) && !canRecordChrome &&
+                    <ChromeNotAvailableIcon
+                        selected={this._isSelected(Controls.TEST_RECORD_CHROME)}
+                        onClick={ this.showNotWorkingOxygenExtensionModalChrome }
+                    />
                 }
 
                 { 
                     !(waitChromeExtension || testRunning) && canRecordChrome &&
-                    <span
-                        className={ this._isSelected(Controls.TEST_RECORD_CHROME) ? 'control selectable active green-bg fas fa-microphone' : 'control selectable fas fa-microphone' }
-                        style={{ fontFamily: 'FontAwesome' }}
-                        title="Record"
+                    <ChromAvailableIcon
+                        selected={this._isSelected(Controls.TEST_RECORD_CHROME)}
                         onClick={ this.showWorkingOxygenExtensionModalChrome }
-                    >
-                        <ChromeIcon selected={this._isSelected(Controls.TEST_RECORD_CHROME)}/>
-                    </span>
+                    />
                 }
 
                 {
                     (waitFirefoxExtension || testRunning) &&
-                    <span
-                        style={{ ...getOpacity(false), fontFamily: 'FontAwesome' }}
-                        className={ this._isSelected(Controls.TEST_RECORD_FIREFOX) ? 'control selectable active fas fa-microphone' : 'control selectable fas fa-microphone' }
-                        title="Record"
-                    >
-                        <FirefoxIcon selected={this._isSelected(Controls.TEST_RECORD_FIREFOX)}/>
-                    </span>
+                    <FirefoxWaitIcon
+                        selected={this._isSelected(Controls.TEST_RECORD_FIREFOX)}
+                    />
                 }
 
-                { 
-                    !(waitFirefoxExtension || testRunning) && !canRecordFirefox && 
-                    <span
-                        className={ this._isSelected(Controls.TEST_RECORD_FIREFOX) ? 'control selectable not-work active fas fa-microphone-slash' : 'control selectable not-work fas fa-microphone-slash' }
-                        style={{ fontFamily: 'FontAwesome' }}
-                        title="Record"
-                        onClick={ this.showNotWorkingOxygenExtensionModal }
-                    >
-                        <FirefoxIcon selected={this._isSelected(Controls.TEST_RECORD_FIREFOX)}/>
-                    </span>
+                {
+                    !(waitFirefoxExtension || testRunning) && !canRecordFirefox &&
+                    <FirefoxNotAvailableIcon
+                        selected={this._isSelected(Controls.TEST_RECORD_FIREFOX)}
+                        onClick={ this.showNotWorkingOxygenExtensionModalFirefox }
+                    />
                 }
 
                 { 
                     !(waitFirefoxExtension || testRunning) && canRecordFirefox &&
-                    <span
-                        className={ this._isSelected(Controls.TEST_RECORD_FIREFOX) ? 'control selectable active orange-bg fas fa-microphone' : 'control selectable fas fa-microphone' }
-                        style={{ fontFamily: 'FontAwesome' }}
-                        title="Record"
+                    <FirefoxAvailableIcon
+                        selected={this._isSelected(Controls.TEST_RECORD_FIREFOX)}
                         onClick={ this.showWorkingOxygenExtensionModalFirefox }
-                    >
-                        <FirefoxIcon selected={this._isSelected(Controls.TEST_RECORD_FIREFOX)}/>
-                    </span>
+                    />
                 }
-
 
                 <span style={{ marginLeft: 'auto' }}>
                     <span 

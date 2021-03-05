@@ -1221,7 +1221,7 @@ export function* startRecorder({ payload }) {
 }
 
 export function* stopRecorder({ payload }) {
-    yield put(recorderActions.stopRecorder());
+    yield put(recorderActions.stopRecorder(payload.browserName));
 }
 
 export function* startRecorderWatcher({ payload }) {
