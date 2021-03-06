@@ -541,8 +541,8 @@ export function* openFakeFile() {
     yield put(tabActions.setActiveTab(key, name));
     yield put(editorActions.setActiveFile(key, name));
     yield put(editorActions.addFile(key, name));
-    yield put(settingsActions.addFile(key,name));
-    yield put(wbActions._openFakeFile_Success(key,name));
+    yield put(settingsActions.addFile(key, name));
+    yield put(wbActions._openFakeFile_Success(key, name));
 }
 
 export function* openFile({ payload }) {
@@ -1209,7 +1209,10 @@ export function* handleFileDelete({ payload }) {
         }
     }
 
-    yield closeFile({ payload: {...payload, force: true} });
+    // to avoid process folder like file
+    if (path.endsWith('.js')) {
+        yield closeFile({ payload: {...payload, force: true} });
+    }
 }
 
 export function* startRecorder({ payload }) {

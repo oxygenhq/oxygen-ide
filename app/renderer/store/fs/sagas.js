@@ -74,7 +74,27 @@ export function* maybeNeedRemoveWatcherToFolder({ payload }) {
     const { path } = payload;
 
     if (path) {
-        yield call(services.mainIpc.call, 'FileService', 'removeFolderToWatchers', [path]);
+        const openFiles = yield select(state => state.editor.openFiles);
+        let removeFolderFromWatchers = true;
+
+        if (openFiles && Object.keys(openFiles).length > 0) {
+            const files = Object.keys(openFiles);
+
+            files.map((item) => {
+                // check if we have some files opened in editor
+                // and if we find files, from folder, that we want to
+                // remove from watch list, we ignore to remove folder 
+                // from folder watch list
+                const dirname = pathLib.dirname(item);
+                if (dirname === path) {
+                    removeFolderFromWatchers = false;
+                }
+            });
+        }
+
+        if (removeFolderFromWatchers) {
+            yield call(services.mainIpc.call, 'FileService', 'removeFolderFromWatchers', [path]);
+        }
     }
 }
 
@@ -230,9 +250,19 @@ function* unlinkFile(path) {
 
             if (filesState && filesState[path] && filesState[path]['content']) {
                 unlinkedFileContent = filesState[path]['content'];
+            } else {
+                // try to find old file instance
+                // where path is previous file path
+                // before rename of rename parent folder
+                const keys = Object.keys(filesState);
+                keys.map((key) => {
+                    const item = filesState[key];
+                    if (item && item.path && item.path === path) {
+                        unlinkedFileContent = item.content;
+                    }
+                });
             }
-
-            yield put(settingsActions.addFile('unknown',newName, unlinkedFileContent));
+            yield put(settingsActions.addFile('unknown', newName, unlinkedFileContent));
         }
 
         yield put(fsActions._delete_Success(path, true));
@@ -443,7 +473,16 @@ export function* initializeSuccess() {
                                         allResults.push(pRes);
                                     }
                                 } else {
-                                    let unlinkedFileContent = fs.files[file.filePath]['content']|| '';
+                                    let unlinkedFileContent = '';
+
+                                    if (
+                                        fs.files &&
+                                        fs.files[file.filePath] &&
+                                        fs.files[file.filePath]['content']
+                                    ) {
+                                        unlinkedFileContent = fs.files[file.filePath]['content'];
+                                    }
+
                                     const pathSplit = file.filePath.split(pathLib.sep);
                                     
                                     const name = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
