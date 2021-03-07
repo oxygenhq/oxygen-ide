@@ -31,6 +31,72 @@ const EDITOR_CONTAINER_CLASS_NAME = 'monaco-editor-container';
 const EDITOR_ACTION_FIND = 'actions.find';
 const EDITOR_ACTION_REPLACE = 'editor.action.startFindReplaceAction'; 
 
+const INTELLISENSE_ON_OPTIONS = {
+    showClasses: true,
+    showColors: true,
+    showConstants: true,
+    showConstructors: true,
+    showEnumMembers: true,
+    showEnums: true,
+    showEvents: true,
+    showFields: true,
+    showFiles: false,
+    showFolders: true,
+    showFunctions: true,
+    showIcons: true,
+    showInlineDetails: true,
+    showInterfaces: true,
+    showIssues: true,
+    showKeywords: true,
+    showMethods: true,
+    showModules: true,
+    showOperators: true,
+    showProperties: true,
+    showReferences: true,
+    showSnippets: true,
+    showStatusBar: true,
+    showStructs: true,
+    showTypeParameters: true,
+    showUnits: true,
+    showUsers: true,
+    showValues: true,
+    showVariables: true,
+    showWords: true
+};
+
+const INTELLISENSE_OFF_OPTIONS = {
+    showClasses: false,
+    showColors: false,
+    showConstants: false,
+    showConstructors: false,
+    showEnumMembers: false,
+    showEnums: false,
+    showEvents: false,
+    showFields: false,
+    showFiles: false,
+    showFolders: false,
+    showFunctions: false,
+    showIcons: false,
+    showInlineDetails: false,
+    showInterfaces: false,
+    showIssues: false,
+    showKeywords: false,
+    showMethods: false,
+    showModules: false,
+    showOperators: false,
+    showProperties: false,
+    showReferences: false,
+    showSnippets: false,
+    showStatusBar: false,
+    showStructs: false,
+    showTypeParameters: false,
+    showUnits: false,
+    showUsers: false,
+    showValues: false,
+    showVariables: false,
+    showWords: false
+};
+
 const MONACO_DEFAULT_OPTIONS = {
     fontSize: '12pt',
     lineHeight: 19,
@@ -40,10 +106,7 @@ const MONACO_DEFAULT_OPTIONS = {
     minimap: {
         enabled: false,
     },
-    theme: 'oxygen-theme',
-    suggest: {
-        showFiles: false
-    }
+    theme: 'oxygen-theme'
 };
 
 type Props = {
@@ -65,6 +128,7 @@ type Props = {
     options: object,
     waitUpdateBreakpoints: boolean,
     featureLanguageLoaded: boolean,
+    useIntellisense: boolean,
     editorDidMount: Function,
     editorWillMount: Function,
     onValueChange: Function,
@@ -233,6 +297,16 @@ export default class MonacoEditor extends React.Component<Props> {
                 });
             }
         }
+
+        if (prevProps.useIntellisense !== this.props.useIntellisense) {
+            let suggest;
+            if (this.props.useIntellisense) {
+                suggest = INTELLISENSE_ON_OPTIONS;
+            } else { 
+                suggest = INTELLISENSE_OFF_OPTIONS;
+            }
+            this.editor.updateOptions({ suggest: suggest });
+        }
     }
 
     componentWillUnmount() {
@@ -288,6 +362,8 @@ export default class MonacoEditor extends React.Component<Props> {
             diffProps.disabledBreakpoints !== this.props.disabledBreakpoints,
             resolvedBreakpoints:
             diffProps.resolvedBreakpoints !== this.props.resolvedBreakpoints,
+            useIntellisense:
+            diffProps.useIntellisense !== this.props.useIntellisense,
         };
     }
 
@@ -363,7 +439,7 @@ export default class MonacoEditor extends React.Component<Props> {
 
     async initMonaco() {
         const value = this.props.value !== null ? this.props.value : this.props.defaultValue;
-        const { language, theme, fontSize, featureLanguageLoaded } = this.props;
+        const { language, theme, fontSize, featureLanguageLoaded, useIntellisense } = this.props;
 
         let saveFontSize = DEFAULT_FONT_SIZE;
 
@@ -420,12 +496,20 @@ export default class MonacoEditor extends React.Component<Props> {
                 ]
             });
 
+            let suggest;
+            if (useIntellisense) {
+                suggest = INTELLISENSE_ON_OPTIONS;
+            } else { 
+                suggest = INTELLISENSE_OFF_OPTIONS;
+            }
+
             this.editor = monaco.editor.create(this.editorContainer, {
                 value,
                 language,
                 ...MONACO_DEFAULT_OPTIONS,
                 fontSize: saveFontSize,
-                lineHeight: saveFontSize*RATIO
+                lineHeight: saveFontSize*RATIO,
+                suggest: suggest
             });
             oxygenIntellisense();
             if (theme) {

@@ -81,6 +81,15 @@ const mapStoreToProps = (state) => {
         return el != null;
     });
 
+    let useIntellisense = true;
+    if (
+        state.settings &&
+        state.settings.generalSettings &&
+        state.settings.generalSettings.useIntellisense === false
+    ) {
+        useIntellisense = false;
+    }
+
     return {
         editorReadOnly: state.test.isRunning,
         activeFile: state.editor.activeFile,
@@ -88,6 +97,7 @@ const mapStoreToProps = (state) => {
         fontSize: state.settings.fontSize,
         openFiles: openFiles, //state.editor.openFiles,
         waitUpdateBreakpoints: state.test.waitUpdateBreakpoints,
+        useIntellisense: useIntellisense
     };
 };
   
