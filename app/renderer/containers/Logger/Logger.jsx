@@ -36,8 +36,10 @@ export default class Logger extends React.PureComponent<Props> {
     };
 
     componentDidMount() {
-        window.addEventListener('mouseup', this.handleMouseUp);
-        window.addEventListener('mousemove', this.handleLoggerDrag);
+        if (window && window.addEventListener) {
+            window.addEventListener('mouseup', this.handleMouseUp);
+            window.addEventListener('mousemove', this.handleLoggerDrag);
+        }
         // adjust log viewer height
         this.setState({ viewerHeight: this.state.panelHeight - this.headerRef.height });
     }

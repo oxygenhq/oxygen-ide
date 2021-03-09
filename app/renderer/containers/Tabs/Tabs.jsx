@@ -49,25 +49,27 @@ class Tabs extends React.Component<Props, void> {
             });
         }
 
-        window.addEventListener('resize', debounce((e) => {
-            e.preventDefault();
-            if (this.ps) {
-                this.ps.destroy();
-                if (this.tabsRef) {
-                    this.ps = new PerfectScrollbar(this.tabsRef, {
-                        suppressScrollY: true,
-                        useBothWheelAxes: true,
-                    });
+        if (window && window.addEventListener) {
+            window.addEventListener('resize', debounce((e) => {
+                e.preventDefault();
+                if (this.ps) {
+                    this.ps.destroy();
+                    if (this.tabsRef) {
+                        this.ps = new PerfectScrollbar(this.tabsRef, {
+                            suppressScrollY: true,
+                            useBothWheelAxes: true,
+                        });
+                    }
+                } else {
+                    if (this.tabsRef) {
+                        this.ps = new PerfectScrollbar(this.tabsRef, {
+                            suppressScrollY: true,
+                            useBothWheelAxes: true,
+                        });
+                    }
                 }
-            } else {
-                if (this.tabsRef) {
-                    this.ps = new PerfectScrollbar(this.tabsRef, {
-                        suppressScrollY: true,
-                        useBothWheelAxes: true,
-                    });
-                }
-            }
-        }, 150), false);
+            }, 150), false);
+        }
     }
 
     // nextProps, nextState

@@ -96,27 +96,29 @@ export default class MonacoEditor extends React.Component<Props> {
         }
 
         this.elem = document.getElementById('editors-container-wrap');
-        this.elem.addEventListener('addContentEvent', (event) => {            
-            const {
-                filePath,
-                fileName,
-            } = this.props;
-
-            if (
-                filePath &&
-                event.detail && 
-                event.detail.filePath && 
-                (filePath === event.detail.filePath || filePath+fileName === event.detail.filePath) && 
-                this.editor && 
-                this.editor.getModel()
-            ) {
-                
-                this.editor.getModel().applyEdits([{
-                    range: monaco.Range.fromPositions(this.editor.getPosition()),
-                    text: event.detail.generatedCode
-                }]);
-            }
-        });
+        if (this.elem && this.elem.addEventListener) {
+            this.elem.addEventListener('addContentEvent', (event) => {            
+                const {
+                    filePath,
+                    fileName,
+                } = this.props;
+    
+                if (
+                    filePath &&
+                    event.detail && 
+                    event.detail.filePath && 
+                    (filePath === event.detail.filePath || filePath+fileName === event.detail.filePath) && 
+                    this.editor && 
+                    this.editor.getModel()
+                ) {
+                    
+                    this.editor.getModel().applyEdits([{
+                        range: monaco.Range.fromPositions(this.editor.getPosition()),
+                        text: event.detail.generatedCode
+                    }]);
+                }
+            });
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {    

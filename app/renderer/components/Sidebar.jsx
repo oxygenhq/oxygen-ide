@@ -24,74 +24,76 @@ type Props = {
 };
 
 export default class Sidebar extends React.Component<Props> {
-  props: Props;
+    props: Props;
 
-  state = {
-      dragFlag: false,
-      sideClass: 'restore-animation',
-  };
+    state = {
+        dragFlag: false,
+        sideClass: 'restore-animation',
+    };
 
-  componentDidMount() {
-      window.addEventListener('mouseup', this.onMouseUpHandler);
-      window.addEventListener('mousemove', this.onAsideDragHandler);
-  }
+    componentDidMount() {
+        if (window && window.addEventListener) {
+            window.addEventListener('mouseup', this.onMouseUpHandler);
+            window.addEventListener('mousemove', this.onAsideDragHandler);
+        }
+    }
 
-  componentDidUpdate(prevProps, prevState) {
-      if (prevState.dragFlag !== this.state.dragFlag) {
-          this.setState({
-              sideClass: prevState.dragFlag
-                  ? 'restore-animation' : 'prevent-animation',
-          });
-      }
-  }
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.dragFlag !== this.state.dragFlag) {
+            this.setState({
+                sideClass: prevState.dragFlag
+                    ? 'restore-animation' : 'prevent-animation',
+            });
+        }
+    }
 
-  componentWillUnmount() {
-      window.removeEventListener('mouseup', this.onMouseUpHandler);
-      window.removeEventListener('mousemove', this.onAsideDragHandler);
-  }
+    componentWillUnmount() {
+        window.removeEventListener('mouseup', this.onMouseUpHandler);
+        window.removeEventListener('mousemove', this.onAsideDragHandler);
+    }
 
-  onAsideDragHandler = (e) => {
-      if (this.props.visible && this.state.dragFlag) {
-          const { align = 'left' } = this.props;
-          const width = align === 'left' ? e.pageX + 3 : document.body.clientWidth - e.pageX + 3;
-          if (width > MIN_SIZE) {
-              this.props.onResize(width);
-          } else {
-              this.setState({ dragFlag: false }, this.props.onResize(MIN_SIZE));
-          }
-      }
-  }
+    onAsideDragHandler = (e) => {
+        if (this.props.visible && this.state.dragFlag) {
+            const { align = 'left' } = this.props;
+            const width = align === 'left' ? e.pageX + 3 : document.body.clientWidth - e.pageX + 3;
+            if (width > MIN_SIZE) {
+                this.props.onResize(width);
+            } else {
+                this.setState({ dragFlag: false }, this.props.onResize(MIN_SIZE));
+            }
+        }
+    }
 
-  onMouseUpHandler = () => {
-      if (this.state.dragFlag) {
-          this.setState({ dragFlag: false, sideClass: 'restore-animation' });
-      }
-  }
+    onMouseUpHandler = () => {
+        if (this.state.dragFlag) {
+            this.setState({ dragFlag: false, sideClass: 'restore-animation' });
+        }
+    }
 
-  onDragging = () => {
-      this.setState({
-          dragFlag: true,
-          sideClass: 'prevent-animation',
-      });
-  }
+    onDragging = () => {
+        this.setState({
+            dragFlag: true,
+            sideClass: 'prevent-animation',
+        });
+    }
 
-  render() {
-      const { align = 'left' } = this.props;
-      return (
-          <Sider
-              trigger={null}
-              collapsible
-              collapsed={!this.props.visible}
-              className={`sidebar ${this.state.sideClass}`}
-              width={this.props.size}
-              collapsedWidth={0}
-          >
-              <button
-                  onMouseDown={this.onDragging}
-                  className={ 'dragline ' + align }
-              />
-              {this.props.children}
-          </Sider>
-      );
-  }
+    render() {
+        const { align = 'left' } = this.props;
+        return (
+            <Sider
+                trigger={null}
+                collapsible
+                collapsed={!this.props.visible}
+                className={`sidebar ${this.state.sideClass}`}
+                width={this.props.size}
+                collapsedWidth={0}
+            >
+                <button
+                    onMouseDown={this.onDragging}
+                    className={ 'dragline ' + align }
+                />
+                {this.props.children}
+            </Sider>
+        );
+    }
 }
