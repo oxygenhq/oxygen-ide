@@ -45,18 +45,28 @@ module.exports = function(grunt) {
         defaultTasks.push('installer-dmg');
     }
 
-    // defaultTasks.push('concat-files-chrome-ext');
-    // defaultTasks.push('concat-files-firefox-ext');
-
     grunt.registerTask('default', defaultTasks);
-    grunt.registerTask('chrome-ext', ['clean:chrome-ext', 'copy:chrome-ext', 'concat-files', 'strip-comments:chrome-ext']);
-    grunt.registerTask('firefox-ext', ['clean:firefox-ext', 'copy:firefox-ext', 'concat-files', 'strip-comments:firefox-ext']);
+    grunt.registerTask('chrome-ext', [
+        'clean:chrome-ext',
+        'copy:chrome-ext',
+        'concat-files:chrome-ext',
+        'strip-comments:chrome-ext'
+    ]);
+    grunt.registerTask('firefox-ext', [
+        'clean:firefox-ext',
+        'copy:firefox-ext',
+        'concat-files:firefox-ext',
+        'strip-comments:firefox-ext',
+        'replace-file-content:firefox-ext'
+    ]);
 
     const OUTDIR = 'dist/temp';
     const RESOURCES = process.platform === 'darwin' ? '/Electron.app/Contents/Resources' : '/resources';
     const CHROME_EXT_SRC = 'browser-extensions/chrome/src/';
     const CHROME_EXT_DIST = 'browser-extensions/chrome/dist/';
+    const CHROME_EXT_PORT = 7778;
     const FIREFOX_EXT_DIST = 'browser-extensions/firefox/dist/';
+    const FIREFOX_EXT_PORT = 7788;
     const SENTRY_BROWSER_SRC = 'app/node_modules/@sentry/browser';
     const SENTRY_BROWSER_DIST = 'dist/temp/resources/app/node_modules/@sentry/browser';
     const RECORDER = 'browser-extensions/recorder/';
@@ -121,26 +131,40 @@ module.exports = function(grunt) {
             dest: OUTDIR
         },
         'concat-files': {
-            src: [RECORDER + 'utils.js',
-                RECORDER + 'elementFinder.js',
-                RECORDER + 'locatorCss.js',
-                RECORDER + 'locatorBuilders.js',
-                RECORDER + 'recorder.js',
-                RECORDER + 'engineXpath.js'],
-            dest: [CHROME_EXT_DIST + 'recorder.js']
+            'chrome-ext': {
+                src: [
+                    RECORDER + 'utils.js',
+                    RECORDER + 'elementFinder.js',
+                    RECORDER + 'locatorCss.js',
+                    RECORDER + 'locatorBuilders.js',
+                    RECORDER + 'recorder.js',
+                    RECORDER + 'engineXpath.js'
+                ],
+                dest: [CHROME_EXT_DIST + 'recorder.js']
+            },
+            'firefox-ext': {
+                src: [
+                    RECORDER + 'utils.js',
+                    RECORDER + 'elementFinder.js',
+                    RECORDER + 'locatorCss.js',
+                    RECORDER + 'locatorBuilders.js',
+                    RECORDER + 'recorder.js',
+                    RECORDER + 'engineXpath.js'
+                ],
+                dest: [FIREFOX_EXT_DIST + 'recorder.js']
+            }
         },
-        // 'concat-files': {
-        //     src: [RECORDER + 'utils.js',
-        //         RECORDER + 'elementFinder.js',
-        //         RECORDER + 'locatorCss.js',
-        //         RECORDER + 'locatorBuilders.js',
-        //         RECORDER + 'recorder.js',
-        //         RECORDER + 'engineXpath.js'],
-        //     dest: [FIREFOX_EXT_DIST + 'recorder.js']
-        // },
         'strip-comments': {
             'chrome-ext': CHROME_EXT_DIST + '*.js',
             'firefox-ext': FIREFOX_EXT_DIST + '*.js'
+        },
+        'replace-file-content': {
+            'firefox-ext': {
+                src: FIREFOX_EXT_DIST + 'background.js',
+                dest: FIREFOX_EXT_DIST + 'background.js',
+                'origin-text': CHROME_EXT_PORT,
+                'dest-text': FIREFOX_EXT_PORT
+            }
         },
         copy: {
             main: {

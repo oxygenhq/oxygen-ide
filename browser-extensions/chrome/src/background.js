@@ -8,13 +8,8 @@
  */
 
 // set diferent port for chrome and firefox
-let portValue;
+const portValue = 7778;
 
-// for chrome
-// portValue = 7778;
-
-// for firefox
-portValue = 7788;
 
 console.log('port : ', portValue);
 

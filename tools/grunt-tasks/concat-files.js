@@ -10,16 +10,15 @@ var fs = require('fs');
 var path = require('path');
 
 module.exports = function(grunt) {
-    grunt.registerTask('concat-files', 'Concatenate multiple files into one', function() {
-        var cfg = grunt.config.get('concat-files');
+    grunt.registerMultiTask('concat-files', 'Concatenate multiple files into one', function() {
         var cwd = process.cwd();
         
         try {
             var bundle = '';
-            for (var script of cfg.src) {
-                bundle += fs.readFileSync(path.join(cwd, script)); 
+            for (var script of this.data.src) {
+                bundle += fs.readFileSync(path.join(cwd, script));
             }
-            for (var dest of cfg.dest) {
+            for (var dest of this.data.dest) {
                 var destFilename = path.join(cwd, dest);
                 fs.writeFileSync(destFilename, bundle);
             }
