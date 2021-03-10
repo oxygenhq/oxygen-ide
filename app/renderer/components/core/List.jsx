@@ -175,7 +175,7 @@ class ListItem extends React.PureComponent<ListItemProps> {
     };
 
     componentDidMount() {
-        if (this.props.editable) {
+        if (this.props.editable && document && document.addEventListener) {
             document.addEventListener('click', ::this.handleClickOutside, true);
         }
     }

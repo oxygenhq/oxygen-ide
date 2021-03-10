@@ -41,7 +41,10 @@ export default class LogViewer extends React.PureComponent<Props> {
     }
 
     componentDidMount() {
-        document.addEventListener('mousedown', this.handleClickOutside);
+        if (document && document.addEventListener) {
+            document.addEventListener('mousedown', this.handleClickOutside);
+        }
+
         const { logs } = this.props;        
         const lines = [];
         let newState = {};
