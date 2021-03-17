@@ -589,8 +589,11 @@ export function* startTest({ payload }) {
 
 export function* stopTest({ payload }) {
     try {
+        const {
+            force
+        } = payload;
         // call TestRunner service to stop the test
-        yield call(services.mainIpc.call, 'TestRunnerService', 'stop');
+        yield call(services.mainIpc.call, 'TestRunnerService', 'stop', [force]);
         
         // reset active line cursor in all editors
         yield put(editorActions.resetActiveLines());

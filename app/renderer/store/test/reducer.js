@@ -13,12 +13,13 @@ import * as Const from '../../../const';
 import { success, failure } from '../../helpers/redux';
 
 const defaultState = {
-    isRunning: false,         // indicates if a test is currently running
-    isPaused: false,          // indicates if the current test is paused
-    isSeleniumReady: false,   // indicates if built-in Selenium server has been successfully started
-    isAppiumReady: false,     // indicates if built-in Appium server has been successfully started
+    isRunning: false,           // indicates if a test is currently running
+    isPaused: false,            // indicates if the current test is paused
+    isSeleniumReady: false,     // indicates if built-in Selenium server has been successfully started
+    isAppiumReady: false,       // indicates if built-in Appium server has been successfully started
     isStopingTest: false,       // indicates if a test is currently stoping
-    breakpoints: {},          // holds all user-defined breakpoints per file, shall include file name and line number
+    isStopingTestForce: false,  // indicates if a test is currently stoping in force mode
+    breakpoints: {},            // holds all user-defined breakpoints per file, shall include file name and line number
     disabledBreakpoints: {},
     resolvedBreakpoints: {},
     waitUpdateBreakpoints: false,
@@ -65,7 +66,20 @@ if (process.platform === 'darwin') {
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { value, settings, device, breakpoints, breakpoint, path, error, cache, fileName, variables, seleniumPid } = payload;
+    const {
+        value,
+        settings,
+        device,
+        breakpoints,
+        breakpoint,
+        path,
+        error,
+        cache,
+        fileName,
+        variables,
+        seleniumPid,
+        force
+    } = payload;
     let _newDevices = [];
     let _newBreakpoints = {};
 
@@ -132,11 +146,13 @@ export default (state = defaultState, action) => {
         return {
             ...state,
             isStopingTest: true,
+            isStopingTestForce: force
         };
     case success(ActionTypes.TEST_STOP):
         return {
             ...state,
             isStopingTest: false,
+            isStopingTestForce: false,
             isRunning: false,
             isPaused: false,
             variables: null
@@ -145,6 +161,7 @@ export default (state = defaultState, action) => {
         return {
             ...state,
             isStopingTest: false,
+            isStopingTestForce: false,
             isRunning: false,
             isPaused: false,
             variables: null

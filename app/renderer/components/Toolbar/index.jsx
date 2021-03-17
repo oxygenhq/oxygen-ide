@@ -518,19 +518,35 @@ export default class Toolbar extends React.Component<Props> {
 
                 { 
                     this._isVisible(Controls.TEST_STOPING) &&
-                    <button
-                        className="control button stop"
-                        style={ getOpacity(this._isEnabled(Controls.TEST_STOPING)) }
-                        title="Stopping…"
-                        disabled
-                    >
-                        <Icon
-                            title="Terminate Test"
-                            type="close-circle"
-                            theme="filled"
-                        /> 
-                        <span>Stopping…</span>
-                    </button> 
+                    <React.Fragment>
+                        <button
+                            className="control button stop"
+                            style={ getOpacity(this._isEnabled(Controls.TEST_STOPING)) }
+                            title="Stopping…"
+                            disabled
+                        >
+                            <Icon
+                                title="Terminate Test"
+                                type="close-circle"
+                                theme="filled"
+                            /> 
+                            <span>Stopping…</span>
+                        </button> 
+                        
+                        <button
+                            className="control button stop"
+                            style={ getOpacity(this._isEnabled(Controls.TEST_FORCE_STOP)) }
+                            onClick={ () => ::this.handleClickEvent(Controls.TEST_FORCE_STOP) }
+                            title="Stop"
+                        >
+                            <Icon
+                                title="Terminate Test"
+                                type="close-circle"
+                                theme="filled"
+                            /> 
+                            <span>Force Stop</span>
+                        </button>
+                    </React.Fragment>
                 }
 
                 <div className="separator" />

@@ -29,12 +29,6 @@ export default (state = DEFAULT_STATE, action) => {
     switch (action.type) {
     // SET_ACTIVE_LINE
     case types.EDITOR_SET_ACTIVE_LINE: {
-
-        console.log('--- debug EDITOR_SET_ACTIVE_LINE ---');
-        console.log('line', line);
-        console.log('path', path);
-        console.log('--- debug ---');
-
         // check if we has file with the specified path in openFiles list
         if (!state.openFiles.hasOwnProperty(path)) {
             return state;

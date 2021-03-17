@@ -291,6 +291,9 @@ export default class Workbench extends React.Component<Props> {
         else if (ctrlId === Controls.TEST_STOP) {
             this.props.stopTest();
         }
+        else if (ctrlId === Controls.TEST_FORCE_STOP) {
+            this.props.stopTest(true);
+        }
         else if (ctrlId === Controls.TEST_CONTINUE) {
             this.props.continueTest();
         }
@@ -364,6 +367,9 @@ export default class Workbench extends React.Component<Props> {
             },
             [Controls.TEST_STOP]: {
                 visible: test.isRunning && !test.isStopingTest,
+            },
+            [Controls.TEST_FORCE_STOP]: {
+                visible: test.isRunning && !test.isStopingTestForce,
             },
             [Controls.TEST_STOPING]: {
                 visible: !!test.isStopingTest,

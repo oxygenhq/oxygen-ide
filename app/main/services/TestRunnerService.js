@@ -318,13 +318,14 @@ export default class TestRunnerService extends ServiceBase {
         }
     }
 
-    async stop() {
-        this.notify({
-            type: EVENT_LOG_ENTRY,
-            severity: SEVERITY_INFO,
-            message: 'Test finished with status --> CANCELED'
-        });
-
+    async stop(force = false) {
+        if (!force) {
+            this.notify({
+                type: EVENT_LOG_ENTRY,
+                severity: SEVERITY_INFO,
+                message: 'Test finished with status --> CANCELED'
+            });
+        }
         if (this.reporter && this.reporter.removeListener) {
             this.reporter.removeListener('runner:start',() => {});
             this.reporter.removeListener('runner:end',() => {});
@@ -347,7 +348,9 @@ export default class TestRunnerService extends ServiceBase {
                     this.runner.removeListener('test-end',() => {});
                 }
 
-                await this.runner.dispose('CANCELED');
+                if (!force) {
+                    await this.runner.dispose('CANCELED');
+                }
                 await this.runner.kill('CANCELED');
 
                 this.runner = null;
