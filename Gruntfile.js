@@ -102,7 +102,7 @@ module.exports = function(grunt) {
             src: OUTDIR + RESOURCES + '/app',
             dest: OUTDIR + RESOURCES + '/app.asar',
             unpack: '*.node',
-            'unpack-dir': '{main/selenium,main/services/Win32FileService,node_modules/oxygen-cli}'
+            'unpack-dir': '{main/selenium,main/services/Win32FileService,node_modules/oxygen-cli,node_modules/canvas}'
         },
         'config-patch': {
             dist: OUTDIR
