@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v1.23.0 (2020-03-22)
+
+#### :beetle: Bug Fix
+* Currently selected file in editor not highlighted in the file tree.
+* Possible issue with the notification about missing Java installation.
+* Scripts getting deleted on certain occasions when renaming parent folders.
+
+#### :house: Internal
+* Update oxygen-cli from v1.16.0 to v1.17.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver and EdgeDriver 89.
+
 ## v1.22.0 (2020-01-16)
 
 #### :beetle: Bug Fix
