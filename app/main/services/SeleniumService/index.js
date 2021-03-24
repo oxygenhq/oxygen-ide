@@ -135,8 +135,9 @@ export default class SeleniumService extends ServiceBase {
 
     async edgeStart() {
         var edgeDriver;
+        let edgeVersion;
         try {
-            const edgeVersion = await this.getEdgeVersion();
+            edgeVersion = await this.getEdgeVersion();
             console.log('Found Edge version: ', edgeVersion);
 
             var edgeDriverVersion = await this.getEdgeDriverVersion(edgeVersion);
@@ -172,11 +173,13 @@ export default class SeleniumService extends ServiceBase {
                         type: ON_EDGE_FINDED
                     });
                 } else {
-                    this.notify({
-                        type: ON_EDGE_DRIVER_ERROR,
-                        edgeVersion: edgeDriverVersion,
-                        edgeDriverVersion: edgeDriver,
-                    });
+                    if (edgeVersion) {
+                        this.notify({
+                            type: ON_EDGE_DRIVER_ERROR,
+                            edgeVersion: edgeVersion,
+                            edgeDriverVersion: edgeDriverVersion,
+                        });
+                    }
                 }
             }
         }
