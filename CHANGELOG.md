@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v1.23.1 (2020-03-25)
+
+#### :beetle: Bug Fix
+* Do not warn user about EdgeDriver mismatch if Edge is not installed.
+* Possible issue with ChromeDriver matching on Windows when user directory is located at an UNC path.
+
+#### :house: Internal
+* Update oxygen-cli from v1.17.0 to v1.18.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+
 ## v1.23.0 (2020-03-22)
 
 #### :beetle: Bug Fix
