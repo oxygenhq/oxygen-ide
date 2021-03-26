@@ -90,40 +90,11 @@ export default class Logger {
         console.log('Logs folder :', this.logsPath);
         console.log('Current log file :', currentLogFileName);
         
-        const transport = new (winston.transports.DailyRotateFile)({
-            filename: this.logFilePath,
-            date_format: null,
-            zippedArchive: false,
-            maxSize: '20m',
-            maxFiles: '14d',
-            format: winston.format.combine(
-                format(),
-                winston.format.simple(),
-            )
-        });
-        
-        transport.on('rotate', function(oldFilename, newFilename) {
-            // do something if need
-        });
-
-        var transConsole = new (winston.transports.Console)({
-            level: levelConsole,
-            json: false,
-            prettyPrint: true,
-            timestamp: () => moment().format('HH:mm:ss'),
-            format: winston.format.combine(
-                winston.format.colorize(),
-                format(),
-                winston.format.simple()
-            )
-        });
-
-        var _log = winston.createLogger({
-            transports: [transport, transConsole]
-        });
-
-        this._overrideLog(_log);
-        this._overrideConsole(_log);
+        const _log = this._createWinstonLogger(levelConsole);
+        if (_log) {
+            this._overrideLog(_log);
+            this._overrideConsole(_log);
+        }
         this._catchTheUncaught();
         const lastLogFilePath = this.getLogFilePath();
         console.log('Logs file location :', lastLogFilePath);
@@ -139,6 +110,46 @@ export default class Logger {
         const dateFormat = 'YYYY-MM-DD';
         const dateStr = moment().local().format(dateFormat);
         return this.logFileName.replace(/%DATE%/g, dateStr);
+    }
+
+    _createWinstonLogger(levelConsole) {
+        try {
+            const transport = new (winston.transports.DailyRotateFile)({
+                filename: this.logFilePath,
+                date_format: null,
+                zippedArchive: false,
+                maxSize: '20m',
+                maxFiles: '14d',
+                format: winston.format.combine(
+                    format(),
+                    winston.format.simple(),
+                )
+            });
+            
+            transport.on('rotate', function(oldFilename, newFilename) {
+                // do something if need
+            });
+    
+            var transConsole = new (winston.transports.Console)({
+                level: levelConsole,
+                json: false,
+                prettyPrint: true,
+                timestamp: () => moment().format('HH:mm:ss'),
+                format: winston.format.combine(
+                    winston.format.colorize(),
+                    format(),
+                    winston.format.simple()
+                )
+            });
+    
+            const _log = winston.createLogger({
+                transports: [transport, transConsole]
+            });
+    
+            return _log;
+        } catch (e) {
+            console.log('winston DailyRotateFile create error: ', e);
+        }
     }
 
     _overrideConsole(_log) {
