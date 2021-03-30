@@ -43,6 +43,9 @@ const MONACO_DEFAULT_OPTIONS = {
     theme: 'oxygen-theme',
     suggest: {
         showFiles: false
+    },
+    hover: {
+        delay: 900
     }
 };
 
