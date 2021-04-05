@@ -135,8 +135,9 @@ export default class SeleniumService extends ServiceBase {
 
     async edgeStart() {
         var edgeDriver;
+        let edgeVersion;
         try {
-            const edgeVersion = await this.getEdgeVersion();
+            edgeVersion = await this.getEdgeVersion();
             console.log('Found Edge version: ', edgeVersion);
 
             var edgeDriverVersion = await this.getEdgeDriverVersion(edgeVersion);
@@ -172,11 +173,13 @@ export default class SeleniumService extends ServiceBase {
                         type: ON_EDGE_FINDED
                     });
                 } else {
-                    this.notify({
-                        type: ON_EDGE_DRIVER_ERROR,
-                        edgeVersion: edgeDriverVersion,
-                        edgeDriverVersion: edgeDriver,
-                    });
+                    if (edgeVersion) {
+                        this.notify({
+                            type: ON_EDGE_DRIVER_ERROR,
+                            edgeVersion: edgeVersion,
+                            edgeDriverVersion: edgeDriverVersion,
+                        });
+                    }
                 }
             }
         }
@@ -329,7 +332,7 @@ export default class SeleniumService extends ServiceBase {
         // thus we copy all bundled drivers from the installation dir
         return new Promise((resolve, reject) => {
             fs.copy(
-                path.join(cwd, process.platform),
+                path.resolve(cwd, process.platform),
                 this.getDriversRootPath(),
                 { overwrite: false },
                 err => {
@@ -555,9 +558,12 @@ export default class SeleniumService extends ServiceBase {
     // or to the user placed binary in the root folder if driverVersion is falsy
     getChromeDriverBinPathExact(driverVersion) {
         return new Promise((resolve, reject) => {
-            const driverBin = path.join(this.getDriversRootPath(),
+            const driverBin = path.resolve(
+                this.getDriversRootPath(),
                 driverVersion ? CHROMEDRIVER_FOLDER_START + driverVersion : '',
-                'chromedriver' + (process.platform === 'win32' ? '.exe' : ''));
+                'chromedriver' + (process.platform === 'win32' ? '.exe' : '')
+            );
+
             fs.access(driverBin, err => {
                 if (err) {
                     resolve(null);
@@ -572,9 +578,12 @@ export default class SeleniumService extends ServiceBase {
     // or to the user placed binary in the root folder if driverVersion is falsy
     getEdgeDriverBinPathExact(driverVersion) {
         return new Promise((resolve, reject) => {
-            const driverBin = path.join(this.getDriversRootPath(),
+            const driverBin = path.resolve(
+                this.getDriversRootPath(),
                 driverVersion ? EDGE_FOLDER_START + driverVersion : '',
-                'edgedriver' + (process.platform === 'win32' ? '.exe' : ''));
+                'edgedriver' + (process.platform === 'win32' ? '.exe' : '')
+            );
+
             fs.access(driverBin, err => {
                 if (err) {
                     resolve(null);
@@ -591,7 +600,7 @@ export default class SeleniumService extends ServiceBase {
         const globVersion = `${segments[0]}.${segments[1]}.${segments[2]}.*/chromedriver${process.platform === 'win32' ? '.*' : ''}`;
 
         return new Promise((resolve, reject) => {
-            const approx = path.join(this.getDriversRootPath(), CHROMEDRIVER_FOLDER_START + globVersion);
+            const approx = path.resolve(this.getDriversRootPath(), CHROMEDRIVER_FOLDER_START + globVersion);
             glob(approx, (err, files) => {
                 if (err || files.length === 0) {
                     resolve(null);
@@ -661,7 +670,7 @@ export default class SeleniumService extends ServiceBase {
         const globVersion = `${segments[0]}.${segments[1]}.${segments[2]}.*/msedgedriver${process.platform === 'win32' ? '.*' : ''}`;
  
         return new Promise((resolve, reject) => {
-            const approx = path.join(this.getDriversRootPath(), EDGE_FOLDER_START + globVersion);
+            const approx = path.resolve(this.getDriversRootPath(), EDGE_FOLDER_START + globVersion);
             glob(approx, (err, files) => {
                 if (err || files.length === 0) {
                     resolve(null);
@@ -719,7 +728,7 @@ export default class SeleniumService extends ServiceBase {
     }
 
     async decompressZip(driverVersion, zipPath, folderStart) {
-        var driverDir = path.join(this.getDriversRootPath(), folderStart + driverVersion);
+        var driverDir = path.resolve(this.getDriversRootPath(), folderStart + driverVersion);
         await extract(zipPath, { dir: driverDir });
         return driverDir;
     }
@@ -727,7 +736,7 @@ export default class SeleniumService extends ServiceBase {
     chmodChromeDriver(driverDir) {
         return new Promise((resolve, reject) => {
             try {
-                var driverBin = path.join(driverDir, 'chromedriver' + (process.platform === 'win32' ? '.exe' : ''));
+                var driverBin = path.resolve(driverDir, 'chromedriver' + (process.platform === 'win32' ? '.exe' : ''));
                 // chmod +x on POSIX
                 if (process.platform !== 'win32') {
                     console.log('chmod +x ' + driverBin);
@@ -752,7 +761,7 @@ export default class SeleniumService extends ServiceBase {
     chmodEdgeDriver(driverDir) {
         return new Promise((resolve, reject) => {
             try {
-                var driverBin = path.join(driverDir, 'msedgedriver' + (process.platform === 'win32' ? '.exe' : ''));
+                var driverBin = path.resolve(driverDir, 'msedgedriver' + (process.platform === 'win32' ? '.exe' : ''));
                 // chmod +x on POSIX
                 if (process.platform !== 'win32') {
                     console.log('chmod +x ' + driverBin);
