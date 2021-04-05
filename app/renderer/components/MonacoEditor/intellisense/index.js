@@ -86,6 +86,24 @@ const arrdata = createModuleAndMethods(intellisenseJson);
 
 export default function () {
     try {
+        monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+            noLib: true,
+            allowNonTsExtensions: true,
+            target: monaco.languages.typescript.ScriptTarget.ES2015,
+            lib: ['es6']
+        });
+    } catch (e) {
+        console.log('monaco.languages.typescript.setCompilerOptions error', e);
+    }
+
+    try {
+        monaco.languages.typescript.javascriptDefaults.addExtraLib('lib.es2015.collection.d.ts');
+        monaco.languages.typescript.javascriptDefaults.addExtraLib('lib.es2019.array.d.ts');
+    } catch (e) {
+        console.log('monaco.languages.typescript.addExtraLib error', e);
+    }
+
+    try {
         monaco.languages.typescript.javascriptDefaults.addExtraLib(arrdata.join('\n'));
     } catch (e) {
         console.log('monaco.languages.typescript.javascriptDefaults error', e);
