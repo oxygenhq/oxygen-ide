@@ -938,12 +938,20 @@ export function* closeFile({ payload }) {
         } else {
             yield put(tabActions.removeTab(path, name));
             yield put(editorActions.closeFile(path, false, name));
-            yield put(fsActions.resetFileContent(path));
+            if ('unknown' === path) {
+                // ignore
+            } else {
+                yield put(fsActions.resetFileContent(path));
+            }
         }
     } else {
         yield put(tabActions.removeTab(path, name));
         yield put(editorActions.closeFile(path, false, name));
-        yield put(fsActions.resetFileContent(path));
+        if ('unknown' === path) {
+            // ignore
+        } else {
+            yield put(fsActions.resetFileContent(path));
+        }
     }
 
     yield put(testActions.removeBreakpoints(path));
