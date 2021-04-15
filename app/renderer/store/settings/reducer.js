@@ -405,7 +405,8 @@ export default (state = defaultState, action) => {
     case types.LOAD_PROJECT_SETTINGS_SUCCESS: 
         return {
             ...state,
-            projectSettings: projectSettings
+            projectSettings: projectSettings,
+            generalSettings: defaultAppSettings.generalSettings
         };
     
     case types.LOAD_PROJECT_SETTINGS_FAILURE:
