@@ -118,7 +118,7 @@ export default (state = DEFAULT_STATE, action) => {
     }
 
     // CLOSE_FILE
-    case types.EDITOR_CLOSE_FILE: {   
+    case types.EDITOR_CLOSE_FILE: {
         _openFilesClone = {};
         for (var filePath of Object.keys(state.openFiles)) {
             if (path === 'unknown') {
@@ -150,14 +150,14 @@ export default (state = DEFAULT_STATE, action) => {
         }
         if (
             (newActiveFile && 
-        newActiveFile.startsWith && 
-        newActiveFile.startsWith('unknown')) || 
-        (newActiveFile && 
-        newActiveFile.endsWith && 
-        newActiveFile.endsWith('(deleted from disk)'))
+            newActiveFile.startsWith && 
+            newActiveFile.startsWith('unknown')) || 
+            (newActiveFile && 
+            newActiveFile.endsWith && 
+            newActiveFile.endsWith('(deleted from disk)'))
         ) {
             _newActiveFile = 'unknown';
-            _newActiveFileName = newActiveFile;
+            _newActiveFileName = newActiveFile.replace('unknown', '');
         } else {
             _newActiveFile = newActiveFile;
             _newActiveFileName = null;
