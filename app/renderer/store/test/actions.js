@@ -109,9 +109,11 @@ export const startAllTests = () => ({
     payload: null,
 });
 
-export const stopTest = () => ({
+export const stopTest = (force) => ({
     type: ActionTypes.TEST_STOP,
-    payload: null,
+    payload: {
+        force
+    },
 });
 
 export const continueTest = () => ({
