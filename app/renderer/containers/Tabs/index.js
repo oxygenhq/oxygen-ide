@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Tabs from './Tabs.jsx';
 import * as actions from '../../store/tabs/actions';
+import { showContextMenu } from '../../store/workbench/actions';
 
 const mapStoreToProps = (state) => {
     return {
@@ -21,7 +22,7 @@ const mapStoreToProps = (state) => {
 };
   
 const mapDispatchToProps = (dispatch) => (
-    bindActionCreators({ ...actions } , dispatch)
+    bindActionCreators({ ...actions, showContextMenu } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Tabs);

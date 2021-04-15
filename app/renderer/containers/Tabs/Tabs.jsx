@@ -25,7 +25,8 @@ type Props = {
     onClose: (string) => void,
     changeTabOrder: Function,
     recorder: Object,
-    activeTitle: string | null
+    activeTitle: string | null,
+    showContextMenu: Function
 };
 
 const circle = () => {
@@ -90,6 +91,14 @@ class Tabs extends React.Component<Props, void> {
 
     changeTabOrder = (dragIndex, hoverIndex) => {
         this.props.changeTabOrder(dragIndex, hoverIndex);
+    }
+
+    handleContextMenuEvent = (e, tab, menuName) => {
+        e.preventDefault();
+        if (this.props.showContextMenu) {
+            this.props.onChange(tab.key, tab.title);
+            this.props.showContextMenu(menuName, e, tab);
+        }
     }
 
     render() {
@@ -158,7 +167,10 @@ class Tabs extends React.Component<Props, void> {
                                     key={tab.key+tab.title}
                                     moveCard={this.changeTabOrder}
                                 >
-                                    <div className={itemClass}>
+                                    <div
+                                        className={itemClass}
+                                        onContextMenu={ (e) => this.handleContextMenuEvent(e, tab, 'CONTEXT_MENU_TAB')}
+                                    >
                                         <Tooltip
                                             mouseEnterDelay={0.5}
                                             placement="top"

@@ -201,6 +201,84 @@ export function* handleMainMenuEvents({ payload }) {
         yield put(wbActions.showDialog('DIALOG_SETTINGS'));
     } else if (cmd === Const.MENU_CMD_OPEN_OR_FILE) {
         yield openOrFile({});
+    } else if (cmd === Const.TAB_CLOSE) {
+        yield currentTabClose();
+    } else if (cmd === Const.TAB_CLOSE_ALL_TABS) {
+        yield allTabsClose();
+    } else if (cmd === Const.TAB_CLOSE_OTHER_TABS) {
+        yield otherTabsClose();
+    }
+}
+
+export function* currentTabClose() {
+    const tabs = yield select(state => state.tabs);
+
+    if (
+        tabs &&
+        tabs.list &&
+        Array.isArray(tabs.list) &&
+        tabs.list.length > 0
+    ) {
+        for (let i = 0; i < tabs.list.length; i++) {
+            const item = tabs.list[i];
+            if (tabs.active === 'unknown') {
+                if (item.key === tabs.active && item.title === tabs.activeTitle) {
+                    yield put(wbActions.closeFile(item.key, false, item.title));
+                } else {
+                    // ignore
+                }
+            } else {
+                if (item.key === tabs.active) {
+                    yield put(wbActions.closeFile(item.key, false, item.title));
+                } else {
+                    // ignore
+                }
+            }
+        }
+    }
+}
+
+export function* allTabsClose() {
+    const tabs = yield select(state => state.tabs);
+
+    if (
+        tabs &&
+        tabs.list &&
+        Array.isArray(tabs.list) &&
+        tabs.list.length > 0
+    ) {
+        for (let i = 0; i < tabs.list.length; i++) {
+            const item = tabs.list[i];
+            yield put(wbActions.closeFile(item.key, false, item.title));
+        }
+    }
+}
+
+export function* otherTabsClose() {
+    const tabs = yield select(state => state.tabs);
+    
+    if (
+        tabs &&
+        tabs.list &&
+        Array.isArray(tabs.list) &&
+        tabs.list.length > 0
+    ) {
+        for (let i = 0; i < tabs.list.length; i++) {
+            const item = tabs.list[i];
+            if (tabs.active === 'unknown') {
+                if (item.key === tabs.active && item.title === tabs.activeTitle) {
+                    // ignore
+                } else {
+                    yield put(wbActions.closeFile(item.key, false, item.title));
+                }
+            } else {
+                if (item.key === tabs.active) {
+                    // ignore
+                } else {
+                    yield put(wbActions.closeFile(item.key, false, item.title));
+                }
+            }
+        }
     }
 }
 

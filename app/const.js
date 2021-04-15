@@ -70,6 +70,10 @@ export const MENU_CMD_HELP_GO_PRO = 'MENU_CMD_HELP_GO_PRO';
 export const MENU_CMD_HELP_CHECK_UPDATES = 'MENU_CMD_HELP_CHECK_UPDATES';
 export const MENU_CMD_OPEL_LOG_FILE = 'MENU_CMD_OPEL_LOG_FILE';
 
+export const TAB_CLOSE = 'TAB_CLOSE';
+export const TAB_CLOSE_OTHER_TABS = 'TAB_CLOSE_OTHER_TABS';
+export const TAB_CLOSE_ALL_TABS = 'TAB_CLOSE_ALL_TABS';
+
 export const CHROME_EMULATED_DEVICES = [
     'iPhone 5/SE',
     'iPhone 6/7/8',
