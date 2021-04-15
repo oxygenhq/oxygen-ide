@@ -90,7 +90,23 @@ const CONTEXT_MENU_OBJECT_REPOSITORY_EDITOR_CONTAINER = [
     }
 ];
 
+const CONTEXT_MENU_TAB = [
+    {
+        label: 'Close',
+        cmd: Const.TAB_CLOSE,
+    },
+    {
+        label: 'Close Other Tabs',
+        cmd: Const.TAB_CLOSE_OTHER_TABS,
+    },
+    {
+        label: 'Close All Tabs',
+        cmd: Const.TAB_CLOSE_ALL_TABS,
+    },
+];
+
 module.exports = {
+    CONTEXT_MENU_TAB: CONTEXT_MENU_TAB,
     CONTEXT_MENU_FILE_EXPLORER_FOLDER: CONTEXT_MENU_FILE_EXPLORER_FOLDER,
     CONTEXT_MENU_FILE_EXPLORER_FILE: CONTEXT_MENU_FILE_EXPLORER_FILE,
     CONTEXT_MENU_OBJECT_REPOSITORY_FILE_EXPLORER_FILE: CONTEXT_MENU_OBJECT_REPOSITORY_FILE_EXPLORER_FILE,
