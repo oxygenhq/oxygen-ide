@@ -65,19 +65,35 @@ export default class SettingsDialog extends React.PureComponent<Props> {
         let integrationsSettings = null;
         let runSettings = null;
         
-        if (this.GeneralSettings && this.GeneralSettings.formWrap && this.GeneralSettings.formWrap.validateFormFields) {
+        if (
+            this.GeneralSettings &&
+            this.GeneralSettings.formWrap &&
+            this.GeneralSettings.formWrap.validateFormFields
+        ) {
             generalSettingsResult = await this.GeneralSettings.formWrap.validateFormFields();
         }
         
-        if (this.CloudProvidersSettings && this.CloudProvidersSettings.formWrap && this.CloudProvidersSettings.formWrap.validateFormFields) {
+        if (
+            this.CloudProvidersSettings &&
+            this.CloudProvidersSettings.formWrap &&
+            this.CloudProvidersSettings.formWrap.validateFormFields
+        ) {
             cloudProvidersResult = await this.CloudProvidersSettings.formWrap.validateFormFields();
         }
         
-        if (this.IntegrationsSettings && this.IntegrationsSettings.formWrap && this.IntegrationsSettings.formWrap.validateFormFields) {
+        if (
+            this.IntegrationsSettings &&
+            this.IntegrationsSettings.formWrap &&
+            this.IntegrationsSettings.formWrap.validateFormFields
+        ) {
             integrationsSettings = await this.IntegrationsSettings.formWrap.validateFormFields();
         }
 
-        if (this.RunSettings && this.RunSettings.formWrap && this.RunSettings.formWrap.validateFormFields) {
+        if (
+            this.RunSettings &&
+            this.RunSettings.formWrap &&
+            this.RunSettings.formWrap.validateFormFields
+        ) {
             runSettings = await this.RunSettings.formWrap.validateFormFields();
         }
 
