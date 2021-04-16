@@ -187,6 +187,11 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: 'resources', src: ['app.png'], 
                         dest: OUTDIR + RESOURCES + '/app'
+                    },
+                    { 
+                        expand: true, 
+                        cwd: '', src: ['LICENSE'], 
+                        dest: OUTDIR
                     }
                 ]
             },
