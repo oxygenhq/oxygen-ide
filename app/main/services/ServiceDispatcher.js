@@ -47,12 +47,16 @@ export default class ServiceDispatcher {
 
         let serviceRef = this.servicesHash[service];
         if (!serviceRef) {
-            e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: { type: 'SERVICE_NOT_FOUND' } });
+            if (e && e.sender && e.sender.send) {
+                e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: { type: 'SERVICE_NOT_FOUND' } });
+            }
             return;     // FIXME: see if we can send back an error message
         }
         let methodRef = serviceRef[method];
         if (!methodRef) {
-            e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: { type: 'METHOD_NOT_FOUND' } });
+            if (e && e.sender && e.sender.send) {
+                e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: { type: 'METHOD_NOT_FOUND' } });
+            }
             return;
         }
         if (service !== 'ElectronService' && method !== 'updateCache') {
@@ -62,12 +66,16 @@ export default class ServiceDispatcher {
             const retval = methodRef.apply(serviceRef, args);
             Promise.resolve(retval)
                 .then( result => {
-                    e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, retval: result });
+                    if (e && e.sender && e.sender.send) {
+                        e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, retval: result });
+                    }
                 })
                 .catch( err => {
                     try {
                         console.log(err);
-                        e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: err });
+                        if (e && e.sender && e.sender.send) {
+                            e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: err });
+                        }
                     } catch (e) {
                         // to avoid Unhandled Promise Rejection. Error: Object has been destroyed
                         // for example if user close ide when test run
@@ -82,17 +90,21 @@ export default class ServiceDispatcher {
                 message: error.message || null,
             };
             console.log(`Service call error: ${service}.${method}`, serializableError);
-            e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: serializableError });
+            if (e && e.sender && e.sender.send) {
+                e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: serializableError });
+            }
         }
     }
 
     _handleServiceEvent(serviceName, event) {
         const allWebContents = webContents.getAllWebContents();
         allWebContents.forEach((contents) => {
-            contents.send('MAIN_SERVICE_EVENT', {
-                service: serviceName,
-                event: event,
-            });
+            if (contents && contents.send) {
+                contents.send('MAIN_SERVICE_EVENT', {
+                    service: serviceName,
+                    event: event,
+                });
+            }
         });
     }
 }
