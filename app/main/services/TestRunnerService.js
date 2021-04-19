@@ -477,7 +477,17 @@ export default class TestRunnerService extends ServiceBase {
     _emitTestEnded(result, error, noLog = false) {
         this.finished = true;
         if (!noLog) {
-            const status = result && result.status ? result.status.toUpperCase() : 'FAILED'; 
+            const status = result && result.status ? result.status.toUpperCase() : 'FAILED';
+            let duration = result && result.duration/1000;
+
+            if (duration > 60) {
+                const m = parseInt(duration/60);
+                const s = duration-m*60;
+                duration = `${m.toFixed(0)}m ${s.toFixed(0)}s`;
+            } else {
+                duration = duration.toFixed(0)+'s';
+            }
+
             let severity = SEVERITY_PASSED;
 
             if (error) {
@@ -541,7 +551,7 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
                     });
                 }
             }
-            this._emitLogEvent(severity, `Test finished with status --> ${status}.`);
+            this._emitLogEvent(severity, `Test finished in ${duration} with status --> ${status}.`);
         }
 
         this.notify({
