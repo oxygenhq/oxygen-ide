@@ -480,13 +480,16 @@ export default class TestRunnerService extends ServiceBase {
             const status = result && result.status ? result.status.toUpperCase() : 'FAILED';
             let duration = result && result.duration/1000;
 
-            if (duration > 60) {
-                const m = parseInt(duration/60);
-                const s = duration-m*60;
-                duration = `${m.toFixed(0)}m ${s.toFixed(0)}s`;
-            } else {
-                duration = duration.toFixed(0)+'s';
+            if (duration) {
+                if (duration > 60) {
+                    const m = parseInt(duration/60);
+                    const s = duration-m*60;
+                    duration = `${m.toFixed(0)}m ${s.toFixed(0)}s`;
+                } else {
+                    duration = duration.toFixed(0)+'s';
+                }
             }
+
 
             let severity = SEVERITY_PASSED;
 

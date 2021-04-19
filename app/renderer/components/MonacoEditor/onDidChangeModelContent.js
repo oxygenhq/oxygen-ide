@@ -42,6 +42,7 @@ export default function onDidChangeModelContent (e) {
     // Only invoking when user input changed
     if (!this.__prevent_trigger_change_event) {
         this.onValueChange(editorContent, e);
+        helpers.markParams(this.editor, editorContent);
     }
 
     if (newLineAddedOrDeleted) {

@@ -156,6 +156,8 @@ export default class MonacoEditor extends React.Component<Props> {
                 this.editor.setValue(this.__current_value);
                 this.__prevent_trigger_change_event = false;
             }
+
+            helpers.markParams(this.editor, this.__current_value);
         }
         if (prevProps.language !== this.props.language) {
             monaco.editor.setModelLanguage(this.editor.getModel(), this.props.language);
@@ -309,6 +311,7 @@ export default class MonacoEditor extends React.Component<Props> {
                 helpers.addBreakpointMarker(this.editor, item, this.props.fontSize, this.props.disabledBreakpoints, this.props.resolvedBreakpoints);
             });
         }
+        helpers.markParams(editor, this.__current_value);
 
         this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_L, () => {
             this.props.handleMainMenuEvent('MENU_CMD_VIEW_EVENT_LOG');

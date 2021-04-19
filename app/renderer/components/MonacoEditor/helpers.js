@@ -536,3 +536,65 @@ export function updateActiveLineMarker(editor, inputLine, fontSize=null) {
         console.log('updateActiveLineMarker Error', e);
     }
 }
+
+const PARAM_DECORATION_CLASS_NAME = 'paramDecoration';
+
+export function markParams (editor, value) {
+    const splitResult = value.split('\n');
+
+    const regex1 = /('|")(.*)('|")/; // for ', ""
+    const regex2 = /\$\{[a-zA-Z]+?}/g; // for ${}
+    var decorations = [];
+
+    const allMarkers = getAllMarkers(editor);
+
+    const decoratorsToRemove = [
+        ...allMarkers.filter((item) => {
+            if (
+                item &&
+                item.options && 
+                item.options.inlineClassName &&
+                typeof item.options.inlineClassName === 'string'
+            ) {
+                return item.options.inlineClassName === PARAM_DECORATION_CLASS_NAME;  
+            } else {
+                return false;
+            }
+        }),
+    ];
+
+    if (splitResult && splitResult.length > 0) {
+        splitResult.map((inputItem, idx) => {
+            let item = inputItem;
+            const result = regex1.exec(item);
+            if (result && result[2]) {
+                const paramsString = result[2];
+                const params = paramsString.match(regex2); 
+                if (params && params.length > 0) {
+                    params.map((param) => {
+                        const indexOf = item.indexOf(param);
+                        const replaceSrt = new Array(param.length + 1).join( ' ' );
+                        item = item.replace(param, replaceSrt);                      
+    
+                        const start = indexOf + 3;
+                        const line = idx + 1;
+                        const end = start + param.length - 3;
+        
+                        decorations.push({
+                            range: new monaco.Range(line,start,line,end),
+                            options: {
+                                inlineClassName: PARAM_DECORATION_CLASS_NAME
+                            }
+                        });
+                    });
+                }
+
+            }
+
+        });
+    }
+
+    if (editor) {
+        editor.deltaDecorations(decoratorsToRemove, decorations);
+    }
+}
