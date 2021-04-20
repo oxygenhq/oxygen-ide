@@ -40,6 +40,13 @@
   border: 4px double #e06331;
 }
 
+.paramDecoration {
+	color: #09885a !important;
+	cursor: pointer;
+	text-decoration: underline;
+	font-style: oblique;
+}
+
 $base: 12;
 $r: 1;
 
