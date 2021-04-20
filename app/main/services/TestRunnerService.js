@@ -551,7 +551,13 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
                     });
                 }
             }
-            this._emitLogEvent(severity, `Test finished in ${duration} with status --> ${status}.`);
+
+            let durationPart = '';
+
+            if (duration) {
+                durationPart = ` in ${duration}`;
+            }
+            this._emitLogEvent(severity, `Test finished${durationPart} with status --> ${status}.`);
         }
 
         this.notify({
