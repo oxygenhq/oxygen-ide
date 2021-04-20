@@ -265,9 +265,8 @@ export default class LogViewer extends React.PureComponent<Props> {
                     className="auto-sizer-wrapper-row" 
                     style={{...style, paddingTop: rowIndex ? '0px': '5px', color: color }}
                     key={key}
-                >
-                    {line.message}
-                </div>
+                    dangerouslySetInnerHTML={{ __html : line.message }}
+                />
             );
         };
 
