@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## v1.24.0 (2020-04-xx)
+
+#### :tada: New Feature
+*  Allow closing all open tabs (through a menu when right clicking on one of the tabs).
+* Add button for force stopping test execution.
+
+#### :beetle: Bug Fix
+* When closing new tab, previously opened tab became empty.
+* Environments drop-down not reseting when switching projects.
+
+#### :nail_care: Polish
+* Improved `pdf` module performance. 
+* Increase timeout for intellisense tooltips.
+* Print test duration on test end.
+* Improve performance of Log Viewer.
+* Highlight `${}` parameters.
+
+#### :house: Internal
+* Update oxygen-cli from v1.18.0 to v1.19.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver/EdgeDriver 90.
+* Bundle GeckoDriver 0.29.1.
+* Bump dependencies.
+
 ## v1.23.1 (2020-03-25)
 
 #### :beetle: Bug Fix
