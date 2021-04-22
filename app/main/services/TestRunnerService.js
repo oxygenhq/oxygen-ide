@@ -22,6 +22,8 @@ const EVENT_LINE_UPDATE = 'LINE_UPDATE';
 const EVENT_TEST_STARTED = 'TEST_STARTED';
 const EVENT_TEST_ENDED = 'TEST_ENDED';
 const EVENT_SEND_START_DATA = 'SEND_START_DATA';
+const REPL_START = 'REPL_START';
+const REPL_RESULT = 'REPL_RESULT';
 
 // Severities
 const SEVERITY_ERROR = 'ERROR';
@@ -346,6 +348,7 @@ export default class TestRunnerService extends ServiceBase {
                     this.runner.removeListener('test-error',() => {});
                     this.runner.removeListener('iteration-end',() => {});
                     this.runner.removeListener('test-end',() => {});
+                    this.runner.removeListener('repl',() => {});
                 }
 
                 if (!force) {
@@ -615,7 +618,6 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
                 this._handleBreakpointError(breakpointError);
             });
             
-            
             this.runner.on('test-error', (err) => {
                 let message = '';
                 if (err.type && err.message) {
@@ -647,6 +649,10 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
                 }
 
                 this._emitLogEvent(SEVERITY_ERROR, message);
+            });
+
+            this.runner.on('repl', (msg) => {
+                this._handleRepl(msg);
             });
         }
 
@@ -730,10 +736,64 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
         }
     }
 
+    _handleRepl(msg) {
+        const {
+            name,
+            params
+        } = msg;
+
+        if (name === 'start') {
+            this.notify({
+                type: REPL_START,
+                message: name+' '+JSON.stringify(params)
+            });
+        }
+
+        if (name === 'result') {
+            const {
+                result,
+
+                error,
+                name,
+                message,
+                stack
+            } = params;
+
+            if (error) {
+                this.notify({
+                    type: REPL_RESULT,
+                    message: JSON.stringify(name+' '+message+' '+stack)
+                });
+            } else {
+                this.notify({
+                    type: REPL_RESULT,
+                    message: JSON.stringify(result)
+                });
+            }
+        }
+    }
+
+    async replClose() {
+        if (this.runner) {
+            return await this.runner.replClose();
+        }
+    }
+
+    async replSend(cmd) {
+        if (this.runner) {
+            return await this.runner.replSend(cmd);
+        }
+    }
+
     _getLocationInfo(location) {
         if (!location) {
             return null;
         }
+        if (location.startsWith('evalmachine.')) {
+            // repl mode
+            return;
+        }
+
         const parts = location.split(':');
 
         let fileName;

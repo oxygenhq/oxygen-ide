@@ -11,6 +11,7 @@ import React from 'react';
 import { Icon, Tabs } from 'antd';
 import LogViewer from '../../components/LogViewer.jsx';
 import VariablesViewer from '../../components/VariablesViewer';
+import ReplViewer from '../../components/ReplViewer';
 import { type LogEntry } from '../../types/LogEntry';
 import '../../css/logger.scss';
 
@@ -23,7 +24,10 @@ type Props = {
   visible: boolean,
   onHide: () => void,
   setActiveLogger: (logger: string) => void,
-  variables: Array | null
+  variables: Array | null,
+  repl: Object | null,
+  replClose: Function,
+  replSend: Function
 };
 
 export default class Logger extends React.PureComponent<Props> {
@@ -78,7 +82,16 @@ export default class Logger extends React.PureComponent<Props> {
 
     render() {
         const { panelHeight } = this.state;
-        const { visible = true, logs, active, variables } = this.props;
+        const {
+            visible = true,
+            logs,
+            active,
+            variables,
+            repl,
+            replClose,
+            replSend
+        } = this.props;
+
         const activeLogs = active ? logs[active] : null;
 
         return (
@@ -104,6 +117,7 @@ export default class Logger extends React.PureComponent<Props> {
                         <TabPane tab="General" key="general" />
                         <TabPane tab="Selenium" key="selenium" />
                         { variables && <TabPane tab="Variables" key="variables" /> }
+                        { repl && repl.active && <TabPane tab="REPL" key="repl" />}
                     </Tabs>
                     <Icon
                         type="close"
@@ -111,11 +125,22 @@ export default class Logger extends React.PureComponent<Props> {
                         onClick={ () => this.props.onHide() }
                     />
                 </div>
-                { active !== 'variables' && 
+                {
+                    active !== 'variables' && active !== 'repl' && 
                     <LogViewer logs={ activeLogs } category={ active } height={ panelHeight } />
                 }
-                { active === 'variables' && 
+                {
+                    active === 'variables' && 
                     <VariablesViewer variables={variables} height={ panelHeight } />
+                }
+                {
+                    active === 'repl' && repl.active &&
+                    <ReplViewer
+                        repl={ repl }
+                        height={ panelHeight } 
+                        replClose={ replClose }
+                        replSend={ replSend }
+                    />
                 }
             </div>
         );

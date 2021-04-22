@@ -216,4 +216,27 @@ export const setSeleniumPid = (seleniumPid) => ({
     payload: { seleniumPid },
 });
 
+export const onReplStart = (msg) => ({
+    type: ActionTypes.TEST_REPL_START,
+    payload: {
+        msg
+    }
+});
 
+export const onReplResult = (msg) => ({
+    type: ActionTypes.TEST_REPL_RESULT,
+    payload: {
+        msg
+    }
+});
+
+export const replClose = () => ({
+    type: ActionTypes.TEST_REPL_CLOSE
+});
+
+export const replSend = (cmd) => ({
+    type: ActionTypes.TEST_REPL_SEND,
+    payload: {
+        cmd
+    }
+});

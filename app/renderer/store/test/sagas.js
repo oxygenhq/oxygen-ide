@@ -30,7 +30,9 @@ export default function* root() {
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
         takeLatest(ActionTypes.TEST_EVENT_LINE_UPDATE, handleOnLineUpdate),
         takeLatest(ActionTypes.TEST_SET_PROVIDER, setTestProvider),
-        takeLatest(ActionTypes.TEST_SET_MODE, setTestMode)
+        takeLatest(ActionTypes.TEST_SET_MODE, setTestMode),
+        takeLatest(ActionTypes.TEST_REPL_CLOSE, replClose),
+        takeLatest(ActionTypes.TEST_REPL_SEND, replSend),
          
     ]);
 }
@@ -232,6 +234,16 @@ function* handleTestRunnerServiceEvent(event) {
     }
     else if (event.type === 'SEND_START_DATA') {
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', [event.data]);
+    }
+    else if (event.type === 'REPL_START') {
+        yield put(testActions.onReplStart(event.message));
+    }
+    else if (event.type === 'REPL_RESULT') {
+        if (event.message) {
+            yield put(testActions.onReplResult(event.message));
+        } else {
+            yield put(testActions.onReplResult('undefined'));
+        }
     }
 }
 
@@ -665,4 +677,16 @@ export function* handleOnLineUpdate ({ payload }) {
     yield put(tabActions.setActiveTab(file));
     yield put(editorActions.setActiveFile(file));
     yield put(editorActions.setActiveLine(time, file, line));
+}
+
+export function* replClose({ payload }) {
+    yield call(services.mainIpc.call, 'TestRunnerService', 'replClose');
+    yield put(loggerActions.setActiveLogger('general'));
+}
+
+export function* replSend({ payload }) {
+    const {
+        cmd
+    } = payload || {};
+    yield call(services.mainIpc.call, 'TestRunnerService', 'replSend', [cmd]);
 }
