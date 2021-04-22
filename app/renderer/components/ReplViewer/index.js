@@ -115,6 +115,7 @@ export default class ReplViewer extends React.PureComponent<Props> {
                         }}
                         value={ value }
                         onChange={ (e) => this.setState({value: e.target.value}) }
+                        onPressEnter={this.replSend}
                     />
                     <Button
                         type="primary"
