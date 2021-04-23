@@ -2,6 +2,7 @@
 import React from 'react';
 import ScrollContainer from '../ScrollContainer.jsx';
 import { Input, Button } from 'antd';
+import difference from 'lodash/difference';
 
 type Props = {
     repl: Object | null,
@@ -19,6 +20,22 @@ export default class ReplViewer extends React.PureComponent<Props> {
             replClosing: false,
             refreshScroll: false,
         };
+    }
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        const diff = difference(nextProps.repl.list, this.props.repl.list); 
+        const lengthDiff = !(nextProps.repl.list.length === this.props.repl.list.length);
+        let newState = {};
+
+        if ((diff && diff.length) || lengthDiff) {
+            newState = {
+                refreshScroll: !this.state.refreshScroll,
+            };
+        }
+        
+        this.setState(
+            newState
+        );
     }
 
     replClose = () => {
