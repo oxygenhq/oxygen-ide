@@ -742,14 +742,14 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
             params
         } = msg;
 
-        if (name === 'start') {
+        if (name === 'repl_started') {
             this.notify({
                 type: REPL_START,
                 message: name+' '+JSON.stringify(params)
             });
         }
 
-        if (name === 'result') {
+        if (name === 'repl_result') {
             const {
                 result,
 
