@@ -50,7 +50,8 @@ const defaultState = {
     variables: null,
     repl: {
         list: [],
-        active: false
+        active: false,
+        canStart: false
     }
 };
 
@@ -406,7 +407,7 @@ export default (state = defaultState, action) => {
             },
         };
 
-    case ActionTypes.TEST_REPL_START:
+    case ActionTypes.TEST_REPL_STARTED:
         return {
             ...state,
             repl: {
@@ -450,6 +451,16 @@ export default (state = defaultState, action) => {
                 active: true,
             },
         };
+
+    case ActionTypes.TEST_REPL_CAN_START: 
+        return {
+            ...state,
+            repl: {
+                ...state.repl,
+                canStart: value
+            },
+        };
+    
 
     case 'ON_EDGE_FINDED': {
         return {

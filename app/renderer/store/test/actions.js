@@ -216,8 +216,8 @@ export const setSeleniumPid = (seleniumPid) => ({
     payload: { seleniumPid },
 });
 
-export const onReplStart = (msg) => ({
-    type: ActionTypes.TEST_REPL_START,
+export const onReplStarted = (msg) => ({
+    type: ActionTypes.TEST_REPL_STARTED,
     payload: {
         msg
     }
@@ -238,5 +238,16 @@ export const replSend = (cmd) => ({
     type: ActionTypes.TEST_REPL_SEND,
     payload: {
         cmd
+    }
+});
+
+export const replStart = () => ({
+    type: ActionTypes.TEST_REPL_START
+});
+
+export const replCanStart = (value) => ({
+    type: ActionTypes.TEST_REPL_CAN_START,
+    payload: {
+        value
     }
 });

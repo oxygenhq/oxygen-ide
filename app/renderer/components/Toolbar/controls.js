@@ -28,3 +28,4 @@ export const TEST_STOP = 'TEST_STOP';
 export const TEST_STOPING = 'TEST_STOPING';
 export const TEST_RECORD = 'TEST_RECORD';
 export const TEST_SETTINGS = 'TEST_SETTINGS';
+export const TEST_REPL_START = 'TEST_REPL_START';

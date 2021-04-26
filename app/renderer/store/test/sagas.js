@@ -24,6 +24,7 @@ const services = ServicesSingleton();
 export default function* root() {
     yield all([
         takeLatest(ActionTypes.TEST_START, startTest),
+        takeLatest(ActionTypes.TEST_REPL_START, startReplStart),
         takeLatest(ActionTypes.TEST_START_ALL, startTestAll),
         takeLatest(ActionTypes.TEST_STOP, stopTest),
         takeLatest(ActionTypes.TEST_CONTINUE, continueTest),
@@ -236,7 +237,7 @@ function* handleTestRunnerServiceEvent(event) {
         yield call(services.mainIpc.call, 'AnalyticsService', 'playStart', [event.data]);
     }
     else if (event.type === 'REPL_START') {
-        yield put(testActions.onReplStart(event.message));
+        yield put(testActions.onReplStarted(event.message));
     }
     else if (event.type === 'REPL_RESULT') {
         if (event.message) {
@@ -244,6 +245,9 @@ function* handleTestRunnerServiceEvent(event) {
         } else {
             yield put(testActions.onReplResult('undefined'));
         }
+    }
+    else if (event.type === 'REPL_CAN_START') {
+        yield put(testActions.replCanStart(event.value));
     }
 }
 
@@ -689,4 +693,8 @@ export function* replSend({ payload }) {
         cmd
     } = payload || {};
     yield call(services.mainIpc.call, 'TestRunnerService', 'replSend', [cmd]);
+}
+
+export function* startReplStart({ payload }) {
+    yield call(services.mainIpc.call, 'TestRunnerService', 'replStart');
 }

@@ -24,6 +24,7 @@ const EVENT_TEST_ENDED = 'TEST_ENDED';
 const EVENT_SEND_START_DATA = 'SEND_START_DATA';
 const REPL_START = 'REPL_START';
 const REPL_RESULT = 'REPL_RESULT';
+const REPL_CAN_START = 'REPL_CAN_START';
 
 // Severities
 const SEVERITY_ERROR = 'ERROR';
@@ -739,7 +740,8 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
     _handleRepl(msg) {
         const {
             name,
-            params
+            params,
+            value
         } = msg;
 
         if (name === 'repl_started') {
@@ -771,6 +773,13 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
                 });
             }
         }
+
+        if (name === 'repl_canStart') {
+            this.notify({
+                type: REPL_CAN_START,
+                value: value
+            });
+        }
     }
 
     async replClose() {
@@ -782,6 +791,14 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
     async replSend(cmd) {
         if (this.runner) {
             return await this.runner.replSend(cmd);
+        }
+    }
+
+    async replStart() {
+        if (this.runner) {
+            return await this.runner.replStart();
+        } else {
+            console.log('this.runner not exist');
         }
     }
 
@@ -828,6 +845,11 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
             fileName = parts[0];
             line = parts[1];
             column = parts[2];
+        }
+
+        if (fileName.endsWith('OxygenWorker.js')) {
+            // repl mode
+            return;
         }
 
         return {
