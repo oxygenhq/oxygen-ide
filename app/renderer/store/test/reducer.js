@@ -51,7 +51,8 @@ const defaultState = {
     repl: {
         list: [],
         active: false,
-        canStart: false
+        canStart: false,
+        waitResult: false
     }
 };
 
@@ -427,6 +428,7 @@ export default (state = defaultState, action) => {
                     msg
                 ],
                 active: true,
+                waitResult: false
             },
         };
     
@@ -449,6 +451,7 @@ export default (state = defaultState, action) => {
                     cmd
                 ],
                 active: true,
+                waitResult: true
             },
         };
 

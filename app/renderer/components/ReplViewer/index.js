@@ -77,7 +77,8 @@ export default class ReplViewer extends React.PureComponent<Props> {
         } = this.state;
 
         const {
-            list
+            list,
+            waitResult
         } = repl;
 
         return (
@@ -121,8 +122,8 @@ export default class ReplViewer extends React.PureComponent<Props> {
                     }}
                 >
                     <Button
-                        onClick={this.replClose}
-                        loading={replClosing}
+                        onClick={ this.replClose }
+                        loading={ replClosing }
                     >
                         Close
                     </Button>
@@ -132,13 +133,22 @@ export default class ReplViewer extends React.PureComponent<Props> {
                         }}
                         value={ value }
                         onChange={ (e) => this.setState({value: e.target.value}) }
-                        onPressEnter={this.replSend}
+                        onPressEnter={ this.replSend }
+                        disabled={ waitResult }
                     />
                     <Button
                         type="primary"
-                        onClick={this.replSend}
+                        onClick={ this.replSend }
+                        loading={ waitResult }
                     >
-                        Enter
+                        {
+                            waitResult &&
+                            <span>Executing...</span>
+                        }
+                        {
+                            !waitResult &&
+                            <span>Enter</span>
+                        }
                     </Button>
                 </div>
             </div>
