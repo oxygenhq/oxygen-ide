@@ -756,15 +756,13 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
                 result,
 
                 error,
-                name,
-                message,
-                stack
+                message
             } = params;
 
             if (error) {
                 this.notify({
                     type: REPL_RESULT,
-                    message: JSON.stringify(name+' '+message+' '+stack)
+                    message: message
                 });
             } else {
                 this.notify({
