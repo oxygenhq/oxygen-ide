@@ -216,4 +216,38 @@ export const setSeleniumPid = (seleniumPid) => ({
     payload: { seleniumPid },
 });
 
+export const onReplStarted = (msg) => ({
+    type: ActionTypes.TEST_REPL_STARTED,
+    payload: {
+        msg
+    }
+});
 
+export const onReplResult = (msg) => ({
+    type: ActionTypes.TEST_REPL_RESULT,
+    payload: {
+        msg
+    }
+});
+
+export const replClose = () => ({
+    type: ActionTypes.TEST_REPL_CLOSE
+});
+
+export const replSend = (cmd) => ({
+    type: ActionTypes.TEST_REPL_SEND,
+    payload: {
+        cmd
+    }
+});
+
+export const replStart = () => ({
+    type: ActionTypes.TEST_REPL_START
+});
+
+export const replCanStart = (value) => ({
+    type: ActionTypes.TEST_REPL_CAN_START,
+    payload: {
+        value
+    }
+});

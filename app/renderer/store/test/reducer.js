@@ -47,7 +47,13 @@ const defaultState = {
     ],
     devices: [],
     emulators: Const.CHROME_EMULATED_DEVICES,
-    variables: null
+    variables: null,
+    repl: {
+        list: [],
+        active: false,
+        canStart: false,
+        waitResult: false
+    }
 };
 
 if (process.platform === 'win32') {
@@ -78,7 +84,9 @@ export default (state = defaultState, action) => {
         fileName,
         variables,
         seleniumPid,
-        force
+        force,
+        msg,
+        cmd
     } = payload;
     let _newDevices = [];
     let _newBreakpoints = {};
@@ -399,6 +407,63 @@ export default (state = defaultState, action) => {
                 seleniumPid: seleniumPid,
             },
         };
+
+    case ActionTypes.TEST_REPL_STARTED:
+        return {
+            ...state,
+            repl: {
+                ...state.repl,
+                list: [msg],
+                active: true,
+            },
+        };
+
+    case ActionTypes.TEST_REPL_RESULT:
+        return {
+            ...state,
+            repl: {
+                ...state.repl,
+                list: [
+                    ...state.repl.list,
+                    msg
+                ],
+                active: true,
+                waitResult: false
+            },
+        };
+    
+    case ActionTypes.TEST_REPL_CLOSE: 
+        return {
+            ...state,
+            repl: {
+                list: [],
+                active: false,
+            },
+        };
+
+    case ActionTypes.TEST_REPL_SEND:
+        return {
+            ...state,
+            repl: {
+                ...state.repl,
+                list: [
+                    ...state.repl.list,
+                    cmd
+                ],
+                active: true,
+                waitResult: true
+            },
+        };
+
+    case ActionTypes.TEST_REPL_CAN_START: 
+        return {
+            ...state,
+            repl: {
+                ...state.repl,
+                canStart: value
+            },
+        };
+    
 
     case 'ON_EDGE_FINDED': {
         return {

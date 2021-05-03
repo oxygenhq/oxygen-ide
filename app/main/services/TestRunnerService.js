@@ -22,6 +22,9 @@ const EVENT_LINE_UPDATE = 'LINE_UPDATE';
 const EVENT_TEST_STARTED = 'TEST_STARTED';
 const EVENT_TEST_ENDED = 'TEST_ENDED';
 const EVENT_SEND_START_DATA = 'SEND_START_DATA';
+const REPL_START = 'REPL_START';
+const REPL_RESULT = 'REPL_RESULT';
+const REPL_CAN_START = 'REPL_CAN_START';
 
 // Severities
 const SEVERITY_ERROR = 'ERROR';
@@ -346,6 +349,7 @@ export default class TestRunnerService extends ServiceBase {
                     this.runner.removeListener('test-error',() => {});
                     this.runner.removeListener('iteration-end',() => {});
                     this.runner.removeListener('test-end',() => {});
+                    this.runner.removeListener('repl',() => {});
                 }
 
                 if (!force) {
@@ -624,7 +628,6 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
                 this._handleBreakpointError(breakpointError);
             });
             
-            
             this.runner.on('test-error', (err) => {
                 let message = '';
                 if (err.type && err.message) {
@@ -656,6 +659,10 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
                 }
 
                 this._emitLogEvent(SEVERITY_ERROR, message);
+            });
+
+            this.runner.on('repl', (msg) => {
+                this._handleRepl(msg);
             });
         }
 
@@ -739,10 +746,78 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
         }
     }
 
+    _handleRepl(msg) {
+        const {
+            name,
+            params,
+            value
+        } = msg;
+
+        if (name === 'repl_started') {
+            this.notify({
+                type: REPL_START,
+                message: name+' '+JSON.stringify(params)
+            });
+        }
+
+        if (name === 'repl_result') {
+            const {
+                result,
+
+                error,
+                message
+            } = params;
+
+            if (error) {
+                this.notify({
+                    type: REPL_RESULT,
+                    message: message
+                });
+            } else {
+                this.notify({
+                    type: REPL_RESULT,
+                    message: JSON.stringify(result)
+                });
+            }
+        }
+
+        if (name === 'repl_canStart') {
+            this.notify({
+                type: REPL_CAN_START,
+                value: value
+            });
+        }
+    }
+
+    async replClose() {
+        if (this.runner) {
+            return await this.runner.replClose();
+        }
+    }
+
+    async replSend(cmd) {
+        if (this.runner) {
+            return await this.runner.replSend(cmd);
+        }
+    }
+
+    async replStart() {
+        if (this.runner) {
+            return await this.runner.replStart();
+        } else {
+            console.log('this.runner not exist');
+        }
+    }
+
     _getLocationInfo(location) {
         if (!location) {
             return null;
         }
+        if (location.startsWith('evalmachine.')) {
+            // repl mode
+            return;
+        }
+
         const parts = location.split(':');
 
         let fileName;
@@ -777,6 +852,11 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
             fileName = parts[0];
             line = parts[1];
             column = parts[2];
+        }
+
+        if (fileName.endsWith('OxygenWorker.js')) {
+            // repl mode
+            return;
         }
 
         return {

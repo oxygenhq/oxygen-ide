@@ -120,7 +120,8 @@ type Props = {
     stopWaitChromeExtension: Function,
     updateGeneralSettings: Function,
     showDownloadEdgeDriverError: Function,
-    startDownloadEdgeDriver: Function
+    startDownloadEdgeDriver: Function,
+    replStart: Function
 };
 
 // set global message position
@@ -291,6 +292,9 @@ export default class Workbench extends React.Component<Props> {
         else if (ctrlId === Controls.TEST_STOP) {
             this.props.stopTest();
         }
+        else if (ctrlId === Controls.TEST_REPL_START) {
+            this.props.replStart();
+        }
         else if (ctrlId === Controls.TEST_FORCE_STOP) {
             this.props.stopTest(true);
         }
@@ -357,32 +361,44 @@ export default class Workbench extends React.Component<Props> {
 
     getToolbarControlsState() {
         const { test, isRecording, editorActiveFile } = this.props;
+        const {
+            isRunning,
+            isPaused,
+            isStopingTest,
+            isStopingTestForce,
+            repl 
+        } = test;
+        const { canStart } = repl;
+
         return {
             [Controls.TEST_RUN]: {
-                visible: !test.isRunning,
+                visible: !isRunning,
                 enabled: !isRecording && 
                     !!editorActiveFile && 
                     editorActiveFile.ext && 
                     ['.js', '.feature'].includes(editorActiveFile.ext)
             },
             [Controls.TEST_STOP]: {
-                visible: test.isRunning && !test.isStopingTest,
+                visible: isRunning && !isStopingTest,
             },
             [Controls.TEST_FORCE_STOP]: {
-                visible: test.isRunning && !test.isStopingTestForce,
+                visible: isRunning && !isStopingTestForce,
             },
             [Controls.TEST_STOPING]: {
-                visible: !!test.isStopingTest,
+                visible: !!isStopingTest,
                 enabled: false
             },
             [Controls.TEST_CONTINUE]: {
-                visible: test.isPaused,
+                visible: isPaused,
             },
             [Controls.TEST_RECORD]: {
                 selected: isRecording,
             },
             [Controls.TEST_SETTINGS]: {
                 selected: false,
+            },
+            [Controls.TEST_REPL_START]: {
+                visible: isRunning && !isPaused && canStart,
             },
         };
     }

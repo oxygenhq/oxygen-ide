@@ -10,17 +10,19 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Logger from './Logger.jsx';
 import * as logActions from '../../store/logger/actions';
+import * as testActions from '../../store/test/actions';
 
 const mapStoreToProps = (state) => {
     return {
         logs: state.logger.logs || [],
         active: state.logger.active,
-        variables: state.test.variables
+        variables: state.test.variables,
+        repl: state.test.repl
     };
 };
   
 const mapDispatchToProps = (dispatch) => (
-    bindActionCreators({ ...logActions } , dispatch)
+    bindActionCreators({ ...logActions, ...testActions } , dispatch)
 );
 
 export default connect(mapStoreToProps, mapDispatchToProps)(Logger);
