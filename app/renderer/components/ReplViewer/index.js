@@ -18,7 +18,7 @@ export default class ReplViewer extends React.PureComponent<Props> {
         this.state = {
             value: '',
             replClosing: false,
-            refreshScroll: false,
+            refreshScrollBottom: false,
         };
     }
 
@@ -29,7 +29,7 @@ export default class ReplViewer extends React.PureComponent<Props> {
 
         if ((diff && diff.length) || lengthDiff) {
             newState = {
-                refreshScroll: !this.state.refreshScroll,
+                refreshScrollBottom: !this.state.refreshScrollBottom,
             };
         }
         
@@ -71,7 +71,7 @@ export default class ReplViewer extends React.PureComponent<Props> {
             height
         } = this.props;
         const {
-            refreshScroll,
+            refreshScrollBottom,
             replClosing,
             value
         } = this.state;
@@ -93,24 +93,35 @@ export default class ReplViewer extends React.PureComponent<Props> {
                 <div
                     style={{
                         flex: '1',
-                        height: (height - 70)+'px',
+                        height: (height - 80)+'px',
                         overflow: 'hidden'
                     }}
                 >
                     <ScrollContainer
-                        refreshScroll={refreshScroll}
+                        refreshScrollBottom={refreshScrollBottom}
                         classes="scroller"
                     >
                         {() => (
                             <div
                                 style={{
-                                    height: height - 70,
-                                    minHeight: height - 70,
+                                    height: height - 80,
+                                    minHeight: height - 80,
                                 }}
                             >
-                                {list.map((item, idx) => {
-                                    return (<div style={{ marginLeft: '5px' }} key={idx}>{item}</div>);
+                                {list.map(({cmd, msg}, idx) => {
+                                    return (
+                                        <div 
+                                            style={{
+                                                marginLeft: '5px',
+                                                color: cmd ? '#0f7da8' : 'rgba(0, 0, 0, 0.65)'
+                                            }}
+                                            key={idx}
+                                        >
+                                            {cmd ? '>' : ''} {msg}
+                                        </div>
+                                    );
                                 })}
+                                <div style={{ marginLeft: '5px', height: '21px' }}></div>
                             </div>
                         )}
                     </ScrollContainer>

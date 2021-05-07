@@ -413,7 +413,9 @@ export default (state = defaultState, action) => {
             ...state,
             repl: {
                 ...state.repl,
-                list: [msg],
+                list: [{
+                    msg: msg
+                }],
                 active: true,
             },
         };
@@ -424,8 +426,9 @@ export default (state = defaultState, action) => {
             repl: {
                 ...state.repl,
                 list: [
-                    ...state.repl.list,
-                    msg
+                    ...state.repl.list,{
+                        msg: msg
+                    }
                 ],
                 active: true,
                 waitResult: false
@@ -447,8 +450,10 @@ export default (state = defaultState, action) => {
             repl: {
                 ...state.repl,
                 list: [
-                    ...state.repl.list,
-                    cmd
+                    ...state.repl.list,{
+                        cmd: true,
+                        msg: cmd
+                    }
                 ],
                 active: true,
                 waitResult: true
