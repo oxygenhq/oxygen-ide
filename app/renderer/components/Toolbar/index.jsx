@@ -549,7 +549,7 @@ export default class Toolbar extends React.Component<Props> {
                     </React.Fragment>
                 }
 
-                { this._isVisible(Controls.TEST_REPL_START) && (
+                {/* { this._isVisible(Controls.TEST_REPL_START) && (
                     <button
                         className="control button stop"
                         style={ getOpacity(this._isEnabled(Controls.TEST_REPL_START)) }
@@ -563,7 +563,7 @@ export default class Toolbar extends React.Component<Props> {
                         /> 
                         <span>Interactive debugging</span>
                     </button>
-                )}
+                )} */}
 
                 <div className="separator" />
 
