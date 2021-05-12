@@ -540,6 +540,10 @@ export function updateActiveLineMarker(editor, inputLine, fontSize=null) {
 const PARAM_DECORATION_CLASS_NAME = 'paramDecoration';
 
 export function markParams (editor, value) {
+    if (!value) {
+        return;
+    }
+
     const splitResult = value.split('\n');
 
     const regex1 = /('|")(.*)('|")/; // for ', ""
