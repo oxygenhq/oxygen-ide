@@ -30,6 +30,8 @@ const defaultState = {
         stepDelay: 0,
         reopenSession: false,   // indicates if Selenium session must be re-opened for each iteration
         seleniumPort: null,     // holds Selenium server port number
+        seleniumBrowserTimeout: null,
+        seleniumTimeout: null,
         iterations: 1,
         paramFilePath: null,
         paramMode: 'sequential',
@@ -234,6 +236,24 @@ export default (state = defaultState, action) => {
             runtimeSettings: {
                 ...state.runtimeSettings,
                 seleniumPort: value,
+            },
+        };
+    // TEST_SET_SELENIUM_BROWSER_TIMEOUT
+    case ActionTypes.TEST_SET_SELENIUM_BROWSER_TIMEOUT:
+        return {
+            ...state,
+            runtimeSettings: {
+                ...state.runtimeSettings,
+                seleniumBrowserTimeout: value,
+            },
+        };
+    // TEST_SET_SELENIUM_TIMEOUT
+    case ActionTypes.TEST_SET_SELENIUM_TIMEOUT:
+        return {
+            ...state,
+            runtimeSettings: {
+                ...state.runtimeSettings,
+                seleniumTimeout: value,
             },
         };
 

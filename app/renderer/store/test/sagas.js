@@ -254,10 +254,16 @@ function* handleTestRunnerServiceEvent(event) {
 function* handleSeleniumServiceEvent(event) {
     if (event.type === 'SELENIUM_STARTED') {
         yield put(testActions.setSeleniumReady(true));
-        const { port = null } = event;
+        const { port = null, browserTimeout = null, timeout = null } = event;
         if (port) {
             yield put(testActions.setSeleniumPort(port));
         }        
+        if (browserTimeout) {
+            yield put(testActions.setSeleniumBrowserTimeout(browserTimeout));
+        }
+        if (timeout) {
+            yield put(testActions.setSeleniumTimeout(timeout));
+        }
     }
     else if (event.type === 'SELENIUM_STOPPED') {
         yield put(testActions.setSeleniumReady(false));

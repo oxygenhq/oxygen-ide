@@ -166,6 +166,16 @@ export const setSeleniumPort = (value) => ({
     payload: { value },
 });
 
+export const setSeleniumBrowserTimeout = (value) => ({
+    type: ActionTypes.TEST_SET_SELENIUM_BROWSER_TIMEOUT,
+    payload: { value },
+});
+
+export const setSeleniumTimeout = (value) => ({
+    type: ActionTypes.TEST_SET_SELENIUM_TIMEOUT,
+    payload: { value },
+});
+
 export const addDevice = (device) => ({
     type: ActionTypes.TEST_ADD_DEVICE,
     payload: { device },

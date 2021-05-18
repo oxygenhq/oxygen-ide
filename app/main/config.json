@@ -2,7 +2,9 @@
   "selenium": {
       "jar": "selenium-server-standalone-3.141.59.jar",
       "args": [],
-      "port": 4444
+      "port": 4444,
+      "browserTimeout": 60,
+      "timeout": 60
   },
   "chrome": {
       "binary": ""
