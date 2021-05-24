@@ -71,6 +71,8 @@ export default class TestRunnerService extends ServiceBase {
             testTarget,
             testProvider,
             seleniumPort,
+            seleniumBrowserTimeout,
+            seleniumTimeout,
             seleniumPid,
             stepDelay,
             testName,
@@ -192,6 +194,15 @@ export default class TestRunnerService extends ServiceBase {
         if (seleniumPid) {
             options.seleniumPid = seleniumPid;
         }
+
+        if (seleniumBrowserTimeout) {
+            options.seleniumBrowserTimeout = seleniumBrowserTimeout;
+        }
+
+        if (seleniumTimeout) {
+            options.seleniumTimeout = seleniumTimeout;
+        }
+
         // make sure to load and merge IDE defined test options with the project configuration file
         if (oxConfigFile) {
             const targetFile = cliutil.processTargetPath(oxConfigFile);            

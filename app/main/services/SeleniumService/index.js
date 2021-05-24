@@ -99,13 +99,15 @@ export default class SeleniumService extends ServiceBase {
         );
     }
 
-    _emitStartedEvent(port) {
+    _emitStartedEvent({port, browserTimeout, timeout}) {
 
         console.log('_emitStartedEvent', port);
 
         this.notify({
             type: ON_SELENIUM_STARTED,
             port: port,
+            timeout: timeout,
+            browserTimeout: browserTimeout
         });
     }
 
@@ -265,6 +267,12 @@ export default class SeleniumService extends ServiceBase {
         selArgs.push(port.toString());
         selArgs.unshift('-jar');
 
+        selArgs.push('-browserTimeout');
+        selArgs.push(selSettings.browserTimeout);
+
+        selArgs.push('-timeout');
+        selArgs.push(selSettings.timeout);
+
         console.log('Attempting to start Selenium process with the following args:', selArgs);
         this.seleniumProc = cp.spawn('java', selArgs, { cwd, shell: true });
 
@@ -274,7 +282,12 @@ export default class SeleniumService extends ServiceBase {
             seleniumPid = this.seleniumProc.pid;
         }
 
-        this._emitStartedEvent(port);
+        this._emitStartedEvent({
+            port: port,
+            browserTimeout: selSettings.browserTimeout,
+            timeout: selSettings.timeout
+        });
+
         this._handleProcessEvents();
 
         return seleniumPid;
