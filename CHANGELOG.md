@@ -1,10 +1,11 @@
 # CHANGELOG
 
-## v1.24.0 (2020-04-xx)
+## v1.24.0 (2020-05-25)
 
 #### :tada: New Feature
-*  Allow closing all open tabs (through a menu when right clicking on one of the tabs).
+* Allow closing all open tabs (through a menu when right clicking on one of the tabs).
 * Add button for force stopping test execution.
+* Add support for REPL.
 
 #### :beetle: Bug Fix
 * When closing new tab, previously opened tab became empty.
