@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v1.24.1 (2020-06-01)
+
+#### :house: Internal
+* Update oxygen-cli from v1.19.0 to v1.19.1. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver/EdgeDriver 91.
+* Bump dependencies.
+
 ## v1.24.0 (2020-05-25)
 
 #### :tada: New Feature
