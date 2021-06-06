@@ -6,7 +6,6 @@
   "permissions": [
     "contextMenus",
     "tabs",
-    "storage",
     "webNavigation",
     "webRequest",
     "webRequestBlocking",
