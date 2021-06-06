@@ -98,16 +98,16 @@ function enableLogging(debuggingEnabled) {
         var self = this;
         window.alert = function(alert) {
             self.windowMethods.alert.call(self.window, alert);
-            window.postMessage(JSON.stringify({ type: 'RECORD_ALERT', cmd: 'assertAlert', val: alert }), '*');
+            window.postMessage(JSON.stringify({ type: 'RECORD_ALERT', cmd: 'alertAccept', val: alert }), '*');
         };
         window.confirm = function(message) {
             var result = self.windowMethods.confirm.call(self.window, message);
-            window.postMessage(JSON.stringify({ type: 'RECORD_ALERT', cmd: result ? 'acceptAlert' : 'dismissAlert' }), '*');
+            window.postMessage(JSON.stringify({ type: 'RECORD_ALERT', cmd: result ? 'alertAccept' : 'alertDismiss' }), '*');
             return result;
         };
         window.prompt = function(message) {
             var result = self.windowMethods.prompt.call(self.window, message);
-            window.postMessage(JSON.stringify({ type: 'RECORD_ALERT', cmd: 'acceptAlert' }), '*');
+            window.postMessage(JSON.stringify({ type: 'RECORD_ALERT', cmd: 'alertAccept' }), '*');
             return result;
         };`;
     document.body.appendChild(s);
