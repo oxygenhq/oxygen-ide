@@ -352,13 +352,6 @@ export function* initialize() {
     if (appSettings && appSettings.cache) {
         yield putAndTake(wbActions.restoreFromCache(appSettings.cache));
 
-        try {
-            yield call(services.mainIpc.call, 'JavaService', 'checkJavaVersion');
-        } catch (error) {
-            console.warn('Failure checking Java', error);
-            yield put(reportError(error));
-            
-        }
         // setup analytics
         if (appSettings.cache.settings && appSettings.cache.settings.uuid) {
             yield call(services.mainIpc.call, 'AnalyticsService', 'setUser', [appSettings.cache.settings.uuid]); 
@@ -390,6 +383,13 @@ export function* initialize() {
         if (appSettings) {
             appSettings.cacheUsed = true;
         }
+    }
+
+    try {
+        yield call(services.mainIpc.call, 'JavaService', 'checkJavaVersion');
+    } catch (error) {
+        console.warn('Failure checking Java', error);
+        yield put(reportError(error));
     }
 
     // start Selenium server
