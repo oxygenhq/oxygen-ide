@@ -224,29 +224,3 @@ export default class FileExplorer extends React.Component<Props> {
         );
     }
 }
-/*
-
-        <ScrollContainer
-          refreshScroll={this.props.refreshScroll}
-          disableHorizontal
-          classes="tree-wrapper scroller"
-        >
-          {() => (
-            <Tree
-              showLine
-              checkable={ false }
-              defaultExpandedKeys={ ['nonexistingkey'] }
-              autoExpandParent
-              selectedKeys={ selectedKeys }
-              loadData={ this.loadData }
-              onSelect={ this.onSelectNode }
-            >
-              { renderTreeNodes.apply(this, [this.props.treeData]) }
-            </Tree>
-          )}
-        </ScrollContainer>
-
-              {renderTreeNodes(this.props.treeData, this.onSelectContexMenuItem)}
-              onExpand={this.onExpandNode}
-              selectedKeys={this.state.selectedKeys}
-*/

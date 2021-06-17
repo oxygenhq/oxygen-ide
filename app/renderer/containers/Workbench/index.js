@@ -17,7 +17,6 @@ import { move } from '../../store/fs/actions';
 import { startDownloadChromeDriver, showDownloadChromeDriverError, startDownloadEdgeDriver, showDownloadEdgeDriverError } from '../../store/dialog/actions';
 
 const mapStoreToProps = (state) => {
-    const activeNode = state.fs.tree.activeNode;
     const rootPath = state.fs.rootPath || null;
 
     const { activeFile, activeFileName } = state.editor;
@@ -54,7 +53,6 @@ const mapStoreToProps = (state) => {
         settings: state.settings,
         test: state.test,
         dialog: state.dialog,
-        treeActiveFile: activeNode && state.fs.files.hasOwnProperty(activeNode) ? state.fs.files[activeNode] : null,
         editorActiveFile: fullEditorActiveFile,
         rootPath: rootPath,
         objrepoPath : state.objrepo.path,
