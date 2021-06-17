@@ -81,8 +81,9 @@ export default class TestRunnerService extends ServiceBase {
         } = testConfig;
         let testsuite = null;
 
+        let saveParamMode;
         try {
-            let saveParamMode = paramMode;
+            saveParamMode = paramMode;
 
             if (useAllParameters) {
                 saveParamMode = 'all';
@@ -269,6 +270,18 @@ export default class TestRunnerService extends ServiceBase {
 
                     // merge IDE and project options (IDE options override project options)
                     options = { ...oxConfigOptions, ...options};
+
+                    // load paramManager fron paramFilePath if exist
+                    if (
+                        paramFilePath &&
+                        options.suites &&
+                        Array.isArray(options.suites) &&
+                        options.suites.length > 0
+                    ) {
+                        options.suites.map(async (suite, suiteIdx) => {
+                            options.suites[suiteIdx]['paramManager'] = await oxutil.loadParameterManager(null, paramFilePath, saveParamMode);
+                        });
+                    }
                 }
             }
         }
