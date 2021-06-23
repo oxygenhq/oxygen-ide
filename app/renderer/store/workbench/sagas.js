@@ -1450,29 +1450,8 @@ export function* showNewFileDialogInFolder() {
 }
 
 export function* showNewFileDialog({ payload }) {
-    
-    // const activeNode = (yield select(state => state.fs.tree.activeNode)) || null;
     const rootPath = (yield select(state => state.fs.rootPath)) || null;
-    // const files = yield select(state => state.fs.files);
-    // const treeActiveFile = activeNode && files.hasOwnProperty(activeNode) ? files[activeNode] : null;
 
-    // if (treeActiveFile) {
-    //     // in case the file is currently selected in the tree, create a new file in the same directory as the selected file
-    //     if (treeActiveFile.type === 'file') {
-    //         console.log('#1');
-    //         yield put(
-    //             wbActions.showDialog('DIALOG_FILE_CREATE', { type: 'file', path: treeActiveFile.parentPath })
-    //         );
-    //     }
-    //     // otherwise if folder is selected, create a new file inside the selected folder
-    //     else {
-    //         console.log('#2');
-    //         yield put(
-    //             wbActions.showDialog('DIALOG_FILE_CREATE', { type: 'file', path: treeActiveFile.path })
-    //         );
-    //     }
-    // }
-    // else 
     if (rootPath) {
         yield put(
             wbActions.showDialog('DIALOG_FILE_CREATE', { type: 'folder', path: rootPath })
@@ -1484,7 +1463,7 @@ export function* showNewFileDialog({ payload }) {
     }
 }
 
-export function* showNewFolderDialog({ payload }) {   
+export function* showNewFolderDialog({ payload }) {
     const activeNode = (yield select(state => state.fs.tree.activeNode)) || null;
     const rootPath = (yield select(state => state.fs.rootPath)) || null;
     const files = yield select(state => state.fs.files);

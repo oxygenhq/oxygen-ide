@@ -21,7 +21,7 @@ const mapStoreToProps = (state) => {
             ? state.fs.files[state.fs.rootPath].name
             : null,
         treeData: uniq(state.fs.tree.data),
-        activeNodePath: state.fs.tree.activeNode,
+        activeNodePath: state.tabs.active,
         expandedKeys: state.fs.tree.expandedKeys,
         refreshScroll: state.fs.refreshScroll
     };

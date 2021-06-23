@@ -137,7 +137,7 @@ export function* handleServiceEvents({ payload }) {
             yield unlinkFile(path);
         }
         if (type === 'fileChangeContent') {
-            const activeNode = yield select(state => state.fs.tree.activeNode);
+            const activeNode = yield select(state => state.tabs.active);
             if (activeNode && path && activeNode === path) {                    
                 const localPayload = { path };
                 yield fetchFileContent({ payload: localPayload });
