@@ -32,6 +32,7 @@
     display: flex;
     align-items: center;
     -webkit-user-select: none;
+    user-select: none;
     padding-top: 0;
     padding-bottom: 0;
     border-left: none !important;
@@ -52,7 +53,7 @@
 
   .logger-textarea {
     font-size: $nodesFontSize;
-    font-family: "Fira Code";
+    font-family: "consolas";
     font-size: 12px;
   }
 
@@ -122,7 +123,7 @@
     color: $loggerFontColor;
     font-size: 15px;
     line-height: 16px;
-    font-family: 'Fira Code';
+    font-family: 'consolas';
     font-variant-ligatures: contextual;
     position: relative;
   }
