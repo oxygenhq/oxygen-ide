@@ -227,18 +227,29 @@ export default class MonacoEditor extends React.Component<Props> {
         }
 
         if (updateFontSize) {
-            if (this.ln && Array.isArray(this.ln)) {
-                this.ln.map((item) => {
+            const editorBreakpoints = helpers.breakpointMarkersToLineNumbers(this.editor);
+
+            if (editorBreakpoints && Array.isArray(editorBreakpoints)) {
+                editorBreakpoints.map((item) => {
                     helpers.addBreakpointMarker(this.editor, item, updateFontSize, this.props.disabledBreakpoints, this.props.resolvedBreakpoints);
                 });
             }
 
-            
+
             if (this.props.resolvedBreakpoints && Array.isArray(this.props.resolvedBreakpoints)) {
                 this.props.resolvedBreakpoints.map((item) => {
                     helpers.addBreakpointMarker(this.editor, item, updateFontSize, this.props.disabledBreakpoints, this.props.resolvedBreakpoints);
                 });
             }
+        }
+
+        if (
+            prevProps.value !== this.props.value &&
+            this.props.breakpoints &&
+            Array.isArray(this.props.breakpoints) &&
+            this.props.breakpoints.length > 0
+        ) {
+            this.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(this.editor));
         }
     }
 
@@ -249,22 +260,7 @@ export default class MonacoEditor extends React.Component<Props> {
             this.elem.removeEventListener('addContentEvent', () => {});
         }
     }
-    
-    addLnToLnArray(ln) {
-        if (this.ln && Array.isArray(this.ln)) {
-            this.ln.push(ln);
-        } else {
-            this.ln = [ln];
-        }
-    }
 
-    removeLnfromLnArray(ln) {
-        if (ln && this.ln && Array.isArray(this.ln)) {
-            this.ln = this.ln.filter((item) => {
-                return item !== ln;
-            });
-        }
-    }  
 
     determineUpdatedProps(diffProps) {
         return {
@@ -512,13 +508,11 @@ export default class MonacoEditor extends React.Component<Props> {
                     if (editor.getModel().getLineContent(ln).trim().length > 0) {
                         if (!marker) {
                             if (helpers.addBreakpointMarker(editor, ln, this.props.fontSize, this.props.disabledBreakpoints, this.props.resolvedBreakpoints)) {
-                                this.addLnToLnArray(ln);
                                 this.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
                             }
                         }
                         else {
                             if (helpers.removeBreakpointMarker(editor, ln)) {
-                                this.removeLnfromLnArray(ln);
                                 this.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
                             }
                         }
@@ -527,7 +521,6 @@ export default class MonacoEditor extends React.Component<Props> {
                             console.warn('Breakpoint cannot be added at the empty line.');
                         } else {
                             if (helpers.removeBreakpointMarker(editor, ln)) {
-                                this.removeLnfromLnArray(ln);
                                 this.onBreakpointsUpdate(helpers.breakpointMarkersToLineNumbers(editor));
                             }
                         }
