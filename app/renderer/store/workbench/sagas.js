@@ -99,7 +99,8 @@ export default function* root() {
         takeLatest(MAIN_MENU_EVENT, handleMainMenuEvents),
         takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
         takeLatest(ActionTypes.WB_OR_ADD_TO_ROOT, orAddToRoot),
-        takeLatest(ActionTypes.UPDATE_CLOUD_PROVIDERS_SETTINGS, setCloudProvidersBrowsersAndDevices)
+        takeLatest(ActionTypes.UPDATE_CLOUD_PROVIDERS_SETTINGS, setCloudProvidersBrowsersAndDevices),
+        takeLatest(ActionTypes.WB_ENCRYPT_DECRYPT_DIALOG_ON_ACTION, encryptDecryptDialogOnAction)
     ]);
 }
 
@@ -131,6 +132,9 @@ export function* handleMainMenuEvents({ payload }) {
     }
     else if (cmd === Const.MENU_CMD_HELP_CHECK_UPDATES) {
         yield services.mainIpc.call('UpdateService', 'start', [true]);
+    }
+    else if (cmd === Const.MENU_CMD_TOOLS_ENCRYPT_DECRYPT) {
+        yield services.mainIpc.call('CryptoService', 'start');
     }
     else if (cmd === Const.MENU_CMD_OPEL_LOG_FILE) {
         try {
@@ -298,6 +302,8 @@ export function* handleServiceEvents({ payload }) {
                 yield handleJavaBadVersion(event);
             }
         }
+    } else if (service === 'CryptoService') {
+        yield handleCryptoServiceEvent(event);
     }
 }
 
@@ -318,6 +324,25 @@ export function* handleJavaBadVersion({ payload }) {
 function* handleUpdateServiceEvent(event) {
     if (event.type === 'UPDATE_CHECK') {
         yield put(wbActions.showDialog('DIALOG_UPDATE', { version: event.version, url: event.url }));
+    }
+}
+
+function* handleCryptoServiceEvent(event) {    
+    if (event.type === 'CRYPTO_SHOW_DIALOG') {
+        yield put(wbActions.showDialog('DIALOG_CRYPTO_ENCRYPT_DECRYPT', { result: event.result, error: event.error } ));
+    }
+}
+
+function* encryptDecryptDialogOnAction(event) {
+    const { payload } = event;
+    const { action } = payload;
+    const { type, value } = action;
+
+    if (type === 'encrypt') {
+        yield services.mainIpc.call('CryptoService', 'encrypt', [value]);
+    }
+    if (type === 'decrypt') {
+        yield services.mainIpc.call('CryptoService', 'decrypt', [value]);
     }
 }
 

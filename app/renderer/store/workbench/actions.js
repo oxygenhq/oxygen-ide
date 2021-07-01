@@ -401,3 +401,8 @@ export const orAddToRoot = (name, key) => ({
     type: ActionTypes.WB_OR_ADD_TO_ROOT,
     payload: { name, key },
 });
+
+export const encryptDecryptDialogOnAction = (action) => ({
+    type: ActionTypes.WB_ENCRYPT_DECRYPT_DIALOG_ON_ACTION,
+    payload: { action },
+});
