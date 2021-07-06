@@ -34,6 +34,8 @@ import EdgeDriverDownloadingDialog from '../../components/dialogs/EdgeDriverDown
 import EdgeDriverDownloadingSuccessDialog from '../../components/dialogs/EdgeDriverDownloadingSuccessDialog';
 import EdgeDriverDownloadingFailedDialog from '../../components/dialogs/EdgeDriverDownloadingFailedDialog';
 
+import EncryptDecryptDialog from '../../components/dialogs/EncryptDecryptDialog.jsx';
+
 // Other components
 import TextEditor from '../TextEditor';
 import Tabs from '../Tabs';
@@ -121,7 +123,8 @@ type Props = {
     updateGeneralSettings: Function,
     showDownloadEdgeDriverError: Function,
     startDownloadEdgeDriver: Function,
-    replStart: Function
+    replStart: Function,
+    encryptDecryptDialogOnAction: Function
 };
 
 // set global message position
@@ -569,6 +572,14 @@ export default class Workbench extends React.Component<Props> {
         this.props.hideDialog('DIALOG_INCORECT_EDGE_DRIVER_VERSION');
         this.props.showDownloadEdgeDriverError();
     }
+
+    encryptDecryptDialogOnAction = (action) => {
+        this.props.encryptDecryptDialogOnAction(action);
+    }
+
+    encryptDecryptDialogOnCancel = () => {
+        this.props.hideDialog('DIALOG_CRYPTO_ENCRYPT_DECRYPT');
+    }
     
     render() {
         const { 
@@ -776,6 +787,15 @@ export default class Workbench extends React.Component<Props> {
                             onSubmit={ ::this.updateDialog_onSubmit }
                             onCancel={ ::this.updateDialog_onCancel }
                         />
+                        {
+                            dialog.DIALOG_CRYPTO_ENCRYPT_DECRYPT &&
+                            dialog.DIALOG_CRYPTO_ENCRYPT_DECRYPT.visible &&
+                            <EncryptDecryptDialog
+                            { ...dialog['DIALOG_CRYPTO_ENCRYPT_DECRYPT'] }
+                                onAction={ this.encryptDecryptDialogOnAction }
+                                onCancel={ this.encryptDecryptDialogOnCancel }
+                            />
+                        }
                     </Fragment>
                 }
                 {updateModals.call(this)}

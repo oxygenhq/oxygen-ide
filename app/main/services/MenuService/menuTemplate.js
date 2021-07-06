@@ -220,6 +220,15 @@ export default (cmdHandler, settings) => {
             }
         ]
     });
+    template.push({
+        label: '&Tools',
+        submenu: [
+            {
+                label: 'Encrypt/Decrypt',
+                click() { cmdHandler(Const.MENU_CMD_TOOLS_ENCRYPT_DECRYPT); }
+            }
+        ]
+    });
 
     return template;
 };

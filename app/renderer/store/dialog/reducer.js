@@ -63,6 +63,9 @@ const defaultState = {
     [types.DIALOG_DOWNLOADING_EDGE_DRIVER_FAILED]: {
         visible: false
     },
+    [types.DIALOG_CRYPTO_ENCRYPT_DECRYPT]: {
+        visible: false
+    }
 };
 
 export default (state = defaultState, action) => {
