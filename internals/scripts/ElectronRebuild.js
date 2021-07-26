@@ -7,6 +7,15 @@ import rimraf from 'rimraf';
 import electronPackage  from '../../node_modules/electron/./package.json';
 import nodeAbi from 'node-abi';
 
+const checkMSVSVersion = () => {
+    const command = 'npm config get msvs_version';
+    const expect = '2019';
+    const msvs_version = execSync(command).toString().trim();
+    if (msvs_version !== expect) {
+        throw new Error(`msvs_version should be ${expect}, now ${msvs_version}`);
+    }
+};
+
 const nodeModulesPath =
   path.join(__dirname, '..', '..', 'app', 'node_modules');
 
@@ -26,6 +35,10 @@ if (Object.keys(dependencies || {}).length > 0 && fs.existsSync(nodeModulesPath)
     // remove fsevents on non OS X OSes, because electron-rebuild will fail when re-building it
     if (process.platform !== 'darwin') {
         rimraf.sync(path.join(nodeModulesPath, 'oxygen-cli', 'node_modules', 'fsevents'));
+    }
+
+    if (process.platform === 'win32') {
+        checkMSVSVersion();
     }
 
     execSync(cmd, {
