@@ -10,7 +10,7 @@
 
 #### Windows:
 * WiX Toolset installed and added to the %PATH%. 
-* ```npm --add-python-to-path='true' --debug install --global windows-build-tools``` from ```cmd``` with admin rights.
+* Python 2.7 and VS Studio 2019 installed manually or ```npm --add-python-to-path='true' --debug install --global windows-build-tools``` from ```cmd``` with admin rights.
 * [Optional. Required for DB support] Windows SDK
 * GTK and libjpeg-turbo https://github.com/Automattic/node-canvas/wiki/Installation:-Windows
 
