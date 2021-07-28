@@ -54,6 +54,7 @@ export default class ChromeDriverDownloadingFailedDialog extends React.PureCompo
                     <p>{'Download the appropriate driver for your version of Chrome from'} <a href='https://chromedriver.chromium.org/downloads' onClick={this.processLink}>here.</a></p>
                     <p>{'Extract the archive.'}</p>
                     <p>{`Place the ChromeDriver executable directly into ${path} or into ${path + require('path').sep}chromedriver-{versionname} folder where {versionname} is the driver's version.`}</p>
+                    <p>{'If you have security problems on mac, check this'} <a href='https://www.macworld.co.uk/how-to/mac-app-unidentified-developer-3669596/' onClick={this.processLink}>link</a></p>
                     <p>{'Restart Oxygen IDE afterwards for the changes to take effect. '}</p>
 
                 </div>
