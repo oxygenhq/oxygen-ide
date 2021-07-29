@@ -132,6 +132,7 @@ const defaultState = {
     uuid: null,
     first: true,
     showRecorderMessage: null,
+    hideAndroidHomeError: null,
     cacheUsed: false,
     showLanding: false,
     fontSize: 12,
@@ -173,6 +174,14 @@ export default (state = defaultState, action) => {
         return { 
             ...state,
             showRecorderMessage: value
+        };
+    }
+    
+    // HIDE ANDROID HOME ERROR
+    case types.HIDE_ANDROID_HOME_ERROR: {
+        return { 
+            ...state,
+            hideAndroidHomeError: value
         };
     }
 
@@ -251,7 +260,8 @@ export default (state = defaultState, action) => {
         return {
             ...state,
             ...settings,
-            showRecorderMessage: state.showRecorderMessage
+            showRecorderMessage: state.showRecorderMessage,
+            hideAndroidHomeError: state.hideAndroidHomeError
         };
     // LAST_SESSION_SET_ROOT_FOLDER
     case types.LAST_SESSION_SET_ROOT_FOLDER:

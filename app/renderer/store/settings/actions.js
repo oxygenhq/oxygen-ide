@@ -27,7 +27,12 @@ export const firstOpen = () => {
     };
 };
 
-
+export const changeShowShowAndroidHomeError = (value) => {
+    return {
+        type: types.HIDE_ANDROID_HOME_ERROR,
+        payload: { value },
+    };
+};
 
 /* Change Cache Used  */
 export const changeShowRecorderMessageValue = (value) => {

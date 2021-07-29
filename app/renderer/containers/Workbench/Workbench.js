@@ -107,7 +107,7 @@ type Props = {
     dialog: Object,
     javaError: Object | undefined,
     xCodeError: Object | undefined,
-    androidHomeError: string | undefined,
+    isAndroidHomeError: boolean | undefined,
     initialized: boolean,
     changeShowRecorderMessageValue: Function,
     canRecord: boolean,
@@ -124,7 +124,8 @@ type Props = {
     showDownloadEdgeDriverError: Function,
     startDownloadEdgeDriver: Function,
     replStart: Function,
-    encryptDecryptDialogOnAction: Function
+    encryptDecryptDialogOnAction: Function,
+    changeShowShowAndroidHomeError: Function
 };
 
 // set global message position
@@ -588,7 +589,7 @@ export default class Workbench extends React.Component<Props> {
             dialog, 
             javaError, 
             xCodeError, 
-            androidHomeError,
+            isAndroidHomeError,
             initialized, 
             changeShowRecorderMessageValue, 
             cleanJavaError, 
@@ -597,10 +598,19 @@ export default class Workbench extends React.Component<Props> {
             objrepoPath,
             editorActiveFile,
             editorActiveFilePossibleRepoPath,
-            objrepoName
+            objrepoName,
+            changeShowShowAndroidHomeError
         } = this.props;
 
-        const { generalSettings = {}, runSettings = {}, integrations = {}, cloudProviders = {}, cloudProvidesBrowsersAndDevices = null, projectSettings = null } = settings;
+        const {
+            generalSettings = {},
+            runSettings = {},
+            integrations = {},
+            cloudProviders = {},
+            cloudProvidesBrowsersAndDevices = null,
+            projectSettings = null,
+            hideAndroidHomeError = null
+        } = settings;
         const { runtimeSettings } = test;
         // sidebars state
         const leftSidebarSize = settings.sidebars.left.size;
@@ -648,10 +658,11 @@ export default class Workbench extends React.Component<Props> {
                     />
                 }
                 {
-                    androidHomeError &&
+                    isAndroidHomeError &&
                     <AndroidHomeErrorDialog
-                        androidHomeError={androidHomeError}
                         clean={cleanAndroidHomeError}
+                        hideAndroidHomeError={hideAndroidHomeError}
+                        changeShowShowAndroidHomeError={changeShowShowAndroidHomeError}
                     />
                 }
                 {

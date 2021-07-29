@@ -218,8 +218,16 @@ export default class DeviceDiscoveryService extends ServiceBase {
                     // ignore, send only once
                 } else {
                     this.notify({
-                        type: ANDROID_HOME_ERROR,
-                        message: e.message,
+                        type: ANDROID_HOME_ERROR
+                    });
+                    this.errorAndroidHomeErrorSended = true;
+                }
+            } else if (e.message && e.message.includes('The Android SDK root')) {
+                if (this.errorAndroidHomeErrorSended) {
+                    // ignore, send only once
+                } else {
+                    this.notify({
+                        type: ANDROID_HOME_ERROR
                     });
                     this.errorAndroidHomeErrorSended = true;
                 }
@@ -411,4 +419,3 @@ export default class DeviceDiscoveryService extends ServiceBase {
         return info;
     }
 }
-
