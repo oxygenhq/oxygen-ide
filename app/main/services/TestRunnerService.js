@@ -576,9 +576,7 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
 
                 if (result.failure.type && result.failure.type === 'CHROMEDRIVER_ERROR') {
                     this.notify({
-                        type: 'ON_CHROME_DRIVER_ERROR',
-                        chromeVersion: null,
-                        chromeDriverVersion: null
+                        type: 'ON_CHROME_DRIVER_ERROR_AFTER_TEST_ENDED'
                     });
                 }
             }

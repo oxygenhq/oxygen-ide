@@ -30,6 +30,7 @@ const selSettings = cfg.selenium;
 const ON_SELENIUM_STARTED = 'SELENIUM_STARTED';
 const ON_SELENIUM_STOPPED = 'SELENIUM_STOPPED';
 const ON_CHROME_DRIVER_ERROR = 'ON_CHROME_DRIVER_ERROR';
+const ON_FINDED_CHROME_DRIVER_VERSION = 'ON_FINDED_CHROME_DRIVER_VERSION';
 const ON_EDGE_FINDED = 'ON_EDGE_FINDED';
 const CHROMEDRIVER_FOLDER_START = 'chromedriver-';
 const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.googleapis.com';
@@ -188,18 +189,33 @@ export default class SeleniumService extends ServiceBase {
         return edgeDriver;
     }
 
+    async findChromeDriverVersion() {
+        try {
+            const chromeVersion = await this.getChromeVersion();
+            const chromeDriverVersion = await this.getChromeDriverVersion(chromeVersion);
+            this.notify({
+                type: ON_FINDED_CHROME_DRIVER_VERSION,
+                chromeVersion: chromeDriverVersion
+            });
+        } catch (e) {
+            this.notify({
+                type: ON_FINDED_CHROME_DRIVER_VERSION
+            });
+        }
+    }
+
     async chromeStart() {
-        var chromedriver;
+        var chromeDriverPath;
+        let chromeDriverVersion;
         try {
             const chromeVersion = await this.getChromeVersion();
             console.log('Found Chrome version: ' + chromeVersion);
 
-            var chromeDriverVersion = await this.getChromeDriverVersion(chromeVersion);
+            chromeDriverVersion = await this.getChromeDriverVersion(chromeVersion);
             console.log('Required ChromeDriver version: ' + chromeDriverVersion);
-
-            chromedriver = await this.findLocalChromeDriver(chromeDriverVersion);
-            if (chromedriver) {
-                console.log('Found matching ChromeDriver at ' + chromedriver);
+            chromeDriverPath = await this.findLocalChromeDriver(chromeDriverVersion);
+            if (chromeDriverPath) {
+                console.log('Found matching ChromeDriver at ' + chromeDriverPath);
             } else {
                 throw new Error('Cannot find it localy');
             }
@@ -207,24 +223,23 @@ export default class SeleniumService extends ServiceBase {
             console.warn('Failure setting up ChromeDriver.', e);
             // if something bad happens, check if user has placed the driver manually
             // getChromeDriverBinPathExact without arguments will try to resolve driver located at the root folder
-            chromedriver = await this.getChromeDriverBinPathExact();
-            if (chromedriver) {
-                console.log('Using user placed ChromeDriver from ' + chromedriver);
+            chromeDriverPath = await this.getChromeDriverBinPathExact();
+            if (chromeDriverPath) {
+                console.log('Using user placed ChromeDriver from ' + chromeDriverPath);
             } else {
                 // if no user placed driver then use, the latest bundled version
-                chromedriver = await this.findLocalChromeDriver(versions[0].driverVersion);
-                if (chromedriver) {
-                    console.log('Using latest bundled ChromeDriver from ' + chromedriver);
+                chromeDriverPath = await this.findLocalChromeDriver(versions[0].driverVersion);
+                if (chromeDriverPath) {
+                    console.log('Using latest bundled ChromeDriver from ' + chromeDriverPath);
                 } else {
                     this.notify({
                         type: ON_CHROME_DRIVER_ERROR,
-                        chromeVersion: chromeDriverVersion,
-                        chromeDriverVersion: chromedriver,
+                        chromeVersion: chromeDriverVersion
                     });
                 }
             }
         }
-        return chromedriver;
+        return chromeDriverPath;
     }
 
     async _startProcess(port) {
@@ -237,28 +252,28 @@ export default class SeleniumService extends ServiceBase {
 
         await this.copyBundledDrivers(cwd);
 
-        const edgeDriver = await this.edgeStart();
-        const chromedriver = await this.chromeStart();
+        const edgeDriverPath = await this.edgeStart();
+        const chromeDriverPath = await this.chromeStart();
 
         const selArgs = [selSettings.jar].concat(selSettings.args);
     
-        let geckodriver = null;
+        let geckodriverPath = null;
     
         if (process.platform === 'win32') {
-            geckodriver = 'win32/geckodriver.exe';
+            geckodriverPath = 'win32/geckodriver.exe';
         } else if (process.platform === 'darwin') {
-            geckodriver = 'darwin/geckodriver';
+            geckodriverPath = 'darwin/geckodriver';
         } else {
-            geckodriver = 'linux/geckodriver';
+            geckodriverPath = 'linux/geckodriver';
         }
     
-        if (chromedriver) {
-            selArgs.unshift(`-Dwebdriver.chrome.driver="${chromedriver}"`);
+        if (chromeDriverPath) {
+            selArgs.unshift(`-Dwebdriver.chrome.driver="${chromeDriverPath}"`);
         }
-        if (edgeDriver) {
-            selArgs.unshift(`-Dwebdriver.edge.driver="${edgeDriver}"`);
+        if (edgeDriverPath) {
+            selArgs.unshift(`-Dwebdriver.edge.driver="${edgeDriverPath}"`);
         }
-        selArgs.unshift(`-Dwebdriver.gecko.driver="${geckodriver}"`);
+        selArgs.unshift(`-Dwebdriver.gecko.driver="${geckodriverPath}"`);
     
         if (process.platform === 'win32') {
             selArgs.unshift('-Dwebdriver.ie.driver=win32/IEDriverServer_x86.exe');
