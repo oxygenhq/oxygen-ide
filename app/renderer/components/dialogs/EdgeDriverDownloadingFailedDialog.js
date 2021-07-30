@@ -54,7 +54,7 @@ export default class EdgeDriverDownloadingFailedDialog extends React.PureCompone
                     <p>{'Download the appropriate driver for your version of Edge from'} <a href='https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/' onClick={this.processLink}>here.</a></p>
                     <p>{'Extract the archive.'}</p>
                     <p>{`Place the EdgeDriver executable directly into ${path} or into ${path + require('path').sep}edgedriver-{versionname} folder where {versionname} is the driver's version.`}</p>
-                    <p>{'If you have security problems on mac, check this'} <a href='https://www.macworld.co.uk/how-to/mac-app-unidentified-developer-3669596/' onClick={this.processLink}>link</a></p>
+                    <p>{'If you encounter security related problems on Mac, see'} <a href='https://www.macworld.co.uk/how-to/mac-app-unidentified-developer-3669596/' onClick={this.processLink}>link</a></p>
                     <p>{'Restart Oxygen IDE afterwards for the changes to take effect. '}</p>
                 </div>
             </Modal>
