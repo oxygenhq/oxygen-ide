@@ -1,4 +1,4 @@
-import { all, put, takeLatest} from 'redux-saga/effects';
+import { all, put, takeLatest } from 'redux-saga/effects';
 import * as ActionTypes from './types';
 import * as actions from './actions';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
@@ -108,24 +108,34 @@ function* showDownloadEdgeDriverFailed() {
     }
 }
 
-function* handleOnChromeDriverErrorEvent(event) {
-    if (event && event.type === 'ON_CHROME_DRIVER_ERROR') {
+export function* handleOnChromeDriverErrorEvent(event) {
+    if (event.type === 'ON_CHROME_DRIVER_ERROR') {
         yield put(actions.setParamstoDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, {
-            chromeDriverVersion: event.chromeDriverVersion,
             chromeVersion: event.chromeVersion
         }));
         yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, event));
     }
-    if (event && event.type === 'ON_EDGE_DRIVER_ERROR') {
+    if (event.type === 'ON_EDGE_DRIVER_ERROR') {
         yield put(actions.setParamstoDialog(ActionTypes.DIALOG_INCORECT_EDGE_DRIVER_VERSION, {
             edgeDriverVersion: event.edgeDriverVersion,
             edgeVersion: event.edgeVersion
         }));
         yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_EDGE_DRIVER_VERSION, event));
     }
-    if (event && event.type === 'ON_EDGE_FINDED') {
+    if (event.type === 'ON_EDGE_FINDED') {
         yield put({
             type: 'ON_EDGE_FINDED'
         });
+    }
+    if (event.type === 'ON_CHROME_DRIVER_ERROR_AFTER_TEST_ENDED') {
+        yield services.mainIpc.call('SeleniumService', 'findChromeDriverVersion');
+    }
+    if (event.type === 'ON_FINDED_CHROME_DRIVER_VERSION') {
+        if (event.chromeVersion) {
+            yield put(actions.setParamstoDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION, {
+                chromeVersion: event.chromeVersion
+            }));
+        }
+        yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_CHROME_DRIVER_VERSION));
     }
 }
