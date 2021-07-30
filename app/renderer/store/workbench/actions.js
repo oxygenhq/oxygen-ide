@@ -73,12 +73,9 @@ export const cleanXCodeError = () => {
     };
 };
 
-export const setAndroidHomeError = (message) => {
+export const setAndroidHomeError = () => {
     return {
-        type: ActionTypes.WB_SET_ANDROID_HOME_ERROR,
-        payload: {
-            message: message
-        }
+        type: ActionTypes.WB_SET_ANDROID_HOME_ERROR
     };
 };
 

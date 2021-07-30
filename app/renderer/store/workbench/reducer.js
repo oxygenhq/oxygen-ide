@@ -52,11 +52,11 @@ export default (state = defaultState, action, dispatch) => {
     case ActionTypes.WB_SET_ANDROID_HOME_ERROR:
         return {
             ...state,
-            androidHomeError: action.payload.message
+            isAndroidHomeError: true
         };
     case ActionTypes.WB_CLEAN_ANDROID_HOME_ERROR: {
         let newState = { ...state };
-        delete newState.androidHomeError;
+        delete newState.isAndroidHomeError;
         return newState;
     }
 
