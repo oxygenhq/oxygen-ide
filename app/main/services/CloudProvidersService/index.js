@@ -151,8 +151,6 @@ export default class CloudProvidersService extends ServiceBase {
                         // Build info: version: 'unknown', revision: 'unknown', time: 'unknown'
                         // System info: host: 'cbd7e2169ec2', ip: '172.17.0.4', os.name: 'Linux', os.arch: 'amd64', os.version: '4.14.123-86.109.amzn1.x86_64', java.version: '11.0.2'
                         // Driver info: driver.version: WebiumDriver
-                    } else if (parseInt(item.browserVersion) > 81) {
-                        // not stable yet
                     } else {
                         browsers.push(new BrowserInfo({
                             apiName: item.browserName,
