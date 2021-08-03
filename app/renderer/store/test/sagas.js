@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import { all, put, select, takeLatest, call } from 'redux-saga/effects';
-import { getBrowsersTarget, getDevicesTarget } from '../../helpers/cloudProviders';
+import { getBrowsersTarget, getDevicesTarget, findDefaultBrowserKey, findDefaultDeviceKey } from '../../helpers/cloudProviders';
 import { success, failure } from '../../helpers/redux';
 import * as testActions from './actions';
 import * as wbActions from '../workbench/actions';
@@ -76,32 +76,20 @@ function* setTestMode({payload}) {
             const testProviders = yield select(state => state.settings.cloudProvidesBrowsersAndDevices);
             if (testProviders && testProviders[testProvider]) {
                 const providerData = testProviders[testProvider];
-                
-                if (testMode === 'web') {
-                    let browser = '';
-                    if (testProvider === 'lambdaTest') {
-                        browser = 'Chrome';
-                    } else if (testProvider === 'testingBot') {
-                        browser = 'Chrome';
-                    } else if (testProvider === 'sauceLabs') {
-                        browser = 'chrome';
-                    } else if (testProvider === 'perfectoMobile') {
-                        browser = 'Chrome';
-                    } else if (testProvider === 'browserStack') {
-                        browser = 'chrome';
-                    }
-
-                    if (browser && providerData.browsersTree) {
-                        const target = getBrowsersTarget(providerData.browsersTree, browser);
+                if (testMode === 'web' && providerData.browsersTree && Array.isArray(providerData.browsersTree) && providerData.browsersTree.length > 0) {
+                    const browserKey = findDefaultBrowserKey(providerData.browsersTree);
+                    if (browserKey) {
+                        const target = getBrowsersTarget(providerData.browsersTree, browserKey);
                         if (target) {
                             yield put(testActions.setTestTarget(target));
                         }
                     }
                 }
                 
-                if (testMode === 'mob') {
+                if (testMode === 'mob' && providerData.devicesTree && Array.isArray(providerData.devicesTree) && providerData.devicesTree.length > 0) {
+                    const deviceKey = findDefaultDeviceKey(providerData.devicesTree);
                     if (providerData && providerData.devicesTree) {
-                        const target = getDevicesTarget(providerData.devicesTree, 'android');
+                        const target = getDevicesTarget(providerData.devicesTree, deviceKey);
                         if (target) {
                             yield put(testActions.setTestTarget(target));
                         }
