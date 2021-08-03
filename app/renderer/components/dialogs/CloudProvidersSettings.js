@@ -57,34 +57,6 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
         });
     }
 
-    onChangeTestObjectApiKey(value) {
-        const { providers = {} } = this.state || {};
-        const { testObject = {} } = providers;
-        this.setState({
-            providers: {
-                ...this.state.providers,
-                testObject: {
-                    ...testObject,
-                    testobject_api_key: value,
-                }
-            }
-        });
-    }
-  
-    onChangeSauceLabsRegion(value) {
-        const { providers = {} } = this.state || {};
-        const { testObject = {} } = providers;
-        this.setState({
-            providers: {
-                ...this.state.providers,
-                testObject: {
-                    ...testObject,
-                    region: value,
-                }
-            }
-        });
-    }
-
     onChangePerfectoMobileLocation(value) {
         const { providers = {} } = this.state || {};
         const { perfectoMobile = {} } = providers;
@@ -94,20 +66,6 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                 perfectoMobile: {
                     ...perfectoMobile,
                     location: value,
-                }
-            }
-        });
-    }
-    
-    onChangeTestObjectHost(value) {
-        const { providers = {} } = this.state || {};
-        const { testObject = {} } = providers;
-        this.setState({
-            providers: {
-                ...this.state.providers,
-                testObject: {
-                    ...testObject,
-                    host: value,
                 }
             }
         });
@@ -136,20 +94,6 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                 perfectoMobile: {
                     ...perfectoMobile,
                     securityToken: value,
-                }
-            }
-        });
-    }
-
-    onChangesTestObjectUsername(value) {
-        const { providers = {} } = this.state || {};
-        const { testObject = {} } = providers;
-        this.setState({
-            providers: {
-                ...this.state.providers,
-                testObject: {
-                    ...testObject,
-                    testObjectUsername: value,
                 }
             }
         });
@@ -205,20 +149,6 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                 ...this.state.providers,
                 sauceLabs: {
                     ...sauceLabs,
-                    inUse: value,
-                }
-            }
-        });
-    }
-
-    onUseTestObjectChange(value) {
-        const { providers = {} } = this.state || {};
-        const { testObject = {} } = providers;
-        this.setState({
-            providers: {
-                ...this.state.providers,
-                testObject: {
-                    ...testObject,
                     inUse: value,
                 }
             }
@@ -573,7 +503,6 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
 
         const {
             sauceLabs = {},
-            testObject = {},
             testingBot = {},
             lambdaTest = {},
             perfectoMobile = {},
@@ -626,45 +555,6 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                     </div>
                 }
 
-                {/* //////////// TestObject  //////////// */}
-                <Form.Item label="TestObject" {...formItemLayout} extra="Use TestObject to run your appium in cloud." >
-                    <Switch onChange={ ::this.onUseTestObjectChange } checked={ testObject.inUse } />
-                </Form.Item>
-                { testObject && testObject.inUse &&
-                    <div className="cloud-providers-form-wrap cloud-providers-form-wrap-margin-bottom">
-                        <Form.Item label="Testobject Settings" style={ {fontWeight: 'bold'} } {...formItemLayout}/>
-                        <Form.Item label="Remote Hub URL" {...formItemLayout} >
-                            <Input
-                                value={ testObject.host }
-                                onChange={ (e) => ::this.onChangeTestObjectHost(e.target.value) }
-                            />
-                        </Form.Item>
-                        <Form.Item label="Username" {...formItemLayout} >
-                            <Input
-                                value={ testObject.testObjectUsername }
-                                onChange={ (e) => ::this.onChangesTestObjectUsername(e.target.value) }
-                            />
-                        </Form.Item>
-
-
-                        <Form.Item label="Api key" {...formItemLayout} >
-                            <Input.Password
-                                value={ testObject.testobject_api_key }
-                                onChange={ (e) => ::this.onChangeTestObjectApiKey(e.target.value) }
-                            />
-                        </Form.Item>
-
-
-                        <Form.Item label="Region" {...formItemLayout}>
-                            <Select value={testObject.region} onChange={(value) => ::this.onChangeSauceLabsRegion(value)}>
-                                <Option value="usWest1">US West 1</Option>
-                                <Option value="eu">EU Central 1</Option>
-                                <Option value="headlessUsEast">Headless US-East</Option>
-                            </Select>
-                        </Form.Item>
-                    </div>
-                }
-                
                 {/* //////////// PerfectoMobile  //////////// */}
                 <Form.Item label="PerfectoMobile" {...formItemLayout} extra="Use PerfectoMobile to run your appium in cloud." >
                     <Switch onChange={ ::this.onUsePerfectoMobileChange } checked={ perfectoMobile.inUse } />

@@ -11,7 +11,6 @@ import * as types from './types';
 const FONT_SIZE_MIN = 12;
 const FONT_SIZE_MAX = 36;
 const SAUCELABS_HUB_DEFAULT_URL = 'https://ondemand.saucelabs.com:443/wd/hub';
-const TESTOBJECT_HUB_DEFAULT_URL = 'https://us1-manual.app.testobject.com/wd/hub';
 const TESTINGBOT_HUB_DEFAULT_URL = 'https://hub.testingbot.com:443/wd/hub';
 const LAMBDATEST_HUB_DEFAULT_URL = 'https://hub.lambdatest.com:443/wd/hub';
 const PERFECTO_MOBILE_HUB_DEFAULT_URL = 'https://partners.perfectomobile.com';
@@ -74,14 +73,6 @@ const defaultAppSettings = {
             accessKey: null,
             extendedDebugging: false,
             capturePerformance: false,
-            inUse: false,
-        },
-        testObject: {
-            title: 'TestObject',
-            testObjectUsername: null,
-            testobject_api_key: null,
-            region: 'usWest1',
-            host: TESTOBJECT_HUB_DEFAULT_URL,
             inUse: false,
         },
         perfectoMobile: {
@@ -339,10 +330,6 @@ export default (state = defaultState, action) => {
                 sauceLabs: {
                     ...saveCloudProvidersDestruction('sauceLabs', defaultState),
                     ...saveCloudProvidersDestruction('sauceLabs', cache.settings),
-                },
-                testObject: {
-                    ...saveCloudProvidersDestruction('testObject', defaultState),
-                    ...saveCloudProvidersDestruction('testObject', cache.settings),
                 },
                 perfectoMobile: {
                     ...saveCloudProvidersDestruction('perfectoMobile', defaultState),

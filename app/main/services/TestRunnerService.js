@@ -310,9 +310,6 @@ export default class TestRunnerService extends ServiceBase {
             if (caps['sauce:options']) {
                 playStartEventData.provider = 'Saucelabs';
             }
-            if (caps['testObject:options']) {
-                playStartEventData.provider = 'Testobject';
-            }
             if (caps['perfectoMobile:options']) {
                 playStartEventData.provider = 'PerfectoMobile';
             }

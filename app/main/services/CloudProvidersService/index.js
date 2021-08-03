@@ -225,79 +225,6 @@ export default class CloudProvidersService extends ServiceBase {
                     }
                 });
             }
-
-        }
-        else if (providerName === 'testObject') {
-            if (browsersAndDevices.devices) {
-                if (browsersAndDevices.devices && Array.isArray(browsersAndDevices.devices) && browsersAndDevices.devices.length > 0) {
-                    browsersAndDevices.devices.map((item) => {
-                        if (item.deviceFamily && item.deviceFamily.toLowerCase && devicesNames.includes(item.deviceFamily.toLowerCase())) {
-
-                            let osName = '';
-                            let osVersion = '';
-                            let apiName = '';
-        
-                            if (item.os) {
-                                if (item.os.startsWith('Mac ')) {
-                                    apiName = 'iOS';
-                                    osName = 'Mac';
-                                    osVersion = item.os.split('Mac ')[1];
-                                } else if (item.os === 'IOS') {
-                                    apiName = 'iOS';
-                                    osName = 'Mac';
-                                    osVersion = item.osVersion;
-                                } else if (item.os.startsWith('Linux')) {
-                                    apiName = 'android';
-                                    osName = 'Linux';
-                                    osVersion = '';
-                                } else if (item.os === 'ANDROID') {
-                                    apiName = 'android';
-                                    osName = 'Linux';
-                                    osVersion = item.osVersion;
-                                } else {
-                                    console.log('Unsupported os item ', item);
-                                }
-                            } else {
-                                console.log('Unsupported item os ', item);
-                            }
-        
-
-                            
-                            // console.log('===');
-                            // console.log('apiName', apiName);
-                            // console.log('name', item.name);
-                            // console.log('version', item.osVersion);
-                            // console.log('===');
-
-                            if (apiName === 'android') {
-                                if (item.name && item.name.startsWith('Samsung Galaxy S20')) {
-                                    devices.push(new DeviceInfo({
-                                        apiName: apiName,
-                                        id: item.id,
-                                        name: item.name,
-                                        version: item.osVersion,
-                                        osName: osName,
-                                        osVersion: osVersion
-                                    }));
-                                }
-                            }
-                            // else {
-                            //     devices.push(new DeviceInfo({
-                            //         apiName: apiName,
-                            //         id: item.id,
-                            //         name: item.name,
-                            //         version: item.osVersion,
-                            //         osName: osName,
-                            //         osVersion: osVersion
-                            //     }));
-                            // }
-                        } else {
-                            console.log('Unsupported item',item );
-                        }
-                    });
-
-                }
-            }
         }
         else if (providerName === 'browserStack') {
             if (browsersAndDevices && Array.isArray(browsersAndDevices) && browsersAndDevices.length > 0 && providerName) {
@@ -597,8 +524,6 @@ export default class CloudProvidersService extends ServiceBase {
                 
                     if (providerName === 'sauceLabs') {
                         // sauceLabs
-                        return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
-                    } else if (providerName === 'testObject') {
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);
                     } else if (providerName === 'perfectoMobile') {
                         return this.sortToBrowsersAndDevice(browsersAndDevices, providerName);

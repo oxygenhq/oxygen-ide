@@ -49,7 +49,7 @@ export default class SauceLabsProvider extends CloudProviderBase {
                 fetchFn = fetch.default;
             } else {
                 console.log('fetchFn not found');
-                throw new Error('TestObject: fetchFn not found');
+                throw new Error('SauceLabs: fetchFn not found');
             }
             
                 
