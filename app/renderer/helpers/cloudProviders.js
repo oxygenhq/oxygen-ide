@@ -21,7 +21,28 @@ const devicesLevels = [
     osVersion
 ];
 
+export const findDefaultBrowserKey = (tree) => {
+    const chromeKey = tree.find((treeItem) => treeItem.key.toLowerCase() === 'chrome');
+    if (chromeKey) {
+        return chromeKey['key'];
+    }
+    
+    return tree[0]['key'];
+};
 
+export const findDefaultDeviceKey = (tree) => {
+    const androidKey = tree.find((treeItem) => treeItem.key.toLowerCase() === 'android');
+    if (androidKey) {
+        return androidKey['key'];
+    }
+    
+    const iOSKey = tree.find((treeItem) => treeItem.key.toLowerCase() === 'ios');
+    if (iOSKey) {
+        return iOSKey['key'];
+    }
+    
+    return tree[0]['key'];
+};
 
 export const getBrowsersTarget = (tree, pos, level = 0, prevValue = '') => {
     let result = null;
