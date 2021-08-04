@@ -70,33 +70,18 @@ export default class BrowserStackService extends CloudProviderBase {
         if (target && target.browserName) {
             
             if (target.browserName) {
-                caps.browserName = target.browserName;
+                caps.browser = target.browserName;
             }
 
             if (target.browserVersion) {
-                caps.browserVersion = target.browserVersion;
-                caps.version = target.browserVersion;
+                caps.browser_version = target.browserVersion;
             }
 
             if (target.osName) {
-                caps.platform = target.osName;
+                caps.os = target.osName;
             }
             
             if (target.osVersion) {
-                caps.platform += ' '+target.osVersion;
-            }
-
-            if (caps.platform === 'Windows 10' ) {
-                caps.platform = 'WINDOWS';
-            } else if (caps.platform === 'Windows 8' ) {
-                caps.platform = 'WIN8';
-            } else if (caps.platform === 'Windows 8.1' ) {
-                caps.platform = 'WIN8';
-            } else if (caps.platform === 'Windows XP' ) {
-                caps.platform = 'XP';
-            } else {
-                delete caps.platform;
-                caps.os = target.osName;
                 caps.os_version = target.osVersion;
             }
 
