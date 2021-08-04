@@ -37,7 +37,7 @@ export default class PerfectoMobileService extends CloudProviderBase {
                 fetchFn = fetch.default;
             } else {
                 console.log('fetchFn not found');
-                throw new Error('TestObject: fetchFn not found');
+                throw new Error('PerfectoMobile: fetchFn not found');
             }
             
             const response = await fetchFn(`${this.settings.host}/web/api/v1/config/devices`,
@@ -65,7 +65,7 @@ export default class PerfectoMobileService extends CloudProviderBase {
                 fetchFn = fetch.default;
             } else {
                 console.log('fetchFn not found');
-                throw new Error('TestObject: fetchFn not found');
+                throw new Error('PerfectoMobile: fetchFn not found');
             }
             
             const response = await fetchFn(`${this.settings.host}/services/handsets?operation=list&securityToken=${this.settings.securityToken}&status=connected`,
@@ -79,7 +79,7 @@ export default class PerfectoMobileService extends CloudProviderBase {
             return null;
         }
         else {
-            throw new Error('TestObject: invalid credentials');
+            throw new Error('PerfectoMobile: invalid credentials');
         }
     }
     async getBrowsersAndDevices() {

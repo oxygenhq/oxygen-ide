@@ -53,7 +53,7 @@ export default class TestingBotProvider extends CloudProviderBase {
                 fetchFn = fetch.default;
             } else {
                 console.log('fetchFn not found');
-                throw new Error('TestObject: fetchFn not found');
+                throw new Error('TestingBot: fetchFn not found');
             }
             
                 
