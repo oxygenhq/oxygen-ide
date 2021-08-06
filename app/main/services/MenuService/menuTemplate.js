@@ -177,6 +177,15 @@ export default (cmdHandler, settings) => {
         ]
     });
     template.push({
+        label: '&Tools',
+        submenu: [
+            {
+                label: 'Encrypt/Decrypt',
+                click() { cmdHandler(Const.MENU_CMD_TOOLS_ENCRYPT_DECRYPT); }
+            }
+        ]
+    });
+    template.push({
     //label: 'Help',
         role: 'help',
         submenu: [
@@ -217,15 +226,6 @@ export default (cmdHandler, settings) => {
             {
                 label: 'Open Log file',
                 click() { cmdHandler(Const.MENU_CMD_OPEL_LOG_FILE); }
-            }
-        ]
-    });
-    template.push({
-        label: '&Tools',
-        submenu: [
-            {
-                label: 'Encrypt/Decrypt',
-                click() { cmdHandler(Const.MENU_CMD_TOOLS_ENCRYPT_DECRYPT); }
             }
         ]
     });
