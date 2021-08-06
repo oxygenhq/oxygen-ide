@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## v1.25.0 (2020-08-xx)
+
+#### :tada: New Feature
+* Interface for encrypting sensitive data. See `Tools -> Encrypt/Decrypt` menu and the `utils.encrypt` `utils.decrypt` commands.
+
+#### :beetle: Bug Fix
+* When switching between scripts, the open script wasn't marked in the file tree.
+* Parameters not working when defined in oxygen.conf.js.
+* Notification about missing Java not triggering on the very first IDE launch.
+* Number of issues with breakpoints.
+* Number of issues with ChromeDriver update mechanism. 
+* Various issues with third party providers: Perfecto, BrowserStack, etc.
+
+#### :nail_care: Polish
+* Improve warning text about missing Android SDK.
+* Remove TestObject support due to EOL.
+
+#### :house: Internal
+* Update oxygen-cli from v1.19.1 to v1.20.1. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver/EdgeDriver 92.
+* Bump dependencies.
+
 ## v1.24.1 (2020-06-01)
 
 #### :house: Internal
