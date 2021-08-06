@@ -57,9 +57,9 @@ export default class EncryptDecryptDialog extends React.PureComponent<Props> {
                         value={value}
                         onChange={this.onChange}
                     />
-                    <Button.Group
+                    <div
                         style={{
-                            margin: '20px 0px'
+                            margin: '10px 0px'
                         }}
                     >
                         <Button
@@ -72,6 +72,7 @@ export default class EncryptDecryptDialog extends React.PureComponent<Props> {
                             }}
                             disabled={value.length === 0}
                             loading={loading}
+                            style={{ margin: '5px' }}
                         >
                             Encrypt
                         </Button>
@@ -85,10 +86,11 @@ export default class EncryptDecryptDialog extends React.PureComponent<Props> {
                             }}
                             disabled={value.length === 0}
                             loading={loading}
+                            style={{ margin: '5px' }}
                         >
                             Decrypt
                         </Button>
-                    </Button.Group>
+                    </div>
                     {
                         typeof result === 'string' &&
                         <Paragraph

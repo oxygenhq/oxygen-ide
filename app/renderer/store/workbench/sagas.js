@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 import uuidv4 from 'uuid/v4';
-import { all, put, select, takeLatest, call } from 'redux-saga/effects';
+import { all, put, select, takeLatest, call, delay } from 'redux-saga/effects';
 import { putAndTake } from '../../helpers/saga';
 import pathHelper from 'path';
 import { 
@@ -340,10 +340,12 @@ function* encryptDecryptDialogOnAction(event) {
 
     if (type === 'encrypt') {
         yield put(wbActions.showDialog('DIALOG_CRYPTO_ENCRYPT_DECRYPT', { loading: true } ));
+        yield delay(3000);
         yield services.mainIpc.call('CryptoService', 'encrypt', [value]);
     }
     if (type === 'decrypt') {
         yield put(wbActions.showDialog('DIALOG_CRYPTO_ENCRYPT_DECRYPT', { loading: true } ));
+        yield delay(3000);
         yield services.mainIpc.call('CryptoService', 'decrypt', [value]);
     }
 }
