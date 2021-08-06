@@ -34,7 +34,8 @@ export default class EncryptDecryptDialog extends React.PureComponent<Props> {
             result,
             error,
             onCancel,
-            onAction
+            onAction,
+            loading
         } = this.props;
 
         return (
@@ -70,6 +71,7 @@ export default class EncryptDecryptDialog extends React.PureComponent<Props> {
                                 });
                             }}
                             disabled={value.length === 0}
+                            loading={loading}
                         >
                             Encrypt
                         </Button>
@@ -82,6 +84,7 @@ export default class EncryptDecryptDialog extends React.PureComponent<Props> {
                                 });
                             }}
                             disabled={value.length === 0}
+                            loading={loading}
                         >
                             Decrypt
                         </Button>
