@@ -329,7 +329,7 @@ function* handleUpdateServiceEvent(event) {
 
 function* handleCryptoServiceEvent(event) {    
     if (event.type === 'CRYPTO_SHOW_DIALOG') {
-        yield put(wbActions.showDialog('DIALOG_CRYPTO_ENCRYPT_DECRYPT', { result: event.result, error: event.error } ));
+        yield put(wbActions.showDialog('DIALOG_CRYPTO_ENCRYPT_DECRYPT', { result: event.result, error: event.error, loading: false } ));
     }
 }
 
@@ -339,9 +339,11 @@ function* encryptDecryptDialogOnAction(event) {
     const { type, value } = action;
 
     if (type === 'encrypt') {
+        yield put(wbActions.showDialog('DIALOG_CRYPTO_ENCRYPT_DECRYPT', { loading: true } ));
         yield services.mainIpc.call('CryptoService', 'encrypt', [value]);
     }
     if (type === 'decrypt') {
+        yield put(wbActions.showDialog('DIALOG_CRYPTO_ENCRYPT_DECRYPT', { loading: true } ));
         yield services.mainIpc.call('CryptoService', 'decrypt', [value]);
     }
 }

@@ -802,7 +802,7 @@ export default class Workbench extends React.Component<Props> {
                             dialog.DIALOG_CRYPTO_ENCRYPT_DECRYPT &&
                             dialog.DIALOG_CRYPTO_ENCRYPT_DECRYPT.visible &&
                             <EncryptDecryptDialog
-                            { ...dialog['DIALOG_CRYPTO_ENCRYPT_DECRYPT'] }
+                                { ...dialog['DIALOG_CRYPTO_ENCRYPT_DECRYPT'] }
                                 onAction={ this.encryptDecryptDialogOnAction }
                                 onCancel={ this.encryptDecryptDialogOnCancel }
                             />
