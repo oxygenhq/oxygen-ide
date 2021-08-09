@@ -431,7 +431,7 @@ export default class MonacoEditor extends React.Component<Props> {
                 fontSize: saveFontSize,
                 lineHeight: saveFontSize*RATIO
             });
-            oxygenIntellisense();
+            oxygenIntellisense(monaco);
             if (theme) {
                 monaco.editor.setTheme(theme);
             }
