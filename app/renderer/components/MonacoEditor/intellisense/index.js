@@ -84,7 +84,7 @@ const createModuleAndMethods = (jsonData) => {
 
 const arrdata = createModuleAndMethods(intellisenseJson);
 
-export default function () {
+export default function (monaco) {
     try {
         monaco.languages.typescript.javascriptDefaults.addExtraLib(arrdata.join('\n'));
     } catch (e) {
