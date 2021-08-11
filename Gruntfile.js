@@ -31,8 +31,6 @@ module.exports = function(grunt) {
         defaultTasks.push('chmod:chromedriver');
         defaultTasks.push('chmod:geckodriver');
         defaultTasks.push('chmod:oxygendarwin');
-    } else if (process.platform === 'win32') {
-        defaultTasks.push('copy:win');
     }
     defaultTasks.push('asar'); 
     defaultTasks.push('rebrand');
@@ -102,7 +100,7 @@ module.exports = function(grunt) {
             src: OUTDIR + RESOURCES + '/app',
             dest: OUTDIR + RESOURCES + '/app.asar',
             unpack: '*.node',
-            'unpack-dir': '{main/selenium,main/services/Win32FileService,node_modules/oxygen-cli,node_modules/canvas,node_module/pdfreader}'
+            'unpack-dir': '{main/selenium,node_modules/oxygen-cli,node_modules/canvas,node_module/pdfreader}'
         },
         'config-patch': {
             dist: OUTDIR
@@ -201,16 +199,6 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: 'resources', src: ['app.icns'], 
                         dest: OUTDIR + RESOURCES
-                    }
-                ]
-            },
-            win: {
-                files: [
-                    { 
-                        expand: true, 
-                        cwd: 'app',
-                        src: ['main/services/Win32FileService/CodeHelper.exe'], 
-                        dest: OUTDIR + RESOURCES + '/app'
                     }
                 ]
             },

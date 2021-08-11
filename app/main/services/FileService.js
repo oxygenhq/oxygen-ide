@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-import * as cp from 'child_process';
 import fs from 'fs';
 import fsExtra from 'fs-extra';
 import beautify from 'js-beautify';
@@ -28,14 +27,6 @@ const FS_ERRORS = {
     ENOENT: 'No such file or directory',
     EPERM: 'Operation not permitted'
 };
-
-const FileChangeType = {
-	UPDATED: 0,
-	ADDED: 1,
-	DELETED: 2
-};
-
-const changeTypeMap = [FileChangeType.UPDATED, FileChangeType.ADDED, FileChangeType.DELETED];
 
 const getFileInfo = (filePath) => {
     try {
@@ -136,45 +127,6 @@ export default class FileService extends ServiceBase {
         }
     }
 
-    processWin32Change(changeType, absolutePathInput, folderPath) {
-        // File Change Event (0 Changed, 1 Created, 2 Deleted)
-        if (typeof changeType !== 'undefined' && changeType >= 0 && changeType < 3) {
-
-            let type = '';
-            const evNumber = changeTypeMap[changeType];
-            const absolutePath = absolutePathInput.replace(/(\r\n|\n|\r)/gm, '');
-
-            let isDirectory = false;
-
-            try {
-                const stats = fs.lstatSync(absolutePath);
-                isDirectory = stats.isDirectory();
-            } catch (e) {
-                // ignore
-            }
-
-            if (evNumber === 0) {
-                type = 'fileChangeContent';
-            }
-            else if (evNumber === 1) {
-                if (isDirectory) {
-                    type = 'dirAdd';
-                } else {
-                    type = 'fileAdd';
-                }
-            }
-            else if (evNumber === 2) {
-                if (isDirectory) {
-                    type = 'dirUnlink';
-                } else {
-                    type = 'fileUnlink';
-                }
-            }
-
-            processChange(absolutePath, folderPath, type);
-        }
-    }
-
     createWatchOnFilesChannel(folderPath, subFolders = null) {
 
         if (Array.isArray(subFolders)) {
@@ -204,79 +156,6 @@ export default class FileService extends ServiceBase {
                 saveWatchFolders = [folderPath, ...subFolders];
             } else {
                 saveWatchFolders = folderPath;
-            }
-
-            if (
-                process.platform === 'win32' &&
-                folderPath &&
-                typeof folderPath === 'string' &&
-                folderPath.startsWith('\\')
-            ) {
-                // network folder
-                let exePath;
-                if (process.env.NODE_ENV === 'production') {
-                    exePath = path.resolve(__dirname, process.env.RELEASE_BUILD ?
-                        '../../app.asar.unpacked/main/services/Win32FileService/CodeHelper.exe' :
-                        'services/Win32FileService/CodeHelper.exe');
-                } else {
-                    exePath = path.resolve(__dirname, './Win32FileService/CodeHelper.exe');
-                }
-
-                const args = [folderPath];
-                this.handleNetworkFolderChanges = cp.spawn(exePath, args);
-
-
-                if (
-                    this.handleNetworkFolderChanges &&
-                    this.handleNetworkFolderChanges.stdout &&
-                    this.handleNetworkFolderChanges.stdout.on
-                ) {
-                    this.handleNetworkFolderChanges.stdout.on('data', (data) => {
-                        var out = new Buffer(data,'utf-8').toString();
-                        const eventParts = out.split('|');
-                        if (eventParts.length === 2) {
-                            const changeType = Number(eventParts[0]);
-                            let absolutePath = eventParts[1];
-                            this.processWin32Change(changeType, absolutePath, folderPath);
-                        } else if (eventParts.length === 3) {
-                            let doubleEventParts = out.split('\r\n').filter((el) => !!el);
-                            if (doubleEventParts && Array.isArray(doubleEventParts) && doubleEventParts.length > 0) {
-                                doubleEventParts.map((item) => {
-                                    const eventParts = item.split('|');
-                                    const changeType = Number(eventParts[0]);
-                                    let absolutePath = eventParts[1];                
-                                    this.processWin32Change(changeType, absolutePath, folderPath);
-                                });
-                            }
-                        }
-
-                    });
-                }
-
-                if (
-                    this.handleNetworkFolderChanges &&
-                    this.handleNetworkFolderChanges.stderr &&
-                    this.handleNetworkFolderChanges.stderr.on
-                ) {
-                    this.handleNetworkFolderChanges.stderr.on('data', (data) => {
-                        var error = new Buffer(data,'utf-8').toString();
-                        console.log('handleNetworkFolderChanges stderr error', error);
-                    });
-                }
-
-                if (this.handleNetworkFolderChanges && this.handleNetworkFolderChanges.on) {
-                    // Errors
-                    this.handleNetworkFolderChanges.on('error', (error) => {
-                        console.log('handleNetworkFolderChanges error', error);
-                    });
-    
-                    // Exit
-                    this.handleNetworkFolderChanges.on('exit', (code, signal) => {
-                        console.log('Watcher failed to start');
-                        console.log('code', code);
-                        console.log('signal', signal);
-                    });
-                }
             }
 
             this.chokidarWatcher = chokidar.watch(saveWatchFolders, {
