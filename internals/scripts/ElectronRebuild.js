@@ -53,4 +53,10 @@ if (Object.keys(dependencies || {}).length > 0 && fs.existsSync(nodeModulesPath)
         const fibersFinal = path.join(nodeModulesPath, 'fibers', 'bin', process.platform + '-' + process.arch + '-' + abi + '-glibc');
         fs.renameSync(fibersOrinal, fibersFinal);
     }
+    
+    if (['win32', 'darwin'].includes(process.platform)) {
+        const odbcLibBindingsOriginal = path.join(nodeModulesPath, 'odbc', 'lib', 'bindings', 'napi-v{napi_build_version}');
+        const odbcLibBindingsFinal = path.join(nodeModulesPath, 'odbc', 'lib', 'bindings', 'napi-v4');
+        fs.renameSync(odbcLibBindingsOriginal, odbcLibBindingsFinal);
+    }
 }
