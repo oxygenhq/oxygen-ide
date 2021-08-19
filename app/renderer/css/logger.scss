@@ -56,12 +56,15 @@
     font-size: 12px;
   }
 
+  .infinite-scroll-component  {
+    overflow: visible !important;
+  }
+
   .auto-sizer-wrapper {
     flex: 1 1 auto;
   }
 
   .auto-sizer-wrapper-row {
-    overflow: hidden;
     padding-left: 10px;
     white-space: pre-wrap;
   }
