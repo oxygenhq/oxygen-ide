@@ -23,10 +23,12 @@ export default class ScrollContainer extends React.Component<Props> {
     componentDidMount() {
         if (!this.scroller) {
             const {
-                disableHorizontal, disableVertical
+                disableHorizontal,
+                disableVertical
             } = this.props;
             this.scroller = initializeScroll(
-                this.scrollWrap, disableHorizontal,
+                this.scrollWrap,
+                disableHorizontal,
                 disableVertical
             );
         }

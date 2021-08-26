@@ -12,9 +12,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { message } from 'antd';
 import difference from 'lodash/difference';
 import { type LogEntry } from '../types/LogEntry';
-import ScrollContainer from './ScrollContainer.jsx';
-import { AutoSizer, Grid } from 'react-virtualized';
-import 'react-virtualized/styles.css';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import os from 'os';
 
 type Props = {
@@ -35,8 +33,7 @@ export default class LogViewer extends React.PureComponent<Props> {
             keyKeys: [],
             selected: false,
             copyValue: '',
-            lines: [],
-            maxWidth: 1
+            lines: []
         };
     }
 
@@ -48,7 +45,6 @@ export default class LogViewer extends React.PureComponent<Props> {
         const { logs } = this.props;        
         const lines = [];
         let newState = {};
-        let maxWidth = 1;
   
         if (logs && logs.map) {
             logs.map((log) => {
@@ -59,14 +55,6 @@ export default class LogViewer extends React.PureComponent<Props> {
                 if (messageSplit && messageSplit.map) {
                     messageSplit.map((inputItem, i) => {
                         const item = inputItem.replace(/\t/g,'    ');
-
-                        if (
-                            item &&
-                            item.length &&
-                            maxWidth < item.length
-                        ) {
-                            maxWidth = item.length;
-                        }
 
                         lines.push({
                             message: item,
@@ -84,7 +72,6 @@ export default class LogViewer extends React.PureComponent<Props> {
             });
 
             newState.lines = lines;
-            newState.maxWidth = maxWidth;
         }
 
         this.setState(
@@ -96,7 +83,6 @@ export default class LogViewer extends React.PureComponent<Props> {
         const diff = difference(nextProps.logs, this.props.logs); 
         const lengthDiff = !(nextProps.logs.length === this.props.logs.length);
         let newState = {};
-        let maxWidth = 1;
 
         if ((this.props.category !== nextProps.category) || (diff && diff.length) || lengthDiff) {
             newState = {
@@ -104,8 +90,7 @@ export default class LogViewer extends React.PureComponent<Props> {
                 keyKeys: [],
                 selected: false,
                 copyValue: '',
-                lines: [],
-                maxWidth: 1
+                lines: []
             };
         }
 
@@ -125,14 +110,6 @@ export default class LogViewer extends React.PureComponent<Props> {
                         messageSplit.map((inputItem, i) => {
                             const item = inputItem.replace(/\t/g,'    ');
 
-                            if (
-                                item &&
-                                item.length &&
-                                maxWidth < item.length
-                            ) {
-                                maxWidth = item.length;
-                            }
-
                             lines.push({
                                 message: item,
                                 timestamp: log.timestamp+''+i,
@@ -149,7 +126,6 @@ export default class LogViewer extends React.PureComponent<Props> {
                 });
 
                 newState.lines = lines;
-                newState.maxWidth = maxWidth;
             }
       
         }
@@ -230,99 +206,70 @@ export default class LogViewer extends React.PureComponent<Props> {
 
     render() {
         const { height } = this.props;
-        const { refreshScroll, selected, copyValue, lines, maxWidth } = this.state;
-        
-        const getRowHeight = ({index}) => {
-            if (index) {
-                return 15;
-            } else {
-                return 20;
-            }
-        };
-
-        const cellRenderer = ({
-            columnIndex,
-            key,
-            rowIndex,
-            style,
-        }) => {
-            const line = lines[rowIndex];
-
-            let color = 'rgba(0, 0, 0, 0.65)';
-
-            if (line && line.severity) {
-                if (line.severity === 'ERROR') {
-                    color = '#a8071a';
-                }
-                
-                if (line.severity === 'PASSED') {
-                    color = '#237804';
-                }
-            }
-
-            return (
-                <div 
-                    className="auto-sizer-wrapper-row" 
-                    style={{...style, paddingTop: rowIndex ? '0px': '5px', color: color }}
-                    key={key}
-                    dangerouslySetInnerHTML={{ __html : line.message }}
-                />
-            );
-        };
-
-        const columnWidth = 10+7.3*maxWidth;
+        const { selected, copyValue, lines } = this.state;
 
         return (
             <div className="logs-container">
-                <ScrollContainer
-                    refreshScroll={refreshScroll}
-                    classes="scroller"
+                <div
+                    ref={this.loggerRef}
+                    className={`logger-textarea ${selected ? 'selected' : ''} `}
+                    onKeyDown={this.onKeyPressed}
+                    tabIndex="1"
+                    style={{
+                        height: height - 32,
+                        minHeight: height - 32,
+                    }}
                 >
-                    {() => (
-                        <div
-                            ref={this.loggerRef}
-                            className={`logger-textarea ${selected ? 'selected' : ''} `}
-                            onKeyDown={this.onKeyPressed}
-                            tabIndex="1"
-                            style={{
-                                height: height - 32,
-                                minHeight: height - 32,
-                            }}
+                    <div 
+                        className="auto-sizer-wrapper"
+                        style={{
+                            height: height - 32,
+                            minHeight: height - 32,
+                            overflow: 'auto'
+                        }}
+                    >
+                        <InfiniteScroll
+                            dataLength={lines.length}
+                            scrollableTarget="scrollableDiv"
                         >
-                            <div 
-                                className="auto-sizer-wrapper"
-                                style={{
-                                    height: height - 32,
-                                    minHeight: height - 32,
-                                }}
-                            >
-                                <AutoSizer>
-                                    {({width, height}) => (
-                                        <Grid
-                                            className="auto-sizer-wrapper-list"
-                                            height={height}
-                                            rowCount={lines.length}
-                                            rowHeight={getRowHeight}
-                                            cellRenderer={cellRenderer}
-                                            columnCount={1}
-                                            columnWidth={columnWidth}
-                                            width={width}
-                                            scrollToRow={lines.length-1}
-                                            scrollToIndex={lines.length-1}
-                                        />
-                                    )}
-                                </AutoSizer>
-                            </div>
-                        </div>
-                    )}
-                </ScrollContainer>
+                            {
+                                lines.map((line, index) => {                                
+                                    let color = 'rgba(0, 0, 0, 0.65)';
+                        
+                                    if (line && line.severity) {
+                                        if (line.severity === 'ERROR') {
+                                            color = '#a8071a';
+                                        }
+                                        
+                                        if (line.severity === 'PASSED') {
+                                            color = '#237804';
+                                        }
+                                    }
+                        
+                                    return (
+                                        <div
+                                            className="auto-sizer-wrapper-row" 
+                                            style={{
+                                                paddingTop: index ? '0px': '5px',
+                                                color: color
+                                            }} 
+                                            key={index}
+                                        >
+                                            {line.message}
+                                        </div>
+                                    );
+                                })
+                            }
+                        </InfiniteScroll>
+                    </div>
+                </div>
                 <CopyToClipboard text={copyValue}>
                     <button
                         className="copy-btn"
                         ref={this.buttonRef}
                         onClick={this.copyClicked}
                     >
-                Copy
+                        Copy
                     </button>
                 </CopyToClipboard>
             </div>
