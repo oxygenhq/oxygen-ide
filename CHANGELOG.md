@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.25.0 (2020-08-xx)
+## v1.25.0 (2020-08-30)
 
 #### :tada: New Feature
 * Interface for encrypting sensitive data. See `Tools -> Encrypt/Decrypt` menu and the `utils.encrypt` `utils.decrypt` commands.
@@ -12,6 +12,7 @@
 * Number of issues with breakpoints.
 * Number of issues with ChromeDriver update mechanism. 
 * Various issues with third party providers: Perfecto, BrowserStack, etc.
+* HTML not being escaped in the Event Log.
 
 #### :nail_care: Polish
 * Improve warning text about missing Android SDK.
