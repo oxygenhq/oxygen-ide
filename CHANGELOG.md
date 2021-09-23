@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.25.0 (2020-08-30)
+## v1.25.0 (2020-09-26)
 
 #### :tada: New Feature
 * Interface for encrypting sensitive data. See `Tools -> Encrypt/Decrypt` menu and the `utils.encrypt` `utils.decrypt` commands.
@@ -19,7 +19,7 @@
 * Remove TestObject support due to EOL.
 
 #### :house: Internal
-* Update oxygen-cli from v1.19.1 to v1.20.1. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update oxygen-cli from v1.19.1 to v1.20.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 * Bundle ChromeDriver/EdgeDriver 92.
 * Bump dependencies.
 
