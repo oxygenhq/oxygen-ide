@@ -430,7 +430,7 @@ export default class MonacoEditor extends React.Component<Props> {
                 ...MONACO_DEFAULT_OPTIONS,
                 fontSize: saveFontSize,
                 lineHeight: saveFontSize*RATIO,
-                renderWhitespace: true
+                renderWhitespace: 'none'
             });
             oxygenIntellisense(monaco);
             if (theme) {
