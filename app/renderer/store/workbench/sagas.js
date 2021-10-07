@@ -390,11 +390,23 @@ export function* initialize() {
             yield put(settingsActions.createUser(uuid));
             yield put(setUserIdToSentry(uuid));
         }
+
+        let env = null;
+
+        // set env if env presented in cache settings
+        if (
+            appSettings.cache.settings &&
+            appSettings.cache.settings.generalSettings &&
+            appSettings.cache.settings.generalSettings.env
+        ) {
+            env = appSettings.cache.settings.generalSettings.env;
+        }
+
         // if we have pre-loaded settings folder from cache, 
         // then check if it has Oxygen project settings file and load it
         if (appSettings.cache.fs && appSettings.cache.fs.rootPath) {
             // load project settings, if oxygen.conf.js file found in the folder        
-            yield putAndTake(settingsActions.loadProjectSettings(appSettings.cache.fs.rootPath));
+            yield putAndTake(settingsActions.loadProjectSettings(appSettings.cache.fs.rootPath, env));
         }
 
     } else {

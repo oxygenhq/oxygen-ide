@@ -157,18 +157,21 @@ class GeneralSettings extends React.PureComponent<Props> {
 
         return (
             <Form>
-                {envList &&
-                <Form.Item label="Environment" {...formItemLayout} >
-                    <Select 
-                        defaultValue="default"
-                        value={ env || undefined }
-                        onChange={ (e) => ::this.onChangeEnvironment(e) }
-                    >
-                        { envList.map(e => 
-                            <Option value={e} key={e}>{e}</Option>
-                        )}
-                    </Select>
-                </Form.Item>
+                {
+                    envList &&
+                    <Form.Item label="Environment" {...formItemLayout} >
+                        <Select 
+                            defaultValue="default"
+                            value={ env || undefined }
+                            onChange={ (e) => ::this.onChangeEnvironment(e) }
+                        >
+                            { 
+                                envList.map(e => 
+                                    <Option value={e} key={e}>{e}</Option>
+                                )
+                            }
+                        </Select>
+                    </Form.Item>
                 }
                 <Form.Item label="Iterations" {...formItemLayout} className="iterations-section" >
                     <InputNumber

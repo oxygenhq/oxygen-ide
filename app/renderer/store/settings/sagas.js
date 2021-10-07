@@ -40,16 +40,42 @@ export default function* root() {
 
 export function* loadProjectSettings({ payload }) {
     const { path } = payload;
+    let env = payload.env;
     try {
-        const settingsRetVal = yield services.mainIpc.call('ProjectService', 'getProjectSettings', [path]);
+        const projectSettings = yield services.mainIpc.call('ProjectService', 'getProjectSettings', [path]);
 
-        if (typeof settingsRetVal === 'string' && settingsRetVal.startsWith('Error: ')) {
-           yield put(loggerActions.addLog(settingsRetVal, 'ERROR', 'general'));
+        if (typeof projectSettings === 'string' && projectSettings.startsWith('Error: ')) {
+           yield put(loggerActions.addLog(projectSettings, 'ERROR', 'general'));
            // report success
            yield put(settingsActions._loadProjectSettings_Failure(path));
         } else {
+            const generalSettings = {};
+            
+            // re-check if env presented is settings
+            if (!env) {
+                const settings = yield select(state => state.settings);
+                if (
+                    settings &&
+                    settings.generalSettings &&
+                    settings.generalSettings.env
+                ) {
+                    env = settings.generalSettings.env;
+                }
+            }
+
+            // check if env key(name) presented in envs list of project
+            if (
+                env &&
+                projectSettings &&
+                projectSettings.envs &&
+                Object.keys(projectSettings.envs) &&
+                projectSettings.envs[env]
+            ) {
+                generalSettings.env = env;
+            }
+
             // report success
-            yield put(settingsActions._loadProjectSettings_Success(path, settingsRetVal));
+            yield put(settingsActions._loadProjectSettings_Success(path, projectSettings, generalSettings));
         }
     } catch (e) {
         console.log('loadProjectSettings e', e);

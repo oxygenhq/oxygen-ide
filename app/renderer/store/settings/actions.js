@@ -159,14 +159,14 @@ export const setCloudProvidersBrowsersAndDevices = (browsersAndDevices, testProv
     payload: { browsersAndDevices, testProvider },
 });
 
-export const loadProjectSettings = (path) => ({
+export const loadProjectSettings = (path, env) => ({
     type: types.LOAD_PROJECT_SETTINGS,
-    payload: { path },
+    payload: { path, env },
 });
 
-export const _loadProjectSettings_Success = (path, settings) => ({
+export const _loadProjectSettings_Success = (path, projectSettings, generalSettings) => ({
     type: success(types.LOAD_PROJECT_SETTINGS),
-    payload: { path, projectSettings: settings },
+    payload: { path, projectSettings, generalSettings },
 });
 
 export const _loadProjectSettings_Failure = (path) => ({
