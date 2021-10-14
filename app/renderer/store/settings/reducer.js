@@ -149,7 +149,22 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
     const payload = action.payload || {};
-    const { projectSettings, value, target, settings, zoom, cache, uuid, providers, browsersAndDevices, testProvider, integrations, runSettings, generalSettings } = payload;
+    const {
+        projectSettings,
+        value,
+        target,
+        settings,
+        zoom,
+        cache,
+        uuid,
+        providers, 
+        browsersAndDevices, 
+        testProvider, 
+        integrations, 
+        runSettings, 
+        generalSettings = {} 
+    } = payload;
+
     switch (action.type) {
     
     // CREATE USER
@@ -403,7 +418,10 @@ export default (state = defaultState, action) => {
         return {
             ...state,
             projectSettings: projectSettings,
-            generalSettings: defaultAppSettings.generalSettings
+            generalSettings: {
+                ...defaultAppSettings.generalSettings,
+                ...generalSettings
+            }
         };
     
     case types.LOAD_PROJECT_SETTINGS_FAILURE:
