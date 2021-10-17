@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v1.26.0 (2020-xx-xx)
+
+#### :beetle: Bug Fix
+* Selected environment not preserved across IDE restarts.
+
+#### :nail_care: Polish
+* Do not render white-space in the editor.
+
+#### :house: Internal
+* Update oxygen-cli from v1.20.2 to v1.21.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+
 ## v1.25.0 (2020-09-26)
 
 #### :tada: New Feature
