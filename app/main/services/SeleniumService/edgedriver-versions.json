@@ -1,95 +1,100 @@
 {
-    "edgeVersions": [
-       {
-            "driverVersion": "93.0.961.52",
-            "edgeMax": 93,
-            "edgeMin": 93
-        },
-        {
-            "driverVersion": "92.0.902.62",
-            "edgeMax": 92,
-            "edgeMin": 92
-        },
-        {
-            "driverVersion": "91.0.864.37",
-            "edgeMax": 91,
-            "edgeMin": 91
-        },
-        {
-            "driverVersion": "90.0.818.41",
-            "edgeMax": 90,
-            "edgeMin": 90
-        },
-        {
-            "driverVersion": "89.0.774.57",
-            "edgeMax": 89,
-            "edgeMin": 89
-        },
-        {
-            "driverVersion": "88.0.705.62",
-            "edgeMax": 88,
-            "edgeMin": 88
-        },
-        {
-            "driverVersion": "87.0.669.0",
-            "edgeMax": 87,
-            "edgeMin": 87
-        },
-        {
-            "driverVersion": "86.0.622.69",
-            "edgeMax": 86,
-            "edgeMin": 86
-        },
-        {
-            "driverVersion": "85.0.564.8",
-            "edgeMax": 85,
-            "edgeMin": 85
-        },
-        {
-            "driverVersion": "84.0.522.63",
-            "edgeMax": 84,
-            "edgeMin": 84
-        },
-        {
-            "driverVersion": "83.0.478.64",
-            "edgeMax": 83,
-            "edgeMin": 83
-        },
-        {
-            "driverVersion": "82.0.459.1",
-            "edgeMax": 82,
-            "edgeMin": 82
-        },
-        {
-            "driverVersion": "81.0.416.77",
-            "edgeMax": 81,
-            "edgeMin": 81
-        },
-        {
-            "driverVersion": "80.0.361.111",
-            "edgeMax": 80,
-            "edgeMin": 80
-        },
-        {
-            "driverVersion": "79.0.309.71",
-            "edgeMax": 79,
-            "edgeMin": 79
-        },
-        {
-            "driverVersion": "78.0.276.24",
-            "edgeMax": 78,
-            "edgeMin": 78
-        },
-        {
-            "driverVersion": "77.0.235.27",
-            "edgeMax": 77,
-            "edgeMin": 77
-        },
-        {
-            "driverVersion": "76.0.182.22",
-            "edgeMax": 76,
-            "edgeMin": 76
-        }
-    ]
+  "edgeVersions": [
+    {
+      "driverVersion": "96.0.1054.34",
+      "edgeMax": 96,
+      "edgeMin": 96
+    },
+    {
+      "driverVersion": "93.0.961.52",
+      "edgeMax": 93,
+      "edgeMin": 93
+    },
+    {
+      "driverVersion": "92.0.902.62",
+      "edgeMax": 92,
+      "edgeMin": 92
+    },
+    {
+      "driverVersion": "91.0.864.37",
+      "edgeMax": 91,
+      "edgeMin": 91
+    },
+    {
+      "driverVersion": "90.0.818.41",
+      "edgeMax": 90,
+      "edgeMin": 90
+    },
+    {
+      "driverVersion": "89.0.774.57",
+      "edgeMax": 89,
+      "edgeMin": 89
+    },
+    {
+      "driverVersion": "88.0.705.62",
+      "edgeMax": 88,
+      "edgeMin": 88
+    },
+    {
+      "driverVersion": "87.0.669.0",
+      "edgeMax": 87,
+      "edgeMin": 87
+    },
+    {
+      "driverVersion": "86.0.622.69",
+      "edgeMax": 86,
+      "edgeMin": 86
+    },
+    {
+      "driverVersion": "85.0.564.8",
+      "edgeMax": 85,
+      "edgeMin": 85
+    },
+    {
+      "driverVersion": "84.0.522.63",
+      "edgeMax": 84,
+      "edgeMin": 84
+    },
+    {
+      "driverVersion": "83.0.478.64",
+      "edgeMax": 83,
+      "edgeMin": 83
+    },
+    {
+      "driverVersion": "82.0.459.1",
+      "edgeMax": 82,
+      "edgeMin": 82
+    },
+    {
+      "driverVersion": "81.0.416.77",
+      "edgeMax": 81,
+      "edgeMin": 81
+    },
+    {
+      "driverVersion": "80.0.361.111",
+      "edgeMax": 80,
+      "edgeMin": 80
+    },
+    {
+      "driverVersion": "79.0.309.71",
+      "edgeMax": 79,
+      "edgeMin": 79
+    },
+    {
+      "driverVersion": "78.0.276.24",
+      "edgeMax": 78,
+      "edgeMin": 78
+    },
+    {
+      "driverVersion": "77.0.235.27",
+      "edgeMax": 77,
+      "edgeMin": 77
+    },
+    {
+      "driverVersion": "76.0.182.22",
+      "edgeMax": 76,
+      "edgeMin": 76
+    }
+  ]
 }
 
