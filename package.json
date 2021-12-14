@@ -139,7 +139,7 @@
     "@emotion/styled": "10.0.27",
     "@sentry/electron": "2.4.1",
     "@sentry/webpack-plugin": "1.15.1",
-    "antd": "3.26.12",
+    "antd": "3.26.13",
     "appium-adb": "8.12.1",
     "chrome-launcher": "0.14.0",
     "clean-stack": "3.0.1",
