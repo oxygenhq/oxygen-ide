@@ -10,12 +10,11 @@ import path from 'path';
 
 export function normalize(_path) {
     let normPath = path.normalize(_path);
-    if (!normPath.endsWith(path.sep)) {
+    if (!normPath.endsWith(path.sep) && !path.extname(normPath)) {
         return `${normPath}${path.sep}`;
     }
     return normPath;
 }
-
 
 export function updateFilesAfterRename(files, oldPath, renamedFile) {
     if (!files || files.length == 0 || !renamedFile) {
@@ -44,6 +43,7 @@ export function updateFilesAfterRename(files, oldPath, renamedFile) {
             newFileList[adjustedPath] = {
                 ...file,
                 parentPath: replacePath(file.parentPath, oldPath, newPath),
+                path: adjustedPath,
                 children: file.children ? replaceChildrenPath(file.children, file.path, newPath) : null,
             };
         }
@@ -70,10 +70,12 @@ export function replaceChildrenPath(children, oldPath, newPath) {
     return newChildren;
 }
 
-export function replacePath(path, inputOldPath, inputNewPath) {
+export function replacePath(inputPath, inputOldPath, inputNewPath) {
     let oldPath = inputOldPath;
     let newPath = inputNewPath;
+    let path = inputPath;
     // normalize all paths
+    path = normalize(path);
     oldPath = normalize(oldPath);
     newPath = normalize(newPath);
 
