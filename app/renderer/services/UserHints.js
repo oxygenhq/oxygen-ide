@@ -8,6 +8,7 @@
  */
 import { all, select, takeLatest, call } from 'redux-saga/effects';
 import { MAIN_SERVICE_EVENT } from './MainIpc';
+import confirm from '../helpers/confirm';
 
 export default class UserHintsService {
     store = null;
@@ -65,9 +66,18 @@ export default class UserHintsService {
     }
 
     *_handleAppiumServerUnavailable() {
-        if (!confirm('Appium server is not accessible.\n\nIn order to run mobile tests, you need to install and run Appium server manually.\n\nDo you want to read a tutorial on how to install and run Appium server?')) {
+        
+        const answer = yield call(confirm, {
+            okText: 'Yes',
+            cancelText: 'No',
+            title: 'Appium server is not accessible',
+            content: 'In order to run mobile tests, you need to install and run Appium server manually.\n\nDo you want to read a tutorial how to install and run Appium server?'
+        });
+
+        if (!answer) {
             return;
         }
+
         yield call(global.services.mainIpc.call, 'ElectronService', 'shellOpenExternal', ['http://docs.oxygenhq.org/download-and-installation/mobile-installation']);
     }
 }

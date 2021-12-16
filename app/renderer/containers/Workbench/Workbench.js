@@ -419,14 +419,6 @@ export default class Workbench extends React.Component<Props> {
     fileExplorer_onRename(type, path, name) {
         this.props.showDialog('DIALOG_FILE_RENAME', { type, path, name });
     }
-    fileExplorer_onDelete(type, path, name) {
-        setTimeout(() => {
-            if (!confirm(`Are you sure you want to delete ${name}?`)) {
-                return false;
-            }
-            this.props.deleteFile(path);
-        }, 500);
-    }
 
     fileExplorer_onMove(oldPath, newPath) {
         this.props.move(oldPath, newPath);
@@ -847,7 +839,6 @@ export default class Workbench extends React.Component<Props> {
                                     onSelect={ ::this.fileExplorer_onSelect } 
                                     onCreate={ ::this.fileExplorer_onCreate }
                                     onRename={ ::this.fileExplorer_onRename }
-                                    onDelete={ ::this.fileExplorer_onDelete }
                                     onMove={ ::this.fileExplorer_onMove }
                                 />
                             </Sidebar>
