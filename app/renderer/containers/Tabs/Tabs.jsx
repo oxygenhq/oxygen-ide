@@ -37,6 +37,14 @@ const circle = () => {
     );
 };
 
+const config = {
+    wheelSpeed: 0.8,
+    wheelPropagation: false,
+    minScrollbarLength: 20,
+    suppressScrollY: true,
+    useBothWheelAxes: true,
+};
+
 class Tabs extends React.Component<Props, void> {
     state = {
         closeTabAsk: false
@@ -44,10 +52,7 @@ class Tabs extends React.Component<Props, void> {
 
     componentDidMount() {
         if (this.tabsRef) {
-            this.ps = new PerfectScrollbar(this.tabsRef, {
-                suppressScrollY: true,
-                useBothWheelAxes: true,
-            });
+            this.ps = new PerfectScrollbar(this.tabsRef, config);
         }
 
         if (window && window.addEventListener) {
@@ -56,17 +61,11 @@ class Tabs extends React.Component<Props, void> {
                 if (this.ps) {
                     this.ps.destroy();
                     if (this.tabsRef) {
-                        this.ps = new PerfectScrollbar(this.tabsRef, {
-                            suppressScrollY: true,
-                            useBothWheelAxes: true,
-                        });
+                        this.ps = new PerfectScrollbar(this.tabsRef, config);
                     }
                 } else {
                     if (this.tabsRef) {
-                        this.ps = new PerfectScrollbar(this.tabsRef, {
-                            suppressScrollY: true,
-                            useBothWheelAxes: true,
-                        });
+                        this.ps = new PerfectScrollbar(this.tabsRef, config);
                     }
                 }
             }, 150), false);
@@ -139,6 +138,10 @@ class Tabs extends React.Component<Props, void> {
 
                 <div
                     className="tabs-bar-wrapper"
+                    style={{
+                        position: 'relative',
+                        overflow: 'hidden'
+                    }}
                     ref={theRef => { this.tabsRef = theRef; }}
                 >
 
