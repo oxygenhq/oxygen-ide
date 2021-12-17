@@ -208,10 +208,10 @@ export default class MonacoEditor extends React.Component<Props> {
             this.editor &&
             (this.props.width !== prevProps.width || this.props.height !== prevProps.height)
         ) {
-            this.editor.layout();
+            this.editorLayoutAndFocus();
         }
-        else if (this.editor && this.props.visible == true && this.props.visible != prevProps.visible) {
-            this.editor.layout();
+        else if (this.editor && this.props.visible === true && this.props.visible !== prevProps.visible) {
+            this.editorLayoutAndFocus();
         }
 
         if (typeof updateActiveLine !== 'boolean' && updateFontSize) {
@@ -264,9 +264,9 @@ export default class MonacoEditor extends React.Component<Props> {
 
     determineUpdatedProps(diffProps) {
         return {
-        // prevent re-render when editor's value property is changed by onDidChangeModelContent event
-        // otherwise, we will have an unneccessary call to editor.setValue (in componentDidUpdate)
-        // and duplicated render
+            // prevent re-render when editor's value property is changed by onDidChangeModelContent event
+            // otherwise, we will have an unneccessary call to editor.setValue (in componentDidUpdate)
+            // and duplicated render
             value:
             this.editor ?
                 diffProps.value !== this.props.value &&
@@ -287,10 +287,8 @@ export default class MonacoEditor extends React.Component<Props> {
             diffProps.fontSize !== this.props.fontSize,
             waitUpdateBreakpoints:
             diffProps.waitUpdateBreakpoints !== this.props.waitUpdateBreakpoints,
-            disabledBreakpoints: 
-            diffProps.disabledBreakpoints !== this.props.disabledBreakpoints,
-            resolvedBreakpoints:
-            diffProps.resolvedBreakpoints !== this.props.resolvedBreakpoints,
+            disabledBreakpoints: !!deepDiff(diffProps.disabledBreakpoints, this.props.disabledBreakpoints),
+            resolvedBreakpoints: !!deepDiff(diffProps.resolvedBreakpoints, this.props.resolvedBreakpoints)
         };
     }
 
@@ -299,8 +297,17 @@ export default class MonacoEditor extends React.Component<Props> {
         editorWillMount(monaco);
     }
 
+    editorLayoutAndFocus() {
+        if (this.editor) {
+            this.editor.layout();
+            if (!this.editor.hasTextFocus()) {
+                this.editor.focus();
+            }
+        }
+    }
+
     editorDidMount(editor) {
-        this.editor.layout();
+        this.editorLayoutAndFocus();
 
         if (this.props.fontSize && this.props.breakpoints && Array.isArray(this.props.breakpoints) && this.props.breakpoints.length > 0) {     
             this.props.breakpoints.map((item) => {
@@ -457,13 +464,13 @@ export default class MonacoEditor extends React.Component<Props> {
         this.props.onBreakpointsUpdate(filePath, bps, fileName);
     }
 
-    onValueChange = (bps) => {
+    onValueChange = (content) => {
         const {
             filePath,
             fileName
         } = this.props;
 
-        this.props.onValueChange(filePath, bps, fileName);
+        this.props.onValueChange(filePath, content, fileName);
     }
 
     onSelectionChange = (bps) => {

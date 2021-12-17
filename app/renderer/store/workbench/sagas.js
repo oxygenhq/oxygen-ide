@@ -29,6 +29,7 @@ import {
 import { notification } from 'antd';
 
 import SupportedExtensions from '../../helpers/file-extensions';
+import confirm from '../../helpers/confirm';
 import * as Const from '../../../const';
 import * as Menus from '../../../config/menus';
 
@@ -478,7 +479,13 @@ export function* openFolder({ payload }) {
             }
         });
 
-        if (!confirm(`There are ${unsaved.length} unsaved files : ${fileNamesStr}. Are you sure you want to proceed and lose unsaved changes?`)) {
+        const answer = yield call(confirm, {
+            okText: 'Yes',
+            cancelText: 'No',
+            title: `There are ${unsaved.length} unsaved files : ${fileNamesStr}. Are you sure you want to proceed and lose unsaved changes?`
+        });
+
+        if (!answer) {
             return;
         }
     }
@@ -1038,7 +1045,13 @@ export function* closeFile({ payload }) {
     const file = yield select(state => state.fs.files[path]);
     // prompt user if file has been modified and unsaved
     if (file && force == false && file.modified && file.modified == true) {
-        if (!confirm(`Are you sure you want to close unsaved file ${file.name}?`)) {
+        const answer = yield call(confirm, {
+            okText: 'Yes',
+            cancelText: 'No',
+            title: `Are you sure you want to close unsaved file ${file.name}?`
+        });
+
+        if (!answer) {
             return;
         }
     }
@@ -1610,10 +1623,17 @@ export function* showDeleteFileDialog({ payload }) {
         if (!treeActiveFile) {
             return;
         }
-        //yield call(delay, 500)
-        if (!confirm(`Are you sure you want to delete '${treeActiveFile.name}'?`)) {
+
+        const answer = yield call(confirm, {
+            okText: 'Yes',
+            cancelText: 'No',
+            title: `Are you sure you want to delete '${treeActiveFile.name}'?`
+        });
+
+        if (!answer) {
             return;
         }
+
         yield put(fsActions.deleteFile(activeNodePath));
     }
 
