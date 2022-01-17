@@ -1,17 +1,22 @@
 # CHANGELOG
 
-## v1.26.0 (2020-xx-xx)
+## v1.26.0 (2022-01-17)
 
 #### :beetle: Bug Fix
 * Selected environment not preserved across IDE restarts.
+* Scrollbar hides out of view when too many files are open.
+* Test scripts becoming unvailable after chnaging folder name.
+* Editor is locked for editing, after a file is erased or dragged to a new location.
 
 #### :nail_care: Polish
 * Do not render white-space in the editor.
 
 #### :house: Internal
 * Update oxygen-cli from v1.20.2 to v1.21.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver/EdgeDriver 97.
+* Bump dependencies.
 
-## v1.25.0 (2020-09-26)
+## v1.25.0 (2021-09-26)
 
 #### :tada: New Feature
 * Interface for encrypting sensitive data. See `Tools -> Encrypt/Decrypt` menu and the `utils.encrypt` `utils.decrypt` commands.
@@ -34,14 +39,14 @@
 * Bundle ChromeDriver/EdgeDriver 92.
 * Bump dependencies.
 
-## v1.24.1 (2020-06-01)
+## v1.24.1 (2021-06-01)
 
 #### :house: Internal
 * Update oxygen-cli from v1.19.0 to v1.19.1. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 * Bundle ChromeDriver/EdgeDriver 91.
 * Bump dependencies.
 
-## v1.24.0 (2020-05-25)
+## v1.24.0 (2021-05-25)
 
 #### :tada: New Feature
 * Allow closing all open tabs (through a menu when right clicking on one of the tabs).
@@ -65,7 +70,7 @@
 * Bundle GeckoDriver 0.29.1.
 * Bump dependencies.
 
-## v1.23.1 (2020-03-25)
+## v1.23.1 (2021-03-25)
 
 #### :beetle: Bug Fix
 * Do not warn user about EdgeDriver mismatch if Edge is not installed.
@@ -74,7 +79,7 @@
 #### :house: Internal
 * Update oxygen-cli from v1.17.0 to v1.18.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 
-## v1.23.0 (2020-03-22)
+## v1.23.0 (2021-03-22)
 
 #### :beetle: Bug Fix
 * Currently selected file in editor not highlighted in the file tree.
@@ -85,7 +90,7 @@
 * Update oxygen-cli from v1.16.0 to v1.17.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 * Bundle ChromeDriver and EdgeDriver 89.
 
-## v1.22.0 (2020-01-16)
+## v1.22.0 (2021-01-16)
 
 #### :beetle: Bug Fix
 * Edge not shown in the browser menu despite of being available for execution.
@@ -95,7 +100,7 @@
 * Update oxygen-cli from v1.15.0 to v1.16.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 * Bundle ChromeDriver and EdgeDriver 88.
 
-## v1.21.0 (2020-01-16)
+## v1.21.0 (2021-01-16)
 
 #### :tada: New Feature
 * Preliminary support for MS Edge.
