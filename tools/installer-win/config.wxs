@@ -14,7 +14,7 @@
              UpgradeCode="9E5A61D1-1F5A-4880-BD62-560DDEB466D5" 
              Name="Oxygen IDE" 
              Version="$(var.Version)"
-             Manufacturer="CloudBeat Ltd." Language="1033">
+             Manufacturer="CBNR Cloud Solutions LTD" Language="1033">
         <Package InstallerVersion="500" Compressed="yes" />
         <Media Id="1" Cabinet="product.cab" EmbedCab="yes" CompressionLevel="high" />
         
