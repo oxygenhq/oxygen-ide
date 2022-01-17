@@ -95,7 +95,7 @@
     "babel-plugin-import": "1.13.3",
     "babel-plugin-transform-imports": "2.0.0",
     "chalk": "3.0.0",
-    "concurrently": "5.1.0",
+    "concurrently": "6.5.1",
     "cross-env": "7.0.3",
     "css-loader": "3.4.2",
     "electron": "7.3.2",
@@ -130,7 +130,7 @@
     "webpack": "4.44.1",
     "webpack-bundle-analyzer": "3.8.0",
     "webpack-cli": "3.3.12",
-    "webpack-dev-server": "3.11.2",
+    "webpack-dev-server": "3.11.3",
     "webpack-merge": "4.2.2"
   },
   "dependencies": {
