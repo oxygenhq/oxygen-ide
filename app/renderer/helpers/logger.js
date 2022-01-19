@@ -49,6 +49,11 @@ export default function loggerSetup() {
             return;
         }
 
+        // ignore Monaco Editor error related to Model is disposed
+        if (error && error.message && typeof error.message === 'string' && error.message.includes('Model is disposed')) {
+            return;
+        }
+
         global.log.error('[R] Unhandled Error.', util.inspect(error));
     });
 
