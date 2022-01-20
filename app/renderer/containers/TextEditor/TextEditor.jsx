@@ -74,6 +74,60 @@ export default class TextEditor extends React.Component<Props> {
         };
     }
 
+    componentDidUpdate() {
+        const {
+            activeFile
+        } = this.props;
+
+        let focusCounter = [];
+
+        Object.keys(this.editors).map((filePath) => {
+            const item = this.editors[filePath];
+            if (item && item.editor) {
+                if (item.editor.hasTextFocus() && activeFile !== filePath) {
+                    focusCounter.push(filePath);
+                }
+            }
+        });
+
+        if (focusCounter.length > 0) {
+            if (document && document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+            }
+
+            focusCounter.map((itm) => {      
+                if (this.editors[itm] && this.editors[itm].editor) {
+                    const editor = this.editors[itm].editor;
+                    if (editor._modelData) {
+                        editor._modelData.hasRealView = false;
+    
+                        if (
+                            editor._modelData.view &&
+                            editor._modelData.view._textAreaHandler &&
+                            editor._modelData.view._textAreaHandler._textAreaInput &&
+                            editor._modelData.view._textAreaHandler._textAreaInput.blur
+                        ) {
+                            editor._modelData.view._textAreaHandler._textAreaInput.blur();  
+                        }
+                    }
+                    editor._domElement.blur();
+                }
+            });
+
+            if (this.editors[activeFile] && this.editors[activeFile].editor) {
+                const editor = this.editors[activeFile].editor;
+
+                if (editor._domElement) {
+                    editor._domElement.focus();
+                }
+
+                editor.focus();
+                editor.setPosition(editor.getPosition());
+            }
+        }
+
+    }
+
     componentWillUnmount() {
         if (this.subscriptions['EDITOR.TRIGGER']) {
             this.subscriptions['EDITOR.TRIGGER'].unsubscribe();
