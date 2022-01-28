@@ -1,13 +1,55 @@
-import { all, takeLatest, select, put } from 'redux-saga/effects';
+import { all, takeLatest, select, put, call } from 'redux-saga/effects';
 import ActionTypes from '../types';
 
 import * as fsActions from '../fs/actions';
 import * as tabsActions from './actions';
+import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
+
+import ServicesSingleton from '../../services';
+const services = ServicesSingleton();
+import confirm from '../../helpers/confirm';
 
 export default function* root() {
     yield all([
-        takeLatest(ActionTypes.TABS_REMOVE, removeTab)
+        takeLatest(ActionTypes.TABS_REMOVE, removeTab),
+        takeLatest(MAIN_SERVICE_EVENT, handleServiceEvents),
     ]);
+}
+
+function* handleServiceEvents({ payload }) {
+    const {
+        event,
+        service
+    } = payload;
+
+    if (
+        service === 'AppCloseService' &&
+        event &&
+        event.type === 'APP_CLOSE_HAS_UNSAVED_FILES'
+    ) {
+        const tabsList =  yield select(state => state.tabs.list);
+        const hasUnsavedFiles = tabsList.find(tab => tab.touched);
+
+        if (hasUnsavedFiles) {
+            const answer = yield call(confirm, {
+                title: 'There are unsaved files',
+                content: 'Do you really want to close the application?',
+                okText: 'Yes',
+                cancelText: 'No',
+            });
+            
+            if (answer) {
+                // Yes
+                yield services.mainIpc.call('AppCloseService', 'closeApp');
+            } else {
+                // No
+                yield services.mainIpc.call('AppCloseService', 'stayAppOpened');
+            }
+        } else {
+            // No unsaved Files
+            yield services.mainIpc.call('AppCloseService', 'closeApp');
+        }
+    }
 }
 
 function* removeTab({ payload }) {

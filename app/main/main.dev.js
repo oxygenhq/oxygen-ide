@@ -17,7 +17,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
+import { app, BrowserWindow, globalShortcut, crashReporter, dialog  } from 'electron';
 
 import Logger from './Logger';
 import MainProcess from './MainProcess';
@@ -115,7 +115,16 @@ app.on('ready', async () => {
         mainWindow.on('closed', () => {
             disposeMainAndQuit();
         });
-        
+
+        mainWindow.on('close', async (e) => {
+            e.preventDefault();
+            const closeApp = await mainProc.serviceDispatcher.servicesHash['AppCloseService'].requestHasUnsavedFilesBeforeClose();
+
+            if (closeApp) {
+                mainWindow.destroy();
+            }
+        });
+
         try {
             mainProc = new MainProcess(mainWindow);
         } catch (e) {
@@ -132,7 +141,7 @@ app.on('ready', async () => {
 });
 
 app.on('unresponsive', () => {
-    require('dialog').showMessageBox({
+    dialog.showMessageBox({
         type: 'info',
         message: 'Reload window?',
         buttons: ['Cancel', 'Reload']
