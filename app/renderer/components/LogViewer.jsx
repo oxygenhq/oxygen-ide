@@ -126,8 +126,16 @@ export default class LogViewer extends React.PureComponent<Props> {
                 });
 
                 newState.lines = lines;
+
+                setTimeout(() => {
+                    const elements = document.getElementsByClassName('auto-sizer-wrapper-row');
+    
+                    if (elements && elements.length > 1) {
+                        elements[elements.length-1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }, 300);
+
             }
-      
         }
         this.setState(
             newState
