@@ -347,7 +347,7 @@ export default class TestRunnerService extends ServiceBase {
             this.notify({
                 type: EVENT_LOG_ENTRY,
                 severity: SEVERITY_INFO,
-                message: 'Test finished with status --> CANCELED'
+                message: moment().format('YYYY-MM-DD HH:mm:ss') + ' Test finished with status --> CANCELED'
             });
         }
         if (this.reporter && this.reporter.removeListener) {
@@ -443,11 +443,11 @@ export default class TestRunnerService extends ServiceBase {
         }
         this._hookToOxygenEvents();
         try {
-            this._emitLogEvent(SEVERITY_INFO, 'Initializing...');
+            this._emitLogEvent(SEVERITY_INFO, moment().format('YYYY-MM-DD HH:mm:ss') + ' Initializing...');
             // initialize runner
             await runner.init(opts, caps, this.reporter);   
             // run test 
-            this._emitLogEvent(SEVERITY_INFO, 'Running test...');
+            this._emitLogEvent(SEVERITY_INFO, moment().format('YYYY-MM-DD HH:mm:ss') + ' Running test...');
             const result = await runner.run();
             // dispose runner
 
@@ -583,7 +583,7 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
             if (duration) {
                 durationPart = ` in ${duration}`;
             }
-            this._emitLogEvent(severity, `Test finished${durationPart} with status --> ${status}.`);
+            this._emitLogEvent(severity, `${moment().format('YYYY-MM-DD HH:mm:ss')} Test finished${durationPart} with status --> ${status}.`);
         }
 
         this.notify({
