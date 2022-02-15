@@ -140,7 +140,7 @@
     "@sentry/electron": "2.4.1",
     "@sentry/webpack-plugin": "1.15.1",
     "antd": "3.26.13",
-    "appium-adb": "8.12.1",
+    "appium-adb": "8.18.0",
     "chrome-launcher": "0.14.0",
     "clean-stack": "3.0.1",
     "core-js": "3.6.5",
