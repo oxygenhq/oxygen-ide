@@ -98,7 +98,7 @@ const defaultAppSettings = {
             captureNetwork: false,
             captureConsole: false,
             takeScreenshots: false,
-            videoRecording: false,
+            videoRecording: false,            
             inUse: false,
         },
         browserStack: {
@@ -108,6 +108,7 @@ const defaultAppSettings = {
             debug: false,
             networkLogs: false,
             recordVideo: false,
+            local: false,
             inUse: false
         }
     },

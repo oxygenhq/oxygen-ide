@@ -435,6 +435,20 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
         });
     }
 
+    onChangeBrowserStackLocal (value) {
+        const { providers = {} } = this.state || {};
+        const { browserStack = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                browserStack: {
+                    ...browserStack,
+                    local: value,
+                }
+            }
+        });
+    }
+
     onChangeBrowserStackNetworkLogs (value) {
         const { providers = {} } = this.state || {};
         const { browserStack = {} } = providers;
@@ -682,13 +696,13 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                     browserStack && browserStack.inUse &&
                     <div className="cloud-providers-form-wrap">
                         <Form.Item label="BrowserStack Settings" style={ {fontWeight: 'bold'} } {...formItemLayout}/>
-                        <Form.Item label="Key" {...formItemLayout} >
+                        <Form.Item label="Username" {...formItemLayout} >
                             <Input.Password
                                 value={ browserStack.key }
                                 onChange={ (e) => ::this.onChangeBrowserStackKey(e.target.value) }
                             />
                         </Form.Item>
-                        <Form.Item label="Secret" {...formItemLayout} >
+                        <Form.Item label="Access Key" {...formItemLayout} >
                             <Input.Password
                                 value={ browserStack.secret }
                                 onChange={ (e) => ::this.onChangeBrowserStackSecret(e.target.value) }
@@ -698,6 +712,12 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                             <Input
                                 value={ browserStack.build }
                                 onChange={ (e) => ::this.onChangeBrowserStackBuildName(e.target.value) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Local" {...formItemLayout} >
+                            <Checkbox
+                                checked={ browserStack.local || false }
+                                onChange={ (e) => ::this.onChangeBrowserStackLocal(e.target.checked) }
                             />
                         </Form.Item>
                         <Form.Item label="Debug" {...formItemLayout} >

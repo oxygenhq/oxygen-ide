@@ -67,47 +67,47 @@ export default class BrowserStackService extends CloudProviderBase {
             throw new Error('"settings" must not be null');
         }
 
+        // add BrowserStack options object
+        const bstackOpts = caps['bstack:options'] = {};
+        // set user credentials
+        bstackOpts.userName = this.settings.key;
+        bstackOpts.accessKey = this.settings.secret;
+        // run test on a browser
         if (target && target.browserName) {
             
             if (target.browserName) {
-                caps.browser = target.browserName;
+                caps.browserName = target.browserName;
             }
 
             if (target.browserVersion) {
-                caps.browser_version = target.browserVersion;
+                caps.browserVersion = target.browserVersion;
             }
 
             if (target.osName) {
-                caps.os = target.osName;
+                bstackOpts.os = target.osName;
             }
             
             if (target.osVersion) {
-                caps.os_version = target.osVersion;
+                bstackOpts.osVersion = target.osVersion;
             }
 
-        } else {
-            caps['browserstack.user'] = this.settings.key;
-            caps['browserstack.key'] = this.settings.secret;
+        } 
+        // run test on a mobile device
+        else if (target) {
             if (target.deviceName) {
-                caps.device = target.deviceName;
+                caps.deviceName = target.deviceName;
             }
 
             if (target.osVersion) {
-                caps.os_version = target.osVersion;
+                bstackOpts.osVersion = target.osVersion;
             }
         }
-
-        caps.name = testName || null;
-        caps.key = this.settings.key;
-        caps.secret = this.settings.secret;
-
-        caps['browserstack.video'] = this.settings.recordVideo || false;
-        caps['browserstack.networkLogs'] = this.settings.networkLogs || false;
-        caps['browserstack.debug'] = this.settings.debug || false;
-
-        caps['browserstack:options'] = {
-            name: testName || null
-        };
+        // set additional options
+        bstackOpts.video = this.settings.recordVideo || false;
+        bstackOpts.networkLogs = this.settings.networkLogs || false;
+        bstackOpts.debug = this.settings.debug || false;
+        bstackOpts.local = this.settings.local || false;
+        bstackOpts.sessionName = testName || null;
 
         return caps;
     }
