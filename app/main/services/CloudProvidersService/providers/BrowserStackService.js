@@ -95,7 +95,8 @@ export default class BrowserStackService extends CloudProviderBase {
         // run test on a mobile device
         else if (target) {
             if (target.deviceName) {
-                caps.deviceName = target.deviceName;
+                bstackOpts.deviceName = target.deviceName;
+                bstackOpts.realMobile = true;
             }
 
             if (target.osVersion) {
@@ -107,7 +108,11 @@ export default class BrowserStackService extends CloudProviderBase {
         bstackOpts.networkLogs = this.settings.networkLogs || false;
         bstackOpts.debug = this.settings.debug || false;
         bstackOpts.local = this.settings.local || false;
+        if (this.settings.build) {
+            bstackOpts.buildName = this.settings.build;
+        }
         bstackOpts.sessionName = testName || null;
+        bstackOpts.idleTimeout = 300;
 
         return caps;
     }
