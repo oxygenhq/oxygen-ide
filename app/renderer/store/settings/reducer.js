@@ -52,7 +52,8 @@ const defaultAppSettings = {
         paramFilePath: null,
         reopenSession: false,
         useParams: false,
-        env: null
+        env: null,
+        extendedDebugging: false
     },
     runSettings: {
         npmGRootExecution: false

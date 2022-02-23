@@ -49,11 +49,11 @@ export function* loadProjectSettings({ payload }) {
            // report success
            yield put(settingsActions._loadProjectSettings_Failure(path));
         } else {
-            const generalSettings = {};
+            const settings = yield select(state => state.settings);
+            const generalSettings = settings.generalSettings;
             
             // re-check if env presented is settings
             if (!env) {
-                const settings = yield select(state => state.settings);
                 if (
                     settings &&
                     settings.generalSettings &&
