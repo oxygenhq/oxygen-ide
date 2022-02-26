@@ -141,6 +141,7 @@
     "@sentry/webpack-plugin": "1.15.1",
     "antd": "3.26.13",
     "appium-adb": "8.18.0",
+    "browserstack-local": "^1.4.8",
     "chrome-launcher": "0.14.0",
     "clean-stack": "3.0.1",
     "core-js": "3.6.5",

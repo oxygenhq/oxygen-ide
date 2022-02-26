@@ -17,4 +17,6 @@ export default class CloudProviderBase {
     updateOptions(target, options) {
         throw Error('"updateOptions" Not implemented');
     }
+    onBeforeTest(caps, options, reporter) {}
+    onAfterTest(err) {}
 }

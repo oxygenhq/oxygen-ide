@@ -117,9 +117,10 @@ export default class TestRunnerService extends ServiceBase {
         options.reopenSession = reopenSession || false;
         options.disableScreenshot = true;
         const cloudProviderSvc = this.getService('CloudProvidersService');
+        let provider = null;
 
         if (cloudProviderSvc && testProvider && testProvider.id) {
-            const provider = cloudProviderSvc.getProvider(testProvider.id);
+            provider = cloudProviderSvc.getProvider(testProvider.id);
 
             if (provider) {
                 const providerCaps = provider.updateCapabilities(testTarget, caps, testName);
@@ -323,12 +324,15 @@ export default class TestRunnerService extends ServiceBase {
                 if (caps && caps.browserName && caps.browserName === 'ie') {
                     this._killIEWebdriver();
                 }
-                this.reporter = new ReportAggregator(options);            
+                this.reporter = new ReportAggregator(options);
+                provider && await provider.onBeforeTest(caps, options, this.reporter);
                 await this._launchTest(options, caps);
+                provider && await provider.onAfterTest();
             } else {
                 this._emitTestEnded(null, processingError);
             }
         } catch (e) {
+            provider && await provider.onAfterTest(e);
             // the error at .init stage can be caused by parallel call to .kill() method
             // make sure in case we are in the middle of stopping the test to ignore any error at this stage
             if (!this.isStopping) {
@@ -338,7 +342,7 @@ export default class TestRunnerService extends ServiceBase {
         finally {
             this.isRunning = false;
             // dispose Oxygen Runner and mark the state as not running, before updating the UI
-            await this.dispose();            
+            await this.dispose();
         }
     }
 

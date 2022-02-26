@@ -18,6 +18,7 @@ import ActionTypes from '../types';
 import { MAIN_SERVICE_EVENT } from '../../services/MainIpc';
 import ServicesSingleton from '../../services';
 const services = ServicesSingleton();
+const LOCAL_TEST_PROVIDER = 'Local';
 /**
  * Test Sagas
  */
@@ -120,8 +121,11 @@ export function* handleServiceEvents({ payload }) {
 
 function* deviceDiscoveryServiceSaveStart() {
     const testMode = yield select(state => state.test.runtimeSettings.testMode);
+    const testProvider = yield select(state => state.test.runtimeSettings.testProvider);
 
-    if (testMode === 'mob') {
+    // list local devices only if we are using a local test provider
+    // we do not need to list the local devices, if using a remote cloud provider
+    if (testMode === 'mob' && testProvider === LOCAL_TEST_PROVIDER) {
         // start Android and iOS device watcher
         services.mainIpc.call('DeviceDiscoveryService', 'start').catch((e) => console.error(e.message));
     }

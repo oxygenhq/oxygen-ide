@@ -1,10 +1,13 @@
 import CloudProviderBase from '../CloudProviderBase';
 const fetch = require('node-fetch');
+const browserstack = require('browserstack-local');
+
 
 export default class BrowserStackService extends CloudProviderBase {
     constructor(settings) {
         super(settings);
         this.isRunning = false;
+        this.bsLocal = null;
     }
 
     start() {
@@ -66,7 +69,6 @@ export default class BrowserStackService extends CloudProviderBase {
         else if (!this.settings || typeof this.settings !== 'object') {
             throw new Error('"settings" must not be null');
         }
-
         // add BrowserStack options object
         const bstackOpts = caps['bstack:options'] = {};
         // set user credentials
@@ -128,5 +130,50 @@ export default class BrowserStackService extends CloudProviderBase {
         };
 
         return options;
+    }
+
+    async onBeforeTest(caps, options, reporter) {
+        if (this.settings.local) {
+            await this.startLocalService();
+        }
+    }
+
+    async onAfterTest(err) {
+        if (this.settings.local) {
+            await this.stopLocalService();
+        }
+    }
+
+    async startLocalService() {
+        // creates an instance of Local
+        this.bsLocal = new browserstack.Local();
+
+        // replace <browserstack-accesskey> with your key. You can also set an environment variable - "BROWSERSTACK_ACCESS_KEY".
+        const bs_local_args = { 'key': this.settings.secret };
+
+        return new Promise((resolve, reject) => {
+            // starts the Local instance with the required arguments
+            this.bsLocal.start(bs_local_args, function(error) {
+                if (!error) {
+                    resolve();
+                }
+                else {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    async stopLocalService() {
+        if (!this.bsLocal) {
+            return;
+        }
+        return new Promise((resolve, reject) => {
+            // stop the Local instance
+            this.bsLocal.stop(function() {
+                resolve();
+            });
+            this.bsLocal = null;
+        });        
     }
 }
