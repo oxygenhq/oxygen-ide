@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v1.27.0 (2022-03-14)
+
+#### :beetle: Bug Fix
+* Editor tabs becoming unresponsive in certain situations.
+* Fix number of issues with test execution on BrowserStack,
+
+#### :nail_care: Polish
+* Print test time and date in general log.
+* Automatically scroll log to the last entry.
+
+#### :house: Internal
+* Update oxygen-cli from v1.21.0 to v1.22.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver/EdgeDriver 99.
+* Bump dependencies.
+
 ## v1.26.0 (2022-01-17)
 
 #### :beetle: Bug Fix
