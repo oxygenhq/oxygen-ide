@@ -121,6 +121,14 @@ export default class TextEditor extends React.Component<Props> {
                     editor._domElement.focus();
                 }
 
+                if (
+                    editor._modelData.view &&
+                    editor._modelData.view._textAreaHandler &&
+                    editor._modelData.view._textAreaHandler._textAreaInput
+                ) {
+                    editor._modelData.view._textAreaHandler._textAreaInput.focus();  
+                }                
+
                 editor.focus();
                 editor.setPosition(editor.getPosition());
             }
