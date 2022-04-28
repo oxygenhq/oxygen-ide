@@ -300,9 +300,6 @@ export default class MonacoEditor extends React.Component<Props> {
     editorLayoutAndFocus() {
         if (this.editor) {
             this.editor.layout();
-            if (!this.editor.hasTextFocus()) {
-                this.editor.focus();
-            }
         }
     }
 

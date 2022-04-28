@@ -74,58 +74,33 @@ export default class TextEditor extends React.Component<Props> {
         };
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
         const {
-            activeFile
+            activeFile,
+            openFiles
         } = this.props;
 
-        let focusCounter = [];
-
-        Object.keys(this.editors).map((filePath) => {
-            const item = this.editors[filePath];
-            if (item && item.editor) {
-                if (item.editor.hasTextFocus() && activeFile !== filePath) {
-                    focusCounter.push(filePath);
-                }
-            }
-        });
-
-        if (focusCounter.length > 0) {
-            if (document && document.activeElement instanceof HTMLElement) {
-                document.activeElement.blur();
-            }
-
-            focusCounter.map((itm) => {      
-                if (this.editors[itm] && this.editors[itm].editor) {
-                    const editor = this.editors[itm].editor;
-                    if (editor._modelData) {
-                        editor._modelData.hasRealView = false;
-    
-                        if (
-                            editor._modelData.view &&
-                            editor._modelData.view._textAreaHandler &&
-                            editor._modelData.view._textAreaHandler._textAreaInput &&
-                            editor._modelData.view._textAreaHandler._textAreaInput.blur
-                        ) {
-                            editor._modelData.view._textAreaHandler._textAreaInput.blur();  
-                        }
-                    }
-                    editor._domElement.blur();
-                }
-            });
-
-            if (this.editors[activeFile] && this.editors[activeFile].editor) {
-                const editor = this.editors[activeFile].editor;
-
-                if (editor._domElement) {
-                    editor._domElement.focus();
-                }
-
-                editor.focus();
-                editor.setPosition(editor.getPosition());
-            }
+        const prevActiveFile = prevProps.activeFile;
+        // the following code removes focus from inactive (invisible) editors and assignes focus to the active editor
+        // we need to perform this operation because otherwise multiple editors might have focus at the same time
+        // and this will cause DELETE and other special keys not to work properly
+        if (prevActiveFile && activeFile && prevActiveFile !== activeFile) {
+            const prevActiveEditor = this.editors[prevActiveFile];
+            const currentActiveEditor = this.editors[activeFile];
+            const isPrevEditorFileStillOpen = openFiles.some(x => x.path === prevActiveFile);
+            // remove focus from previous active editor
+            if (prevActiveEditor && isPrevEditorFileStillOpen) {
+                prevActiveEditor.editor._modelData.hasRealView = false;
+                prevActiveEditor.editor._domElement.blur();
+            }            
+            // focus on the current editor
+            if (currentActiveEditor) {
+                currentActiveEditor.editor._modelData.hasRealView = true;
+                currentActiveEditor.editor.focus();
+                currentActiveEditor.editor._domElement.focus();
+                currentActiveEditor.editor.setPosition(currentActiveEditor.editor.getPosition());
+            }            
         }
-
     }
 
     componentWillUnmount() {
