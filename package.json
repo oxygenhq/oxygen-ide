@@ -162,7 +162,7 @@
     "monaco-editor": "0.26.1",
     "monaco-editor-textmate": "3.0.0",
     "monaco-textmate": "3.0.1",
-    "node-fetch": "2.6.1",
+    "node-fetch": "2.6.7",
     "onigasm": "2.2.5",
     "perfect-scrollbar": "1.5.3",
     "react": "16.13.0",
