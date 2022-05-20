@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v1.28.0 (2022-05-20)
+
+#### :beetle: Bug Fix
+* Fix editor locking-up for editing sometimes.
+
+#### :house: Internal
+* Update oxygen-cli from v1.22.0 to v1.22.1. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bump dependencies.
+* Update Geckodriver to 0.31.0.
+* Bundle ChromeDriver/EdgeDriver 100 and 101. 
+
 ## v1.27.0 (2022-03-14)
 
 #### :beetle: Bug Fix
