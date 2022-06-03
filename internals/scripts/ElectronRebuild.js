@@ -56,5 +56,6 @@ if (Object.keys(dependencies || {}).length > 0 && fs.existsSync(nodeModulesPath)
     
     const odbcLibBindingsOriginal = path.join(nodeModulesPath, 'odbc', 'lib', 'bindings', 'napi-v{napi_build_version}');
     const odbcLibBindingsFinal = path.join(nodeModulesPath, 'odbc', 'lib', 'bindings', 'napi-v4');
+    fs.rmdirSync(odbcLibBindingsFinal, { recursive: true });
     fs.renameSync(odbcLibBindingsOriginal, odbcLibBindingsFinal);
 }
