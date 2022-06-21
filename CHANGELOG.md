@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v1.29.0 (2022-06-21)
+
+#### :house: Internal
+* Update oxygen-cli from v1.22.1 to v1.23.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bump dependencies.
+* Bundle ChromeDriver/EdgeDriver 102. 
+
 ## v1.28.0 (2022-05-20)
 
 #### :beetle: Bug Fix
