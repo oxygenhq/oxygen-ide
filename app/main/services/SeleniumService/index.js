@@ -143,15 +143,18 @@ export default class SeleniumService extends ServiceBase {
             edgeVersion = await this.getEdgeVersion();
             console.log('Found Edge version: ', edgeVersion);
 
+            if (edgeVersion) {
+                this.notify({
+                    type: ON_EDGE_FINDED
+                });
+            }
+
             var edgeDriverVersion = await this.getEdgeDriverVersion(edgeVersion);
-            console.log('Required Edge version: ', edgeDriverVersion);
+            console.log('Required EdgeDriver version: ', edgeDriverVersion);
 
             edgeDriver = await this.findLocalEdgeDriver(edgeDriverVersion);
             if (edgeDriver) {
                 console.log('Found matching EdgeDriver at ', edgeDriver);
-                this.notify({
-                    type: ON_EDGE_FINDED
-                });
             } else {
                 throw new Error('Cannot find it localy');
             }
@@ -172,9 +175,6 @@ export default class SeleniumService extends ServiceBase {
                 edgeDriver = await this.findLocalEdgeDriver(edgeVersions[0].driverVersion);
                 if (edgeDriver) {
                     console.log('Using latest bundled EdgeDriver from ' + edgeDriver);
-                    this.notify({
-                        type: ON_EDGE_FINDED
-                    });
                 } else {
                     if (edgeVersion) {
                         this.notify({
