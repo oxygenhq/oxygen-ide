@@ -179,8 +179,7 @@ export default class SeleniumService extends ServiceBase {
                     if (edgeVersion) {
                         this.notify({
                             type: ON_EDGE_DRIVER_ERROR,
-                            edgeVersion: edgeVersion,
-                            edgeDriverVersion: edgeDriverVersion,
+                            edgeVersion: edgeDriverVersion
                         });
                     }
                 }

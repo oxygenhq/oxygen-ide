@@ -3,7 +3,7 @@ import { Modal, Button } from 'antd';
 
 type Props = {
     onCancel: Function,
-    chromeDriverVersion: string,
+    edgeDriverVersion: string,
     edgeVersion: string,
     onSubmit: Function,
     onNoChromeDriverSubmit: Function
