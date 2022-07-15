@@ -609,7 +609,7 @@ export default class SeleniumService extends ServiceBase {
             const driverBin = path.resolve(
                 this.getDriversRootPath(),
                 driverVersion ? EDGE_FOLDER_START + driverVersion : '',
-                'edgedriver' + (process.platform === 'win32' ? '.exe' : '')
+                'msedgedriver' + (process.platform === 'win32' ? '.exe' : '')
             );
 
             fs.access(driverBin, err => {
