@@ -1,11 +1,16 @@
 # CHANGELOG
 
-## v1.29.0 (2022-06-21)
+## v1.29.0 (2022-07-20)
+
+#### :beetle: Bug Fix
+* Edge installation not being recognized sometimes.
+* Edge driver not being found when placed in drivers root.
+* Edge driver download link not being constructed correctly.
 
 #### :house: Internal
-* Update oxygen-cli from v1.22.1 to v1.23.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update oxygen-cli from v1.22.1 to v1.24.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 * Bump dependencies.
-* Bundle ChromeDriver/EdgeDriver 102. 
+* Bundle ChromeDriver/EdgeDriver 103. 
 
 ## v1.28.0 (2022-05-20)
 
