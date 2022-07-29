@@ -84,7 +84,7 @@
     "@babel/preset-flow": "7.10.4",
     "@babel/preset-react": "7.10.4",
     "@babel/register": "7.10.4",
-    "archiver": "5.0.2",
+    "archiver": "5.3.1",
     "asar": "3.0.3",
     "babel-eslint": "10.1.0",
     "babel-jest": "28.1.1",
