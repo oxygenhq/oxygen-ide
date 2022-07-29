@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v1.29.1 (2022-07-29)
+
+#### :house: Internal
+* Update oxygen-cli from v1.24.0 to v1.24.1. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bump dependencies.
+
 ## v1.29.0 (2022-07-20)
 
 #### :beetle: Bug Fix
