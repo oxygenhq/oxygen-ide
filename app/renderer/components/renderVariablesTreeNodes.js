@@ -104,7 +104,7 @@ function generatePreviewTextForVariableValue(value) {
     if (typeof value === 'string') {
         return `"${value}"`;
     }
-    if (typeof value === 'number') {
+    if (typeof value === 'number' || typeof value === 'bigint') {
         return value + '';
     }
     if (typeof value === 'boolean') {
