@@ -128,7 +128,7 @@ export const onTestEnded = () => ({
 
 export const onBreakpoint = (file, line, variables) => ({
     type: ActionTypes.TEST_EVENT_BREAKPOINT,
-    payload: { file, line, variables: convertVariablesForTree(variables) },
+    payload: { file, line, variables: variables }, //convertVariablesForTree(variables) },
 });
 
 export const onLineUpdate = (time, file, line, primary) => ({

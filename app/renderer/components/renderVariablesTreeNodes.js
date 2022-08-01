@@ -21,17 +21,18 @@ function renderVariablesTreeNodes(nodes, parentIndex) {
         let theTitle = (
             <Fragment>
                 <span style={{color: '#0000ff'}}>{element.name}</span>
-                {' '}
                 :
                 {' '}
-                <span style={{color: '#a31515'}}>{'<'+element.type+'>'}</span>
-
                 {
-                    element && typeof element.value !== 'undefined' &&
-                    ' '+element.value
+                    generatePreviewTextForVariableValue(element.value)
                 }
             </Fragment>
         );
+        //                <span style={{color: '#a31515'}}>{'<'+element.type+'>'}</span>
+        /*
+         && typeof element.value !== 'undefined' &&
+                    ' '+element.value
+        */
 
         let saveParentIndex = '0';
 
@@ -40,8 +41,7 @@ function renderVariablesTreeNodes(nodes, parentIndex) {
         }
 
         saveParentIndex+='.'+idx;
-        
-        if (element.children && element.children.length) {
+        if (element.value && typeof element.value === 'object') {
             return (
                 <Tree.TreeNode
                     hideIcon={true}
@@ -53,7 +53,7 @@ function renderVariablesTreeNodes(nodes, parentIndex) {
                     style={{ userSelect: 'none' }}
                     isLeaf={false}
                 >
-                    {element.children ? renderVariablesTreeNodes.apply(this, [element.children, saveParentIndex]) : []}
+                    { renderVariablesTreeNodes.apply(this, [generateVariablesListFromObjectProperties(element.value), saveParentIndex]) }
                 </Tree.TreeNode>
             );
         }
@@ -71,6 +71,49 @@ function renderVariablesTreeNodes(nodes, parentIndex) {
             />
         );
     });
+}
+
+function generateVariablesListFromObjectProperties(obj) {
+    if (typeof obj !== 'object') {
+        return [];
+    }
+    const variableList = [];
+    Object.keys(obj).forEach(key => {
+        const value = obj[key];
+        const type = typeof value;
+        // ignore empty objects (originally, those were functions that were serialized by Oxygen into empty objects)
+        if (type === 'object' && Object.keys(value).length == 0) {
+            return;
+        }
+        variableList.push({
+            name: key,
+            type: type,
+            value,
+        });
+    });
+    return variableList;
+}
+
+function generatePreviewTextForVariableValue(value) {
+    if (typeof value === 'undefined') {
+        return 'undefined';
+    }
+    if (value === null) {
+        return 'null';
+    }
+    if (typeof value === 'string') {
+        return `"${value}"`;
+    }
+    if (typeof value === 'number') {
+        return value + '';
+    }
+    if (typeof value === 'boolean') {
+        return value.toString();
+    }
+    if (typeof value === 'object') {
+        return JSON.stringify(value);
+    }
+    return '';
 }
 
 export default renderVariablesTreeNodes;

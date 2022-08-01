@@ -50,7 +50,6 @@ export default class VariablesViewer extends React.PureComponent<Props> {
     render() {
         const { height, variables } = this.props;
         const { refreshScroll } = this.state;
-
         return (
             <div style={{height: (height - 32)+'px'}}>
                 <ScrollContainer

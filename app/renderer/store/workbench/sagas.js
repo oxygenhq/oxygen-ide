@@ -144,7 +144,7 @@ export function* handleMainMenuEvents({ payload }) {
                 yield put(wbActions.openFile(filePath));
             }
         } catch (e) {
-            console.log('MENU_CMD_OPEL_LOG_FILE e'. e);
+            console.error('MENU_CMD_OPEL_LOG_FILE failed'. e);
         }
     }
     else if (cmd === Const.MENU_CMD_CLEAR_ALL) {
@@ -1811,7 +1811,7 @@ export function* setCloudProvidersBrowsersAndDevices() {
             yield put(testActions.setTestProvider('Local'));
         }
     } catch (e) {
-        console.log('setCloudProvidersBrowsersAndDevices e', e);
+        console.error('setCloudProvidersBrowsersAndDevices failed', e);
     }
 }
 
