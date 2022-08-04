@@ -8,6 +8,7 @@
  */
 import * as ActionTypes from './types';
 
+// eslint-disable-next-line no-unused-vars
 const convertVariablesForTree = (variables, objectId = null) => {
 
     if (!variables) {
