@@ -1,8 +1,7 @@
 # Oxygen IDE
 
 ## Building:
-1. ```npm install -g grunt-cli```
-2. ```npm install```
+2. ```npm i```
 3. ```npm run dev``` to start in development mode or ```npm run start``` in production mode.
 4. ```npm run package``` to generate the release package.
 
@@ -10,7 +9,7 @@
 
 #### Windows:
 * WiX Toolset installed and added to the %PATH%. 
-* Python 2.7 and VS Studio 2019 installed manually or ```npm --add-python-to-path='true' --debug install --global windows-build-tools``` from ```cmd``` with admin rights.
+* Python 3 (latest) and Visual Studio Build Tools 2019 installed manually or ```npm --add-python-to-path='true' --debug install --global windows-build-tools``` from ```cmd``` with admin rights. Run `npm config set msvs_version 2019 --global` afterwards to set `msvs_version`.
 * [Optional. Required for DB support] Windows SDK
 * GTK and libjpeg-turbo https://github.com/Automattic/node-canvas/wiki/Installation:-Windows
 
