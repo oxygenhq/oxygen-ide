@@ -25,7 +25,8 @@
     "test-file-watcher": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r @babel/register ./node_modules/jest/bin/jest test/file-watcher/",
     "test-all": "npm run lint && npm run flow && npm run build && npm run test && npm run test-e2e",
     "test-e2e": "cross-env NODE_ENV=test BABEL_DISABLE_CACHE=1 node --trace-warnings -r @babel/register ./internals/scripts/RunTests.js e2e",
-    "test-watch": "npm test -- --watch"
+    "test-watch": "npm test -- --watch",
+    "prepare": "husky install"
   },
   "browserslist": "electron 7.0",
   "repository": {
@@ -67,11 +68,6 @@
     "verbose": true,
     "useStderr": true
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint"
-    }
-  },
   "devDependencies": {
     "@babel/core": "7.10.4",
     "@babel/plugin-proposal-class-properties": "7.10.4",
@@ -85,7 +81,7 @@
     "@babel/preset-react": "7.10.4",
     "@babel/register": "7.10.4",
     "archiver": "5.3.1",
-    "asar": "3.0.3",
+    "asar": "3.2.0",
     "babel-eslint": "10.1.0",
     "babel-jest": "28.1.1",
     "babel-loader": "8.2.2",
@@ -112,7 +108,7 @@
     "flow-runtime": "0.17.0",
     "flow-typed": "3.7.0",
     "grunt": "1.5.3",
-    "husky": "4.3.8",
+    "husky": "^8.0.0",
     "jest": "28.1.1",
     "mini-css-extract-plugin": "0.9.0",
     "modclean": "2.1.2",
@@ -162,7 +158,7 @@
     "monaco-editor": "0.26.1",
     "monaco-editor-textmate": "3.0.0",
     "monaco-textmate": "3.0.1",
-    "node-fetch": "2.6.1",
+    "node-fetch": "2.6.7",
     "onigasm": "2.2.5",
     "perfect-scrollbar": "1.5.3",
     "react": "16.13.0",
