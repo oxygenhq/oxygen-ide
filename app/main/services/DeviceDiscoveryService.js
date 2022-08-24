@@ -305,7 +305,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
             }
         }
         catch (e) {
-            if (e && e.message && e.message === 'Could not find the instruments binary. Please ensure `xcrun -find instruments` can locate it.') {
+            if (e && e.message && e.message === 'instruments/xctrace not found error') {
                 if (this.xCodeNotified) {
                     // ignore
                 } else {
@@ -327,31 +327,79 @@ export default class DeviceDiscoveryService extends ServiceBase {
             let {stdout} = await exec('xcrun', ['-find', 'instruments']);
             instrumentsPath = (stdout || '').trim().replace('\n$', '');
         } catch (err) {
-            if (err) {
-                console.error(err.message);
-            }
+            console.error(err.message);
         }
         if (!instrumentsPath) {
-            throw new Error('Could not find the instruments binary. Please ensure `xcrun -find instruments` can locate it.');
+            throw new Error('instruments/xctrace not found error');
         }
         return instrumentsPath;
     }
 
-    async _iosGetAvailableDevices(timeout = INST_STALL_TIMEOUT) {
-        let instrumentsPath = await this._iosGetInstrumentsPath();
-        let opts = {timeout};
-        let lines;
+    async _iosGetXctracePath() {
+        let xctracePath;
         try {
-            let {stdout} = await exec(instrumentsPath, ['-s', 'devices'], opts);
-            lines = stdout.split('\n');
+            let {stdout} = await exec('xcrun', ['-find', 'xctrace']);
+            xctracePath = (stdout || '').trim().replace('\n$', '');
         } catch (err) {
-            if (err && err.message && err.message.includes('timed out after')) {
-                // ignore
-            } else {
-                throw new Error(`Failed getting devices, err: ${err}.`);
+            console.error(err);
+        }
+        return xctracePath;
+    }
+
+    async _iosGetAvailableDevices(timeout = INST_STALL_TIMEOUT) {
+        let opts = {timeout};
+
+        let xctracePath = await this._iosGetXctracePath();
+        let devices = [];
+        let lines;
+        if (xctracePath) {
+            try {
+                // xcrun xctrace writes to stderr instead of stdout
+                let {stderr} = await exec(xctracePath, ['list', 'devices'], opts);
+
+                lines = stderr.split('\n');
+
+                // adapt the lines to same format as returned by 'instruments'
+                var simulators = false
+                for (var i = 0; i < lines.length; i++) {
+                    // replace regular brackets around udid with square brackets
+                    var indexOpen = lines[i].lastIndexOf('(');
+                    var indexClose = lines[i].lastIndexOf(')');
+                    if (indexOpen >= 0 && indexClose >= 0) {
+                        lines[i] = lines[i].substring(0, indexOpen) + '[' + lines[i].substring(indexOpen + 1);
+                        lines[i] = lines[i].substring(0, indexClose) + ']' + lines[i].substring(indexClose + 1);
+                    }
+
+                    if (lines[i] === '== Simulators ==') {
+                        simulators = true;
+                        continue;
+                    }
+
+                    // add '(Simulator)' suffix
+                    if (simulators) {
+                        lines[i] += ' (Simulator)';
+                    }
+                }
+            } catch (err) {
+                if (err && err.message && err.message.includes('timed out after')) {
+                    // ignore
+                } else {
+                    throw new Error(`Failed getting devices, err: ${err}.`);
+                }
+            }
+        } else {
+            let instrumentsPath = await this._iosGetInstrumentsPath();
+            try {
+                let {stdout} = await exec(instrumentsPath, ['-s', 'devices'], opts);
+                lines = stdout.split('\n');
+            } catch (err) {
+                if (err && err.message && err.message.includes('timed out after')) {
+                    // ignore
+                } else {
+                    throw new Error(`Failed getting devices, err: ${err}.`);
+                }
             }
         }
-        let devices = [];
 
         if (lines && lines.filter) {
             devices = lines.filter((line) => {
@@ -359,6 +407,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 return /^.+ \(\d+\.(\d+\.)?\d+( Simulator)?\) \[.+\]( \(Simulator\))?$/.test(line);
             });
         }
+
         return devices;
     }
         
