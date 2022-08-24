@@ -360,7 +360,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 lines = stderr.split('\n');
 
                 // adapt the lines to same format as returned by 'instruments'
-                var simulators = false
+                var simulators = false;
                 for (var i = 0; i < lines.length; i++) {
                     // replace regular brackets around udid with square brackets
                     var indexOpen = lines[i].lastIndexOf('(');
