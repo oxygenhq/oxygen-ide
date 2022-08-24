@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## v1.30.0 (2022-08-24)
+
+#### :tada: New Feature
+* Show oxygen internal variables in debugger window.
+
+#### :beetle: Bug Fix
+* Add support for iOS device recognition with Xcode 13 and later.
+
+#### :house: Internal
+* Update oxygen-cli from v1.24.1 to v1.24.4. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver/EdgeDriver 104.
+* Bump dependencies.
+
 ## v1.29.1 (2022-07-29)
 
 #### :house: Internal
