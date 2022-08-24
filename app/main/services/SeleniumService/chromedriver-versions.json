@@ -1,6 +1,11 @@
 {
   "versions": [
     {
+      "driverVersion": "104.0.5112.79",
+      "chromeMax": 104,
+      "chromeMin": 104
+    },
+    {
       "driverVersion": "103.0.5060.53",
       "chromeMax": 103,
       "chromeMin": 103
