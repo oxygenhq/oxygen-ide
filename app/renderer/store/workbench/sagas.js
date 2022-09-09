@@ -116,6 +116,9 @@ export function* handleMainMenuEvents({ payload }) {
     else if (cmd === Const.MENU_CMD_SAVE_AS) {
         yield put(wbActions.saveCurrentFile(true));
     }
+    else if (cmd === Const.MENU_CMD_SAVE_ALL) {
+        yield saveAllUnsavedfiles();
+    }
     else if (cmd === Const.MENU_CMD_UNDO) {
         yield editorSubjects['EDITOR.TRIGGER'].next({ trigger: 'undo' });
     }
@@ -283,6 +286,46 @@ export function* otherTabsClose() {
                     yield put(wbActions.closeFile(item.key, false, item.title));
                 }
             }
+        }
+    }
+}
+
+function* saveAllUnsavedfiles() {
+    const tabs = yield select(state => state.tabs);
+    const files = yield select(state => state.fs.files);
+
+    if (
+        tabs &&
+        tabs.list &&
+        Array.isArray(tabs.list) &&
+        tabs.list.length > 0
+    ) {
+        for (let i = 0; i < tabs.list.length; i++) {
+            const activeFile = tabs.list[i];
+
+            if (activeFile.touched) {
+                // edited
+                if (activeFile.key === 'unknown') {
+                    // ignore
+                } else {
+                    // real file
+
+                    if (!activeFile || !files.hasOwnProperty(activeFile.key)) {
+                        return;
+                    }
+
+                    const currentFile = files[activeFile.key];
+
+                    const { error } = yield putAndTake(
+                        fsActions.saveFile(activeFile.key, currentFile.content)
+                    );
+                    if (!error) {
+                        yield put(tabActions.setTabTouched(activeFile.key, false));
+                    }
+                }
+            }
+
+
         }
     }
 }

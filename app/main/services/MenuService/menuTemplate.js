@@ -46,6 +46,11 @@ export default (cmdHandler, settings) => {
             click() { cmdHandler(Const.MENU_CMD_SAVE_AS); }
         },
         {
+            label: 'Save All',
+            accelerator: 'CommandOrControl+Alt+S',
+            click() { cmdHandler(Const.MENU_CMD_SAVE_ALL); }
+        },
+        {
             type: 'separator'
         },
         {
