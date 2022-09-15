@@ -38,6 +38,11 @@ export const startDownloadEdgeDriver = (edgeDriverVersion) => ({
     payload: { edgeDriverVersion },
 });
 
+export const storeEdgeBinaryPath = (path) => ({
+    type: types.STORE_EDGE_BINARY_PATH,
+    payload: { path },
+});
+
 export const showDownloadEdgeDriverError = () => ({
     type: types.DIALOG_SHOW_DOWNLOADING_EDGE_DRIVER_FAILED,
     payload: {  },

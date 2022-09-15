@@ -123,9 +123,7 @@ export function* handleOnChromeDriverErrorEvent(event) {
         yield put(actions.showDialog(ActionTypes.DIALOG_INCORECT_EDGE_DRIVER_VERSION, event));
     }
     if (event.type === 'ON_EDGE_FINDED') {
-        yield put({
-            type: 'ON_EDGE_FINDED'
-        });
+        yield put(actions.storeEdgeBinaryPath(event.path));
     }
     if (event.type === 'ON_CHROME_DRIVER_ERROR_AFTER_TEST_ENDED') {
         yield services.mainIpc.call('SeleniumService', 'findChromeDriverVersion');

@@ -489,15 +489,22 @@ export default (state = defaultState, action) => {
             },
         };
     
-
-    case 'ON_EDGE_FINDED': {
+    case 'STORE_EDGE_BINARY_PATH': {
         return {
             ...state,
+            runtimeSettings: {
+                ...state.runtimeSettings,
+                edgePath: path
+            },
             browsers: [
                 ...state.browsers,
                 {
-                    name: 'Microsoft Edge',
+                    name: 'Edge',
                     id: 'MicrosoftEdge',
+                },
+                {
+                    name: 'Edge (IE Mode)',
+                    id: 'MicrosoftEdgeIEMode',
                 }
             ]
         };

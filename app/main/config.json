@@ -1,6 +1,6 @@
 {
   "selenium": {
-      "jar": "selenium-server-standalone-3.141.59.jar",
+      "jar": "selenium-server-4.4.0.jar",
       "args": [],
       "port": 4444,
       "browserTimeout": 1200,

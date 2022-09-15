@@ -140,12 +140,14 @@ export default class SeleniumService extends ServiceBase {
         var edgeDriver;
         let edgeVersion;
         try {
-            edgeVersion = await this.getEdgeVersion();
+            const edgeDetails = await this.getEdgeVersion();
+            edgeVersion = edgeDetails.version;
             console.log('Found Edge version: ', edgeVersion);
 
             if (edgeVersion) {
                 this.notify({
-                    type: ON_EDGE_FINDED
+                    type: ON_EDGE_FINDED,
+                    path: edgeDetails.path
                 });
             }
 
@@ -256,6 +258,8 @@ export default class SeleniumService extends ServiceBase {
 
         const selArgs = [selSettings.jar].concat(selSettings.args);
     
+        selArgs.push('standalone');
+
         let geckodriverPath = null;
     
         if (process.platform === 'win32') {
@@ -277,14 +281,11 @@ export default class SeleniumService extends ServiceBase {
         if (process.platform === 'win32') {
             selArgs.unshift('-Dwebdriver.ie.driver=win32/IEDriverServer_x86.exe');
         }
-        selArgs.push('-port');
+        selArgs.push('--port');
         selArgs.push(port.toString());
         selArgs.unshift('-jar');
 
-        selArgs.push('-browserTimeout');
-        selArgs.push(selSettings.browserTimeout);
-
-        selArgs.push('-timeout');
+        selArgs.push('--session-timeout');
         selArgs.push(selSettings.timeout);
 
         console.log('Attempting to start Selenium process with the following args:', selArgs);
@@ -391,7 +392,10 @@ export default class SeleniumService extends ServiceBase {
                         const dataCleaned = data.toString().trim().toLowerCase();
                         if (dataCleaned.indexOf('version=') > -1) {
                             const edgeVersion = dataCleaned.split('version=')[1].split('wmic')[0].replace(/\r?\n|\r/g, '');
-                            resolve(edgeVersion.split('.')[0]);
+                            resolve({
+                                        version: edgeVersion.split('.')[0],
+                                        path: installations[0]
+                                    });
                         }
                     });
                 } else {
@@ -403,7 +407,10 @@ export default class SeleniumService extends ServiceBase {
                         let edgeVersion = data.toString().trim();
                         edgeVersion = edgeVersion.substr('Microsoft Edge '.length).split(' ')[0];
                         edgeVersion = edgeVersion.split('.')[0];
-                        resolve(edgeVersion);
+                        resolve({
+                                    version: edgeVersion,
+                                    path: installations[0]
+                                });
                     });
                 }
             } else {

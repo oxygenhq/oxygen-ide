@@ -59,6 +59,7 @@ export default class TestRunnerService extends ServiceBase {
             dbgPort: await detectPort(10205),
             ...runtimeSettings,
         };
+
         const {
             paramFilePath, 
             paramMode,
@@ -77,7 +78,8 @@ export default class TestRunnerService extends ServiceBase {
             stepDelay,
             testName,
             rootPath,
-            oxConfigFile
+            oxConfigFile,
+            edgePath
         } = testConfig;
         let testsuite = null;
 
@@ -182,6 +184,13 @@ export default class TestRunnerService extends ServiceBase {
                 // @FIXME: this option should be exposed in reports settings
                 options.screenshots = 'never';
                 caps.browserName = testTarget;
+                if (testTarget === 'MicrosoftEdgeIEMode') {
+                    caps.browserName = 'ie';
+                    caps['se:ieOptions'] = {
+                        'ie.edgechromium': true,
+                        'ie.edgepath': edgePath
+                    };
+                }
             }
         }
             
