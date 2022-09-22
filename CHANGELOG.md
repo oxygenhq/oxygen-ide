@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v1.31.0 (2022-09-22)
+
+#### :tada: New Feature
+* Add support for running tests in Internet Explorer mode under Microsoft Edge.
+* Add ability to save all unsaved files.
+
+#### :house: Internal
+* Update oxygen-cli from v1.24.4 to v1.24.5. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver/EdgeDriver 105.
+* Bump dependencies.
+
 ## v1.30.0 (2022-08-24)
 
 #### :tada: New Feature
