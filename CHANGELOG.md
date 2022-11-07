@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v1.31.1 (2022-11-07)
+
+#### :beetle: Bug Fix
+* Update to Selenium 4.6. This resolves an issue with test execution on Edge in IE mode.
+
+#### :house: Internal
+* Update oxygen-cli from v1.24.5 to v1.24.6. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver/EdgeDriver 107.
+* Update GeckoDriver to 0.32.0
+
 ## v1.31.0 (2022-09-22)
 
 #### :tada: New Feature
