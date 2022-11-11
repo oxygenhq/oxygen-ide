@@ -205,17 +205,8 @@ function* handleTestRunnerServiceEvent(event) {
         yield put(testActions.onLineUpdate(event.time, resolvedFileName, event.line, event.primary));
     }
     else if (event.type === 'BREAKPOINT') {
-
-        console.log('event', event);
-
-        let variables = null;
-
-        if (event && event.variables) {
-            variables = event.variables;
-        }
-
         const resolvedFileName = checkFileNameForUpperLoverCases(event.file, rootPath);
-        yield put(testActions.onBreakpoint(resolvedFileName, event.line, variables));
+        yield put(testActions.onBreakpoint(resolvedFileName, event.line, event.variables || []));
     }
     else if (event.type === 'BREAKPOIN_DEACTIVATE') {
         const resolvedFileName = checkFileNameForUpperLoverCases(event.file, rootPath);
@@ -280,16 +271,9 @@ function* handleDeviceDiscoveryServiceEvent(event) {
 
 export function* runItem(itemsLength, browsersList, inputCurrentItem, saveMainFile, breakpoints, runtimeSettingsClone, runSettings) {
     let currentItem = inputCurrentItem;
-
-    console.log('---');
-    console.log('currentItem', currentItem);
-    console.log('itemsLength', itemsLength);
-    console.log('---');
-
+    
     if (currentItem < itemsLength) {
-        const browser = browsersList[currentItem];
-        console.log('browser', browser);
-        
+        const browser = browsersList[currentItem];        
         const testBrowser = {
             browserName: browser._apiName,
             browserVersion: browser._version,
@@ -443,12 +427,7 @@ export function* startTestAll({ payload }) {
                 providerData.browsersList.length > 0
             ) {
                 const itemsLength = providerData.browsersList.length;
-
-                console.log('itemsLength', itemsLength);
-
-                yield runItem(itemsLength, providerData.browsersList, currentItem, saveMainFile, breakpoints, runtimeSettingsClone, runSettings);
-            
-                console.log('runItems finished');
+                yield runItem(itemsLength, providerData.browsersList, currentItem, saveMainFile, breakpoints, runtimeSettingsClone, runSettings);            
             }
         }
 
@@ -618,7 +597,7 @@ export function* stopTest({ payload }) {
         });
     }
     catch (err) {
-        console.log('stop err', err);
+        console.error('Failed to stop the test', err);
         /* istanbul ignore next */
         yield put({
             type: failure(ActionTypes.TEST_STOP),

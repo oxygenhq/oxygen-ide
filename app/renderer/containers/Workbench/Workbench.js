@@ -884,6 +884,7 @@ export default class Workbench extends React.Component<Props> {
                                     <Logger
                                         visible={loggerVisible}
                                         onHide={::this.logger_onHide}
+                                        variables={ test.variables }
                                     />
                                 </div>
                             </Layout>

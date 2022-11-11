@@ -8,6 +8,7 @@
  */
 import * as ActionTypes from './types';
 
+// eslint-disable-next-line no-unused-vars
 const convertVariablesForTree = (variables, objectId = null) => {
 
     if (!variables) {
@@ -128,7 +129,7 @@ export const onTestEnded = () => ({
 
 export const onBreakpoint = (file, line, variables) => ({
     type: ActionTypes.TEST_EVENT_BREAKPOINT,
-    payload: { file, line, variables: convertVariablesForTree(variables) },
+    payload: { file, line, variables: variables }, //convertVariablesForTree(variables) },
 });
 
 export const onLineUpdate = (time, file, line, primary) => ({
