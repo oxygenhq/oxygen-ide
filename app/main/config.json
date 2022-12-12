@@ -4,7 +4,8 @@
       "args": [],
       "port": 4444,
       "browserTimeout": 1200,
-      "timeout": 1200
+      "sessionTimeout": 1500,
+      "maxSessions": 100
   },
   "chrome": {
       "binary": ""

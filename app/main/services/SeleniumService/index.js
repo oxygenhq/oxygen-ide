@@ -101,7 +101,6 @@ export default class SeleniumService extends ServiceBase {
     }
 
     _emitStartedEvent({port, browserTimeout, timeout}) {
-
         console.log('_emitStartedEvent', port);
 
         this.notify({
@@ -286,8 +285,14 @@ export default class SeleniumService extends ServiceBase {
         selArgs.unshift('-jar');
 
         selArgs.push('--session-timeout');
-        selArgs.push(selSettings.timeout);
+        selArgs.push(selSettings.sessionTimeout);
 
+        selArgs.push('--override-max-sessions');
+        selArgs.push('true');
+
+        selArgs.push('--max-sessions');
+        selArgs.push(selSettings.maxSessions);
+        
         console.log('Attempting to start Selenium process with the following args:', selArgs);
         this.seleniumProc = cp.spawn('java', selArgs, { cwd, shell: true });
 
@@ -297,10 +302,11 @@ export default class SeleniumService extends ServiceBase {
             seleniumPid = this.seleniumProc.pid;
         }
 
+        // FIXME: browserTimeout is not needed in Selenium 4 and should be cleaned up (also from oxygen-cli)
         this._emitStartedEvent({
             port: port,
             browserTimeout: selSettings.browserTimeout,
-            timeout: selSettings.timeout
+            timeout: selSettings.sessionTimeout
         });
 
         this._handleProcessEvents();
