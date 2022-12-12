@@ -180,8 +180,8 @@
     "teen_process": "1.16.0",
     "tmp": "0.2.1",
     "uuid": "3.4.0",
-    "winston": "3.3.3",
-    "winston-daily-rotate-file": "4.5.1"
+    "winston": "3.3.4",
+    "winston-daily-rotate-file": "4.7.1"
   },
   "optionalDependencies": {
     "appdmg": "0.6.2"
