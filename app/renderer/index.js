@@ -24,7 +24,7 @@ import packageJson from '../../package.json';
 if (process.env.NODE_ENV === 'production') {
     try {
         Sentry.init({
-            dsn: 'https://cbea024b06984b9ebb56cffce53e4d2f@sentry.io/1483893',
+            dsn: 'https://24eaf38a68394ad69198ece9985cabff@o4504315553185792.ingest.sentry.io/4504315816116224',
             release: packageJson.version
         });
         window.Sentry = Sentry;
