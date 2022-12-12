@@ -28,6 +28,11 @@ import packageJson from '../../package.json';
 
 console.log('Version: ', packageJson.version);
 
+if (process.env.OXYGEN_IDE_USERDATA_PATH) {
+    console.log('Setting custom userData path: ' + process.env.OXYGEN_IDE_USERDATA_PATH);
+    app.setPath('userData', process.env.OXYGEN_IDE_USERDATA_PATH);
+}
+
 if (process && process.env && process.env.NODE_ENV !== 'development') {
     initializeCrashReporterAndSentry();
 }
