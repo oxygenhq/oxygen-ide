@@ -168,7 +168,7 @@ function initializeCrashReporterAndSentry() {
             companyName: 'no-company-nc',
             productName: 'ide',
             ignoreSystemCrashHandler: true,
-            submitURL: 'https://o4504315553185792.ingest.sentry.io/api/4504315816116224/minidump/?sentry_key=24eaf38a68394ad69198ece9985cabff',
+            submitURL: 'https://o4504315553185792.ingest.sentry.io/api/4504321208745984/minidump/?sentry_key=7cef25c67bfb4badbd917b8a51ea4561',
             uploadToServer: true
         });
 
@@ -191,7 +191,7 @@ function initializeCrashReporterAndSentry() {
         }
   
         const sentryConfig = {
-            dsn: 'https://24eaf38a68394ad69198ece9985cabff@o4504315553185792.ingest.sentry.io/4504315816116224',
+            dsn: 'https://7cef25c67bfb4badbd917b8a51ea4561@o4504315553185792.ingest.sentry.io/4504321208745984',
             release: packageJson.version,
             beforeSend(event) {
                 // console.log('event', JSON.stringify(event, null, 2));
