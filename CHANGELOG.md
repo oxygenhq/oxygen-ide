@@ -1,12 +1,16 @@
 # CHANGELOG
 
-## v1.31.1 (2022-11-07)
+## v1.32.0 (2022-12-xx)
+
+#### :tada: New Feature
+* Allow changing user data path via an environment variable.
 
 #### :beetle: Bug Fix
-* Update to Selenium 4.6. This resolves an issue with test execution on Edge in IE mode.
+* Test execution not working after when test fails multiple times.
+* Update to Selenium 4.7. This resolves an issue with test execution on Edge in IE mode.
 
 #### :house: Internal
-* Update oxygen-cli from v1.24.5 to v1.24.6. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update oxygen-cli from v1.24.5 to v1.24.7. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 * Bundle ChromeDriver/EdgeDriver 107.
 * Update GeckoDriver to 0.32.0
 
