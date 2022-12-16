@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.32.0 (2022-12-xx)
+## v1.32.0 (2022-12-16)
 
 #### :tada: New Feature
 * Allow changing user data path via an environment variable.
