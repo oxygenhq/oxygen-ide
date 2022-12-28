@@ -20,8 +20,11 @@ const nodeModulesPath =
   path.join(__dirname, '..', '..', 'app', 'node_modules');
 
 if (Object.keys(dependencies || {}).length > 0 && fs.existsSync(nodeModulesPath)) {
+    // canvas cannot be rebuild on electron >= 8. need to wait for canvas to be updated to use node-bindings-api instead of nan.
+    // so we rebuild everything except canvas (it's not needed in IDE since it's used only for creating test screenshots)
+    // also for some reason parallel rebuild fails, so we use sequential.
     const electronRebuildCmd =
-  '../node_modules/.bin/electron-rebuild --parallel --force --types prod,optional --module-dir .';
+  '../node_modules/.bin/electron-rebuild --sequential --force --types prod,optional --only odbc,deasync,fibers,node-expat,@serialport  --module-dir .';
 
     const cmd = process.platform === 'win32'
         ? electronRebuildCmd.replace(/\//g, '\\')

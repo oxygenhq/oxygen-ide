@@ -6,11 +6,11 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { remote } from 'electron';
+import { getGlobal } from '@electron/remote';
 import util from 'util';
 
 export default function loggerSetup() {
-    var _log = remote.getGlobal('log');
+    var _log = getGlobal('log');
 
     // prefix messages so we know they came from renderer process
     global.log = {};

@@ -22,7 +22,6 @@ import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
 import Logger from './Logger';
 import MainProcess from './MainProcess';
 import * as Sentry from '@sentry/electron';
-import fs from 'fs';
 import path from 'path';
 import packageJson from '../../package.json';
 
@@ -32,6 +31,8 @@ if (process.env.OXYGEN_IDE_USERDATA_PATH) {
     console.log('Setting custom userData path: ' + process.env.OXYGEN_IDE_USERDATA_PATH);
     app.setPath('userData', process.env.OXYGEN_IDE_USERDATA_PATH);
 }
+
+require('@electron/remote/main').initialize();
 
 if (process && process.env && process.env.NODE_ENV !== 'development') {
     initializeCrashReporterAndSentry();
@@ -94,11 +95,14 @@ app.on('ready', async () => {
         height: 728,
         webPreferences: {
             webSecurity: false,
+            contextIsolation: false,
             nodeIntegration: true
         },
     });
 
     if (mainWindow) {
+        require('@electron/remote/main').enable(mainWindow.webContents);
+
         // Prevent refresh
         // @FIXME: it'll cause preventing refreshesh for all windows
         // https://stackoverflow.com/questions/51187602/electron-js-prevent-refresh-for-created-window
@@ -172,24 +176,6 @@ function initializeCrashReporterAndSentry() {
             uploadToServer: true
         });
 
-        const crashesDirectory = crashReporter.getCrashesDirectory();
-        const completedDirectory = path.join(crashesDirectory, 'completed');
-        const newDirectory = path.join(crashesDirectory, 'new');
-        const pendingDirectory = path.join(crashesDirectory, 'pending');
-        // make sure crashesDirectory and its sub folders exist, otherwise we will get an error while initializing Sentry
-        if (!fs.existsSync(crashesDirectory)) {
-            fs.mkdirSync(crashesDirectory);
-        }
-        if (!fs.existsSync(completedDirectory)) {
-            fs.mkdirSync(completedDirectory);
-        }
-        if (!fs.existsSync(newDirectory)) {
-            fs.mkdirSync(newDirectory);
-        }
-        if (!fs.existsSync(pendingDirectory)) {
-            fs.mkdirSync(pendingDirectory);
-        }
-  
         const sentryConfig = {
             dsn: 'https://24eaf38a68394ad69198ece9985cabff@o4504315553185792.ingest.sentry.io/4504315816116224',
             release: packageJson.version,
