@@ -12,7 +12,7 @@ import detectPort from 'detect-port';
 import { app } from 'electron';
 import * as chromeFinder from 'chrome-launcher/dist/chrome-finder';
 import * as edgeFinder from './edge-finder';
-import { spawn } from 'cross-spawn';
+import { exec } from 'teen_process';
 import fs from 'fs-extra';
 import tmp from 'tmp';
 import extract from 'extract-zip';
@@ -377,93 +377,91 @@ export default class SeleniumService extends ServiceBase {
     }
 
     // Gets Edge version. Returns null on failures.
-    getEdgeVersion() {
-        return new Promise((resolve, reject) => {
-            const installations = edgeFinder[process.platform]();            
-            if (installations && installations.length > 0) {
-                console.log('Found Edge at: ', installations);
-                if (process.platform === 'win32') {
-                    const cp = spawn('wmic',
-                        [
-                            'datafile',
-                            'where',
-                            `name='${installations[0].replace(/\\/g, '\\\\')}'`,
-                            'get',
-                            'version',
-                            '/value'
-                        ]);
-                    cp.on('exit', () => reject(new Error('Unable to get Edge version')));
-                    cp.stderr.on('data', () => reject(new Error('Unable to get Edge version')));
-                    cp.stdout.on('data', (data) => {
-                        const dataCleaned = data.toString().trim().toLowerCase();
-                        if (dataCleaned.indexOf('version=') > -1) {
-                            const edgeVersion = dataCleaned.split('version=')[1].split('wmic')[0].replace(/\r?\n|\r/g, '');
-                            resolve({
-                                        version: edgeVersion.split('.')[0],
-                                        path: installations[0]
-                                    });
-                        }
-                    });
+    async getEdgeVersion() {
+        const installations = edgeFinder[process.platform]();            
+        if (installations && installations.length > 0) {
+            console.log('Found Edge at: ', installations);
+            if (process.platform === 'win32') {
+                let {stdout,stderr} = await exec('wmic', [
+                        'datafile',
+                        'where',
+                        `name='${installations[0].replace(/\\/g, '\\\\')}'`,
+                        'get',
+                        'version',
+                        '/value'
+                    ]);
+
+                const dataCleaned = stdout.toString().trim().toLowerCase();
+                if (!stderr && dataCleaned.indexOf('version=') > -1) {
+                    const edgeVersion = dataCleaned.split('version=')[1].split('wmic')[0].replace(/\r?\n|\r/g, '');
+                    return {
+                                version: edgeVersion.split('.')[0],
+                                path: installations[0]
+                            };
                 } else {
-                    const cp = spawn(installations[0], ['--version']);
-                    cp.on('exit', () => reject(new Error('Unable to get Edge version')));
-                    cp.stderr.on('data', () => reject(new Error('Unable to get Edge version')));
-                    cp.stdout.on('data', (data) => {
-                        // like Microsoft Edge 85.0.564.63
-                        let edgeVersion = data.toString().trim();
-                        edgeVersion = edgeVersion.substr('Microsoft Edge '.length).split(' ')[0];
-                        edgeVersion = edgeVersion.split('.')[0];
-                        resolve({
-                                    version: edgeVersion,
-                                    path: installations[0]
-                                });
-                    });
+                    throw new Error('Unable to get Edge version');
                 }
             } else {
-                reject(new Error('Unable to find Edge'));
+                let {stdout,stderr} = await exec(installations[0], ['--version']);
+
+
+                    if (!stderr) {
+                        // like Microsoft Edge 85.0.564.63
+                        let edgeVersion = stdout.toString().trim();
+                        edgeVersion = edgeVersion.substr('Microsoft Edge '.length).split(' ')[0];
+                        edgeVersion = edgeVersion.split('.')[0];
+                        return {
+                                    version: edgeVersion,
+                                    path: installations[0]
+                                };
+
+                    } else {
+                        throw new Error('Unable to get Edge version');
+                    }
+
+
             }
-        });
+        } else {
+            throw new Error('Unable to find Edge');
+        }
     }
 
     // Gets Chrome version. Returns null on failures.
-    getChromeVersion() {
-        return new Promise((resolve, reject) => {
-            const installations = chromeFinder[process.platform]();
+    async getChromeVersion() {
+        const installations = chromeFinder[process.platform]();
 
-            if (installations && installations.length > 0) {
-                console.log('Found Chrome at: ', installations);
-                if (process.platform === 'win32') {
-                    const cp = spawn('wmic',
-                        [
-                            'datafile',
-                            'where',
-                            `name='${installations[0].replace(/\\/g, '\\\\')}'`,
-                            'get',
-                            'version',
-                            '/value'
-                        ]);
-                    cp.on('exit', () => reject(new Error('Unable to get Chrome version')));
-                    cp.stderr.on('data', () => reject(new Error('Unable to get Chrome version')));
-                    cp.stdout.on('data', (data) => {
-                        const dataCleaned = data.toString().trim().toLowerCase();
-                        if (dataCleaned.indexOf('version=') > -1) {
-                            const chromeVersion = dataCleaned.split('version=')[1].split('wmic')[0].replace(/\r?\n|\r/g, '');
-                            resolve(chromeVersion.split('.')[0]);
-                        }
-                    });
+        if (installations && installations.length > 0) {
+            console.log('Found Chrome at: ', installations);
+            if (process.platform === 'win32') {
+                let {stdout,stderr} = await exec('wmic',
+                    [
+                        'datafile',
+                        'where',
+                        `name='${installations[0].replace(/\\/g, '\\\\')}'`,
+                        'get',
+                        'version',
+                        '/value'
+                    ]);
+
+                const dataCleaned = stdout.toString().trim().toLowerCase();
+                if (!stderr && dataCleaned.indexOf('version=') > -1) {
+                    const chromeVersion = dataCleaned.split('version=')[1].split('wmic')[0].replace(/\r?\n|\r/g, '');
+                    return chromeVersion.split('.')[0];
                 } else {
-                    const cp = spawn(installations[0], ['--version']);
-                    cp.on('exit', () => reject(new Error('Unable to get Chrome version')));
-                    cp.stderr.on('data', () => reject(new Error('Unable to get Chrome version')));
-                    cp.stdout.on('data', (data) => {
-                        const chromeVersion = data.toString().trim().substr('Google Chrome '.length).split(' ')[0];
-                        resolve(chromeVersion.split('.')[0]);
-                    });
+                    throw new Error('Unable to get Chrome version');
                 }
             } else {
-                reject(new Error('Unable to find Chrome'));
+                let {stdout,stderr} = await exec(installations[0], ['--version']);
+                if (!stderr) {
+                    const chromeVersion = stdout.toString().trim().substr('Google Chrome '.length).split(' ')[0];
+                    return chromeVersion.split('.')[0];
+                } else {
+                    throw new Error('Unable to get Chrome version');
+                }
             }
-        });
+        } else {
+            throw new Error('Unable to find Chrome');
+        }
     }
 
     convertLastReleaseVersion(body) {
@@ -657,38 +655,32 @@ export default class SeleniumService extends ServiceBase {
     }
 
     // kill any active chromedriver processes
-    _killChromeDriverProcess() {
-        return new Promise((resolve, reject) => {
+    async _killChromeDriverProcess() {
+        try {
             if (process.platform === 'win32') {
-                const cp = spawn('taskkill', ['/IM', 'chromedriver.exe', '/F']);
-                cp.on('exit', () => resolve(true));
-                // ignore errors since the process does not necessary exists at all
-                cp.on('error', () => resolve(true));
+                await exec('taskkill', ['/IM', 'chromedriver.exe', '/F']);
             } else {
-                const cp = spawn('killall', ['chromedriver']);
-                cp.on('exit', () => resolve(true));
-                // ignore errors since the process does not necessary exists at all
-                cp.on('error', () => resolve(true));
+                await exec('killall', ['chromedriver']);
             }
-        });
+        } catch (err) {
+            // ignore errors since the process does not necessary exists at all
+        }
     }
 
     // kill any active edgedriver processes
-    _killEdgeDriverProcess() {
-        return new Promise((resolve, reject) => {
+    async _killEdgeDriverProcess() {
+
+        try {
             if (process.platform === 'win32') {
-                const cp = spawn('taskkill', ['/IM', 'msedgedriver.exe', '/F']);
-                cp.on('exit', () => resolve(true));
-                // ignore errors since the process does not necessary exists at all
-                cp.on('error', () => resolve(true));
+                await exec('taskkill', ['/IM', 'msedgedriver.exe', '/F']);
             } else {
-                const cp = spawn('killall', ['msedgedriver']);
-                cp.on('exit', () => resolve(true));
-                // ignore errors since the process does not necessary exists at all
-                cp.on('error', () => resolve(true));
+                await exec('killall', ['msedgedriver']);
             }
-        });
+        } catch (err) {
+            // ignore errors since the process does not necessary exists at all
+        }
     }
+
     // return path to the driver binary if exists or null otherwise
     async findLocalChromeDriver(driverVersion) {
         if (!driverVersion) {
