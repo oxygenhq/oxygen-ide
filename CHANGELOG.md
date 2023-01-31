@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v1.32.1 (2023-01-31)
+
+#### :beetle: Bug Fix
+* `soap` module not loading.
+
+#### :house: Internal
+* Update oxygen-cli from v1.24.7 to v1.27.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update Selenium to v4.8. 
+* Bundle ChromeDriver/EdgeDriver 109.
+* Bump dependencies.
+
 ## v1.32.0 (2022-12-16)
 
 #### :tada: New Feature
