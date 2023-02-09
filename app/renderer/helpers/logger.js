@@ -44,13 +44,9 @@ export default function loggerSetup() {
             return;
         }
 
-        // ignore Monaco Editor error related to doResolve
-        if (error && error.message && typeof error.message === 'string' && error.message.includes('doResolve')) {
-            return;
-        }
-
-        // ignore Monaco Editor error related to Model is disposed
-        if (error && error.message && typeof error.message === 'string' && error.message.includes('Model is disposed')) {
+        // ignore certain Monaco Editor errors
+        if (error && error.message && typeof error.message === 'string' && 
+            (error.message.includes('doResolve') || error.message.includes('Model is disposed') || error.message.includes('setPosition'))) {
             return;
         }
 
