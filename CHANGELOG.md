@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v1.32.2 (2023-02-10)
+
+#### :beetle: Bug Fix
+* Browser windows were terminated instead of remaining open on failed tests.
+* IDE crashing when editing certain scripts.
+
+#### :house: Internal
+* Update oxygen-cli from v1.27.0 to v1.27.2. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bump dependencies.
+
 ## v1.32.1 (2023-01-31)
 
 #### :beetle: Bug Fix
