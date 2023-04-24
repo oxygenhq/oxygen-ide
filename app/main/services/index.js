@@ -21,7 +21,7 @@ import IntegrationProvidersService from './IntegrationsService';
 import ProjectService from './ProjectService';
 import JavaService from './JavaService';
 import CryptoService from './CryptoService';
-
+import AppCloseService from './AppCloseService';
 
 export default {
     AppiumService,
@@ -38,5 +38,6 @@ export default {
     IntegrationProvidersService,
     ProjectService,
     JavaService,
-    CryptoService
+    CryptoService,
+    AppCloseService
 };
