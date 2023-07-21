@@ -215,7 +215,6 @@ export default class LogViewer extends React.PureComponent<Props> {
     render() {
         const { height } = this.props;
         const { selected, copyValue, lines } = this.state;
-
         return (
             <div className="logs-container">
                 <div
@@ -250,7 +249,7 @@ export default class LogViewer extends React.PureComponent<Props> {
                                         }
                                         
                                         if (line.severity === 'PASSED') {
-                                            color = '#237804';
+                                            color = '#5292f8'; //'#237804';
                                         }
                                     }
                         
