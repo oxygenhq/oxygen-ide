@@ -33,7 +33,11 @@ const ON_CHROME_DRIVER_ERROR = 'ON_CHROME_DRIVER_ERROR';
 const ON_FINDED_CHROME_DRIVER_VERSION = 'ON_FINDED_CHROME_DRIVER_VERSION';
 const ON_EDGE_FINDED = 'ON_EDGE_FINDED';
 const CHROMEDRIVER_FOLDER_START = 'chromedriver-';
-const CHROMEDRIVER_BASE_URL = 'https://chromedriver.storage.googleapis.com';
+// chrome < 115
+const CHROMEDRIVER_PRE_115_API_URL = 'https://chromedriver.storage.googleapis.com';
+// chrome >= 115
+const CHROMEDRIVER_API_URL = 'https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json';
+const CHROMEDRIVER_DOWNLOAD_URL = 'https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing';
 
 // some info about edge drivers 
 // https://msedgewebdriverstorage.z22.web.core.windows.net/
@@ -189,10 +193,16 @@ export default class SeleniumService extends ServiceBase {
         return edgeDriver;
     }
 
+    // used to display required driver version to the user
     async findChromeDriverVersion() {
         try {
             const chromeVersion = await this.getChromeVersion();
-            const chromeDriverVersion = await this.getChromeDriverVersion(chromeVersion);
+            const chromeMajVersion = chromeVersion.split('.')[0];
+
+            const chromeDriverVersion = chromeMajVersion < 115 ? 
+                await this.getChromeDriverPre115Version(chromeMajVersion) :
+                await this.getChromeDriverVersion(chromeVersion);
+
             this.notify({
                 type: ON_FINDED_CHROME_DRIVER_VERSION,
                 chromeVersion: chromeDriverVersion
@@ -209,9 +219,13 @@ export default class SeleniumService extends ServiceBase {
         let chromeDriverVersion;
         try {
             const chromeVersion = await this.getChromeVersion();
-            console.log('Found Chrome version: ' + chromeVersion);
+            const chromeMajVersion = chromeVersion.split('.')[0];
+            console.log('Found Chrome version: ' + chromeMajVersion);
 
-            chromeDriverVersion = await this.getChromeDriverVersion(chromeVersion);
+            chromeDriverVersion = chromeMajVersion < 115 ? 
+                await this.getChromeDriverPre115Version(chromeMajVersion) :
+                await this.getChromeDriverVersion(chromeVersion);
+
             console.log('Required ChromeDriver version: ' + chromeDriverVersion);
             chromeDriverPath = await this.findLocalChromeDriver(chromeDriverVersion);
             if (chromeDriverPath) {
@@ -403,8 +417,6 @@ export default class SeleniumService extends ServiceBase {
                 }
             } else {
                 let {stdout,stderr} = await exec(installations[0], ['--version']);
-
-
                     if (!stderr) {
                         // like Microsoft Edge 85.0.564.63
                         let edgeVersion = stdout.toString().trim();
@@ -414,12 +426,9 @@ export default class SeleniumService extends ServiceBase {
                                     version: edgeVersion,
                                     path: installations[0]
                                 };
-
                     } else {
                         throw new Error('Unable to get Edge version');
                     }
-
-
             }
         } else {
             throw new Error('Unable to find Edge');
@@ -446,7 +455,7 @@ export default class SeleniumService extends ServiceBase {
                 const dataCleaned = stdout.toString().trim().toLowerCase();
                 if (!stderr && dataCleaned.indexOf('version=') > -1) {
                     const chromeVersion = dataCleaned.split('version=')[1].split('wmic')[0].replace(/\r?\n|\r/g, '');
-                    return chromeVersion.split('.')[0];
+                    return chromeVersion;
                 } else {
                     throw new Error('Unable to get Chrome version');
                 }
@@ -454,7 +463,7 @@ export default class SeleniumService extends ServiceBase {
                 let {stdout,stderr} = await exec(installations[0], ['--version']);
                 if (!stderr) {
                     const chromeVersion = stdout.toString().trim().substr('Google Chrome '.length).split(' ')[0];
-                    return chromeVersion.split('.')[0];
+                    return chromeVersion;
                 } else {
                     throw new Error('Unable to get Chrome version');
                 }
@@ -513,18 +522,18 @@ export default class SeleniumService extends ServiceBase {
         });
     }
 
-    getChromeDriverVersion(chromeVersion) {
+    getChromeDriverPre115Version(chromeMajorVersion) {
         return new Promise((resolve, reject) => {
             // try getting the version from a local version map file
             for (var version of versions) {
-                if (version.chromeMin <= chromeVersion && version.chromeMax >= chromeVersion) {
+                if (version.chromeMin <= chromeMajorVersion && version.chromeMax >= chromeMajorVersion) {
                     resolve(version.driverVersion);
                     return;
                 }
             }
 
             // try getting the version online
-            const versionUrl = `${CHROMEDRIVER_BASE_URL}/LATEST_RELEASE_${chromeVersion}`;
+            const versionUrl = `${CHROMEDRIVER_PRE_115_API_URL}/LATEST_RELEASE_${chromeMajorVersion}`;
             console.log('Getting ChromeDriver version from ' + versionUrl);
             return fetch(versionUrl)
                 .then(res => {
@@ -552,20 +561,77 @@ export default class SeleniumService extends ServiceBase {
         });
     }
 
-    getChromeDriverDownloadUrl(driverVersion) {
-        var zipFilename;
-        switch (process.platform) {
-        case 'win32':
-            zipFilename = 'chromedriver_win32.zip'; break;
-        case 'darwin':
-            zipFilename = 'chromedriver_mac64.zip'; break;
-        case 'linux':
-            zipFilename = 'chromedriver_linux64.zip'; break;
-        default:
-            zipFilename = null;
-        }
+    // starting with v115 chrome has different api for driver downloads
+    getChromeDriverVersion(chromeVersion) {
+        return new Promise((resolve, reject) => {
+            // try getting the version from a local version map file
+            for (var version of versions) {
+                if (version.chromeMin <= chromeVersion && version.chromeMax >= chromeVersion) {
+                    resolve(version.driverVersion);
+                    return;
+                }
+            }
 
-        return `${CHROMEDRIVER_BASE_URL}/${driverVersion}/${zipFilename}`;
+            // try getting the version online
+            console.log(`Getting ChromeDriver 115+ version JSON ${CHROMEDRIVER_API_URL}`);
+            return fetch(CHROMEDRIVER_API_URL)
+                .then(res => {
+                    if (!res.ok) {
+                        reject(new Error('Unable to get ChromeDriver versions JSON: ' + res.statusText));
+                    }
+                    return res.buffer();
+                })
+                .then(body => {
+                    var bodyStr = new Buffer(body,'utf-8').toString();
+                    var json = JSON.parse(bodyStr);
+
+                    if (!json.versions) {
+                        reject('No versions found in the json');
+                        return;
+                    }
+
+                    for (var ver of json.versions) {
+                        if (ver.version == chromeVersion) {
+                            resolve(version);
+                        }
+                    }
+
+                    reject('No matching version found in the json');
+                })
+                .catch(err => reject(err));
+        });
+    }
+
+    getChromeDriverDownloadUrl(driverVersion) {
+        const maj = driverVersion.split('.')[0];
+
+        if (maj < 115) {
+            let zipFilename;
+            switch (process.platform) {
+                case 'win32':
+                    zipFilename = 'chromedriver_win32.zip'; break;
+                case 'darwin':
+                    zipFilename = 'chromedriver_mac64.zip'; break;
+                case 'linux':
+                    zipFilename = 'chromedriver_linux64.zip'; break;
+                default:
+                    zipFilename = null;
+            }
+            return `${CHROMEDRIVER_PRE_115_API_URL}/${driverVersion}/${zipFilename}`;  
+        } else {
+            let zipFilename;
+            switch (process.platform) {
+                case 'win32':
+                    zipFilename = '/win64/chromedriver-win64.zip'; break;
+                case 'darwin':
+                    zipFilename = '/mac-x64/chromedriver-mac-x64.zip'; break;
+                case 'linux':
+                    zipFilename = '/linux64/chromedriver-linux64.zip'; break;
+                default:
+                    zipFilename = null;
+            }
+            return `${CHROMEDRIVER_DOWNLOAD_URL}/${driverVersion}/${zipFilename}`;  
+        }
     }
 
     getEdgeDriverDownloadUrl(driverVersion) {
