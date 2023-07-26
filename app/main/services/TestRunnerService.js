@@ -12,6 +12,7 @@ import moment from 'moment';
 import detectPort from 'detect-port';
 import ServiceBase from './ServiceBase';
 import cp from 'child_process';
+import { FAILED } from 'oxygen-cli/build/model/status';
 
 // Events
 const EVENT_LOG_ENTRY = 'LOG_ENTRY';
@@ -39,6 +40,7 @@ export default class TestRunnerService extends ServiceBase {
         this.runner = null;
         this.reporter = null;
         this.mainFilePath = null;
+        this.currentTransactionName = null;
     }
     
     async start(mainFilePath, breakpoints, runtimeSettings, runSettings) {
@@ -367,6 +369,7 @@ export default class TestRunnerService extends ServiceBase {
             this.reporter.removeListener('runner:start',() => {});
             this.reporter.removeListener('runner:end',() => {});
             this.reporter.removeListener('step:start',() => {});
+            this.reporter.removeListener('step:end',() => {});
             this.reporter.removeListener('test-error',() => {});
             this.reporter.removeListener('log',() => {});
         }
@@ -638,6 +641,10 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
         });
 
         this.reporter.on('runner:end', ({ rid, result }) => {
+            if (this.currentTransactionName) {
+                this._emitLogEvent(SEVERITY_PASSED, `<-- Transaction "${this.currentTransactionName}" PASSED -`);
+                this.currentTransactionName = null;
+            }
             this._emitTestEnded(result);
         });
 
@@ -647,7 +654,26 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
                 // determine if this the primary file or not (so we can open the relevant tab)
                 const primary = this.mainFilePath === loc.file;
                 this._emitLineUpdate(step.time, loc.file, loc.line, primary);
-            }            
+            }
+            if (step.name && step.name === 'transaction' && step.args && step.args.length) {
+                const transactionName = step.args[0];
+                // if new transaction has started, then report success on the previous one
+                if (this.currentTransactionName && this.currentTransactionName !== transactionName) {
+                    this._emitLogEvent(SEVERITY_PASSED, `<-- Transaction "${this.currentTransactionName}" PASSED`);
+                }
+                this.currentTransactionName = transactionName;
+                this._emitLogEvent(SEVERITY_INFO, `--> Transaction "${transactionName}" STARTED`);
+            }
+        });
+
+        this.reporter.on('step:end', ({ rid, step }) => {
+            const transactionName = step ? step.transaction : undefined;
+            if (this.currentTransactionName && this.currentTransactionName === transactionName) {
+                if (step.status === FAILED) {
+                    this.currentTransactionName = null;
+                    this._emitLogEvent(SEVERITY_ERROR, `<-- Transaction "${transactionName}" FAILED`);
+                }
+            }
         });
 
         // @params breakpoint

@@ -66,7 +66,7 @@ export default class ServiceDispatcher {
                 })
                 .catch( err => {
                     try {
-                        console.log(err);
+                        console.error('MAIN_SERVICE_CALL_REPLY', err);
                         e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: err });
                     } catch (e) {
                         // to avoid Unhandled Promise Rejection. Error: Object has been destroyed
