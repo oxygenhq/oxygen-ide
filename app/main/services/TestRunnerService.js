@@ -642,7 +642,7 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
 
         this.reporter.on('runner:end', ({ rid, result }) => {
             if (this.currentTransactionName) {
-                this._emitLogEvent(SEVERITY_PASSED, `<-- Transaction "${this.currentTransactionName}" PASSED -`);
+                this._emitLogEvent(SEVERITY_PASSED, `<-- Transaction "${this.currentTransactionName}" PASSED`);
                 this.currentTransactionName = null;
             }
             this._emitTestEnded(result);
