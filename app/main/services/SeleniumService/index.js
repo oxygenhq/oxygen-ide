@@ -10,7 +10,7 @@ import path from 'path';
 import cp from 'child_process';
 import detectPort from 'detect-port';
 import { app } from 'electron';
-import * as chromeFinder from 'chrome-launcher/dist/chrome-finder';
+import * as chromeFinder from './chrome-finder';
 import * as edgeFinder from './edge-finder';
 import { exec } from 'teen_process';
 import fs from 'fs-extra';
