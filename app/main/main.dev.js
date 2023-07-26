@@ -72,7 +72,6 @@ if (process.env.NODE_ENV === 'production') {
 if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
     const sourceMapSupport = require('source-map-support');
     sourceMapSupport.install();
-    require('electron-debug')();
     const p = path.join(__dirname, 'node_modules');
     require('module').globalPaths.push(p);
 }
