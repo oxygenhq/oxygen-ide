@@ -279,25 +279,34 @@ export default merge.smart(baseConfig, {
 
     devServer: {
         port,
-        publicPath,
+        client: {
+            webSocketURL: {
+                hostname: 'localhost',
+                pathname: '/ws',
+                port: 1212
+            }
+        },
         compress: true,
-        noInfo: true,
-        stats: 'errors-only',
-        inline: true,
-        lazy: false,
+        devMiddleware: {
+            publicPath: publicPath,
+            stats: 'errors-only',
+        },
         hot: true,
         headers: { 'Access-Control-Allow-Origin': '*' },
-        contentBase: path.join(__dirname, 'dist'),
-        watchOptions: {
-            aggregateTimeout: 300,
-            ignored: /node_modules/,
-            poll: 100
+        static: {
+            directory: path.join(__dirname, 'dist'),
+            watch: {
+                aggregateTimeout: 300,
+                usePolling: false,
+                ignored: /node_modules/,
+                poll: 100
+            }
         },
         historyApiFallback: {
             verbose: true,
             disableDotRule: false,
         },
-        before() {
+        onBeforeSetupMiddleware: function (devServer) {
             if (process.env.START_HOT) {
                 console.log('\x1b[32m%s\x1b[0m', 'Starting Main Process...');
                 spawn(
