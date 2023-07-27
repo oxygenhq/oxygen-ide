@@ -550,10 +550,10 @@ export default class SeleniumService extends ServiceBase {
                         if (bodyToString) {
                             version = bodyToString;
                         } else {
-                            version = new Buffer(body,'utf-8').toString();
+                            version = Buffer.from(body,'utf-8').toString();
                         }
                     } else {
-                        version = new Buffer(body,'utf-8').toString();
+                        version = Buffer.from(body,'utf-8').toString();
                     }
                     resolve(version);
                 })
@@ -582,7 +582,7 @@ export default class SeleniumService extends ServiceBase {
                     return res.buffer();
                 })
                 .then(body => {
-                    var bodyStr = new Buffer(body,'utf-8').toString();
+                    var bodyStr = Buffer.from(body,'utf-8').toString();
                     var json = JSON.parse(bodyStr);
 
                     if (!json.versions) {
@@ -592,7 +592,8 @@ export default class SeleniumService extends ServiceBase {
 
                     for (var ver of json.versions) {
                         if (ver.version == chromeVersion) {
-                            resolve(version);
+                            resolve(chromeVersion);
+                            return;
                         }
                     }
 
@@ -622,11 +623,11 @@ export default class SeleniumService extends ServiceBase {
             let zipFilename;
             switch (process.platform) {
                 case 'win32':
-                    zipFilename = '/win64/chromedriver-win64.zip'; break;
+                    zipFilename = 'win64/chromedriver-win64.zip'; break;
                 case 'darwin':
-                    zipFilename = '/mac-x64/chromedriver-mac-x64.zip'; break;
+                    zipFilename = 'mac-x64/chromedriver-mac-x64.zip'; break;
                 case 'linux':
-                    zipFilename = '/linux64/chromedriver-linux64.zip'; break;
+                    zipFilename = 'linux64/chromedriver-linux64.zip'; break;
                 default:
                     zipFilename = null;
             }
@@ -828,6 +829,29 @@ export default class SeleniumService extends ServiceBase {
     async decompressZip(driverVersion, zipPath, folderStart) {
         var driverDir = path.resolve(this.getDriversRootPath(), folderStart + driverVersion);
         await extract(zipPath, { dir: driverDir });
+
+        // some drivers for chrome >= 115 will have an internal directory zipped
+        // so we need to move the binary outside of it
+
+        let subdir;
+        switch (process.platform) {
+            case 'win32':
+                subdir = 'chromedriver-win64'; break;
+            case 'darwin':
+                subdir = 'chromedriver-mac-x64'; break;
+            case 'linux':
+                subdir = 'chromedriver-linux64'; break;
+            default:
+                subdir = null;
+        }
+
+        var driverSubPathBin = path.join(driverDir, subdir, 'chromedriver' + (process.platform === 'win32' ? '.exe' : ''));
+        var driverPathBin = path.join(driverDir, 'chromedriver' + (process.platform === 'win32' ? '.exe' : ''));
+
+        if (fs.existsSync(driverSubPathBin)) {
+            fs.renameSync(driverSubPathBin, driverPathBin);
+        }
+
         return driverDir;
     }
 
@@ -889,63 +913,56 @@ export default class SeleniumService extends ServiceBase {
                 console.log('Downloading ' + downloadUrl);
 
                 if (downloadUrl) {
-
-                    let killResult;
                     try {
-                        killResult = await this._killEdgeDriverProcess();
+                        await this._killEdgeDriverProcess();
                     } catch (error) {
                         console.log('_killEdgeDriverProcess error', error);
-                        resolve(error);
                     }
     
-                    if (killResult) {
-                        let zipPath;
-                        try {
-                            zipPath = await this.fetchDriver(downloadUrl);
-                        } catch (error) {
-                            resolve(error);
-                        }
+                    let zipPath;
+                    try {
+                        zipPath = await this.fetchDriver(downloadUrl);
+                    } catch (error) {
+                        resolve(error);
+                    }
 
-                        if (zipPath) {
-                            if (zipPath instanceof Error) {
-                                resolve(zipPath);
-                            } else {
-                                let driverDir;
-
-                                try {
-                                    driverDir = await this.decompressZip(driverVersion, zipPath, EDGE_FOLDER_START);
-                                } catch (error) {
-                                    resolve(error);
-                                }
-
-                                if (driverDir) {
-                                    if (driverDir instanceof Error) {
-                                        resolve(driverDir);
-                                    } else {
-                                        let driverBin;
-                                        
-                                        try {
-                                            driverBin = await this.chmodEdgeDriver(driverDir);
-                                        } catch (error) {
-                                            resolve(error);
-                                        }
-
-                                        if (driverBin) {
-                                            // Final stage
-                                            resolve(driverBin);
-                                        } else {
-                                            resolve(new Error('driverBin is not defined', driverBin));
-                                        }
-                                    }
-                                } else {
-                                    resolve(new Error('driverDir is not defined', driverDir));
-                                }
-                            }
+                    if (zipPath) {
+                        if (zipPath instanceof Error) {
+                            resolve(zipPath);
                         } else {
-                            resolve(new Error('zipPath is not defined', zipPath));
+                            let driverDir;
+
+                            try {
+                                driverDir = await this.decompressZip(driverVersion, zipPath, EDGE_FOLDER_START);
+                            } catch (error) {
+                                resolve(error);
+                            }
+
+                            if (driverDir) {
+                                if (driverDir instanceof Error) {
+                                    resolve(driverDir);
+                                } else {
+                                    let driverBin;
+                                    
+                                    try {
+                                        driverBin = await this.chmodEdgeDriver(driverDir);
+                                    } catch (error) {
+                                        resolve(error);
+                                    }
+
+                                    if (driverBin) {
+                                        // Final stage
+                                        resolve(driverBin);
+                                    } else {
+                                        resolve(new Error('driverBin is not defined', driverBin));
+                                    }
+                                }
+                            } else {
+                                resolve(new Error('driverDir is not defined', driverDir));
+                            }
                         }
                     } else {
-                        resolve(new Error('killResult is not defined', killResult));
+                        resolve(new Error('zipPath is not defined', zipPath));
                     }
                 } else {
                     resolve(new Error('downloadUrl is not defined', downloadUrl));
@@ -965,63 +982,56 @@ export default class SeleniumService extends ServiceBase {
                 console.log('Downloading ' + downloadUrl);
 
                 if (downloadUrl) {
-
-                    let killResult;
                     try {
-                        killResult = await this._killChromeDriverProcess();
+                        await this._killChromeDriverProcess();
                     } catch (error) {
                         console.log('_killChromeDriverProcess error', error);
-                        resolve(error);
                     }
     
-                    if (killResult) {
-                        let zipPath;
-                        try {
-                            zipPath = await this.fetchDriver(downloadUrl);
-                        } catch (error) {
-                            resolve(error);
-                        }
+                    let zipPath;
+                    try {
+                        zipPath = await this.fetchDriver(downloadUrl);
+                    } catch (error) {
+                        resolve(error);
+                    }
 
-                        if (zipPath) {
-                            if (zipPath instanceof Error) {
-                                resolve(zipPath);
-                            } else {
-                                let driverDir;
-
-                                try {
-                                    driverDir = await this.decompressZip(driverVersion, zipPath, CHROMEDRIVER_FOLDER_START);
-                                } catch (error) {
-                                    resolve(error);
-                                }
-
-                                if (driverDir) {
-                                    if (driverDir instanceof Error) {
-                                        resolve(driverDir);
-                                    } else {
-                                        let driverBin;
-                                        
-                                        try {
-                                            driverBin = await this.chmodChromeDriver(driverDir);
-                                        } catch (error) {
-                                            resolve(error);
-                                        }
-
-                                        if (driverBin) {
-                                            // Final stage
-                                            resolve(driverBin);
-                                        } else {
-                                            resolve(new Error('driverBin is not defined', driverBin));
-                                        }
-                                    }
-                                } else {
-                                    resolve(new Error('driverDir is not defined', driverDir));
-                                }
-                            }
+                    if (zipPath) {
+                        if (zipPath instanceof Error) {
+                            resolve(zipPath);
                         } else {
-                            resolve(new Error('zipPath is not defined', zipPath));
+                            let driverDir;
+
+                            try {
+                                driverDir = await this.decompressZip(driverVersion, zipPath, CHROMEDRIVER_FOLDER_START);
+                            } catch (error) {
+                                resolve(error);
+                            }
+
+                            if (driverDir) {
+                                if (driverDir instanceof Error) {
+                                    resolve(driverDir);
+                                } else {
+                                    let driverBin;
+                                    
+                                    try {
+                                        driverBin = await this.chmodChromeDriver(driverDir);
+                                    } catch (error) {
+                                        resolve(error);
+                                    }
+
+                                    if (driverBin) {
+                                        // Final stage
+                                        resolve(driverBin);
+                                    } else {
+                                        resolve(new Error('driverBin is not defined', driverBin));
+                                    }
+                                }
+                            } else {
+                                resolve(new Error('driverDir is not defined', driverDir));
+                            }
                         }
                     } else {
-                        resolve(new Error('killResult is not defined', killResult));
+                        resolve(new Error('zipPath is not defined', zipPath));
                     }
                 } else {
                     resolve(new Error('downloadUrl is not defined', downloadUrl));
