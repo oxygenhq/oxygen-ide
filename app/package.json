@@ -10,12 +10,14 @@
   },
   "scripts": {
     "electron-rebuild": "cd ../ && node -r @babel/register ./internals/scripts/ElectronRebuild.js",
-    "postinstall": "npm run electron-rebuild"
+    "postinstall": "npm run electron-rebuild",
+    "preinstall": "npx npm-force-resolutions"
   },
   "license": "GPL-3.0",
   "@comment dependencies": [
     "axios is a peer dependency of soap. it needs to be included to avoid 'npm ls' failing due to missing deps",
-    "triple-beam is a dep of winston and new version 1.4 requires node >= 14. thus we include it explicitly and pin to 1.3.0."
+    "triple-beam is a dep of winston and new version 1.4 requires node >= 14. thus we include it explicitly and pin to 1.3.0.",
+    "axios-ntlm (dep of soap) is pinned to 1.3.0 because later versions break when executed from within the IDE."
   ],
   "dependencies": {
     "axios": "0.27.2",
@@ -23,6 +25,9 @@
     "oxygen-cli": "1.29.1",
     "triple-beam": "1.3.0",
     "xml2json": "0.12.0"
+  },
+  "resolutions": {
+    "axios-ntlm": "1.3.0"
   },
   "@comment dev dependencies": [
     "typescript is a peer dependency of wdio. it needs to be included to avoid 'npm ls' failing due to missing deps. and since we don't actually need it, it can be included as dev dep."
