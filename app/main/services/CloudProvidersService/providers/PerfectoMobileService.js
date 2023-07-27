@@ -1,6 +1,6 @@
 import CloudProviderBase from '../CloudProviderBase';
 import fetch from 'node-fetch';
-import parser from 'xml2json';
+//import parser from 'xml2json';
 
 export default class PerfectoMobileService extends CloudProviderBase {
     constructor(settings) {
@@ -83,6 +83,8 @@ export default class PerfectoMobileService extends CloudProviderBase {
         }
     }
     async getBrowsersAndDevices() {
+        return null;
+
         let devices = [];
         let browsers = [];
 

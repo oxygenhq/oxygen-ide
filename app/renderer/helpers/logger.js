@@ -39,7 +39,7 @@ export default function loggerSetup() {
 
     process.on('uncaughtException', error => {
         // ignore Monaco Editor error related to jsonMode.js
-        if (error.message && error.name && error.name === 'ReferenceError' && error.message === 'exports is not defined') {
+        if (error && error.message && error.name && error.name === 'ReferenceError' && error.message === 'exports is not defined') {
             console.warn(`Ignoring error: ${error.name}: ${error.message}`);
             return;
         }
@@ -47,6 +47,10 @@ export default function loggerSetup() {
         // ignore certain Monaco Editor errors
         if (error && error.message && typeof error.message === 'string' && 
             (error.message.includes('doResolve') || error.message.includes('Model is disposed') || error.message.includes('setPosition'))) {
+            return;
+        }
+
+        if (!error) {
             return;
         }
 

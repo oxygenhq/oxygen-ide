@@ -33,6 +33,19 @@ if (process.env.NODE_ENV === 'production') {
     }
 }
 
+class CalmResizeObserver extends ResizeObserver {
+  constructor(callback: ResizeObserverCallback) {
+    super((entries, observer) => {
+      requestAnimationFrame(() => {
+        callback(entries, observer);
+      });
+    });
+  }
+}
+
+window.ResizeObserver = CalmResizeObserver;
+
+
 const { configureStore, history } = importConfigureStore;
 
 // initialize Redux store

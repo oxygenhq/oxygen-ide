@@ -21,7 +21,6 @@ import { edgeVersions } from './edgedriver-versions.json';
 import fetch from 'node-fetch';
 import ServiceBase from '../ServiceBase';
 import glob from 'glob';
-// import parser from 'xml2json';
 
 import cfg from '../../config.json';
 const selSettings = cfg.selenium;
