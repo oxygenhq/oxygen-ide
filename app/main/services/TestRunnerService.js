@@ -12,7 +12,7 @@ import moment from 'moment';
 import detectPort from 'detect-port';
 import ServiceBase from './ServiceBase';
 import cp from 'child_process';
-import { FAILED } from 'oxygen-cli/build/model/status';
+//import { FAILED } from 'oxygen-cli/build/model/status';
 
 // Events
 const EVENT_LOG_ENTRY = 'LOG_ENTRY';
@@ -669,7 +669,7 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
         this.reporter.on('step:end', ({ rid, step }) => {
             const transactionName = step ? step.transaction : undefined;
             if (this.currentTransactionName && this.currentTransactionName === transactionName) {
-                if (step.status === FAILED) {
+                if (step.status === 'FAILED') {
                     this.currentTransactionName = null;
                     this._emitLogEvent(SEVERITY_ERROR, `<-- Transaction "${transactionName}" FAILED`);
                 }
