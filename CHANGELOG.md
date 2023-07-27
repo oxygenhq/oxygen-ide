@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## v1.33.0 (2023-xx-xx)
+
+#### :tada: New Feature
+* Print transaction details inside the log panel.
+
+#### :beetle: Bug Fix
+* Fix `soap` module not loading.
+* Fix chromedriver downloads for chrome v115 and later.
+
+#### :house: Internal
+* Update oxygen-cli from v1.27.2 to v1.29.1. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update Selenium to v4.10. 
+* Update GeckoDriver to 0.33.0.
+* Bundle ChromeDriver/EdgeDriver 115.
+* Bump dependencies.
+
 ## v1.32.2 (2023-02-10)
 
 #### :beetle: Bug Fix
