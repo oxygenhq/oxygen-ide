@@ -1,5 +1,6 @@
 import CloudProviderBase from '../CloudProviderBase';
 import fetch from 'node-fetch';
+// FIXME: needs to be adapted to xml2js
 //import parser from 'xml2json';
 
 export default class PerfectoMobileService extends CloudProviderBase {
