@@ -62,7 +62,7 @@ module.exports = function(grunt) {
         try {
             var cwd = process.cwd();
             process.chdir('app');
-            var out = cp.execSync('npm ls --prod=true --parseable');
+            var out = cp.execSync('npm ls --prod=true --parseable --all');
             var prodDepsUnfiltered = out.toString().split(/\r?\n/);
             var si = __dirname.length + 1 + 'app'.length + 1 + 'node_modules'.length + 1;
             for (var i = 0; i < prodDepsUnfiltered.length; i++) {
@@ -100,7 +100,7 @@ module.exports = function(grunt) {
             src: OUTDIR + RESOURCES + '/app',
             dest: OUTDIR + RESOURCES + '/app.asar',
             unpack: '*.node',
-            'unpack-dir': '{main/selenium,node_modules/oxygen-cli,node_modules/canvas,node_module/pdfreader}'
+            'unpack-dir': '{main/selenium,node_modules/oxygen-cli,node_modules/sharp}'
         },
         'config-patch': {
             dist: OUTDIR
@@ -130,7 +130,7 @@ module.exports = function(grunt) {
                 files: [
                     { 
                         expand: true, 
-                        cwd: 'app/node_modules', src: prodDeps.concat(['!fibers/src/**',
+                        cwd: 'app/node_modules', src: prodDeps.concat([
                             '!oxygen-cli/build/ox_reporters/pdf/**',
                             '!oxygen-cli/build/ox_reporters/html/**',
                             '!**/obj/**',

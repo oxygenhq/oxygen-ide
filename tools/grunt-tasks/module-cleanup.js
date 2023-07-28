@@ -14,7 +14,7 @@ module.exports = function(grunt) {
     grunt.registerTask('module-cleanup', 'Removes unneeded files from node_modules', function() {
         var done = this.async();
 
-        new modclean.ModClean({
+        var mc = new modclean.ModClean({
             cwd: path.join(process.cwd(), 'app', 'node_modules'),
             patterns: ['default:safe'],
             additionalPatterns: [
@@ -29,28 +29,32 @@ module.exports = function(grunt) {
                 'yarn.lock', 'package-lock.json',
                 '*.html', '*.htm', '*.png', '*.map'],
             test: true
-        }, function(err, results) {
-            if (err) {
-                grunt.fail.fatal('Error while cleaning up modules', err);
-            }
-            
-            var syncConfig = grunt.config.get(['copy']);
-            var syncSrcs = syncConfig.main.files[0].src;
-
-            var count = 0;
-            for (var file of results) {
-                if (file) {
-                    var isdir = fs.statSync(path.join(process.cwd(), 'app', 'node_modules', file)).isDirectory();
-                    syncSrcs.push(isdir ? '!' + file + '/**' : '!' + file);
-                    count++;
-                }
-            }
-            
-            grunt.log.ok('Excluded ' + count + ' files');
-            grunt.config.set(['copy'], syncConfig);
-            
-            done(true);
         });
+
+        mc.clean()
+            .then(result => {
+                var syncConfig = grunt.config.get(['copy']);
+                var syncSrcs = syncConfig.main.files[0].src;
+
+                var basePath = path.join(process.cwd(), 'app', 'node_modules') + path.sep;
+
+                for (var file of result.deleted) {
+                    var isdir = fs.statSync(file).isDirectory();
+                    if (!isdir) {
+                        syncSrcs.push('!' + file.substring(basePath.length)); 
+                    }
+                }
+
+                grunt.log.ok('Excluded ' + result.deleted.length + ' files');
+                grunt.config.set(['copy'], syncConfig);
+                
+                done(true);
+            })
+            .catch(err => {
+                if (err) {
+                    grunt.fail.fatal('Error while cleaning up modules', err);
+                }
+            });
     });
 };
 
