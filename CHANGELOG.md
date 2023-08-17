@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v1.33.0 (2023-xx-xx)
+## v1.33.0 (2023-08-17)
 
 #### :tada: New Feature
 * Print transaction details inside the log panel.
@@ -10,7 +10,7 @@
 * Fix chromedriver downloads for chrome v115 and later.
 
 #### :house: Internal
-* Update oxygen-cli from v1.27.2 to v1.29.1. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update oxygen-cli from v1.27.2 to v1.30.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 * Update Selenium to v4.10. 
 * Update GeckoDriver to 0.33.0.
 * Bundle ChromeDriver/EdgeDriver 115.
