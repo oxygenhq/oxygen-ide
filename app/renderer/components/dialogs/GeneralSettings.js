@@ -10,7 +10,8 @@ const DEFAULT_STATE = {
     useParams: false,
     paramFilePath: null,
     paramMode: 'sequential',
-    useAllParameters: false
+    useAllParameters: false,
+    extendedDebugging: false
 };
 
 // form layout settings
@@ -39,6 +40,7 @@ class GeneralSettings extends React.PureComponent<Props> {
             paramFilePath: props.settings.paramFilePath || null,
             reopenSession: props.settings.reopenSession || false,
             useParams: props.settings.paramFilePath != null,
+            extendedDebugging: props.settings.extendedDebugging
         };
     }
     
@@ -78,6 +80,12 @@ class GeneralSettings extends React.PureComponent<Props> {
         });
     }
 
+    onExtendedDebuggingChange(value) {
+        this.setState({
+            extendedDebugging: value
+        });
+    }
+
     onReopenSessionChange(value) {
         this.setState({
             reopenSession: value,
@@ -97,7 +105,7 @@ class GeneralSettings extends React.PureComponent<Props> {
     }
 
     validateFields = () => {
-        const { iterations, useParams, paramMode, reopenSession, env, useAllParameters } = this.state;
+        const { iterations, useParams, paramMode, reopenSession, env, useAllParameters, extendedDebugging } = this.state;
 
         return new Promise((resolve, reject) => {
             this.props.form.validateFields((err, values) => {
@@ -113,7 +121,8 @@ class GeneralSettings extends React.PureComponent<Props> {
                     reopenSession: reopenSession,
                     paramFilePath: paramFilePath,
                     env: env || null,
-                    useAllParameters: paramFilePath ? useAllParameters : false
+                    useAllParameters: paramFilePath ? useAllParameters : false,
+                    extendedDebugging: extendedDebugging
                 });
             });   
         });
@@ -134,7 +143,8 @@ class GeneralSettings extends React.PureComponent<Props> {
             // reopenSession,
             env,
             useAllParameters,
-            paramMode
+            paramMode,
+            extendedDebugging
         } = this.state;
         const { projectSettings } = this.props;
         const { getFieldDecorator } = this.props.form;
@@ -230,6 +240,16 @@ class GeneralSettings extends React.PureComponent<Props> {
                         </Form.Item>
                     </Fragment>
                 }
+                <Form.Item 
+                    label="Extended Debugging"
+                    extra="Reload IDE needs" 
+                    {...formItemLayout}
+                >
+                    <Switch
+                        onChange={ ::this.onExtendedDebuggingChange }
+                        checked={ extendedDebugging }
+                    />
+                </Form.Item>
             </Form>
         );
     }
