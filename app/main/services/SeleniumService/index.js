@@ -590,9 +590,20 @@ export default class SeleniumService extends ServiceBase {
                         return;
                     }
 
-                    for (var ver of json.versions) {
+                    // find exact match
+                    for (let ver of json.versions) {
                         if (ver.version == chromeVersion) {
                             resolve(chromeVersion);
+                            return;
+                        }
+                    }
+
+                    // find closest version if no exact match
+                    var baseVersion = chromeVersion.substring(0, chromeVersion.lastIndexOf('.'));
+                    for (var i = json.versions.length - 1; i >= 0; i--) {
+                        let ver = json.versions[i];
+                        if (ver.version.startsWith(baseVersion)) {
+                            resolve(ver.version);
                             return;
                         }
                     }
