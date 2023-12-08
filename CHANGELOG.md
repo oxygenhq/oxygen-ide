@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v1.34.0 (2023-12-xx)
+
+#### :house: Internal
+* Update oxygen-cli from v1.30.0 to v1.31.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Bundle ChromeDriver 120 and EdgeDriver 119.
+
 ## v1.33.0 (2023-08-17)
 
 #### :tada: New Feature
