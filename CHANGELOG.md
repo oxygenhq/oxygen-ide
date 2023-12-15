@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v1.35.0 (2023-12-15)
+
+#### :beetle: Bug Fix
+* Fix UI freezing when performing right click on a tab.
+
+#### :house: Internal
+* Update oxygen-cli from v1.31.0 to v1.32.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+
 ## v1.34.0 (2023-12-11)
 
 #### :house: Internal
