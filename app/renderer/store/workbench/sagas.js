@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 CloudBeat Limited
+ * Copyright (C) 2015-2023 CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1688,11 +1688,13 @@ export function* showDeleteFileDialog({ payload }) {
 
 export function* showContextMenu({ payload }) {
     const { type, event, node } = payload;
-    if (!Menus.hasOwnProperty(type)) {
+
+    const menuItems = Menus[type];
+    if (!menuItems) {
         console.warn(`Menu type "${type}" not found.`);
         return;
     }
-    const menuItems = Menus[type];
+
     const { clientX, clientY } = event;
 
     const options = {
