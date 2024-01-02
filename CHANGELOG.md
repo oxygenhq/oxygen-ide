@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v1.35.1 (2024-01-02)
+
+#### :beetle: Bug Fix
+* Do not block F5/Cmd+R.
+
 ## v1.35.0 (2023-12-15)
 
 #### :beetle: Bug Fix
