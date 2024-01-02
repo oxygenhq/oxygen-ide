@@ -17,7 +17,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow, globalShortcut, crashReporter } from 'electron';
+import { app, BrowserWindow, crashReporter } from 'electron';
 
 import Logger from './Logger';
 import MainProcess from './MainProcess';
@@ -98,11 +98,6 @@ app.on('ready', async () => {
     });
 
     if (mainWindow) {
-        // Prevent refresh
-        // @FIXME: it'll cause preventing refreshesh for all windows
-        // https://stackoverflow.com/questions/51187602/electron-js-prevent-refresh-for-created-window
-        globalShortcut.register('CommandOrControl+R', () => false);
-        globalShortcut.register('F5', () => false);
         mainWindow.loadURL(`file://${__dirname}/../renderer/app.html`);
     
         mainWindow.webContents.on('did-finish-load', () => {
