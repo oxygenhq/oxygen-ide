@@ -41,26 +41,28 @@ global.log = new Logger('debug', 'info');
 let mainWindow = null;
 let mainProc = null;
 
-try {
-    const gotTheLock = app.requestSingleInstanceLock();
-  
-    if (!gotTheLock) {
-        app.exit();
-    } else {
-        app.on('second-instance', (event, commandLine, workingDirectory) => {
-            // Someone tried to run a second instance, we should focus our window.
-            if (mainWindow) {
-                if (mainWindow.isMinimized()) mainWindow.restore();
-                mainWindow.focus();
-            }
-        });
-    }
-} catch (e) {
-    alert('Please, open later (2 sec)');
-    console.log(e);
+if (!process.env.OXYGEN_IDE_USERDATA_PATH) {
+    try {
+        const gotTheLock = app.requestSingleInstanceLock();
+      
+        if (!gotTheLock) {
+            app.exit();
+        } else {
+            app.on('second-instance', (event, commandLine, workingDirectory) => {
+                // Someone tried to run a second instance, we should focus our window.
+                if (mainWindow) {
+                    if (mainWindow.isMinimized()) mainWindow.restore();
+                    mainWindow.focus();
+                }
+            });
+        }
+    } catch (e) {
+        alert('Please, open later (2 sec)');
+        console.log(e);
 
-    if (Sentry && Sentry.captureException) {
-        Sentry.captureException(e);
+        if (Sentry && Sentry.captureException) {
+            Sentry.captureException(e);
+        }
     }
 }
 
