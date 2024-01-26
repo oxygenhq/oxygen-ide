@@ -306,7 +306,7 @@ export default merge.smart(baseConfig, {
             verbose: true,
             disableDotRule: false,
         },
-        onBeforeSetupMiddleware: function (devServer) {
+        setupMiddlewares: (middlewares, devServer) => {
             if (process.env.START_HOT) {
                 console.log('\x1b[32m%s\x1b[0m', 'Starting Main Process...');
                 spawn(
@@ -317,6 +317,7 @@ export default merge.smart(baseConfig, {
                     .on('close', code => process.exit(code))
                     .on('error', spawnError => console.error(spawnError));
             }
+            return middlewares;
         }
     },
 });
