@@ -67,7 +67,6 @@ export default class TestRunnerService extends ServiceBase {
             paramMode,
             useAllParameters,
             iterations,
-            reopenSession,
             env,
             dbgPort,
             testMode,
@@ -118,7 +117,6 @@ export default class TestRunnerService extends ServiceBase {
             allow: true,
             allowGlobal: true
         };
-        options.reopenSession = reopenSession || false;
         options.disableScreenshot = true;
         const cloudProviderSvc = this.getService('CloudProvidersService');
         let provider = null;

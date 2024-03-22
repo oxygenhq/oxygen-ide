@@ -50,7 +50,6 @@ const defaultAppSettings = {
         iterations: 1,
         paramMode: 'sequential',
         paramFilePath: null,
-        reopenSession: false,
         useParams: false,
         env: null
     },

@@ -28,7 +28,6 @@ const defaultState = {
         testTarget: 'chrome',
         testProvider: 'Local',
         stepDelay: 0,
-        reopenSession: false,   // indicates if Selenium session must be re-opened for each iteration
         seleniumPort: null,     // holds Selenium server port number
         seleniumBrowserTimeout: null,
         seleniumTimeout: null,

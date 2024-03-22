@@ -6,7 +6,6 @@ const services = ServicesSingleton();
 
 const DEFAULT_STATE = {
     iterations: 1,
-    reopenSession: false,
     useParams: false,
     paramFilePath: null,
     paramMode: 'sequential',
@@ -37,7 +36,6 @@ class GeneralSettings extends React.PureComponent<Props> {
             paramMode: props.settings.paramMode || 'sequential',
             useAllParameters: props.settings.useAllParameters || false,
             paramFilePath: props.settings.paramFilePath || null,
-            reopenSession: props.settings.reopenSession || false,
             useParams: props.settings.paramFilePath != null,
         };
     }
@@ -78,12 +76,6 @@ class GeneralSettings extends React.PureComponent<Props> {
         });
     }
 
-    onReopenSessionChange(value) {
-        this.setState({
-            reopenSession: value,
-        });
-    }
-
     onChangeEnvironment(value) {
         this.setState({
             env: value,
@@ -97,7 +89,7 @@ class GeneralSettings extends React.PureComponent<Props> {
     }
 
     validateFields = () => {
-        const { iterations, useParams, paramMode, reopenSession, env, useAllParameters } = this.state;
+        const { iterations, useParams, paramMode, env, useAllParameters } = this.state;
 
         return new Promise((resolve, reject) => {
             this.props.form.validateFields((err, values) => {
@@ -110,7 +102,6 @@ class GeneralSettings extends React.PureComponent<Props> {
                 resolve({
                     iterations: iterations,
                     paramMode: paramMode,
-                    reopenSession: reopenSession,
                     paramFilePath: paramFilePath,
                     env: env || null,
                     useAllParameters: paramFilePath ? useAllParameters : false
@@ -131,7 +122,6 @@ class GeneralSettings extends React.PureComponent<Props> {
             iterations,
             paramFilePath,
             useParams,
-            // reopenSession,
             env,
             useAllParameters,
             paramMode
@@ -193,9 +183,6 @@ class GeneralSettings extends React.PureComponent<Props> {
                         </Checkbox >
                     }
                 </Form.Item>
-                {/* <Form.Item label="Re-Open Session" {...formItemLayout} extra="Create (re-open) a new or use an existing Selenium session on next iteration." >
-                    <Switch onChange={ ::this.onReopenSessionChange } checked={ reopenSession } />
-                </Form.Item> */}
                 <Form.Item label="Use Parameter File" {...formItemLayout} extra="Use parameter file (CSV or Excel) to run data-driven tests." >
                     <Switch onChange={ ::this.onUseParamsChange } checked={ useParams } />
                 </Form.Item>
