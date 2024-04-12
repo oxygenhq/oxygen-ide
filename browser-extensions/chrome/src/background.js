@@ -16,6 +16,7 @@ const MENU_ID_WAITFOREXIST = 'waitForExist';
 const MENU_ID_ASSERTTEXT = 'assertText';
 const MENU_ID_ASSERVALUE = 'assertValue';
 const MENU_ID_ASSERTITLE = 'assertTitle';
+const MENU_ID_SEPARATOR = 'separator';
 
 const PING_INTERVAL = 1000;
 const XHR_TIMEOUT = 2000;
@@ -33,9 +34,15 @@ var filter = {
     urls: ['*://*/*'],
     types: ['main_frame', 'sub_frame', 'xmlhttprequest']
 };
-chrome.webRequest.onHeadersReceived.addListener(onHeadersReceived, filter, ['blocking', 'responseHeaders']);
 
-function onHeadersReceived(details) {
+chrome.declarativeNetRequest.onRuleMatchedDebug.addListener((e) => {
+  const msg = `Navigation blocked to ${e.request.url} on tab ${e.request.tabId}.`;
+  console.log(msg);
+});
+
+//chrome.webRequest.onHeadersReceived.addListener(headersReceived, filter, ['blocking', 'responseHeaders']);
+
+function headersReceived(details) {
     for (var i = 0; i < details.responseHeaders.length; i++) {
         if (details.responseHeaders[i].name.toLowerCase() === 'content-security-policy') {
             details.responseHeaders[i].value = '';
@@ -44,8 +51,10 @@ function onHeadersReceived(details) {
     return { responseHeaders: details.responseHeaders };
 };
 
+console.log('=-======================================================: ' + chrome.action);
+
 // disable browser action on browser start
-chrome.browserAction.disable();
+//chrome.action.disable();
 
 // setup context menu for browser_action
 chrome.contextMenus.create({
@@ -78,6 +87,7 @@ chrome.contextMenus.create({
     contexts: ['page', 'frame', 'selection', 'link', 'editable', 'image', 'video', 'audio']
 });
 chrome.contextMenus.create({
+    id: MENU_ID_SEPARATOR,
     type: 'separator',
     documentUrlPatterns: ['<all_urls>'],
     contexts: ['page', 'frame', 'selection', 'link', 'editable', 'image', 'video', 'audio']
@@ -129,7 +139,35 @@ setInterval(() => checkIfRecordingIsActive(), PING_INTERVAL);
 
 function checkIfRecordingIsActive() {
     try {
-        var req = new XMLHttpRequest();
+
+
+        fetch(IDE_URL_HTTP + '/ping')
+          .then(response => {
+            console.log('##################################### response')
+            if (response.ok) {
+                isIdeRecordingPrev = isIdeRecording;
+                isIdeRecording = true;
+                toggleExtension();
+            } else {
+                isIdeRecording = false;
+                toggleExtension();
+            }
+          })
+          .then(data => {
+             console.log('##################################### data')
+            // Do something with the data
+          })
+          .catch(error => {
+             console.log('##################################### error')
+            isIdeRecording = false;
+            toggleExtension();
+          });
+
+
+
+
+
+       /* var req = new XMLHttpRequest();
         req.open('GET', IDE_URL_HTTP + '/ping');
         req.timeout = PING_INTERVAL - 100;  // should be less than polling interval
         req.onload = function (e) {
@@ -146,7 +184,7 @@ function checkIfRecordingIsActive() {
             isIdeRecording = false;
             toggleExtension();
         };
-        req.send();
+        req.send();*/
     } catch (e) {
         isIdeRecordingPrev = isIdeRecording;
         isIdeRecording = false;
@@ -169,9 +207,9 @@ function toggleExtension() {
     }
 
     if (isIdeRecording) {
-        chrome.browserAction.enable();
+        chrome.action.enable();
     } else {
-        chrome.browserAction.disable();
+        chrome.action.disable();
     }
 
     chrome.contextMenus.update(MENU_ID_WAITFORTEXT, { enabled: isIdeRecording });
@@ -184,7 +222,27 @@ function toggleExtension() {
 
 function postToIDEAsync(url, data) {
     try {
-        var req = new XMLHttpRequest();
+        fetch(url,  
+        {
+            method: "POST"
+        })
+          .then(response => {
+            if (response.ok) {
+                
+            } else {
+                console.warn('ox: error posting to ' + url + ': ' + req.statusText);
+            }
+          })
+          .then(data => {
+            // Do something with the data
+          })
+          .catch(error => {
+            console.warn('ox: error posting to ' + url + ': ' + req.statusText);
+          });
+
+
+
+        /*var req = new XMLHttpRequest();
         req.open('POST', url);
         req.timeout = XHR_TIMEOUT;
         req.onreadystatechange = function() {
@@ -192,7 +250,7 @@ function postToIDEAsync(url, data) {
                 console.warn('ox: error posting to ' + url + ': ' + req.statusText);
             }
         };
-        req.send(data);
+        req.send(data);*/
     } catch (e) {
         console.warn('ox: error posting to ' + url + ': ' + e);
     }
@@ -278,7 +336,31 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
         }]);
 
         try {
-            var req = new XMLHttpRequest();
+
+            fetch(IDE_URL_HTTP,  
+            {
+                method: "POST"
+            })
+          .then(response => {
+            if (response.ok) {
+                
+            } else {
+                console.error('ox: error sending open cmd: ' + response);
+            }
+          })
+          .then(data => {
+            // Do something with the data
+          })
+          .catch(error => {
+            console.error('ox: error sending open cmd: ' + error);
+          });
+
+
+
+
+
+
+           /* var req = new XMLHttpRequest();
             req.open('POST', IDE_URL_HTTP);
             req.onload = function (e) {
                 if (req.readyState === 4 && req.status != 200) {
@@ -288,7 +370,7 @@ chrome.webNavigation.onCommitted.addListener(function(details) {
             req.onerror = function (e) {
                 console.error('ox: error sending open cmd: ' + req.statusText);
             };
-            req.send(data);
+            req.send(data);*/
         } catch (e) {
             console.error('ox: error sending open cmd: ', e);
         }

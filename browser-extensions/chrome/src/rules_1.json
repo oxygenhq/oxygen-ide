@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": { "type": "allowAllRequests" },
+    "condition": {
+      "urlFilter": "|https*",
+      "resourceTypes": ["main_frame"]
+    }
+  }
+]
