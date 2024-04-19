@@ -36,6 +36,7 @@ export function* startDownloadChromeDriver({ payload }) {
             const result = yield services.mainIpc.call('SeleniumService', 'downloadChromeDriver', [chromeDriverVersion]);
     
             if (result) {
+                // download failed
                 if (typeof result === 'object') {
                     //error object
                     const path = yield services.mainIpc.call('SeleniumService', 'getDriversRootPath');
@@ -43,8 +44,11 @@ export function* startDownloadChromeDriver({ payload }) {
                         yield put(actions.hideDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER));
                         yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED, {path}));
                     }
-                } else {
+                }
+                // download success
+                else {
                     yield put(actions.hideDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER));
+                    yield services.mainIpc.call('SeleniumService', 'restart');
                     yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS));
                 }
             }
@@ -77,6 +81,7 @@ function* startDownloadEdgeDriver({ payload }) {
             const result = yield services.mainIpc.call('SeleniumService', 'downloadEdgeDriver', [edgeDriverVersion]);
     
             if (result) {
+                // download failed
                 if (typeof result === 'object') {
                     //error object
                     const path = yield services.mainIpc.call('SeleniumService', 'getDriversRootPath');
@@ -84,8 +89,11 @@ function* startDownloadEdgeDriver({ payload }) {
                         yield put(actions.hideDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER));
                         yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER_FAILED, {path}));
                     }
-                } else {
+                }
+                // download success
+                else {
                     yield put(actions.hideDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER));
+                    yield services.mainIpc.call('SeleniumService', 'restart');
                     yield put(actions.showDialog(ActionTypes.DIALOG_DOWNLOADING_EDGE_DRIVER_SUCCESS));
                 }
             }
