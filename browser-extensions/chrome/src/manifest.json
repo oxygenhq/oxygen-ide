@@ -57,5 +57,15 @@
         "<all_urls>"
       ]
     }
-  ]
+  ],
+  "externally_connectable": {
+      "ids": ["*" ],
+      // If this field is not specified, no web pages can connect.
+      "matches": [
+        "<all_urls>",
+        "https://wikipedia.org/*"
+
+      ],
+      "accepts_tls_channel_id": false
+    }
 }

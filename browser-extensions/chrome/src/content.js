@@ -7,13 +7,15 @@
  * (at your option) any later version.
  */
 
-chrome.runtime.sendMessage({ cmd: 'IS_RECORDING' }, (response) => {
+const extensionId = 'ibbmgejonlmocgjnkmabigdgbolcomea';
+
+chrome.runtime.sendMessage(extensionId, { cmd: 'IS_RECORDING' }, (response) => {
     if (response && response.result === true) {
         window.ox_debug = response.settings.debuggingEnabled;
     }
 });
 
-chrome.runtime.onMessage.addListener((msg) => {
+chrome.runtime.onMessageExternal.addListener((msg) => {
     if (msg.cmd === 'INJECT_RECORDER') {
         window.ox_debug = msg.settings.debuggingEnabled;
     } else if (msg.cmd === 'SETTINGS_DEBUG') {
@@ -53,13 +55,13 @@ window.addEventListener(
             port.onMessage.addListener(handler);
         } else if (msg.cmd === 'RECORDER_LASTWIN') {
             e.stopPropagation();
-            chrome.runtime.sendMessage(msg);
+            chrome.runtime.sendMessage(extensionId, msg);
         } else if (msg.cmd === 'RECORDER_WINDOW_GROUP_ADD') {
             e.stopPropagation();
-            chrome.runtime.sendMessage(msg);
+            chrome.runtime.sendMessage(extensionId, msg);
         } else if (msg.cmd === 'RECORDER_COMMAND') {
             e.stopPropagation();
-            chrome.runtime.sendMessage(msg);
+            chrome.runtime.sendMessage(extensionId, msg);
         } else if (msg.cmd === 'RECORDER_LASTWIN_UPDATE') {
             e.stopPropagation();
             /*
@@ -72,7 +74,7 @@ window.addEventListener(
                 7. Content relays the message to Background
                 8. Background sends to IDE
             */
-            chrome.runtime.sendMessage(msg, (response) => {
+            chrome.runtime.sendMessage(extensionId, msg, (response) => {
                 e.source.postMessage(JSON.stringify({
                     type: 'RECORD_COMMAND',
                     lastWindow: response.result
