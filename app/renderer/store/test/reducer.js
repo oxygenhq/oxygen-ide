@@ -490,6 +490,17 @@ export default (state = defaultState, action) => {
         };
     
     case 'STORE_EDGE_BINARY_PATH': {
+        // if we already have Edge browsers in the list, do not re-add them, just update the driver path
+        if (state.browsers.some(x => x.name && x.name.startsWith('Edge'))) {
+            return {
+                ...state,
+                runtimeSettings: {
+                    ...state.runtimeSettings,
+                    edgePath: path
+                }
+            };
+        }
+        // otherwise, update the driver path + add Edge browsers to the list
         return {
             ...state,
             runtimeSettings: {

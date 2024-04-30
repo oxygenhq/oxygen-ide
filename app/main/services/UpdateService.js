@@ -105,10 +105,9 @@ export default class UpdateService extends ServiceBase {
         try {
             console.log('UpdateService start', notifyIfNoUpdate);
             const checkForUpdate = await this._checkForUpdate(notifyIfNoUpdate);
-            console.log('checkForUpdate', checkForUpdate);
             result = checkForUpdate;
         } catch (e) {
-            console.log('UpdateService e', e);
+            console.log('UpdateService start failed', e);
             Sentry.captureException(e);
         }
         
@@ -134,7 +133,6 @@ export default class UpdateService extends ServiceBase {
                         } else {
                             console.log('self.notify is not exist');
                         }
-                        console.log('201');
                         resolve(201);
                     } else if (notifyIfNoUpdate) {
                         if (self && self.notify) {
@@ -144,10 +142,8 @@ export default class UpdateService extends ServiceBase {
                         } else {
                             console.log('self.notify is not exist');
                         }
-                        console.log('202');
                         resolve(202);
                     } else {
-                        console.log('203');
                         resolve(203);
                     }
                 } else {

@@ -33,7 +33,7 @@ export default class ChromeDriverDownloadingSuccessDialog extends React.PureComp
 
             >  
                 <div>
-                    <p>{'ChromeDriver was successfully installed. Restart the IDE for changes to take effect.'}</p> 
+                    <p>{'ChromeDriver was successfully installed. You can now run your tests on Chrome browser.'}</p> 
                 </div>
             </Modal>
         );

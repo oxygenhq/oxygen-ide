@@ -37,7 +37,7 @@ const CHROMEDRIVER_FOLDER_START = 'chromedriver-';
 const CHROMEDRIVER_PRE_115_API_URL = 'https://chromedriver.storage.googleapis.com';
 // chrome >= 115
 const CHROMEDRIVER_API_URL = 'https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json';
-const CHROMEDRIVER_DOWNLOAD_URL = 'https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing';
+const CHROMEDRIVER_DOWNLOAD_URL = 'https://storage.googleapis.com/chrome-for-testing-public';
 
 // some info about edge drivers 
 // https://msedgewebdriverstorage.z22.web.core.windows.net/
@@ -89,6 +89,11 @@ export default class SeleniumService extends ServiceBase {
             this._killSelenium();
             this.seleniumProc = null;
         }
+    }
+
+    async restart() {
+        this.stop();
+        await this.start();
     }
 
     dispose() {
@@ -145,7 +150,7 @@ export default class SeleniumService extends ServiceBase {
         try {
             const edgeDetails = await this.getEdgeVersion();
             edgeVersion = edgeDetails.version;
-            console.log('Found Edge version: ', edgeVersion);
+            console.log('Found installed Edge browser version: ', edgeVersion);
 
             if (edgeVersion) {
                 this.notify({
@@ -154,22 +159,21 @@ export default class SeleniumService extends ServiceBase {
                 });
             }
 
-            var edgeDriverVersion = await this.getEdgeDriverVersion(edgeVersion);
-            console.log('Required EdgeDriver version: ', edgeDriverVersion);
+            /*var edgeDriverVersion = await this.getEdgeDriverVersion(edgeVersion);
+            console.log('Required EdgeDriver version: ', edgeDriverVersion);*/
 
-            edgeDriver = await this.findLocalEdgeDriver(edgeDriverVersion);
+            edgeDriver = await this.findLocalEdgeDriver(edgeVersion);
             if (edgeDriver) {
-                console.log('Found matching EdgeDriver at ', edgeDriver);
+                console.log('Found the matching EdgeDriver at ', edgeDriver);
             } else {
-                throw new Error('Cannot find it localy');
+                throw new Error('Unable to find the matching EdgeDriver locally, needs to be downloaded');
             }
         } catch (e) {
             if (process.platform === 'linux') {
                 console.log('Failure setting up EdgeDriver: Edge is not supported on Linux.');
                 return null;
             }
-
-            console.warn('Failure setting up EdgeDriver.', e);
+            console.warn(e.message);
             // if something bad happens, check if user has placed the driver manually
             // getEdgeDriverBinPathExact without arguments will try to resolve driver located at the root folder
             edgeDriver = await this.getEdgeDriverBinPathExact();
@@ -184,7 +188,7 @@ export default class SeleniumService extends ServiceBase {
                     if (edgeVersion) {
                         this.notify({
                             type: ON_EDGE_DRIVER_ERROR,
-                            edgeVersion: edgeDriverVersion
+                            edgeVersion: edgeVersion
                         });
                     }
                 }
@@ -220,14 +224,14 @@ export default class SeleniumService extends ServiceBase {
         try {
             const chromeVersion = await this.getChromeVersion();
             const chromeMajVersion = chromeVersion.split('.')[0];
-            console.log('Found Chrome version: ' + chromeMajVersion);
+            console.log('Found Chrome version: ' + chromeVersion);
 
-            chromeDriverVersion = chromeMajVersion < 115 ? 
+            /*chromeDriverVersion = chromeMajVersion < 115 ? 
                 await this.getChromeDriverPre115Version(chromeMajVersion) :
                 await this.getChromeDriverVersion(chromeVersion);
-
-            console.log('Required ChromeDriver version: ' + chromeDriverVersion);
-            chromeDriverPath = await this.findLocalChromeDriver(chromeDriverVersion);
+            */
+            // console.log('Required ChromeDriver version: ' + chromeDriverVersion);
+            chromeDriverPath = await this.findLocalChromeDriver(chromeVersion);
             if (chromeDriverPath) {
                 console.log('Found matching ChromeDriver at ' + chromeDriverPath);
             } else {
@@ -248,7 +252,7 @@ export default class SeleniumService extends ServiceBase {
                 } else {
                     this.notify({
                         type: ON_CHROME_DRIVER_ERROR,
-                        chromeVersion: chromeDriverVersion
+                        chromeVersion: chromeVersion
                     });
                 }
             }
@@ -409,7 +413,7 @@ export default class SeleniumService extends ServiceBase {
                 if (!stderr && dataCleaned.indexOf('version=') > -1) {
                     const edgeVersion = dataCleaned.split('version=')[1].split('wmic')[0].replace(/\r?\n|\r/g, '');
                     return {
-                                version: edgeVersion.split('.')[0],
+                                version: edgeVersion, //edgeVersion.split('.')[0],
                                 path: installations[0]
                             };
                 } else {
@@ -421,7 +425,7 @@ export default class SeleniumService extends ServiceBase {
                         // like Microsoft Edge 85.0.564.63
                         let edgeVersion = stdout.toString().trim();
                         edgeVersion = edgeVersion.substr('Microsoft Edge '.length).split(' ')[0];
-                        edgeVersion = edgeVersion.split('.')[0];
+                        edgeVersion = edgeVersion; //edgeVersion.split('.')[0];
                         return {
                                     version: edgeVersion,
                                     path: installations[0]
@@ -616,6 +620,7 @@ export default class SeleniumService extends ServiceBase {
 
     getChromeDriverDownloadUrl(driverVersion) {
         const maj = driverVersion.split('.')[0];
+        const patchedVersion = this.patchDriverVersion(driverVersion);
 
         if (maj < 115) {
             let zipFilename;
@@ -632,17 +637,18 @@ export default class SeleniumService extends ServiceBase {
             return `${CHROMEDRIVER_PRE_115_API_URL}/${driverVersion}/${zipFilename}`;  
         } else {
             let zipFilename;
+            const archName = process.arch;
             switch (process.platform) {
                 case 'win32':
                     zipFilename = 'win64/chromedriver-win64.zip'; break;
                 case 'darwin':
-                    zipFilename = 'mac-x64/chromedriver-mac-x64.zip'; break;
+                    zipFilename = `mac-${archName}/chromedriver-mac-${archName}.zip`; break;
                 case 'linux':
                     zipFilename = 'linux64/chromedriver-linux64.zip'; break;
                 default:
                     zipFilename = null;
             }
-            return `${CHROMEDRIVER_DOWNLOAD_URL}/${driverVersion}/${zipFilename}`;  
+            return `${CHROMEDRIVER_DOWNLOAD_URL}/${patchedVersion}/${zipFilename}`;  
         }
     }
 
@@ -732,6 +738,11 @@ export default class SeleniumService extends ServiceBase {
         });
     }
 
+    patchDriverVersion(orgDriverVersion) {
+        const segmentsExceptLast = orgDriverVersion.split('.').slice(0, -1);
+        return [...segmentsExceptLast, '0'].join('.');
+    }
+
     // kill any active chromedriver processes
     async _killChromeDriverProcess() {
         try {
@@ -778,7 +789,6 @@ export default class SeleniumService extends ServiceBase {
         }
         const segments = driverVersion.split('.');
         const globVersion = `${segments[0]}.${segments[1]}.${segments[2]}.*/msedgedriver${process.platform === 'win32' ? '.*' : ''}`;
- 
         return new Promise((resolve, reject) => {
             const approx = path.resolve(this.getDriversRootPath(), EDGE_FOLDER_START + globVersion);
             glob(approx, (err, files) => {

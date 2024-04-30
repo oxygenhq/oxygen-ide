@@ -33,7 +33,7 @@ export default class EdgeDriverDownloadingSuccessDialog extends React.PureCompon
 
             >  
                 <div>
-                    <p>{'EdgeDriver was successfully installed. Restart the IDE for changes to take effect.'}</p> 
+                    <p>{'EdgeDriver was successfully installed. You can now run your tests on Microsoft Edge browser.'}</p> 
                 </div>
             </Modal>
         );
