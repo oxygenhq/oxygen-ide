@@ -220,10 +220,10 @@ export default class SeleniumService extends ServiceBase {
 
     async chromeStart() {
         var chromeDriverPath;
-        let chromeDriverVersion;
+        var chromeVersion;
         try {
-            const chromeVersion = await this.getChromeVersion();
-            const chromeMajVersion = chromeVersion.split('.')[0];
+            chromeVersion = await this.getChromeVersion();
+            //const chromeMajVersion = chromeVersion.split('.')[0];
             console.log('Found Chrome version: ' + chromeVersion);
 
             /*chromeDriverVersion = chromeMajVersion < 115 ? 
@@ -425,7 +425,7 @@ export default class SeleniumService extends ServiceBase {
                         // like Microsoft Edge 85.0.564.63
                         let edgeVersion = stdout.toString().trim();
                         edgeVersion = edgeVersion.substr('Microsoft Edge '.length).split(' ')[0];
-                        edgeVersion = edgeVersion; //edgeVersion.split('.')[0];
+                        //edgeVersion = edgeVersion.split('.')[0];
                         return {
                                     version: edgeVersion,
                                     path: installations[0]
