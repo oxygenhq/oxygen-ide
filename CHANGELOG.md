@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v1.36.0 (2025-04-30)
+
+#### :beetle: Bug Fix
+* Fix auto download issue with Chrome driver and optimize IDE startup time by removing unnecessary browser version checks.
+
+#### :nail_care: Polish
+* Do not prevent multiple instances OXYGEN_IDE_USERDATA_PATH env var is defined.
+
+#### :house: Internal
+* Update oxygen-cli from v1.32.0 to v1.33.3. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update Selenium to v4.19.1. 
+* Update GeckoDriver to 0.34.0.
+* Bundle ChromeDriver/EdgeDriver 124.
+
 ## v1.35.1 (2024-01-02)
 
 #### :beetle: Bug Fix
