@@ -61,19 +61,18 @@ module.exports = function (grunt) {
                 grunt.log.writeln('\nImage: ' + chalk.cyan(filePair.dest) + ' created');
                 grunt.log.writeln('\nUploading the application for notarization...');
                 var notarize = cp.spawnSync('xcrun', [
-                    'altool',
-                    '--notarize-app',
-                    '-t', 'osx',
-                    '-f', path.resolve(filePair.dest),
-                    '--primary-bundle-id', 'org.oxygen.ide',
-                    '-u', process.env.APPLE_ID_USR,
-                    '-p', process.env.APPLE_ID_PWD 
+                    'notarytool',
+                    'submit',
+                    '--apple-id', process.env.APPLE_ID_USR,
+                    '--password', process.env.APPLE_ID_PWD,
+                    '--team-id', process.env.APPLE_ID_TEAM, 
+                    path.resolve(filePair.dest)
                 ]);
                 if (notarize.status !== 0) {
                     done(false);
                 }
 
-                var uuidMatch = /\nRequestUUID = (.+?)\n/g.exec(notarize.output);
+                var uuidMatch = /\n *id: (.+?)\n/g.exec(notarize.output);
                 if (!uuidMatch) {
                     grunt.log.error('Failed to find request UUID in output:\n' + notarize.output);
                     done(false);
@@ -97,12 +96,9 @@ module.exports = function (grunt) {
                         out[key] = modifier ? modifier(exec[1]) : exec[1];
                     }
                 };
-                matchToProperty('uuid', /\n *RequestUUID: (.+?)\n/);
-                matchToProperty('date', /\n *Date: (.+?)\n/, function (d) { return new Date(d); });
-                matchToProperty('status', /\n *Status: (.+?)\n/);
-                matchToProperty('logFileUrl', /\n *LogFileURL: (.+?)\n/);
-                matchToProperty('statusCode', /\n *Status Code: (.+?)\n/, function (n) { return parseInt(n, 10); });
-                matchToProperty('statusMessage', /\n *Status Message: (.+?)\n/);
+                matchToProperty('uuid', /\n *id: (.+?)\n/);
+                matchToProperty('date', /\n *createdDate: (.+?)\n/, function (d) { return new Date(d); });
+                matchToProperty('status', /\n *status: (.+?)\n/);
                 if (out.logFileUrl === '(null)') {
                     out.logFileUrl = null;
                 }
@@ -111,10 +107,12 @@ module.exports = function (grunt) {
 
             function checkNotarizationStatus(uuid) {
                 var notarizeCheck = cp.spawnSync('xcrun', [
-                    'altool',
-                    '--notarization-info', uuid,
-                    '-u', process.env.APPLE_ID_USR,
-                    '-p', process.env.APPLE_ID_PWD
+                    'notarytool',
+                    'info',
+                    '--apple-id', process.env.APPLE_ID_USR,
+                    '--password', process.env.APPLE_ID_PWD,
+                    '--team-id', process.env.APPLE_ID_TEAM, 
+                    uuid
                 ]);
                 if (notarizeCheck.status !== 0) {
                     grunt.log.error('Failure checking for notarization status:\n' + notarizeCheck.output);
@@ -122,13 +120,10 @@ module.exports = function (grunt) {
                 }
 
                 var notarizationInfo = parseNotarizationInfo(notarizeCheck.output);
-                if (notarizationInfo.status === 'in progress') {
+                if (notarizationInfo.status === 'In Progress') {
                     grunt.log.writeln('Still in progress, waiting 30 seconds');
                     setTimeout(checkNotarizationStatus.bind(null, uuid), 30*1000);
-                } else if (notarizationInfo.status === 'invalid') {
-                    grunt.log.error('Apple failed to notarize your application, check the logs for more info\n\nStatus Code: ' + (notarizationInfo.statusCode || 'No Code') + '\nMessage: ' + (notarizationInfo.statusMessage || 'No Message') + '\nLogs: ' + notarizationInfo.logFileUrl);
-                    done(false);
-                } else if (notarizationInfo.status === 'success') {
+                } else if (notarizationInfo.status === 'Accepted') {
                     grunt.log.writeln('Notarization completed successfully!');
                     grunt.log.writeln('\nStapling the ticket to DMG...');
                     var stapler = cp.spawnSync('xcrun', [
