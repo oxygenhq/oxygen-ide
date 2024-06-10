@@ -148,12 +148,14 @@
                   var modDoc = this.load(path.join(modPath, m), true);
                   // load commands
                   var cmdsDir = path.join(modDir, 'commands');
-                  var cmds = fs.readdirSync(cmdsDir);
-                  for (var cmd of cmds) {
-                      var cmdfile = path.join(cmdsDir, cmd);
-                      if (fs.lstatSync(cmdfile).isFile() && cmd.endsWith('.js')) {
-                          modDoc.methods = modDoc.methods.concat(this.load(cmdfile, false).methods);
-                      }
+                  if (fs.existsSync(cmdsDir)) {
+                    var cmds = fs.readdirSync(cmdsDir);
+                    for (var cmd of cmds) {
+                        var cmdfile = path.join(cmdsDir, cmd);
+                        if (fs.lstatSync(cmdfile).isFile() && cmd.endsWith('.js')) {
+                            modDoc.methods = modDoc.methods.concat(this.load(cmdfile, false).methods);
+                        }
+                    }
                   }
                   docs[name] = modDoc;
               } else {
