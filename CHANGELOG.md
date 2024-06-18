@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v1.37.0 (2025-06-18)
+
+#### :beetle: Bug Fix
+* Fix display of command params in documentation popup.
+
+#### :house: Internal
+* Update oxygen-cli from v1.33.3 to v1.35.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+
 ## v1.36.0 (2025-04-30)
 
 #### :beetle: Bug Fix
