@@ -42,7 +42,7 @@ const createModuleAndMethods = (jsonData) => {
                     paramsInBrackets += `, ${param.name}: ${param.type}`;
                     paramsDescription = [
                         ...paramsDescription,
-                        `@param {} **${param.name}** ${param.description}`
+                        `@param ${param.name} ${param.description}`
                     ];
                 });
                 if (paramsInBrackets.length > 1) {
