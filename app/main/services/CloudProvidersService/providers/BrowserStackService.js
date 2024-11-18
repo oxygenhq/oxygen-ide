@@ -97,12 +97,25 @@ export default class BrowserStackService extends CloudProviderBase {
         // run test on a mobile device
         else if (target) {
             if (target.deviceName) {
-                bstackOpts.deviceName = target.deviceName;
+                // bstackOpts.deviceName = target.deviceName;
+                caps['appium:deviceName'] = target.deviceName;
                 bstackOpts.realMobile = true;
             }
 
             if (target.osVersion) {
-                bstackOpts.osVersion = target.osVersion;
+                // bstackOpts.osVersion = target.osVersion;
+                caps['appium:platformVersion'] = target.osVersion;
+            }
+
+            if (target.osName) {
+                if (target.osName === 'android') {
+                    caps.platformName = 'Android';
+                    caps['appium:automationName'] = 'UIAutomator2';
+                }
+                else if (target.osName === 'ios') {
+                    caps.platformName = 'iOS';
+                    caps['appium:automationName'] = 'XCUITest';
+                }
             }
         }
         // set additional options

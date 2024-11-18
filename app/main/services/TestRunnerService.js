@@ -230,6 +230,7 @@ export default class TestRunnerService extends ServiceBase {
                 let config;
                 try {
                     config = await cliutil.getConfigurations(targetFile, argv, this.mainFilePath);
+                    this._updateCapsWithEnvironmentVariables(caps, env, config.envs);
                 } catch (e) {
                     this.notify({
                         type: EVENT_LOG_ENTRY,
@@ -864,6 +865,16 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
             return await this.runner.replStart();
         } else {
             console.log('this.runner not exist');
+        }
+    }
+
+    _updateCapsWithEnvironmentVariables(caps, envName, allEnvVars) {
+        if (!allEnvVars[envName]) {
+            return;
+        }
+        const envVars = allEnvVars[envName];
+        if (envVars['appium:app']) {
+            caps['appium:app'] = envVars['appium:app'];
         }
     }
 
