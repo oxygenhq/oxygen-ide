@@ -1,6 +1,16 @@
 # CHANGELOG
 
-## v1.37.0 (2025-06-18)
+## v1.37.1 (2024-11-19)
+
+#### :beetle: Bug Fix
+* Fix BrowserStack settings to comply with W3C.
+
+#### :house: Internal
+* Update oxygen-cli from v1.35.0 to v1.37.1. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update GeckoDriver to 0.35.0.
+* Bundle ChromeDriver/EdgeDriver 131.
+
+## v1.37.0 (2024-06-18)
 
 #### :beetle: Bug Fix
 * Fix display of command params in documentation popup.
@@ -8,7 +18,7 @@
 #### :house: Internal
 * Update oxygen-cli from v1.33.3 to v1.35.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
 
-## v1.36.0 (2025-04-30)
+## v1.36.0 (2024-04-30)
 
 #### :beetle: Bug Fix
 * Fix auto download issue with Chrome driver and optimize IDE startup time by removing unnecessary browser version checks.
