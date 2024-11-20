@@ -250,7 +250,7 @@ module.exports = function(grunt) {
             },
             target: {
                 dest:  'dist/oxygen-' + pkg.version + '-osx-x64.dmg',
-                'sign-identity': '21E9DBB193EBE7B9422F830962C2604A65233A02'
+                'sign-identity': 'AC2F354E3725BA7C045B0F497895314C3EBC5934'
             }
             
         },
