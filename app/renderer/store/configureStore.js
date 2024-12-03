@@ -27,7 +27,7 @@ const history = createHashHistory();
 // initialize Rxjs subject for action to subject middleware
 let action$ = new Subject();
 
-const configureStore = (initialState?: counterStateType) => {
+const configureStore = async (initialState?: counterStateType) => {
     // prevent duplicated store initialization
     if (global.store) {
         return global.store;
@@ -52,16 +52,17 @@ const configureStore = (initialState?: counterStateType) => {
     // Thunk Middleware
     middleware.push(thunk);
 
+    const settings = await services.mainIpc.call( 'ElectronService', 'getSettings');
     // Apply redux-logger if we are in debugging mode
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' || settings.cache.settings.generalSettings.extendedDebugging) {
         const { createLogger } = require('redux-logger');
         middleware.push(createLogger({ 
             collapsed: true,      
             predicate: (getState, action) => !((
                 action.payload && 
-        action.payload.event && 
-        action.payload.event.type && 
-        ['CHROME_EXTENSION_ENABLED', 'RECORDER_NEW_CAN_RECORD'].includes(action.payload.event.type)
+                action.payload.event && 
+                action.payload.event.type && 
+                ['CHROME_EXTENSION_ENABLED', 'RECORDER_NEW_CAN_RECORD'].includes(action.payload.event.type)
             ))
         }));
     }
