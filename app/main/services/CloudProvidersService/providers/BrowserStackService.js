@@ -146,8 +146,8 @@ export default class BrowserStackService extends CloudProviderBase {
     }
 
     async onBeforeTest(caps, options, reporter) {
-        if (this.settings.local) {
-            await this.startLocalService();
+        if (this.settings.local && this.settings.localAutoStart) {
+            await this.startLocalService(this.settings.localForce || false);
         }
     }
 
@@ -157,12 +157,15 @@ export default class BrowserStackService extends CloudProviderBase {
         }
     }
 
-    async startLocalService() {
+    async startLocalService(force = false) {
         // creates an instance of Local
         this.bsLocal = new browserstack.Local();
 
         // replace <browserstack-accesskey> with your key. You can also set an environment variable - "BROWSERSTACK_ACCESS_KEY".
-        const bs_local_args = { 'key': this.settings.secret };
+        const bs_local_args = {
+            'key': this.settings.secret,
+            'force': force,
+        };
 
         return new Promise((resolve, reject) => {
             // starts the Local instance with the required arguments

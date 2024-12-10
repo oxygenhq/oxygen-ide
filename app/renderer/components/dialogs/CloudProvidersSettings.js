@@ -449,6 +449,34 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
         });
     }
 
+    onChangeBrowserStackLocalForce (value) {
+        const { providers = {} } = this.state || {};
+        const { browserStack = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                browserStack: {
+                    ...browserStack,
+                    localForce: value,
+                }
+            }
+        });
+    }
+
+    onChangeBrowserStackLocalAutoStart (value) {
+        const { providers = {} } = this.state || {};
+        const { browserStack = {} } = providers;
+        this.setState({
+            providers: {
+                ...this.state.providers,
+                browserStack: {
+                    ...browserStack,
+                    localAutoStart: value,
+                }
+            }
+        });
+    }
+
     onChangeBrowserStackNetworkLogs (value) {
         const { providers = {} } = this.state || {};
         const { browserStack = {} } = providers;
@@ -714,10 +742,22 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                                 onChange={ (e) => ::this.onChangeBrowserStackBuildName(e.target.value) }
                             />
                         </Form.Item>
-                        <Form.Item label="Local" {...formItemLayout} >
+                        <Form.Item label="Enable Local" {...formItemLayout} >
                             <Checkbox
                                 checked={ browserStack.local || false }
                                 onChange={ (e) => ::this.onChangeBrowserStackLocal(e.target.checked) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Force Local" {...formItemLayout} >
+                            <Checkbox
+                                checked={ browserStack.localForce || false }
+                                onChange={ (e) => ::this.onChangeBrowserStackLocalForce(e.target.checked) }
+                            />
+                        </Form.Item>
+                        <Form.Item label="Auto Start Local Service" {...formItemLayout} >
+                            <Checkbox
+                                checked={ browserStack.localAutoStart || false }
+                                onChange={ (e) => ::this.onChangeBrowserStackLocalAutoStart(e.target.checked) }
                             />
                         </Form.Item>
                         <Form.Item label="Debug" {...formItemLayout} >
