@@ -36,26 +36,28 @@ if (process.env.NODE_ENV === 'production') {
 const { configureStore, history } = importConfigureStore;
 
 // initialize Redux store
-const store = configureStore();
-window.dispatch = store.dispatch;
+configureStore().then((store) => {
+    window.dispatch = store.dispatch;
+    window.getState = store.getState;
 
-configureServices(store);
-
-render(
-    <AppContainer>
-        <App store={store} history={history} />
-    </AppContainer>,
-    document.getElementById('root')
-);
-
-if (module.hot) {
-    module.hot.accept('./containers/App.js', () => {
-        const NextRoot = require('./containers/App');
-        render(
-            <AppContainer>
-                <NextRoot store={store} history={history} />
-            </AppContainer>,
-            document.getElementById('root')
-        );
-    });
-}
+    configureServices(store);
+    
+    render(
+        <AppContainer>
+            <App store={store} history={history} />
+        </AppContainer>,
+        document.getElementById('root')
+    );
+    
+    if (module.hot) {
+        module.hot.accept('./containers/App.js', () => {
+            const NextRoot = require('./containers/App');
+            render(
+                <AppContainer>
+                    <NextRoot store={store} history={history} />
+                </AppContainer>,
+                document.getElementById('root')
+            );
+        });
+    }
+});
