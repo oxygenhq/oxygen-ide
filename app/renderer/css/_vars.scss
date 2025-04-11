@@ -41,3 +41,8 @@ $logHeaderColor: #606060;
 // Sprint 6 vars
 $nodesFontSize: 9pt;
 $nodePadding: 1.3pt;
+
+@font-face {
+    font-family: 'consolas';
+    src: url('../fonts/consolas.ttf');
+}
