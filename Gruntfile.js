@@ -9,6 +9,7 @@
 var pkg = require('./package.json');
 var cp = require('child_process');
 var path = require('path');
+var fs = require('fs');
 
 module.exports = function(grunt) {
     grunt.loadTasks('./tools/grunt-tasks');
@@ -90,6 +91,13 @@ module.exports = function(grunt) {
         prodDeps.push('!@oxygenhq/mitmproxy-node/mitmproxy/mitmdump.exe');
     }
 
+    // crutch for now owkring RP reporter
+    const reportAggregatorFile = 'app/node_modules/oxygen-cli/build/reporter/ReportAggregator.js';
+    var reportAgg = fs.readFileSync(reportAggregatorFile, { encoding: 'utf8', flag: 'r' });
+    reportAgg = reportAgg.replace('var _reporterRp = _interopRequireDefault(require("../ox_reporters/reporter-rp"));', '')
+                        .replace('rp: _reporterRp.default', '');
+    fs.writeFileSync(reportAggregatorFile, reportAgg);
+
     grunt.initConfig({
         rebrand: {
             name: pkg.name,
@@ -141,7 +149,8 @@ module.exports = function(grunt) {
                             '!moment/locale/**',
                             '!intl/locale-data/jsonp/**',
                             '!chromedriver/**',
-                            '!geckodriver/**']),
+                            '!geckodriver/**',
+                            '!oxygen-cli/build/ox_reporters/reporter-rp.js']),
                         dest: OUTDIR + RESOURCES + '/app/node_modules' 
                     },
                     { 
