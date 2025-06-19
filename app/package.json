@@ -24,7 +24,7 @@
     "axios": "0.27.2",
     "chokidar": "3.5.3",
     "@noble/hashes": "1.2.0",
-    "oxygen-cli": "1.40.1",
+    "oxygen-cli": "1.40.2-beta.1",
     "triple-beam": "1.3.0",
     "xml2json": "0.12.0"
   },

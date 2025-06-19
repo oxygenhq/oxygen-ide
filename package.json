@@ -120,6 +120,7 @@
     "monaco-editor-textmate": "3.0.0",
     "monaco-textmate": "3.0.1",
     "node-fetch": "2.6.12",
+    "node-gyp": "^9.4.1",
     "onigasm": "2.2.5",
     "perfect-scrollbar": "1.5.5",
     "react": "16.14.0",

@@ -215,7 +215,6 @@ export default class TestRunnerService extends ServiceBase {
         if (seleniumTimeout) {
             options.seleniumTimeout = seleniumTimeout;
         }
-
         // make sure to load and merge IDE defined test options with the project configuration file
         if (oxConfigFile) {
             const targetFile = cliutil.processTargetPath(oxConfigFile);            
@@ -336,6 +335,7 @@ export default class TestRunnerService extends ServiceBase {
                 if (caps && caps.browserName && caps.browserName === 'ie') {
                     this._killIEWebdriver();
                 }
+                options._oxide = true;
                 this.reporter = new ReportAggregator(options);
                 provider && await provider.onBeforeTest(caps, options, this.reporter);
                 await this._launchTest(options, caps);
@@ -407,12 +407,6 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     async updateBreakpoints(breakpoints, filePath) {        
-        /*
-        console.log('--- updateBreakpoints ---');
-        console.log('breakpoints', breakpoints);
-        console.log('filePath', filePath);
-        console.log('--- updateBreakpoints ---');
-        */
         if (this.runner && breakpoints && filePath) {
             return await this.runner.updateBreakpoints(breakpoints, filePath);
         } else {
