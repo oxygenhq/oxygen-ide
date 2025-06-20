@@ -1,7 +1,7 @@
 {
   "name": "oxygenide",
   "productName": "Oxygen IDE",
-  "version": "1.37.1",
+  "version": "1.37.2",
   "description": "IDE for Oxygen automation framework.",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
@@ -39,6 +39,7 @@
     "@babel/plugin-proposal-class-properties": "7.10.4",
     "@babel/plugin-proposal-decorators": "7.10.4",
     "@babel/plugin-proposal-function-bind": "7.10.4",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/plugin-transform-classes": "7.10.4",
     "@babel/plugin-transform-modules-commonjs": "7.10.4",
     "@babel/plugin-transform-runtime": "7.10.4",

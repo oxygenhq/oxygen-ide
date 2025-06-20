@@ -32,8 +32,24 @@ export default merge.smart(baseConfig, {
     module: {
         rules: [
             {
+                test: /\.js$/,
+                // include: /node_modules\/node-gyp/, // Target problematic module
+                include: (filepath) => filepath.includes('make-fetch-happen'),
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env'],
+                        plugins: [
+                            '@babel/plugin-proposal-class-properties',      // Handles class properties
+                            '@babel/plugin-proposal-private-methods',       // Handles private methods
+                            '@babel/plugin-proposal-private-property-in-object' // Handles private properties
+                        ]
+                    }
+                }
+            },
+            {
                 test: /\.(js|jsx)?$/,
-                exclude: [/node_modules/, /app\/node_modules/],
+                exclude: [/node_modules\/(?!node-gyp)/, /app\/node_modules/],
                 use: {
                     loader: 'babel-loader',
                     options: {
