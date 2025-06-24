@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v1.38.0 (2025-06-24)
+
+#### :house: Internal
+* Update oxygen-cli from v1.37.1 to v1.41.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Update GeckoDriver to 0.36.0.
+* Bundle ChromeDriver/EdgeDriver 137.
+
 ## v1.37.1 (2024-11-19)
 
 #### :beetle: Bug Fix
