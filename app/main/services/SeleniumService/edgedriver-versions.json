@@ -1,6 +1,11 @@
 {
   "edgeVersions": [
     {
+      "driverVersion": "137.0.3296.93",
+      "edgeMax": 137,
+      "edgeMin": 137
+    },
+    {
       "driverVersion": "131.0.2903.51",
       "edgeMax": 131,
       "edgeMin": 131
