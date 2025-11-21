@@ -1,7 +1,7 @@
 {
   "name": "oxygenide",
   "productName": "Oxygen IDE",
-  "version": "1.38.0",
+  "version": "1.39.0",
   "description": "IDE for Oxygen automation framework.",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
@@ -13,7 +13,7 @@
     "flow-typed": "rimraf flow-typed/npm && flow-typed update --ignoreDeps dev || (exit 0)",
     "lint": "cross-env NODE_ENV=development eslint '**/*.{js,jsx}' --quiet",
     "package": "npm install && cross-env RELEASE_BUILD=true npm run build && grunt",
-    "postinstall": "node -r @babel/register internals/scripts/CheckNativeDep.js && npm run flow-typed && npm run build-dll && cd app && npm i --force",
+    "postinstall": "node -r @babel/register internals/scripts/CheckNativeDep.js && npm run flow-typed && npm run build-dll && cd app && npm i",
     "prestart": "npm run build",
     "start": "cross-env NODE_ENV=production electron -r @babel/register ./app/",
     "start-main-dev": "cross-env HOT=1 NODE_ENV=development electron ./wrap-main.dev.js",

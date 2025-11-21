@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v1.39.0 (2025-11-21)
+
+#### :house: Internal
+* Update oxygen-cli from v1.41.0 to v1.43.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+
 ## v1.38.0 (2025-06-24)
 
 #### :house: Internal
