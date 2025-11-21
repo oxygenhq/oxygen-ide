@@ -60,23 +60,29 @@ module.exports = function(grunt) {
     // because ** and tons of ingores (from modclean task) don't play along nicely
     var prodDeps = [];
     if (!grunt.cli.tasks.includes('chrome-ext')) {
+        var cwd = process.cwd();
+        process.chdir('app');
+
+        var out;
+
         try {
-            var cwd = process.cwd();
-            process.chdir('app');
-            var out = cp.execSync('npm ls --prod=true --parseable');
-            var prodDepsUnfiltered = out.toString().split(/\r?\n/);
-            var si = __dirname.length + 1 + 'app'.length + 1 + 'node_modules'.length + 1;
-            for (var i = 0; i < prodDepsUnfiltered.length; i++) {
-                var dep = prodDepsUnfiltered[i].substring(si);
-                if (dep === '' || dep.indexOf('node_modules') > 0) {
-                    continue;
-                }
-                prodDeps.push(dep + '/**');
-            }
-            process.chdir(cwd);
+            out = cp.execSync('npm ls -s --prod=true --parseable');
         } catch (e) {
-            grunt.fail.fatal('Unable to get production dependencies list', e);
+            // npm ls will always throw because some deps are missing... we treat as a normal behavior
+            grunt.log.writeln('Unable to get production dependencies list');
+            out = e.stdout;
         }
+
+        var prodDepsUnfiltered = out.toString().split(/\r?\n/);
+        var si = __dirname.length + 1 + 'app'.length + 1 + 'node_modules'.length + 1;
+        for (var i = 0; i < prodDepsUnfiltered.length; i++) {
+            var dep = prodDepsUnfiltered[i].substring(si);
+            if (dep === '' || dep.indexOf('node_modules') > 0) {
+                continue;
+            }
+            prodDeps.push(dep + '/**');
+        }
+        process.chdir(cwd);
     }
 
     // exclude mitmdump
