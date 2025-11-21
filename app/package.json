@@ -24,11 +24,12 @@
     "axios": "0.27.2",
     "chokidar": "3.5.3",
     "@noble/hashes": "1.2.0",
-    "oxygen-cli": "1.41.0",
+    "oxygen-cli": "1.42.0",
     "triple-beam": "1.3.0",
     "xml2json": "0.12.0"
   },
   "resolutions": {
+    "@dabh/diagnostics": "2.0.3",
     "axios-ntlm": "1.3.0"
   },
   "@comment dev dependencies": [
