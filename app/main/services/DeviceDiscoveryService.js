@@ -381,7 +381,11 @@ export default class DeviceDiscoveryService extends ServiceBase {
                     }
                 }
             } catch (err) {
-                if (err && err.message && err.message.includes('timed out after')) {
+                if (err && err.message && (
+                    err.message.includes('timed out after') ||
+                    err.code === null ||
+                    err.message.includes('exited with code null')
+                )) {
                     // ignore
                 } else {
                     throw new Error(`Failed getting devices, err: ${err}.`);
