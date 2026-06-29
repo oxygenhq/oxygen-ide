@@ -21,6 +21,51 @@ type Props = {
     height: number
 };
 
+type LogLinesProps = {
+    lines: Array<Object>
+};
+
+// rendering every log row is the expensive part of this component (can be hundreds/
+// thousands of divs once there's enough output to scroll). LogViewer's own render() also
+// re-runs on every height-only change (e.g. every frame while the log panel is being
+// dragged/resized), which previously re-created and re-diffed this entire row list each
+// time even though the actual log content hadn't changed. Isolating it behind React.memo,
+// keyed only on `lines`, means a pure height change no longer touches this at all.
+const LogLines = React.memo(function LogLines({ lines }: LogLinesProps) {
+    return (
+        <>
+            {
+                lines.map((line, index) => {
+                    let color = 'rgba(0, 0, 0, 0.65)';
+
+                    if (line && line.severity) {
+                        if (line.severity === 'ERROR') {
+                            color = '#a8071a';
+                        }
+
+                        if (line.severity === 'PASSED') {
+                            color = '#5292f8'; //'#237804';
+                        }
+                    }
+
+                    return (
+                        <div
+                            className="auto-sizer-wrapper-row"
+                            style={{
+                                paddingTop: index ? '0px': '5px',
+                                color: color
+                            }}
+                            key={index}
+                        >
+                            {line.message}
+                        </div>
+                    );
+                })
+            }
+        </>
+    );
+}, (prevProps, nextProps) => prevProps.lines === nextProps.lines);
+
 export default class LogViewer extends React.PureComponent<Props> {
     constructor(props: Props) {
         super(props);
@@ -177,7 +222,7 @@ export default class LogViewer extends React.PureComponent<Props> {
                 copyValue: this.loggerRef.current.innerText
             });
         }
-    }
+    };
 
     handleClickOutside = (event) => {
         if (this.state.selected && this.loggerRef && !this.loggerRef.current.contains(event.target)) {
@@ -186,7 +231,7 @@ export default class LogViewer extends React.PureComponent<Props> {
                 selected: false
             });
         }
-    }
+    };
 
     copyClicked = () => {
 
@@ -210,7 +255,7 @@ export default class LogViewer extends React.PureComponent<Props> {
                 message.error('Nothing to copy');
             }
         }
-    }
+    };
 
     render() {
         const { height } = this.props;
@@ -227,7 +272,8 @@ export default class LogViewer extends React.PureComponent<Props> {
                         minHeight: height - 32,
                     }}
                 >
-                    <div 
+                    <div
+                        id="scrollableDiv"
                         className="auto-sizer-wrapper"
                         style={{
                             height: height - 32,
@@ -239,34 +285,7 @@ export default class LogViewer extends React.PureComponent<Props> {
                             dataLength={lines.length}
                             scrollableTarget="scrollableDiv"
                         >
-                            {
-                                lines.map((line, index) => {                                
-                                    let color = 'rgba(0, 0, 0, 0.65)';
-                        
-                                    if (line && line.severity) {
-                                        if (line.severity === 'ERROR') {
-                                            color = '#a8071a';
-                                        }
-                                        
-                                        if (line.severity === 'PASSED') {
-                                            color = '#5292f8'; //'#237804';
-                                        }
-                                    }
-                        
-                                    return (
-                                        <div
-                                            className="auto-sizer-wrapper-row" 
-                                            style={{
-                                                paddingTop: index ? '0px': '5px',
-                                                color: color
-                                            }} 
-                                            key={index}
-                                        >
-                                            {line.message}
-                                        </div>
-                                    );
-                                })
-                            }
+                            <LogLines lines={lines} />
                         </InfiniteScroll>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2015-2018 CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
@@ -78,7 +78,7 @@ export default class UpdateDialog extends React.PureComponent<Props> {
                     <Modal
                         title="Update"
                         width={400}
-                        visible={visible}
+                        open={visible}
                         onCancel={onCancel}
                         footer={[
                             <Button
@@ -103,7 +103,7 @@ export default class UpdateDialog extends React.PureComponent<Props> {
                     <Modal
                         title="Update"
                         width={400}
-                        visible={visible}
+                        open={visible}
                         onCancel={onCancel}
                         footer={
                             <Button

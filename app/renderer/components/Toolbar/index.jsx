@@ -7,7 +7,13 @@
  * (at your option) any later version.
  */
 // @flow
-import { Icon, Select, Input, TreeSelect, Tooltip } from 'antd';
+import {
+    FileAddOutlined, FolderAddOutlined, FolderOpenOutlined, SaveOutlined,
+    GlobalOutlined, MobileOutlined, ScanOutlined,
+    PlayCircleFilled, PlaySquareFilled, ForwardOutlined, CloseCircleFilled,
+    SettingOutlined
+} from '@ant-design/icons';
+import { Select, Input, TreeSelect, Tooltip } from 'antd';
 import React, { Fragment } from 'react';
 import '../../css/toolbar.scss';
 import * as Controls from './controls';
@@ -65,13 +71,13 @@ export default class Toolbar extends React.Component<Props> {
         this.setState({
             showNoChromeDialog: false
         });
-    }
+    };
 
     hideWorkingChromeDialog = () => {
         this.setState({
             showWorkingChromeDialog: false
         });
-    }
+    };
 
     handleClickEvent(ctrlId) {
         if (this._isEnabled(ctrlId) && this._isVisible(ctrlId) && this.props.onButtonClick) {
@@ -123,7 +129,7 @@ export default class Toolbar extends React.Component<Props> {
         this.setState({
             showNoChromeDialog: true
         });
-    }
+    };
 
     showWorkingOxygenExtensionModal = () => {
         this.setState({
@@ -131,21 +137,21 @@ export default class Toolbar extends React.Component<Props> {
         }, () => {
             this.handleClickEvent(Controls.TEST_RECORD);
         });
-    }
+    };
 
     handleBrowsersTreeValueChange = (browsersTree, value, label, extra) => {
         if (value) {
             const target = getBrowsersTarget(browsersTree, value);
             this.handleValueChange(Controls.TEST_TARGET, target);
         }
-    }
+    };
 
     handleDevicesTreeValueChange = (devicesTree, value, label, extra) => {
         if (value) {
             const target = getDevicesTarget(devicesTree, value);
             this.handleValueChange(Controls.TEST_TARGET, target);
         }
-    }
+    };
 
     render() {
         const {
@@ -252,40 +258,36 @@ export default class Toolbar extends React.Component<Props> {
                 }
 
                 { this._isVisible(Controls.NEW_FILE) && (
-                    <Icon
+                    <FileAddOutlined
                         className="control button"
                         style={ getOpacity(this._isEnabled(Controls.NEW_FILE)) }
                         onClick={ () => ::this.handleClickEvent(Controls.NEW_FILE) }
-                        type="file-add"
                         title="New File"
                     />
                 )}
 
                 { this._isVisible(Controls.NEW_FOLDER) && (
-                    <Icon
+                    <FolderAddOutlined
                         className="control button"
                         onClick={ () => ::this.handleClickEvent(Controls.NEW_FOLDER) }
-                        type="folder-add"
                         title="New Folder"
                         style={ {
-                            ...getOpacity(this._isEnabled(Controls.NEW_FOLDER)), 
+                            ...getOpacity(this._isEnabled(Controls.NEW_FOLDER)),
                             'fontSize': '25px'} }
                     />
                 )}
 
-                <Icon
+                <FolderOpenOutlined
                     className="control button"
                     onClick={ () => ::this.handleClickEvent(Controls.OPEN_FOLDER) }
-                    type="folder-open"
                     title="Open Folder"
                     style={ {'fontSize': '25px'} }
                 />
 
-                <Icon
+                <SaveOutlined
                     className="control button"
                     onClick={ () => ::this.handleClickEvent(Controls.SAVE_FILE) }
                     title="Save"
-                    type="save"
                 />
 
                 <div className="separator" />
@@ -312,26 +314,18 @@ export default class Toolbar extends React.Component<Props> {
                     !cloudProvidesBrowsersAndDevicesEnabled && 
                     <Fragment>
                         <span key='web' className={testMode === 'web' ? 'control selectable active' : 'control selectable'}>
-                            <Icon
+                            <GlobalOutlined
                                 onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_WEB) }
-                                style={{ 
-                                    ...getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)),
-                                    marginRight: 0 
-                                }}
+                                style={{ ...getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)), marginRight: 0 }}
                                 title="Web Mode"
-                                type="global"
                             />
                         </span>
-            
+
                         <span key='mob' className={testMode === 'mob' ? 'control selectable active' : 'control selectable'}>
-                            <Icon
+                            <MobileOutlined
                                 onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_MOB) }
-                                style={{ 
-                                    ...getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)),
-                                    marginRight: 0 
-                                }}
+                                style={{ ...getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)), marginRight: 0 }}
                                 title="Mobile Mode"
-                                type="mobile"
                             />
                         </span>
                     </Fragment>
@@ -339,28 +333,20 @@ export default class Toolbar extends React.Component<Props> {
                 {
                     cloudProvidesBrowsersEnabled &&
                     <span key='web' className={cloudProviderTestMode === 'web' ? 'control selectable active' : 'control selectable'}>
-                        <Icon
+                        <GlobalOutlined
                             onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_WEB) }
-                            style={{ 
-                                ...getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)),
-                                marginRight: 0 
-                            }}
+                            style={{ ...getOpacity(this._isEnabled(Controls.TEST_MODE_WEB)), marginRight: 0 }}
                             title="Web Mode"
-                            type="global"
                         />
                     </span>
                 }
                 {
                     cloudProvidesDevicesEnabled &&
                     <span key='mob' className={cloudProviderTestMode === 'mob' ? 'control selectable active' : 'control selectable'}>
-                        <Icon
+                        <MobileOutlined
                             onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_MOB) }
-                            style={{ 
-                                ...getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)),
-                                marginRight: 0 
-                            }}
+                            style={{ ...getOpacity(this._isEnabled(Controls.TEST_MODE_MOB)), marginRight: 0 }}
                             title="Mobile Mode"
-                            type="mobile"
                         />
                     </span>
                 }
@@ -383,14 +369,10 @@ export default class Toolbar extends React.Component<Props> {
                 {
                     (!providersUnabled || testProvider === 'Local') && (
                         <span key='resp' className={testMode === 'resp' ? 'control selectable active' : 'control selectable'}>
-                            <Icon
+                            <ScanOutlined
                                 onClick={ () => ::this.handleClickEvent(Controls.TEST_MODE_RESP) }
-                                style={{ 
-                                    ...getOpacity(this._isEnabled(Controls.TEST_MODE_RESP)),
-                                    marginRight: 0
-                                }}
+                                style={{ ...getOpacity(this._isEnabled(Controls.TEST_MODE_RESP)), marginRight: 0 }}
                                 title="Responsive Mode"
-                                type="scan"
                             />
                         </span>
                     )
@@ -462,11 +444,7 @@ export default class Toolbar extends React.Component<Props> {
                             className={ this._getControlClassNames(Controls.TEST_RUN, 'button') }
                             disabled={ !this._isEnabled(Controls.TEST_RUN) }
                         >
-                            <Icon
-                                title="Run Test"
-                                type="play-circle"
-                                theme="filled"
-                            /> <span>Run</span>
+                            <PlayCircleFilled title="Run Test" /> <span>Run</span>
                         </button>
                         {
                             cloudProvidesBrowsersAndDevicesEnabled && 
@@ -480,22 +458,17 @@ export default class Toolbar extends React.Component<Props> {
                                 // className={ this._getControlClassNames(Controls.TEST_RUN, 'button') }
                                 // disabled={ !this._isEnabled(Controls.TEST_RUN) }
                             >
-                                <Icon
-                                    title="Run Test"
-                                    type="play-square"
-                                    theme="filled"
-                                /> <span>Run all</span>
+                                <PlaySquareFilled title="Run Test" /> <span>Run all</span>
                             </button>
                         }
                     </React.Fragment>
                 )}
 
                 { this._isVisible(Controls.TEST_CONTINUE) && (
-                    <Icon
+                    <ForwardOutlined
                         className="control button forward"
                         style={ getOpacity(this._isEnabled(Controls.TEST_CONTINUE)) }
                         onClick={ () => ::this.handleClickEvent(Controls.TEST_CONTINUE) }
-                        type="forward"
                         title="Continue"
                     />
                 )}
@@ -507,16 +480,12 @@ export default class Toolbar extends React.Component<Props> {
                         onClick={ () => ::this.handleClickEvent(Controls.TEST_STOP) }
                         title="Stop"
                     >
-                        <Icon
-                            title="Terminate Test"
-                            type="close-circle"
-                            theme="filled"
-                        /> 
+                        <CloseCircleFilled title="Terminate Test" />
                         <span>Stop</span>
                     </button>
                 )}
 
-                { 
+                {
                     this._isVisible(Controls.TEST_STOPING) &&
                     <React.Fragment>
                         <button
@@ -525,25 +494,17 @@ export default class Toolbar extends React.Component<Props> {
                             title="Stopping…"
                             disabled
                         >
-                            <Icon
-                                title="Terminate Test"
-                                type="close-circle"
-                                theme="filled"
-                            /> 
+                            <CloseCircleFilled title="Terminate Test" />
                             <span>Stopping…</span>
-                        </button> 
-                        
+                        </button>
+
                         <button
                             className="control button stop"
                             style={ getOpacity(this._isEnabled(Controls.TEST_FORCE_STOP)) }
                             onClick={ () => ::this.handleClickEvent(Controls.TEST_FORCE_STOP) }
                             title="Stop"
                         >
-                            <Icon
-                                title="Terminate Test"
-                                type="close-circle"
-                                theme="filled"
-                            /> 
+                            <CloseCircleFilled title="Terminate Test" />
                             <span>Force Stop</span>
                         </button>
                     </React.Fragment>
@@ -616,10 +577,9 @@ export default class Toolbar extends React.Component<Props> {
                         className={ this._isSelected(Controls.TEST_SETTINGS) ? 'control selectable active' : 'control selectable' }
                         style={{ float: 'right' }}
                     >
-                        <Icon
+                        <SettingOutlined
                             style={ getOpacity(this._isEnabled(Controls.TEST_SETTINGS)) }
                             onClick={ () => ::this.handleClickEvent(Controls.TEST_SETTINGS) }
-                            type="setting"
                             title="Test Settings"
                         />
                     </span>

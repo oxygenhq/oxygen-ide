@@ -9,7 +9,7 @@
 // @flow
 import React, { Fragment } from 'react';
 import styled from '@emotion/styled';
-import { Icon } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
 
 import FlexColumn from '../../components/core/FlexColumn';
 import Panel from '../../components/Panel.jsx';
@@ -49,21 +49,21 @@ export default class ObjectRepositoryNotValidView extends React.PureComponent<Pr
         this.setState({
             searchResults: searchResults
         });
-    }
+    };
 
     closeSelectedObject = () => {
         const { closeActive } = this.props;
         if (closeActive) {
             closeActive();
         }
-    }
+    };
 
     closeObjectRepository= () => {
         const { clearObjectRepositoryFile } = this.props;
         if (clearObjectRepositoryFile) {
             clearObjectRepositoryFile();
         }
-    }
+    };
   
     render() {
         const { name } = this.props;
@@ -76,7 +76,7 @@ export default class ObjectRepositoryNotValidView extends React.PureComponent<Pr
             <Fragment>
                 {repoPanelTitle} 
                 <div onClick={this.closeObjectRepository} className={'header-control'}>
-                    <Icon type="close" />
+                    <CloseOutlined />
                 </div>
             </Fragment>
         );

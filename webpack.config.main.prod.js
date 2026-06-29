@@ -9,12 +9,13 @@ import TerserPlugin from 'terser-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
-import SentryWebpackPlugin from '@sentry/webpack-plugin';
+import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
+import getSentryConfig from './internals/scripts/getSentryConfig';
 import { version }  from './package.json';
 
 CheckNodeEnv('production');
 
-export default merge.smart(baseConfig, {
+export default merge(baseConfig, {
     devtool: 'source-map',
 
     target: 'electron-main',
@@ -24,14 +25,23 @@ export default merge.smart(baseConfig, {
     output: {
         path: path.join(__dirname, 'app/main'),
         publicPath: process.env.RELEASE_BUILD ? '../main/' /*npm run package*/ : '../app/main/' /*npm run start*/,
-        filename: 'main.prod.js'
+        filename: 'main.prod.js',
+        hashFunction: 'sha256'
     },
+    externals: [
+        // sentry v7 uses ESM internally — exclude from webpack bundle, load via require() at runtime
+        /^@sentry\//,
+        // mixpanel's bundled feature-flags code uses syntax webpack 4 / Terser can't parse — exclude and load via require() at runtime
+        'mixpanel',
+        // appium-adb pulls in sharp's native .node binaries via @appium/support — can't be bundled, must load via require() at runtime
+        'appium-adb',
+    ],
+
     optimization: {
         minimize: true,
         minimizer: [
             new TerserPlugin({
                 parallel: true,
-                sourceMap: true,
                 terserOptions: {
                     ecma: 2016
                 }
@@ -64,22 +74,21 @@ export default merge.smart(baseConfig, {
         }),
 
         // adbkit has a double require for CoffeScript and Javascript and packing fails if we don't ingore the CS ones.
-        new webpack.IgnorePlugin(/(\.\/src\/adb)|(\.\/src\/monkey)|(\.\/src\/logcat)/),
+        new webpack.IgnorePlugin({ resourceRegExp: /(\.\/src\/adb)|(\.\/src\/monkey)|(\.\/src\/logcat)/ }),
 
         // ignore locale files of moment.js
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/ }),
         
-        new SentryWebpackPlugin({
-            release: version,
-            include: [
-                'app/main/main.prod.js.map',
-                'app/main/main.prod.js',
-            ],
-            urlPrefix: '~app/main/',
-            ignoreFile: '.sentrycliignore',
-            ignore: ['node_modules', 'webpack.config.js'],
-            // validate: true,
-            sourceMapReference: false
+        sentryWebpackPlugin({
+            ...getSentryConfig(),
+            release: { name: version },
+            sourcemaps: {
+                assets: [
+                    'app/main/main.prod.js.map',
+                    'app/main/main.prod.js',
+                ],
+                ignore: ['node_modules', 'webpack.config.js'],
+            },
         }),
     ],
 });

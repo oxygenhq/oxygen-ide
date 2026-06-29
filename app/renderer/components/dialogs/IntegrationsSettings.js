@@ -71,15 +71,7 @@ class IntegrationsSettings extends React.PureComponent<Props> {
   
     validateFields() {
         const { providers } = this.state;
-        
-        return new Promise((resolve, reject) => {
-            this.props.form.validateFields((err, values) => {
-                if (err) {
-                    return;
-                }
-                resolve(providers);
-            });   
-        });
+        return Promise.resolve(providers);
     }
     
     async validateFormFields() {
@@ -128,12 +120,10 @@ class IntegrationsSettings extends React.PureComponent<Props> {
     }
 }
 
-const EnhancedForm =  Form.create()(IntegrationsSettings);
-
-export default class GeneralSettingsWrap extends React.PureComponent<Props> {
+export default class IntegrationsSettingsWrap extends React.PureComponent {
     render() {
         return (
-            <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />
+            <IntegrationsSettings ref={(node) => this.formWrap = node} {...this.props} />
         );
     }
 }

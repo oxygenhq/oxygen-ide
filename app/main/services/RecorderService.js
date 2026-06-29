@@ -8,7 +8,7 @@
  */
 import http from 'http';
 import dns from 'dns';
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/main';
 
 import ServiceBase from './ServiceBase';
 
@@ -149,7 +149,7 @@ export default class RecorderService extends ServiceBase {
             });
             
         }, 0);
-    }
+    };
 
     timer = () => {
         if (this.lastExtensionTime) {
@@ -170,5 +170,5 @@ export default class RecorderService extends ServiceBase {
                 newCanRecord: newCanRecord
             });
         }
-    }
+    };
 }

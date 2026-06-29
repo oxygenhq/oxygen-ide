@@ -9,9 +9,10 @@
 // @flow
 import React, { Fragment } from 'react';
 import PerfectScrollbar from 'perfect-scrollbar';
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
-import { Icon, Tooltip, Modal, Button } from 'antd';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { FileOutlined, CloseOutlined } from '@ant-design/icons';
+import { Tooltip, Modal, Button } from 'antd';
 import debounce from 'lodash/debounce';
 import 'perfect-scrollbar/css/perfect-scrollbar.css';
 import DraggableTab from './DraggableTab.jsx';
@@ -48,7 +49,7 @@ const config = {
 class Tabs extends React.Component<Props, void> {
     state = {
         closeTabAsk: false
-    }
+    };
 
     componentDidMount() {
         if (this.tabsRef) {
@@ -86,11 +87,11 @@ class Tabs extends React.Component<Props, void> {
     }
 
     // holds PerfectScrollbar instance
-    ps = null
+    ps = null;
 
     changeTabOrder = (dragIndex, hoverIndex) => {
         this.props.changeTabOrder(dragIndex, hoverIndex);
-    }
+    };
 
     handleContextMenuEvent = (e, tab, menuName) => {
         e.preventDefault();
@@ -98,7 +99,7 @@ class Tabs extends React.Component<Props, void> {
             this.props.onChange(tab.key, tab.title);
             this.props.showContextMenu(menuName, e, tab);
         }
-    }
+    };
 
     render() {
         const { active, tabs, recorder, activeTitle } = this.props;
@@ -124,12 +125,13 @@ class Tabs extends React.Component<Props, void> {
         }
 
         return (
+            <DndProvider backend={HTML5Backend}>
             <Fragment>
                 <Modal
                     title="Confirm your actions"
                     okText="Don`t save"
                     cancelText="Cancel"
-                    visible={this.state.closeTabAsk}
+                    open={this.state.closeTabAsk}
                     onCancel={this.onCancelClose}
                     footer={confirmFooter}
                 >
@@ -180,25 +182,25 @@ class Tabs extends React.Component<Props, void> {
                                             title={tab.key}
                                         >
                                             <button onClick={() => this.props.onChange(tab.key, tab.title)}>
-                                                {tabs.length < 6 && <Icon type="file" />}
+                                                {tabs.length < 6 && <FileOutlined />}
                                                 <span style={{ marginLeft: 5 }}>{tab.title}</span>
                                             </button>
                                         </Tooltip>
 
-                                        { 
+                                        {
                                             tab.touched &&
-                                            <Icon
+                                            <span
                                                 className="close-icon"
                                                 onClick={() => this.props.onClose && this.props.onClose(tab.key, tab.title)}
-                                                component={circle}
-                                            />
+                                            >
+                                                {circle()}
+                                            </span>
                                         }
-                                        { 
+                                        {
                                             !tab.touched &&
-                                            <Icon
+                                            <CloseOutlined
                                                 className="close-icon"
                                                 onClick={() => this.props.onClose && this.props.onClose(tab.key, tab.title)}
-                                                type={'close'}
                                             />
                                         }
                                     </div>
@@ -208,8 +210,9 @@ class Tabs extends React.Component<Props, void> {
                     )}
                 </div>
             </Fragment>
+            </DndProvider>
         );
     }
 }
 
-export default DragDropContext(HTML5Backend)(Tabs);
+export default Tabs;

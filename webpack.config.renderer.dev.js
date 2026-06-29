@@ -13,8 +13,10 @@ import webpack from 'webpack';
 import chalk from 'chalk';
 import merge from 'webpack-merge';
 import { spawn, execSync } from 'child_process';
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
+import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 
 CheckNodeEnv('development');
 
@@ -31,23 +33,27 @@ if (!(fs.existsSync(dll) && fs.existsSync(manifest))) {
     execSync('npm run build-dll');
 }
 
-export default merge.smart(baseConfig, {
+export default merge(baseConfig, {
     mode: 'development',
+
+    // sentry v7 uses ESM internally — exclude from bundle, load via require() at runtime
+    externals: [
+        /^@sentry\//,
+    ],
 
     devtool: 'inline-source-map',
 
     target: 'electron-renderer',
 
     entry: [
-        'react-hot-loader/patch',
-        //`webpack-dev-server/client?http://localhost:${port}/`,  // https://stackoverflow.com/a/40050967
-        'webpack/hot/only-dev-server',
+        // devServer.hot: true (below) auto-injects the HMR client + runtime — don't add it manually here
         path.join(__dirname, 'app/renderer/index.js'),
     ],
 
     output: {
         publicPath: `http://localhost:${port}/dist/`,
-        filename: 'renderer.dev.js'
+        filename: 'renderer.dev.js',
+        hashFunction: 'sha256'
     },
 
     module: {
@@ -77,13 +83,13 @@ export default merge.smart(baseConfig, {
                         plugins: [
                             // Here, we include babel plugins that are only required for the
                             // renderer process. The 'transform-*' plugins must be included
-                            // before react-hot-loader/babel
+                            // before react-refresh/babel
                             '@babel/transform-modules-commonjs',
                             ['@babel/plugin-proposal-class-properties', { 'loose': true }],
                             '@babel/plugin-transform-classes',
-                            'react-hot-loader/babel',
+                            'react-refresh/babel',
                             '@babel/plugin-proposal-function-bind',
-                            ['import', { 'libraryName': 'antd', 'libraryDirectory': 'es', 'style': 'css' }],
+                            ['import', { 'libraryName': 'antd', 'libraryDirectory': 'es', 'style': false }],
                             'add-module-exports',
                             [
                               '@babel/plugin-proposal-decorators',
@@ -184,56 +190,36 @@ export default merge.smart(baseConfig, {
             // WOFF Font
             {
                 test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        limit: 10000,
-                        mimetype: 'application/font-woff',
-                    }
-                },
+                type: 'asset',
+                parser: { dataUrlCondition: { maxSize: 10000 } },
             },
             // WOFF2 Font
             {
                 test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        limit: 10000,
-                        mimetype: 'application/font-woff',
-                    }
-                }
+                type: 'asset',
+                parser: { dataUrlCondition: { maxSize: 10000 } },
             },
             // TTF Font
             {
                 test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        limit: 10000,
-                        mimetype: 'application/octet-stream'
-                    }
-                }
+                type: 'asset',
+                parser: { dataUrlCondition: { maxSize: 10000 } },
             },
             // EOT Font
             {
                 test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-                use: 'url-loader',
+                type: 'asset/inline',
             },
             // SVG Font
             {
                 test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        limit: 10000,
-                        mimetype: 'image/svg+xml',
-                    }
-                }
+                type: 'asset',
+                parser: { dataUrlCondition: { maxSize: 10000 } },
             },
             // Common Image Formats
             {
                 test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
-                use: 'url-loader',
+                type: 'asset/inline',
             }
         ]
     },
@@ -244,12 +230,6 @@ export default merge.smart(baseConfig, {
             manifest: require(manifest),
             sourceType: 'var',
         }),
-
-        new webpack.HotModuleReplacementPlugin({
-            multiStep: true
-        }),
-
-        new webpack.NoEmitOnErrorsPlugin(),
 
         /**
      * Create global constants which can be configured at compile time.
@@ -270,6 +250,23 @@ export default merge.smart(baseConfig, {
         new webpack.LoaderOptionsPlugin({
             debug: true
         }),
+
+        // editor.api.js (imported directly by MonacoEditor/index.jsx) gets bundled fresh here,
+        // not via the DLL (only bare package names get auto-swept into the DLL) — without this,
+        // the basic-languages tokenizer contributions (javascript, typescript, etc.) never get
+        // wired into the monaco instance the app actually uses, breaking syntax highlighting.
+        new MonacoWebpackPlugin({
+            languages: ['javascript', 'typescript', 'json', 'xml'],
+            features: [
+                'accessibilityHelp', 'bracketMatching', 'caretOperations', 'clipboard', 'codeAction', 'comment',
+                'contextmenu', 'coreCommands', 'cursorUndo', 'find', 'folding', 'fontZoom', 'format',
+                'gotoError', 'gotoLine', 'gotoSymbol', 'hover', 'inPlaceReplace', 'linesOperations', 'links',
+                'multicursor', 'parameterHints', 'quickCommand', 'quickOutline', 'referenceSearch', 'rename',
+                'smartSelect', 'snippets', 'suggest', 'toggleHighContrast', 'toggleTabFocusMode', 'transpose',
+                'wordHighlighter', 'wordOperations', 'wordPartOperations']
+        }),
+
+        new ReactRefreshWebpackPlugin(),
     ],
 
     node: {
@@ -284,7 +281,11 @@ export default merge.smart(baseConfig, {
                 hostname: 'localhost',
                 pathname: '/ws',
                 port: 1212
-            }
+            },
+            overlay: {
+                runtimeErrors: (error) =>
+                    error?.message !== 'ResizeObserver loop completed with undelivered notifications.',
+            },
         },
         compress: true,
         devMiddleware: {

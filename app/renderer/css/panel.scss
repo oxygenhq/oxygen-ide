@@ -1,4 +1,4 @@
-@import 'vars';
+@use 'vars' as *;
 
 .panel-full-height {
   height: calc(100% - 60px) !important;
@@ -60,6 +60,6 @@
   border-left: none;
 }
 
-.panel-body:not(> .scroller) {
+.panel-body:not(:has(> .scroller)) {
   padding-right: 8px;
 }

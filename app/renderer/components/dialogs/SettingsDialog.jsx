@@ -12,7 +12,6 @@ import GeneralSettings from './GeneralSettings';
 import CloudProvidersSettings from './CloudProvidersSettings';
 import IntegrationsSettings from './IntegrationsSettings';
 import RunSettings from './RunSettings';
-const { TabPane } = Tabs;
 
 const DEFAULT_STATE = {
     tabKey: 1,
@@ -38,7 +37,7 @@ export default class SettingsDialog extends React.PureComponent<Props> {
 
     state = {
         ...DEFAULT_STATE,
-    }
+    };
 
     static getDerivedStateFromProps(nextProps, prevState) {
         // if the dialog was just dismissed (e.g. visible is now false)
@@ -104,7 +103,7 @@ export default class SettingsDialog extends React.PureComponent<Props> {
         this.setState({
             tabKey: key
         });
-    }
+    };
 
     render() {
         const {
@@ -123,42 +122,62 @@ export default class SettingsDialog extends React.PureComponent<Props> {
                 className="scroll-y"
                 okText="Save &amp; Close"
                 width={700}
-                visible={visible}
+                open={visible}
                 onOk={this.handleOk.bind(this)}
                 onCancel={onCancel}
-                bodyStyle={ { overflow: 'hidden', overflowY: 'hidden', height: '425px' } }
+                styles={{ body: { overflow: 'hidden', overflowY: 'hidden', height: '425px' } }}
             >
-                <Tabs defaultActiveKey="1" onChange={this.onTabChange}>
-                    <TabPane tab="General" key="1">
-                        <GeneralSettings
-                            ref={node => (this.GeneralSettings = node)}
-                            settings={ generalSettings }
-                            projectSettings={ projectSettings }
-                            visible={ visible }
-                        />
-                    </TabPane>
-                    <TabPane tab="Cloud Providers" key="2">
-                        <CloudProvidersSettings
-                            ref={node => (this.CloudProvidersSettings = node)}
-                            providers={ cloudProviders }
-                            visible={ visible }
-                        />
-                    </TabPane>
-                    <TabPane tab="Integrations" key="3">
-                        <IntegrationsSettings
-                            ref={node => (this.IntegrationsSettings = node)}
-                            providers={ integrations }
-                            visible={ visible }
-                        />
-                    </TabPane>
-                    <TabPane tab="Run settings" key="4">
-                        <RunSettings
-                            ref={node => (this.RunSettings = node)}
-                            runSettings={ runSettings }
-                            visible={ visible }
-                        />
-                    </TabPane>
-                </Tabs>
+                <Tabs
+                    defaultActiveKey="1"
+                    onChange={this.onTabChange}
+                    items={[
+                        {
+                            key: '1',
+                            label: 'General',
+                            children: (
+                                <GeneralSettings
+                                    ref={node => (this.GeneralSettings = node)}
+                                    settings={ generalSettings }
+                                    projectSettings={ projectSettings }
+                                    visible={ visible }
+                                />
+                            ),
+                        },
+                        {
+                            key: '2',
+                            label: 'Cloud Providers',
+                            children: (
+                                <CloudProvidersSettings
+                                    ref={node => (this.CloudProvidersSettings = node)}
+                                    providers={ cloudProviders }
+                                    visible={ visible }
+                                />
+                            ),
+                        },
+                        {
+                            key: '3',
+                            label: 'Integrations',
+                            children: (
+                                <IntegrationsSettings
+                                    ref={node => (this.IntegrationsSettings = node)}
+                                    providers={ integrations }
+                                    visible={ visible }
+                                />
+                            ),
+                        },
+                        {
+                            key: '4',
+                            label: 'Run settings',
+                            children: (
+                                <RunSettings
+                                    ref={node => (this.RunSettings = node)}
+                                    runSettings={ runSettings }
+                                    visible={ visible }
+                                />
+                            ),
+                        },
+                    ]}
+                />
             </Modal>
         );
     }

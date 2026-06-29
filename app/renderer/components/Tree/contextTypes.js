@@ -11,7 +11,10 @@
  * When util.js imports the TreeNode for tree generate will cause treeContextTypes be empty.
  */
 
+import React from 'react';
 import PropTypes from 'prop-types';
+
+export const TreeContext = React.createContext({});
 
 /**
  * Thought we still use `cloneElement` to pass `key`,

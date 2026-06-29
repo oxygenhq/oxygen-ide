@@ -1,8 +1,12 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
     "sourceType": "module",
-    "allowImportExportEverywhere": true
+    "allowImportExportEverywhere": true,
+    "requireConfigFile": false,
+    "babelOptions": {
+      "configFile": "./.babelrc"
+    }
   },
   "extends": ["eslint:recommended", "plugin:react/recommended"],
   "env": {

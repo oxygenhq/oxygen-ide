@@ -18,10 +18,11 @@
  * @flow
  */
 import { app, BrowserWindow, crashReporter } from 'electron';
+import * as remoteMain from '@electron/remote/main';
 
 import Logger from './Logger';
 import MainProcess from './MainProcess';
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/main';
 import fs from 'fs';
 import path from 'path';
 import packageJson from '../../package.json';
@@ -89,17 +90,20 @@ app.on('window-all-closed', () => {
 });
 
 app.on('ready', async () => {
+    remoteMain.initialize();
     mainWindow = new BrowserWindow({
         show: false,
         width: 1024,
         height: 728,
         webPreferences: {
             webSecurity: false,
-            nodeIntegration: true
+            nodeIntegration: true,
+            contextIsolation: false,
         },
     });
 
     if (mainWindow) {
+        remoteMain.enable(mainWindow.webContents);
         mainWindow.loadURL(`file://${__dirname}/../renderer/app.html`);
     
         mainWindow.webContents.on('did-finish-load', () => {
@@ -161,29 +165,14 @@ function normalizeUrl(url) {
 function initializeCrashReporterAndSentry() {
     try {
         crashReporter.start({
-            companyName: 'no-company-nc',
-            productName: 'ide',
-            ignoreSystemCrashHandler: true,
             submitURL: 'https://o4504315553185792.ingest.sentry.io/api/4504315816116224/minidump/?sentry_key=24eaf38a68394ad69198ece9985cabff',
             uploadToServer: true
         });
 
-        const crashesDirectory = crashReporter.getCrashesDirectory();
-        const completedDirectory = path.join(crashesDirectory, 'completed');
-        const newDirectory = path.join(crashesDirectory, 'new');
-        const pendingDirectory = path.join(crashesDirectory, 'pending');
-        // make sure crashesDirectory and its sub folders exist, otherwise we will get an error while initializing Sentry
+        // getCrashesDirectory() was removed in Electron 13; use app.getPath('crashDumps') instead
+        const crashesDirectory = app.getPath('crashDumps');
         if (!fs.existsSync(crashesDirectory)) {
-            fs.mkdirSync(crashesDirectory);
-        }
-        if (!fs.existsSync(completedDirectory)) {
-            fs.mkdirSync(completedDirectory);
-        }
-        if (!fs.existsSync(newDirectory)) {
-            fs.mkdirSync(newDirectory);
-        }
-        if (!fs.existsSync(pendingDirectory)) {
-            fs.mkdirSync(pendingDirectory);
+            fs.mkdirSync(crashesDirectory, { recursive: true });
         }
   
         const sentryConfig = {

@@ -162,11 +162,6 @@ export const setSeleniumReady = (value) => ({
     payload: { value },
 });
 
-export const setSeleniumPort = (value) => ({
-    type: ActionTypes.TEST_SET_SELENIUM_PORT,
-    payload: { value },
-});
-
 export const setSeleniumBrowserTimeout = (value) => ({
     type: ActionTypes.TEST_SET_SELENIUM_BROWSER_TIMEOUT,
     payload: { value },

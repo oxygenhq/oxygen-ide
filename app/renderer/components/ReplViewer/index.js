@@ -48,7 +48,7 @@ export default class ReplViewer extends React.PureComponent<Props> {
         }, () => {
             replClose();
         });
-    }
+    };
     
     replSend = () => {
         const {
@@ -63,7 +63,7 @@ export default class ReplViewer extends React.PureComponent<Props> {
         }, () => {
             replSend(value);
         });
-    }
+    };
 
     render() {
         const {

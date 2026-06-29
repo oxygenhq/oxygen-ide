@@ -1,4 +1,4 @@
-@import 'vars';
+@use 'vars' as *;
 
 .ide-editors {
     max-width: 100% !important;
@@ -84,13 +84,13 @@
 .iterations-section {
   height: 43px;
 
-  & .ant-form-item-control-wrapper {
+  & .ant-form-item-control-input {
     display: flex;
     align-items: center;
     height: 43px;
   }
 
-  & .ant-form-item-children {
+  & .ant-form-item-control-input-content {
     display: flex;
     align-items: center;
   }

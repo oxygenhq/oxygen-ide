@@ -18,7 +18,7 @@ export default function updateModals() {
             <Modal
                 title="Update"
                 width={400}
-                visible={showNoUpdatesDialog}
+                open={showNoUpdatesDialog}
                 onCancel={() => { this.setState({ showNoUpdatesDialog: false }); }}
                 footer={
                     <Button
@@ -33,7 +33,7 @@ export default function updateModals() {
             <Modal
                 title="Update"
                 width={400}
-                visible={showUpdatesDialog}
+                open={showUpdatesDialog}
                 onCancel={() => { this.setState({ showUpdatesDialog: false }); }}
                 footer={[
                     <Button

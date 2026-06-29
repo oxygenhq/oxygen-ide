@@ -161,13 +161,8 @@ const configureStore = (initialState?: counterStateType) => {
     async function setUserIdToSentry(userId) {
         try {
 
-            if (userId && window && window.Sentry && window.Sentry.configureScope) {
-                window.Sentry.configureScope((scope) => {
-                    scope.setUser({'userId': userId});
-                });
-            } else {
-                console.log('maybe bad userId', userId);
-                console.log('or window.Sentry', window.Sentry);
+            if (userId && window && window.Sentry && window.Sentry.getCurrentScope) {
+                window.Sentry.getCurrentScope().setUser({'userId': userId});
             }
 
         } catch (e) {

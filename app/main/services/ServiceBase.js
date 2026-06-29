@@ -70,7 +70,14 @@ export default class ServiceBase {
         }
 
         for (var o of this.observers) {
-            o(event);
+            try {
+                o(event);
+            } catch (e) {
+                // an observer throwing here would otherwise silently stop this notify()
+                // call (and skip any notify() calls after it in the caller) with zero
+                // trace anywhere.
+                console.warn(`notify() observer threw for event type "${event && event.type}":`, e);
+            }
         }
     }
     // dispose method must be implemented by inheriting class

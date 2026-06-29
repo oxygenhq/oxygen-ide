@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2015-2018 CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
@@ -96,7 +96,7 @@ export default class ObjectElementCreateDialog extends React.PureComponent<Props
       }
 
       return result;
-  }
+  };
 
   render() {
 
@@ -120,7 +120,7 @@ export default class ObjectElementCreateDialog extends React.PureComponent<Props
               title={`Create New Element ${parentName}`}
               okText="Create"
               width={700}
-              visible={visible}
+              open={visible}
               onOk={this.handleOk.bind(this)}
               onCancel={onCancel}
           >

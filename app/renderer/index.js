@@ -10,11 +10,10 @@
 import loggerSetup from './helpers/logger';
 loggerSetup();
 
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/renderer';
 import React from 'react';
-import { render } from 'react-dom';
-import { AppContainer } from 'react-hot-loader';
-import 'antd/dist/antd.css';
+import { createRoot } from 'react-dom/client';
+import 'antd/dist/reset.css';
 import App from './containers/App';
 import importConfigureStore from './store/configureStore';
 import { configureServices } from './services';
@@ -41,21 +40,12 @@ window.dispatch = store.dispatch;
 
 configureServices(store);
 
-render(
-    <AppContainer>
-        <App store={store} history={history} />
-    </AppContainer>,
-    document.getElementById('root')
-);
+const root = createRoot(document.getElementById('root'));
+root.render(<App store={store} history={history} />);
 
 if (module.hot) {
     module.hot.accept('./containers/App.js', () => {
-        const NextRoot = require('./containers/App');
-        render(
-            <AppContainer>
-                <NextRoot store={store} history={history} />
-            </AppContainer>,
-            document.getElementById('root')
-        );
+        const NextRoot = require('./containers/App').default;
+        root.render(<NextRoot store={store} history={history} />);
     });
 }

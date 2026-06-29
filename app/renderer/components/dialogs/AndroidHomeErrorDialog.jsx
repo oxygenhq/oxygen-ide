@@ -1,4 +1,4 @@
-//@flow
+﻿//@flow
 import React from 'react';
 import electron from 'electron';
 import { Modal, Button, Checkbox } from 'antd';
@@ -23,7 +23,7 @@ export default class AndroidHomeErrorDialog extends React.PureComponent<Props> {
         if (this.props.clean) {
             this.props.clean();
         }
-    }
+    };
     
     onShowEgainChange = (e) => {
         const { changeShowShowAndroidHomeError } = this.props;
@@ -37,7 +37,7 @@ export default class AndroidHomeErrorDialog extends React.PureComponent<Props> {
                 changeShowShowAndroidHomeError(checked);
             }
         });
-    }
+    };
 
     processLink = (event) => {
         if (event) {
@@ -50,7 +50,7 @@ export default class AndroidHomeErrorDialog extends React.PureComponent<Props> {
                 console.log('bad event.target', event.target);
             }
         }
-    }
+    };
     
     render() {
         const { 
@@ -67,7 +67,7 @@ export default class AndroidHomeErrorDialog extends React.PureComponent<Props> {
             <Modal
                 title="Device Discovery Service"
                 width={480}
-                visible={true}
+                open={true}
                 onCancel={this.close}
                 maskClosable={false}
                 footer={(

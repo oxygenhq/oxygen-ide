@@ -2,8 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const {homedir} = require('os');
 const {execSync} = require('child_process');
-const escapeRegExp = require('escape-string-regexp');
 const newLineRegex = /\r?\n/;
+
+// inlined equivalent of escape-string-regexp (ESM-only, can't be required here)
+function escapeRegExp(string) {
+    return string
+        .replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+        .replace(/-/g, '\\x2d');
+}
 
 export function darwin() {
   const suffixes = ['/Contents/MacOS/Microsoft Edge'];

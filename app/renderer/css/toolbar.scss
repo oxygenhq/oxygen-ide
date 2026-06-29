@@ -1,4 +1,4 @@
-@import 'vars';
+@use 'vars' as *;
 
 .appTollbar {
   background-image: url("../img/tb-background.png");
@@ -20,17 +20,23 @@
   margin-right: 8px;
   margin-left: 8px;
 }
+
+.appTollbar .control.label {
+  // matches the toolbar's actual text scale (e.g. the Chrome select, 14px) —
+  // without this it fell back to the browser's ~16px default and looked oversized
+  font-size: 14px;
+}
 .appTollbar .control.disabled {
   -webkit-filter: grayscale(1);
   opacity: 0.5;
   pointer-events: none;
 }
-/* Patch Ant Select component, to narrow down a bit the component height to be in match with other toolbar controls */
-.appTollbar .control.select .ant-select-selection--single,
-.appTollbar .ant-select .ant-select-selection--single{
+/* Narrow the antd Select height to match other toolbar controls */
+.appTollbar .control.select .ant-select-selector,
+.appTollbar .ant-select .ant-select-selector {
   height: 30px !important;
 }
-.appTollbar .control.select .ant-select-selection__rendered {
+.appTollbar .control.select .ant-select-selection-item {
   line-height: 28px !important;
 }
 
@@ -38,6 +44,15 @@
 .appTollbar .control.selectable
 {
   font-size: 21px;
+}
+
+/* antd v5 injects line-height:0 + display:inline-flex on .anticon via CSS-in-JS.
+   Our .control rule overrides display to inline-block, which collapses the span to
+   0 height (line-height:0 + inline-block = no height), pushing icons to the top.
+   Restore inline-flex so the flex item height equals the SVG intrinsic size. */
+.appTollbar .anticon.control {
+  display: inline-flex;
+  align-items: center;
 }
 
 .appTollbar .control.button.forward {
@@ -71,15 +86,16 @@
   cursor: pointer;
   outline: none;
   /*min-width: 68px;*/
-  font-size: inherit;
-}
-
-.appTollbar button.control.button > i {
+  // matches the icon size of the other (icon-only) toolbar controls — "font-size:
+  // inherit" left this at the browser's ~16px default, which also leaked into the
+  // "Run"/"Stop" label text below since it has no size of its own, making the text
+  // look oversized next to the toolbar's actual ~14px scale (e.g. the Chrome select).
   font-size: 21px;
 }
 
-.appTollbar button.control.button > span {
+.appTollbar button.control.button > span:not(.anticon) {
   padding-left: 6px;
+  font-size: 14px;
 }
 
 .appTollbar button.control.button:hover,

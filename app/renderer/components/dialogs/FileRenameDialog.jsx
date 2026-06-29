@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2015-2018 CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
@@ -81,7 +81,7 @@ export default class FileRenameDialog extends React.PureComponent<Props> {
               title={`Rename ${capitalizeFirst(type)}`}
               okText="Rename"
               width={700}
-              visible={visible}
+              open={visible}
               onOk={this.handleOk.bind(this)}
               onCancel={onCancel}
           >

@@ -29,22 +29,18 @@ const defaultState = {
         testProvider: 'Local',
         stepDelay: 0,
         reopenSession: false,   // indicates if Selenium session must be re-opened for each iteration
-        seleniumPort: null,     // holds Selenium server port number
         seleniumBrowserTimeout: null,
         seleniumTimeout: null,
         iterations: 1,
         paramFilePath: null,
         paramMode: 'sequential',
-        seleniumPid: null
+        seleniumPid: null,
+        firefoxPath: null
     },
     browsers: [
         {
             name: 'Chrome',
             id: 'chrome',
-        },
-        {
-            name: 'Firefox',
-            id: 'firefox',
         },
     ],
     devices: [],
@@ -229,15 +225,6 @@ export default (state = defaultState, action) => {
             isSeleniumReady: value,
         };
 
-    // TEST_SET_SELENIUM_PORT
-    case ActionTypes.TEST_SET_SELENIUM_PORT:
-        return {
-            ...state,
-            runtimeSettings: {
-                ...state.runtimeSettings,
-                seleniumPort: value,
-            },
-        };
     // TEST_SET_SELENIUM_BROWSER_TIMEOUT
     case ActionTypes.TEST_SET_SELENIUM_BROWSER_TIMEOUT:
         return {
@@ -521,7 +508,35 @@ export default (state = defaultState, action) => {
         };
     }
 
-    case 'FROM_CACHE': 
+    case 'STORE_FIREFOX_BINARY_PATH': {
+        // if we already have Firefox in the list, do not re-add it, just update the binary path
+        if (state.browsers.some(x => x.id === 'firefox')) {
+            return {
+                ...state,
+                runtimeSettings: {
+                    ...state.runtimeSettings,
+                    firefoxPath: path
+                }
+            };
+        }
+        // otherwise, update the binary path + add Firefox to the list
+        return {
+            ...state,
+            runtimeSettings: {
+                ...state.runtimeSettings,
+                firefoxPath: path
+            },
+            browsers: [
+                ...state.browsers,
+                {
+                    name: 'Firefox',
+                    id: 'firefox',
+                }
+            ]
+        };
+    }
+
+    case 'FROM_CACHE':
         return {
             ...defaultState,
             ...cache.test

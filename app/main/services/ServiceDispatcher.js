@@ -14,7 +14,7 @@ export default class ServiceDispatcher {
     constructor(mainWindow, settings = null) {
         global.services = this.servicesHash = {};
         this.mainWindow = mainWindow;
-        this.settings = appSettings.get('appSettings');
+        this.settings = appSettings.getSync('appSettings');
     }
 
     start() {
@@ -62,12 +62,23 @@ export default class ServiceDispatcher {
             const retval = methodRef.apply(serviceRef, args);
             Promise.resolve(retval)
                 .then( result => {
-                    e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, retval: result });
+                    try {
+                        e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, retval: result });
+                    } catch (e) {
+                        // ignore — frame can be torn down mid-call (e.g. during a dev-mode reload)
+                        console.log('sender.send error:', e);
+                    }
                 })
                 .catch( err => {
+                    // dont send the raw Error object — IPC structured clone drops custom
+                    // properties like .code, keeping only name/message/stack
+                    const serializableError = {
+                        code: (err && err.code) || null,
+                        message: (err && err.message) || null,
+                    };
                     try {
-                        console.error('MAIN_SERVICE_CALL_REPLY', err);
-                        e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: err });
+                        console.error('MAIN_SERVICE_CALL_REPLY', serializableError);
+                        e.sender.send('MAIN_SERVICE_CALL_REPLY', { ...call, error: serializableError });
                     } catch (e) {
                         // to avoid Unhandled Promise Rejection. Error: Object has been destroyed
                         // for example if user close ide when test run
@@ -89,10 +100,20 @@ export default class ServiceDispatcher {
     _handleServiceEvent(serviceName, event) {
         const allWebContents = webContents.getAllWebContents();
         allWebContents.forEach((contents) => {
-            contents.send('MAIN_SERVICE_EVENT', {
-                service: serviceName,
-                event: event,
-            });
+            if (contents.isDestroyed() || contents.isCrashed()) {
+                return;
+            }
+            try {
+                contents.send('MAIN_SERVICE_EVENT', {
+                    service: serviceName,
+                    event: event,
+                });
+            } catch (e) {
+                // usually a torn-down frame (e.g. during a dev-mode reload), but can also be
+                // an IPC structured-clone failure on non-serializable event data — log so the
+                // latter isn't silently swallowed (that would make the event vanish with no trace)
+                console.warn(`Failed to send MAIN_SERVICE_EVENT for service "${serviceName}", event type "${event && event.type}":`, e);
+            }
         });
     }
 }

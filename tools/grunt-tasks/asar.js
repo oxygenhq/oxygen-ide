@@ -16,12 +16,13 @@ module.exports = function(grunt) {
         const cfg = grunt.config.get('asar');
         removeEmptyDirs(cfg.src);
 
-        const child = cp.spawnSync(path.resolve(__dirname, '..', '..', 'node_modules', '.bin', os.platform() === 'win32' ? 'asar.cmd' : 'asar'), 
+        const child = cp.spawnSync(path.resolve(__dirname, '..', '..', 'node_modules', '.bin', os.platform() === 'win32' ? 'asar.cmd' : 'asar'),
             [ 'pack',
                 cfg.src,
                 cfg.dest,
                 '--unpack', cfg.unpack,
-                '--unpack-dir', cfg['unpack-dir']]);
+                '--unpack-dir', cfg['unpack-dir']],
+            { shell: os.platform() === 'win32' });
         if (child.error) {
             grunt.fail.fatal(child.error);
         }

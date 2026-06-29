@@ -1,5 +1,5 @@
 import CloudProviderBase from '../CloudProviderBase';
-const fetch = require('node-fetch');
+const fetch = require('node-fetch').default;
 const browserstack = require('browserstack-local');
 
 

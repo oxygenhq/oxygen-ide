@@ -9,7 +9,7 @@
 import https from 'https';
 import ServiceBase from './ServiceBase';
 import pkgInfo from '../../../package.json';
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/main';
 
 const UPDATE_CHECK = 'UPDATE_CHECK';
 

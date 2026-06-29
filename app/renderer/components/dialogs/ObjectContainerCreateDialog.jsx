@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2015-2018 CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
@@ -106,7 +106,7 @@ export default class ObjectContainerCreateDialog extends React.PureComponent<Pro
               title={'Create New Container'}
               okText="Create"
               width={700}
-              visible={visible}
+              open={visible}
               onOk={this.handleOk.bind(this)}
               onCancel={onCancel}
           >

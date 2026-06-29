@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2015-2018 CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
@@ -114,7 +114,7 @@ export default class ObjectElementOrContainerRenameDialog extends React.PureComp
         }
 
         return result;
-    }
+    };
 
     render() {
 
@@ -147,7 +147,7 @@ export default class ObjectElementOrContainerRenameDialog extends React.PureComp
                 title={`Reneme ${typeString} '${parentName}' `}
                 okText="Reneme"
                 width={700}
-                visible={visible}
+                open={visible}
                 onOk={this.handleOk.bind(this)}
                 onCancel={onCancel}
             >

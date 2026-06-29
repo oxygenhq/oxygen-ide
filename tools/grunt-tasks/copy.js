@@ -12,7 +12,7 @@
 module.exports = function(grunt) {
   var path = require('path');
   var fs = require('fs');
-  var chalk = require('chalk');
+  var chalk = require('chalk').default;
   var isWindows = process.platform === 'win32';
 
   grunt.registerMultiTask('copy', 'Copy files.', function() {

@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
-import { Input, Button, Icon } from 'antd';
+import { MinusOutlined, PlusOutlined, UpOutlined, DownOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Input, Button } from 'antd';
 import '../../css/locators-changer.scss';
 
 export default class LocatorsChanger extends React.PureComponent<Props> {
@@ -19,7 +20,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
       this.setState({ 
           text: nexText
       });
-  }
+  };
 
   onChangeUpdate = (e) => {
       const nexText = e.target.value.trim();
@@ -27,7 +28,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
       if (this.props.onChangeUpdate) {
           this.props.onChangeUpdate(nexText);
       }
-  }
+  };
 
   add = () => {
       const { text } = this.state;
@@ -42,7 +43,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
               addLocator: !this.state.addLocator
           });
       }
-  }
+  };
 
   update = () => {
       const { editStr, finishEdit } = this.props;
@@ -55,7 +56,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
       } else {
       // looks line need delete element or do nothing
       }
-  }
+  };
 
   cancelUpdate = () => {
       const { cancelEdit } = this.props;
@@ -63,13 +64,13 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
       if (cancelEdit) {
           cancelEdit();
       }
-  }
+  };
 
   toggleAdd = () => {
       this.setState({
           addLocator: !this.state.addLocator
       });
-  }
+  };
 
   remove = () => {
       const { 
@@ -80,7 +81,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
       if (remove) {
           remove(selectedLocatorName);
       }
-  }
+  };
 
   edit = () => {
       const { 
@@ -91,7 +92,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
       if (startEdit) {
           startEdit(selectedLocatorName);
       }
-  }
+  };
 
   up = () => {
       const { 
@@ -102,7 +103,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
       if (moveLocator) {
           moveLocator(selectedLocatorName, 'up');
       }
-  }
+  };
 
   down = () => {
       const { 
@@ -113,7 +114,7 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
       if (moveLocator) {
           moveLocator(selectedLocatorName, 'down');
       }
-  }
+  };
 
   render() {
       const { 
@@ -182,24 +183,24 @@ export default class LocatorsChanger extends React.PureComponent<Props> {
                   !locator &&
           <div className="locators-changer-container">
               <div onClick={ () => {!(!addLocator && freezAllBtns) && this.toggleAdd();}} className={`control ${ (!addLocator && freezAllBtns) ? 'disabled' : '' }`}>
-                  <Icon type={ addLocator ? 'minus' : 'plus' } />
+                  { addLocator ? <MinusOutlined /> : <PlusOutlined /> }
               </div>
   
               <div className="control-group">
                   <div onClick={() => {!upDisabled && this.up();}} className={`control ${ upDisabled ? 'disabled' : '' }`}>
-                      <Icon type="up" />
+                      <UpOutlined />
                   </div>
                   <div onClick={() => {!downDisabled && this.down();}} className={`control ${ downDisabled ? 'disabled' : '' }`}>
-                      <Icon type="down" />
+                      <DownOutlined />
                   </div>
               </div>
   
               <div className="control-group">
                   <div onClick={() => { locatorNameCondition && this.edit(); }} className={`control ${ !locatorNameCondition ? 'disabled' : '' }`}>
-                      <Icon type="edit" />
+                      <EditOutlined />
                   </div>
                   <div onClick={() => { locatorNameCondition && this.remove(); }} className={`control ${ !locatorNameCondition ? 'disabled' : '' }`}>
-                      <Icon type="delete" />
+                      <DeleteOutlined />
                   </div>
               </div>
           </div>

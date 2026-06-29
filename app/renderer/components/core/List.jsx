@@ -9,7 +9,8 @@
 // @flow
 
 import React, { Fragment } from 'react';
-import { Button, Icon } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 import styled from '@emotion/styled';
 
 import FlexColumn from './FlexColumn';
@@ -47,7 +48,7 @@ export default class List extends React.PureComponent<ListProps> {
         if (this.props.object && this.props.deleteLocator) {
             this.props.deleteLocator(this.props.object);
         }
-    }
+    };
 
     startEditSingleLocator = (locator) => {
         const { object, startEdit } = this.props;
@@ -65,7 +66,7 @@ export default class List extends React.PureComponent<ListProps> {
         } else {
             console.warn('this.props', this.props);
         }
-    }
+    };
     
     startAdd = () => {
         const { object, startEdit } = this.props;
@@ -82,7 +83,7 @@ export default class List extends React.PureComponent<ListProps> {
         } else {
             console.warn('this.props', this.props);
         }
-    }
+    };
 
     renderInner() {
         const { 
@@ -126,13 +127,13 @@ export default class List extends React.PureComponent<ListProps> {
                                     onClick={ () => this.startEditSingleLocator(data[0]) }
                                     className="control" 
                                 >
-                                    <Icon type="edit" />
+                                    <EditOutlined />
                                 </div>
                                 <div 
                                     onClick={ () => this.deleteSingleLocator(data[0]) }
                                     className="control" 
                                 >
-                                    <Icon type="delete" />
+                                    <DeleteOutlined />
                                 </div>
                             </div>
                         } />) }
@@ -240,7 +241,7 @@ class ListItem extends React.PureComponent<ListItemProps> {
                         className="item-value-editing"
                         ref={node => (this.input = node)}
                         value={ value }
-                        onPressEnter={ ::this.handleUpdate }
+                        onKeyDown={ (e) => { if (e.key === 'Enter') { this.handleUpdate(); } } }
                     />
                     :
                     <div

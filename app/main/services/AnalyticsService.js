@@ -12,8 +12,8 @@ import ServiceBase from './ServiceBase';
 import moment from 'moment';
 import { version }  from '../../../package.json';
 import os from 'os';
-import uuidv4 from 'uuid/v4';
-import * as Sentry from '@sentry/electron';
+import { randomUUID } from 'crypto';
+import * as Sentry from '@sentry/electron/main';
 
 export default class AnalyticsService extends ServiceBase {
     constructor() {
@@ -40,7 +40,7 @@ export default class AnalyticsService extends ServiceBase {
             return this.uuid;
         } else {
             try {
-                this.uuid = uuidv4();
+                this.uuid = randomUUID();
             } catch (e) {
                 console.log('uuidv4 e', e);
             }
@@ -52,7 +52,7 @@ export default class AnalyticsService extends ServiceBase {
         if (uuid) {
             this.uuid = uuid;
         } else {
-            this.uuid = uuidv4();
+            this.uuid = randomUUID();
         }
         this.ideOpen();
     }
@@ -62,7 +62,7 @@ export default class AnalyticsService extends ServiceBase {
             this.uuid = uuid;
         } else {
             try {
-                this.uuid = uuidv4();
+                this.uuid = randomUUID();
             } catch (e) {
                 console.log('createUser e', e);
             }
@@ -179,10 +179,8 @@ export default class AnalyticsService extends ServiceBase {
                 }); 
             }
 
-            if (Sentry && Sentry.configureScope) {
-                Sentry.configureScope((scope) => {
-                    scope.setUser({'userId': this.uuid});
-                });
+            if (Sentry && Sentry.getCurrentScope) {
+                Sentry.getCurrentScope().setUser({'userId': this.uuid});
             }
 
         } catch (e) {

@@ -43,6 +43,7 @@ export default function onDidChangeModelContent (e) {
     if (!this.__prevent_trigger_change_event) {
         this.onValueChange(editorContent, e);
         helpers.markParams(this.editor, editorContent);
+        helpers.markTransactions(this.editor, editorContent);
     }
 
     if (newLineAddedOrDeleted) {

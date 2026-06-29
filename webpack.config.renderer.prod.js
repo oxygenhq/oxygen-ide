@@ -6,19 +6,25 @@ import path from 'path';
 import webpack from 'webpack';
 import TerserPlugin from 'terser-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import merge from 'webpack-merge';
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from './internals/scripts/CheckNodeEnv';
 import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
-import SentryWebpackPlugin from '@sentry/webpack-plugin';
+import { sentryWebpackPlugin } from '@sentry/webpack-plugin';
+import getSentryConfig from './internals/scripts/getSentryConfig';
 import { version }  from './package.json';
 
 CheckNodeEnv('production');
 
-export default merge.smart(baseConfig, {
+export default merge(baseConfig, {
     devtool: 'source-map',
+
+    // sentry v7 uses ESM internally — exclude from bundle, load via require() at runtime
+    externals: [
+        /^@sentry\//,
+    ],
 
     target: 'electron-renderer',
 
@@ -27,7 +33,8 @@ export default merge.smart(baseConfig, {
     output: {
         path: path.join(__dirname, 'app/dist'),
         publicPath: process.env.RELEASE_BUILD ? '../dist/' /*npm run package*/ : '../../app/dist/' /*npm run start*/,
-        filename: 'renderer.prod.js'
+        filename: 'renderer.prod.js',
+        hashFunction: 'sha256'
     },
 
     module: {
@@ -76,20 +83,17 @@ export default merge.smart(baseConfig, {
             // Fonts
             {
                 test: /\.(woff|woff2|eot|ttf|otf|svg)(\?v=\d+\.\d+\.\d+)?$/,
-                use: {
-                    loader: 'file-loader'
-                }
+                type: 'asset/resource',
             },
             // Common Image Formats
             {
                 test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
-                use: 'url-loader',
+                type: 'asset/inline',
             },
             // WASM
             {
                 test: /\.wasm$/,
-                loader: 'file-loader',
-                type: 'javascript/auto',
+                type: 'asset/resource',
             }
         ]
     },
@@ -98,12 +102,11 @@ export default merge.smart(baseConfig, {
         minimizer: [
             new TerserPlugin({
                 parallel: true,
-                sourceMap: true,
                 terserOptions: {
                     ecma: 2016
                 }
             }),
-            new OptimizeCSSAssetsPlugin({})
+            new CssMinimizerPlugin()
         ]
     },
     plugins: [
@@ -133,7 +136,7 @@ export default merge.smart(baseConfig, {
         }),
 
         // ignore locale files of moment.js
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/ }),
 
         new MonacoWebpackPlugin({
             languages: ['javascript', 'typescript', 'json', 'xml'],
@@ -146,16 +149,17 @@ export default merge.smart(baseConfig, {
             'wordHighlighter', 'wordOperations', 'wordPartOperations']
         }),
         
-        new SentryWebpackPlugin({
-            release: version,
-            include: [
-                'app/dist/renderer.prod.js.map',
-                'app/dist/renderer.prod.js'
-            ],
-            ignoreFile: '.sentrycliignore',
-            ignore: ['node_modules', 'webpack.config.js'],
+        sentryWebpackPlugin({
+            ...getSentryConfig(),
+            release: { name: version },
+            sourcemaps: {
+                assets: [
+                    'app/dist/renderer.prod.js.map',
+                    'app/dist/renderer.prod.js'
+                ],
+                ignore: ['node_modules', 'webpack.config.js'],
+            },
             validate: true,
-            sourceMapReference: false
         }),
     ],
 });

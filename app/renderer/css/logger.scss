@@ -1,7 +1,7 @@
 /*
  * General log
  */
-@import 'vars';
+@use 'vars' as *;
 
 /*
 * Selenium log
@@ -54,6 +54,7 @@
     font-size: $nodesFontSize;
     font-family: "Fira Code";
     font-size: 12px;
+    outline: none;
   }
 
   .infinite-scroll-component  {
@@ -90,12 +91,11 @@
 
   .ant-tabs {
     margin-left: 0px;
-  
-    .ant-tabs-bar {
-      margin: inherit;
-      margin-bottom: -1px;
+
+    .ant-tabs-nav {
+      margin: 0 0 -1px 0;
     }
-    .ant-tabs-nav-container {
+    .ant-tabs-nav-wrap {
       font-family: Helvetica;
       font-size: 12px !important;
       font-weight: normal;
@@ -104,17 +104,19 @@
       letter-spacing: normal;
       color: #666666;
     }
-    .ant-tabs-nav .ant-tabs-tab {
+    .ant-tabs-tab {
       padding: 6px 16px !important;
-      margin: inherit !important;
+      margin: 0 !important;
       border-right: 1px solid $panelBorderColor;
     }
-    .ant-tabs-nav .ant-tabs-tab:first-child {
+    .ant-tabs-tab:first-child {
       border-left: 1px solid $panelBorderColor;
     }
-    .ant-tabs-tab-active {
-      color: $active !important;
+    .ant-tabs-tab.ant-tabs-tab-active {
       background-color: white;
+    }
+    .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+      color: $active !important;
     }
     .ant-tabs-ink-bar {
       background-color: #4A90E2 !important;

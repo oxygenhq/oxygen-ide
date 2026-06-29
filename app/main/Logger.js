@@ -10,12 +10,11 @@ import { app, dialog } from 'electron';
 let winston = require('winston');
 let DailyRotateFile = require('winston-daily-rotate-file');
 winston.transports.DailyRotateFile = DailyRotateFile;
-import { default as cleanStack } from 'clean-stack';
 import moment from 'moment';
 import util from 'util';
 import path from 'path';
 import fs from 'fs';
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/main';
 
 /*
 Following is a description of how log.* and console.* commands work and what effect do they have on 
@@ -42,6 +41,61 @@ Render process:
 - Unhandled promise rejections will produce an error dialog only in DEV mode.
 - console.* methods including console.error and console.warn *DO NOT* write to logs yet (this will probably change)
 */
+
+// inlined equivalent of clean-stack@6 (ESM-only, can't be required/bundled here) for the { pretty: true } case used below
+const CLEAN_STACK_PATH_REGEX = /\s+at.*[(\s](.*)\)?/;
+const CLEAN_STACK_NODE_PATH_REGEX = /^(?:(?:(?:node|node:[\w/]+|(?:(?:node:)?internal\/[\w/]*|.*node_modules\/(?:babel-polyfill|pirates)\/.*)?\w+)(?:\.js)?:\d+:\d+)|native)/;
+const CLEAN_STACK_SIMPLE_PATH_REGEX = /^\w+\.js:\d+:\d+$/;
+
+function cleanStack(stack, { pretty = false } = {}) {
+    if (typeof stack !== 'string') {
+        return undefined;
+    }
+
+    const homeDirectory = pretty ? require('os').homedir().replace(/\\/g, '/') : '';
+
+    return stack.replace(/\\/g, '/')
+        .split('\n')
+        .filter(line => {
+            const pathMatches = line.match(CLEAN_STACK_PATH_REGEX);
+            if (!pathMatches || !pathMatches[1]) {
+                return true;
+            }
+            const match = pathMatches[1];
+            if (
+                match.includes('.app/Contents/Resources/electron.asar')
+                || match.includes('.app/Contents/Resources/default_app.asar')
+                || match.includes('node_modules/electron/dist/resources/electron.asar')
+                || match.includes('node_modules/electron/dist/resources/default_app.asar')
+            ) {
+                return false;
+            }
+            if (CLEAN_STACK_SIMPLE_PATH_REGEX.test(match)) {
+                return true;
+            }
+            if (CLEAN_STACK_NODE_PATH_REGEX.test(match)) {
+                return false;
+            }
+            return true;
+        })
+        .filter(line => line.trim() !== '')
+        .map(line => {
+            if (!pretty) {
+                return line;
+            }
+            return line.replace(CLEAN_STACK_PATH_REGEX, (m, p1) => {
+                let filePath = p1;
+                if (filePath.startsWith('file://')) {
+                    filePath = require('url').fileURLToPath(filePath);
+                }
+                if (homeDirectory) {
+                    filePath = filePath.replace(homeDirectory, '~');
+                }
+                return m.replace(p1, filePath);
+            });
+        })
+        .join('\n');
+}
 
 const format = winston.format((info, ops) => {
     const result = moment().format('YYYY-MM-DD HH:mm:ss') + ' '

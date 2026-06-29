@@ -19,7 +19,6 @@ import UpdateService from './UpdateService';
 import CloudProvidersService from './CloudProvidersService';
 import IntegrationProvidersService from './IntegrationsService';
 import ProjectService from './ProjectService';
-import JavaService from './JavaService';
 import CryptoService from './CryptoService';
 
 
@@ -37,6 +36,5 @@ export default {
     CloudProvidersService,
     IntegrationProvidersService,
     ProjectService,
-    JavaService,
     CryptoService
 };

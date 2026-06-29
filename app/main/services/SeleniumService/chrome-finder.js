@@ -5,8 +5,14 @@ import fs from 'fs';
 import path from 'path';
 import { homedir } from 'os';
 import { execSync, execFileSync } from 'child_process';
-import escapeRegExp from 'escape-string-regexp';
 const newLineRegex = /\r?\n/;
+
+// inlined equivalent of escape-string-regexp (ESM-only, can't be required here)
+function escapeRegExp(string) {
+    return string
+        .replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+        .replace(/-/g, '\\x2d');
+}
 
 export function darwin() {
     const suffixes = ['/Contents/MacOS/Google Chrome Canary', '/Contents/MacOS/Google Chrome'];

@@ -86,7 +86,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
         if (this.props.addLocator) {
             this.props.addLocator(path, name);
         }
-    }
+    };
 
     addArrayObjectLocator = (name) => {
         const { object } = this.props;
@@ -95,7 +95,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
         if (this.props.addArrayObjectLocator) {
             this.props.addArrayObjectLocator(path, name);
         }
-    }
+    };
 
     select = (selectedName, index) => {
         const { selectedLocatorName } = this.state;
@@ -114,7 +114,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
             selectedLocatorName: newSelectedLocatorName,
             selectedLocatorIndex: newSelectedLocatorIndex
         });
-    }
+    };
 
     selectArrayObject = (name, index) => {
         const { selectedArrayObjectLocatorIndex } = this.state;
@@ -134,7 +134,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
             selectedArrayObjectLocatorName: newSelectedArrayObjectLocatorName,
             selectedArrayObjectLocatorIndex: newSelectedArrayObjectLocatorIndex
         });
-    }
+    };
 
 
     remove = (name) => {
@@ -149,7 +149,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
                 selectedLocatorIndex: null
             });      
         }
-    }
+    };
 
     removeArrayObjectLocator = (id) => {
 
@@ -164,7 +164,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
                 selectedArrayObjectLocatorIndex: null
             });      
         }
-    }
+    };
 
     startEdit = (name, path = null) => {
         this.setState({
@@ -173,7 +173,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
             originPath: path,
             editing: true
         });
-    }
+    };
 
     startEditArrayObject = (index) => {
         try {
@@ -190,7 +190,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
         } catch (error) {
             console.warn('startEditArrayObject error', error);
         }
-    }
+    };
 
     finishEdit = (name) => {
         const { originStr } = this.state;
@@ -209,7 +209,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
                 this.props.updateLocator(path, name, originStr);
             }
         });
-    }
+    };
 
     moveLocator = (name, direction) => {
         const { selectedLocatorIndex } = this.state;
@@ -225,7 +225,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
                 this.props.moveLocator(path, name, direction, selectedLocatorIndex);
             }
         });    
-    }
+    };
 
   moveArrayObjectLocator = (index, direction) => {
       const { object } = this.props;
@@ -240,7 +240,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
               this.props.moveArrayObjectLocator(path, index, direction);
           }
       });    
-  }
+  };
 
   finishEditLocator = (name) => {
       const { originPath } = this.state;
@@ -256,7 +256,7 @@ export default class ObjectEditor extends React.PureComponent<Props> {
               this.props.updateLocatorValue(originPath, name);
           }
       });
-  }
+  };
 
   finishArrayObjecEditLocator = (name) => {
       const { object } = this.props;
@@ -276,14 +276,14 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           selectedArrayObjectLocatorIndex: null,
       });
 
-  }
+  };
 
   cancelEdit = () => {
       this.setState({
           editStr: null,
           editing: false
       });
-  }
+  };
 
   cancelArrayObjectEdit = () => {
       this.setState({
@@ -292,19 +292,19 @@ export default class ObjectEditor extends React.PureComponent<Props> {
           arrayObjectOriginIndex: null,
           arrayObjectEditing: false
       });
-  }
+  };
 
   onChangeUpdate = (name) => {
       this.setState({
           editStr: name
       });
-  }
+  };
 
   onChangeArrayObjectUpdate= (name) => {
       this.setState({
           arrayObjectEditStr: name
       });
-  }
+  };
 
   renderLocatorChanger() {
       const { object } = this.props;

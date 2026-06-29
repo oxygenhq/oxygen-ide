@@ -24,7 +24,7 @@ export default class ObjectTree extends React.PureComponent<Props> {
 
   state = {
       selectedKeys: [],
-  }
+  };
 
   UNSAFE_componentWillReceiveProps(nextProps) {
       if (this.props.active !== nextProps.active) {
@@ -44,7 +44,7 @@ export default class ObjectTree extends React.PureComponent<Props> {
   handleSelectNode = (selectedKeys, info) => {
       const { nodeInfo } = info.node.props;
       this.props.onSelect(nodeInfo.path);
-  }
+  };
 
   render() {
       const { tree, searchResults } = this.props;

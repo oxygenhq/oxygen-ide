@@ -6,52 +6,56 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import React from 'react';
-import { DragSource, DropTarget } from 'react-dnd';
-import { cardSource, cardTarget } from '../../components/dndHelper';
+import React, { useRef } from 'react';
+import PropTypes from 'prop-types';
+import { useDrag, useDrop } from 'react-dnd';
 
-type Props = {
-    connectDragSource: Function,
-    connectDropTarget: Function,
-    isDragging: boolean,
-    children: Array<React.Node> | React.Node
-};
+function DraggableTab({ id, index, moveCard, children }) {
+    const ref = useRef(null);
 
-class DraggableTab extends React.Component<Props> {
-    render() {
-        const {
-            connectDragSource, connectDropTarget, isDragging,
-        } = this.props;
-        const style = {
-            //      borderBottom: '1px solid #d9d9d9',
-            opacity: isDragging ? 0.1 : 1,
-            cursor: 'move',
-        };
+    const [{ isDragging }, drag] = useDrag({
+        type: 'menuitem',
+        item: () => ({ id, index }),
+        collect: (monitor) => ({
+            isDragging: monitor.isDragging(),
+        }),
+    });
 
-        return connectDragSource(connectDropTarget(
-            <div style={style}>
-                {this.props.children}
-            </div>,
-        ));
-    }
+    const [, drop] = useDrop({
+        accept: 'menuitem',
+        hover(item, monitor) {
+            if (!ref.current) return;
+            const dragIndex = item.index;
+            const hoverIndex = index;
+            if (dragIndex === hoverIndex) return;
+
+            const hoverBoundingRect = ref.current.getBoundingClientRect();
+            const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+            const clientOffset = monitor.getClientOffset();
+            const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+
+            if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
+            if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
+
+            moveCard(dragIndex, hoverIndex);
+            item.index = hoverIndex;
+        },
+    });
+
+    drag(drop(ref));
+
+    return (
+        <div ref={ref} style={{ opacity: isDragging ? 0.1 : 1, cursor: 'move' }}>
+            {children}
+        </div>
+    );
 }
 
-// export default DraggableTab;
+DraggableTab.propTypes = {
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    index: PropTypes.number.isRequired,
+    moveCard: PropTypes.func.isRequired,
+    children: PropTypes.node,
+};
 
-export default DropTarget(
-    'menuitem',
-    cardTarget,
-    connect => ({
-        connectDropTarget: connect.dropTarget(),
-    }))(
-    DragSource(
-        'menuitem',
-        cardSource,
-        (connect, monitor) => ({
-            connectDragSource: connect.dragSource(),
-            isDragging: monitor.isDragging()
-        }))(
-        DraggableTab
-    )
-);
-
+export default DraggableTab;

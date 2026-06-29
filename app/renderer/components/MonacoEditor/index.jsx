@@ -6,19 +6,40 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import 'monaco-editor/esm/vs/language/typescript/monaco.contribution';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.main';
+import { ICodeEditorService } from 'monaco-editor/esm/vs/editor/browser/services/codeEditorService';
+import { PasteAction } from 'monaco-editor/esm/vs/editor/contrib/clipboard/browser/clipboard';
+import { TokenizationRegistry } from 'monaco-editor/esm/vs/editor/common/languages';
 import React from 'react';
+import { clipboard } from 'electron';
 import path from 'path';
 import { loadWASM } from 'onigasm';
 import { Registry } from 'monaco-textmate';
 import { wireTmGrammars } from 'monaco-editor-textmate';
 import deepDiff from 'deep-diff';
 import oxygenIntellisense from './intellisense';
-import { language as jsTokenizer } from './tokenizers/javascript'; 
 import * as helpers from './helpers';
 import onDidChangeModelContent from './onDidChangeModelContent';
 import onDidChangeCursorSelection from './onDidChangeCursorSelection';
+
+// monaco-editor's paste command checks base/common/platform#isWeb, which is
+// explicitly false for Electron renderers — so its clipboard-service fallback that
+// reads clipboard text is skipped entirely and paste (both Ctrl+V and the context
+// menu, which invoke the same command) becomes a no-op. Register our own
+// implementation with higher priority that reads via Electron's clipboard module.
+if (PasteAction) {
+    PasteAction.addImplementation(20000, 'oxygen-electron-paste', (accessor) => {
+        const focusedEditor = accessor.get(ICodeEditorService).getFocusedCodeEditor();
+        if (focusedEditor && focusedEditor.hasModel() && focusedEditor.hasTextFocus()) {
+            const text = clipboard.readText();
+            if (text) {
+                focusedEditor.trigger('keyboard', 'paste', { text });
+            }
+            return true;
+        }
+        return false;
+    });
+}
 
 const RATIO = 1.58;
 const DEFAULT_FONT_SIZE = 12;
@@ -46,7 +67,9 @@ const MONACO_DEFAULT_OPTIONS = {
     },
     hover: {
         delay: 900
-    }
+    },
+    // disable highlighting all other occurrences of the word under the caret
+    occurrencesHighlight: 'off'
 };
 
 type Props = {
@@ -158,6 +181,7 @@ export default class MonacoEditor extends React.Component<Props> {
             }
 
             helpers.markParams(this.editor, this.__current_value);
+            helpers.markTransactions(this.editor, this.__current_value);
         }
         if (prevProps.language !== this.props.language) {
             monaco.editor.setModelLanguage(this.editor.getModel(), this.props.language);
@@ -312,6 +336,20 @@ export default class MonacoEditor extends React.Component<Props> {
             });
         }
         helpers.markParams(editor, this.__current_value);
+        helpers.markTransactions(editor, this.__current_value);
+        // monaco.editor.tokenize() (used by markTransactions to tell code from comments/strings)
+        // reads TokenizationRegistry.get(languageId) synchronously and falls back to a no-op
+        // "null" tokenizer if nothing is registered yet — it does kick off
+        // TokenizationRegistry.getOrCreate(languageId) to resolve the real, async-registered
+        // factory-based tokenizer, but doesn't await it, so the very first tokenize() call after
+        // mount can silently use the fallback (mis-highlighting comment text) until something
+        // else (e.g. an edit) calls tokenize() again after the factory has resolved. Explicitly
+        // awaiting the real registry here and re-running the markers once it resolves removes
+        // that race instead of relying on the user's first edit to paper over it.
+        TokenizationRegistry.getOrCreate('javascript').then(() => {
+            helpers.markParams(editor, this.__current_value);
+            helpers.markTransactions(editor, this.__current_value);
+        });
 
         this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KEY_L, () => {
             this.props.handleMainMenuEvent('MENU_CMD_VIEW_EVENT_LOG');
@@ -411,21 +449,11 @@ export default class MonacoEditor extends React.Component<Props> {
                 });
             }
 
-            // workaround for not being able to override or extend existing tokenziers
-            // https://github.com/Microsoft/monaco-editor/issues/252
-            monaco.languages.onLanguage('javascript', () => {
-                // waits til after monaco tries to register things itself
-                setTimeout(() => {
-                    monaco.languages.setMonarchTokensProvider('javascript', jsTokenizer);
-                }, 1000);
-            });
-
             monaco.editor.defineTheme('oxygen-theme', {
                 base: 'vs', // can also be vs-dark or hc-black
                 inherit: true,
-                rules: [
-                    { token: 'ox.transaction', foreground: '314496', fontStyle: 'bold' }
-                ]
+                rules: [],
+                colors: {}
             });
 
             this.editor = monaco.editor.create(this.editorContainer, {
@@ -459,7 +487,7 @@ export default class MonacoEditor extends React.Component<Props> {
         } = this.props;
 
         this.props.onBreakpointsUpdate(filePath, bps, fileName);
-    }
+    };
 
     onValueChange = (content) => {
         const {
@@ -468,7 +496,7 @@ export default class MonacoEditor extends React.Component<Props> {
         } = this.props;
 
         this.props.onValueChange(filePath, content, fileName);
-    }
+    };
 
     onSelectionChange = (bps) => {
         const {
@@ -476,7 +504,7 @@ export default class MonacoEditor extends React.Component<Props> {
         } = this.props;
 
         this.props.onSelectionChange(filePath, bps);
-    }
+    };
 
     /**
      * Watching click events
@@ -533,7 +561,7 @@ export default class MonacoEditor extends React.Component<Props> {
                 }
             }
         });
-    }
+    };
 
     assignRef = (component) => {
         this.editorContainer = component;

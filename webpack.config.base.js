@@ -54,13 +54,22 @@ export default {
                     ]
                 }
             }
+        }, {
+            // webpack 5 requires explicit extensions for extensionless relative imports inside
+            // ESM-flavored packages (e.g. react-dnd, react-dnd-html5-backend). Disable that
+            // strictness rather than patching every offending package.
+            test: /\.m?js$/,
+            resolve: {
+                fullySpecified: false,
+            },
         }]
     },
 
     output: {
         path: path.join(__dirname, 'app'),
         // https://github.com/webpack/webpack/issues/1114
-        libraryTarget: 'commonjs2'
+        libraryTarget: 'commonjs2',
+        hashFunction: 'sha256'
     },
 
     /**
@@ -78,8 +87,6 @@ export default {
         new webpack.EnvironmentPlugin({
             NODE_ENV: 'production'
         }),
-
-        new webpack.NamedModulesPlugin(),
     ],
 
     /**

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Menu, Dropdown, Icon, Modal, Input } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+import { Button, Menu, Dropdown, Modal, Input } from 'antd';
 
 type Props = {
     orAddToRoot: Function
@@ -69,7 +70,7 @@ export default class AddToRootRow extends React.PureComponent<Props> {
             visible: true,
             key: key
         });
-    }
+    };
 
     onChangeName = (e) => {
         const nexName = e.target.value.trim();
@@ -77,14 +78,14 @@ export default class AddToRootRow extends React.PureComponent<Props> {
         this.setState({
             name: nexName
         });
-    }
+    };
 
     handleKeyPress = (e) => {
         const { name, key } = this.state;
         if (e.key === 'Enter' && key && !(!name || name.length === 0)) {
             this.handleCreate();
         }
-    }
+    };
 
     render() {
         const { 
@@ -111,12 +112,12 @@ export default class AddToRootRow extends React.PureComponent<Props> {
                     </Menu>
                 }>
                     <Button>
-                    Add <Icon type="down" />
+                    Add <DownOutlined />
                     </Button>
                 </Dropdown>
                 <Modal
                     title={'Create '+title}
-                    visible={visible}
+                    open={visible}
                     onOk={this.handleCreate}
                     onCancel={this.handleCancel}
                     okText={'Create'}

@@ -32,15 +32,7 @@ class RunSettings extends React.PureComponent<Props> {
   
     validateFields() {
         const { runSettings } = this.state;
-        
-        return new Promise((resolve, reject) => {
-            this.props.form.validateFields((err, values) => {
-                if (err) {
-                    return;
-                }
-                resolve(runSettings);
-            });   
-        });
+        return Promise.resolve(runSettings);
     }
     
     async validateFormFields() {
@@ -71,12 +63,10 @@ class RunSettings extends React.PureComponent<Props> {
     }
 }
 
-const EnhancedForm =  Form.create()(RunSettings);
-
-export default class RunSettingsWrap extends React.PureComponent<Props> {
+export default class RunSettingsWrap extends React.PureComponent {
     render() {
         return (
-            <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />
+            <RunSettings ref={(node) => this.formWrap = node} {...this.props} />
         );
     }
 }

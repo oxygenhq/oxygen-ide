@@ -108,7 +108,7 @@ export default class ElectronService extends ServiceBase {
     }
 
     addFile(key, name, content = '') {
-        const settings = appSettings.get('appSettings');
+        const settings = appSettings.getSync('appSettings');
 
         const newSettings = { ...settings };
         if (key, name) {
@@ -126,13 +126,13 @@ export default class ElectronService extends ServiceBase {
             return null;
         }
 
-        appSettings.set('appSettings', newSettings);
+        appSettings.setSync('appSettings', newSettings);
         
         return newSettings;
     }
 
     removeFile(key, name) {
-        const settings = appSettings.get('appSettings');
+        const settings = appSettings.getSync('appSettings');
 
         const newSettings = { ...settings };
         if (key && name) {
@@ -145,13 +145,13 @@ export default class ElectronService extends ServiceBase {
             return null;
         }
 
-        appSettings.set('appSettings', newSettings);
+        appSettings.setSync('appSettings', newSettings);
         
         return newSettings;
     }
 
     updateFileContent(key, name, content = '') {
-        const settings = appSettings.get('appSettings');
+        const settings = appSettings.getSync('appSettings');
 
         const newSettings = { ...settings };
         if (key && name && typeof content !== 'undefined') {
@@ -166,14 +166,14 @@ export default class ElectronService extends ServiceBase {
             return null;
         }
 
-        appSettings.set('appSettings', newSettings);
+        appSettings.setSync('appSettings', newSettings);
         
         return newSettings;
     }
 
     updateCache(cache) {
         if (cache) {
-            const settings = appSettings.get('appSettings');
+            const settings = appSettings.getSync('appSettings');
             let newSettings = {};
             let files = {};
             
@@ -184,7 +184,7 @@ export default class ElectronService extends ServiceBase {
             newSettings.cache = cache;
             newSettings.files = files;
     
-            appSettings.set('appSettings', newSettings);
+            appSettings.setSync('appSettings', newSettings);
     
             return newSettings;
         } else {
@@ -193,14 +193,14 @@ export default class ElectronService extends ServiceBase {
     }
 
     clearSettings() {
-        appSettings.deleteAll();
+        appSettings.unsetSync();
 
-        const settings = appSettings.get('appSettings');
+        const settings = appSettings.getSync('appSettings');
         return settings;
     }
 
     getSettings() {
-        const settings = appSettings.get('appSettings');
+        const settings = appSettings.getSync('appSettings');
         return settings;
     }
 

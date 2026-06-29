@@ -1,4 +1,4 @@
-//@flow
+﻿//@flow
 import React from 'react';
 import { Modal, Button } from 'antd';
 
@@ -11,14 +11,14 @@ export default class XCodeDialog extends React.PureComponent<Props> {
       if (this.props.clean) {
           this.props.clean();
       }
-  }
+  };
   
   render() {
       return (
           <Modal
               title="Device Discovery Service"
               width={480}
-              visible={true}
+              open={true}
               onCancel={this.close}
               footer={(
                   <React.Fragment>

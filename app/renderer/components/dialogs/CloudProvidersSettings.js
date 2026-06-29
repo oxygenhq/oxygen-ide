@@ -507,15 +507,7 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
 
     validateFields() {
         const { providers } = this.state;
-        
-        return new Promise((resolve, reject) => {
-            this.props.form.validateFields((err, values) => {
-                if (err) {
-                    return;
-                }
-                resolve(providers);
-            });   
-        });
+        return Promise.resolve(providers);
     }
     
     async validateFormFields() {
@@ -535,7 +527,7 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
                 console.log('bad event.target', event.target);
             }
         }
-    }
+    };
     
     render() {
         
@@ -785,12 +777,10 @@ class CloudProvidersSettings extends React.PureComponent<Props> {
     }
 }
 
-const EnhancedForm =  Form.create()(CloudProvidersSettings);
-
-export default class GeneralSettingsWrap extends React.PureComponent<Props> {
+export default class CloudProvidersSettingsWrap extends React.PureComponent {
     render() {
         return (
-            <EnhancedForm wrappedComponentRef={(form) => this.formWrap = form} {...this.props} />
+            <CloudProvidersSettings ref={(node) => this.formWrap = node} {...this.props} />
         );
     }
 }

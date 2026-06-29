@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+﻿import React, { Fragment } from 'react';
 import { Modal, Button } from 'antd';
 import electron from 'electron';
 
@@ -13,7 +13,7 @@ export default class EdgeDriverDownloadingFailedDialog extends React.PureCompone
         if (this.props.onClose) {
             this.props.onClose();
         }
-    }
+    };
 
     processLink = (event) => {
         if (event) {
@@ -26,7 +26,7 @@ export default class EdgeDriverDownloadingFailedDialog extends React.PureCompone
                 console.log('bad event.target', event.target);
             }
         }
-    }
+    };
 
     render() {
 
@@ -38,7 +38,7 @@ export default class EdgeDriverDownloadingFailedDialog extends React.PureCompone
                 className="hide-x-button"
                 success
                 width={490}
-                visible={true}
+                open={true}
                 footer={(
                     <Fragment>
                         <Button

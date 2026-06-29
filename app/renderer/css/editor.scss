@@ -1,4 +1,4 @@
-@import 'vars';
+@use 'vars' as *;
 
 .monaco-editor-container {
   overflow: hidden !important;

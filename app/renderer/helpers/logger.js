@@ -6,16 +6,16 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import { remote } from 'electron';
+import { getGlobal } from '@electron/remote';
 import util from 'util';
 
 export default function loggerSetup() {
-    var _log = remote.getGlobal('log');
+    var _log = getGlobal('log');
 
     // prefix messages so we know they came from renderer process
     global.log = {};
 
-    const prefix = (args) => { 
+    const prefix = (args) => {
         let monacoError = false;
         if (args && Array.isArray(args) && args.length > 0) {
             args.map((arg) => {
@@ -28,7 +28,7 @@ export default function loggerSetup() {
         }
 
         args[0] = '[R]' + args[0];
-        
+
         return monacoError;
     };
 
@@ -38,14 +38,18 @@ export default function loggerSetup() {
     global.log.debug = (...args) => { const monacoError = prefix(args); if (!monacoError) { return _log.debug.apply(global.log, args); } };
 
     process.on('uncaughtException', error => {
+        if (!error) {
+            return;
+        }
+
         // ignore Monaco Editor error related to jsonMode.js
-        if (error.message && error.name && error.name === 'ReferenceError' && error.message === 'exports is not defined') {
+        if (error.name === 'ReferenceError' && error.message === 'exports is not defined') {
             console.warn(`Ignoring error: ${error.name}: ${error.message}`);
             return;
         }
 
         // ignore certain Monaco Editor errors
-        if (error && error.message && typeof error.message === 'string' && 
+        if (error.message && typeof error.message === 'string' && 
             (error.message.includes('doResolve') || error.message.includes('Model is disposed') || error.message.includes('setPosition'))) {
             return;
         }

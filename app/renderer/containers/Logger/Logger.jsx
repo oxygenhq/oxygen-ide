@@ -8,15 +8,19 @@
  */
 // @flow
 import React from 'react';
-import { Icon, Tabs } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
+import { Tabs } from 'antd';
 import LogViewer from '../../components/LogViewer.jsx';
 import VariablesViewer from '../../components/VariablesViewer';
 import ReplViewer from '../../components/ReplViewer';
 import { type LogEntry } from '../../types/LogEntry';
 import '../../css/logger.scss';
-
-const { TabPane } = Tabs;
 const MIN_HEIGHT = 200;
+// reserve room above the log panel for the toolbar, tabs bar, and a usable editor area —
+// without this, dragging (or a window resize leaving) the panel taller than the window
+// makes the column's total content exceed the viewport, and since the ancestor is
+// overflow:hidden, the toolbar at the top of the column gets clipped/pushed off-screen.
+const TOP_UI_RESERVED_HEIGHT = 230;
 
 type Props = {
   logs: { [string]: Array<LogEntry>},
@@ -43,45 +47,65 @@ export default class Logger extends React.PureComponent<Props> {
         if (window && window.addEventListener) {
             window.addEventListener('mouseup', this.handleMouseUp);
             window.addEventListener('mousemove', this.handleLoggerDrag);
+            window.addEventListener('resize', this.handleWindowResize);
         }
         // adjust log viewer height
-        this.setState({ viewerHeight: this.state.panelHeight - this.headerRef.height });
+        this.setState({ viewerHeight: this.state.panelHeight - this.headerRef.offsetHeight });
     }
-    
+
     componentWillUnmount() {
         window.removeEventListener('mouseup', this.handleMouseUp);
         window.removeEventListener('mousemove', this.handleLoggerDrag);
+        window.removeEventListener('resize', this.handleWindowResize);
+    }
+
+    getMaxPanelHeight() {
+        return Math.max(MIN_HEIGHT, window.innerHeight - TOP_UI_RESERVED_HEIGHT);
     }
 
     handleMouseDown = () => {
         this.setState({ dragFlag: true });
-    }
+    };
 
     handleMouseUp = () => {
         if (this.state.dragFlag) {
             this.setState({ dragFlag: false });
         }
-    }
+    };
+
+    handleWindowResize = () => {
+        // re-clamp so a panel dragged tall before the window was shrunk doesn't keep
+        // overflowing the (now smaller) window and clipping the toolbar
+        if (this.state.panelHeight > this.getMaxPanelHeight()) {
+            const panelHeight = this.getMaxPanelHeight();
+            this.setState({
+                panelHeight,
+                viewerHeight: panelHeight - this.headerRef.offsetHeight,
+            });
+        }
+    };
 
     handleLoggerDrag = (e) => {
         if (this.state.dragFlag) {
             const height = window.innerHeight - e.pageY;
-            const panelHeight = height < MIN_HEIGHT ? MIN_HEIGHT : height;
-            const viewerHeight = panelHeight - this.headerRef.height;
+            let panelHeight = height < MIN_HEIGHT ? MIN_HEIGHT : height;
+            // don't allow the panel to grow past the window and push the toolbar out of view
+            panelHeight = Math.min(panelHeight, this.getMaxPanelHeight());
+            const viewerHeight = panelHeight - this.headerRef.offsetHeight;
             // don't allow to drag logger out of the window
-            this.setState({ 
+            this.setState({
                 panelHeight: panelHeight,
                 viewerHeight: viewerHeight,
             });
         }
-    }
+    };
 
     handleTabChange(tabKey) {
         this.props.setActiveLogger(tabKey);
     }
 
     render() {
-        const { panelHeight } = this.state;
+        const { panelHeight, viewerHeight } = this.state;
         const {
             visible = true,
             logs,
@@ -98,8 +122,8 @@ export default class Logger extends React.PureComponent<Props> {
             <div
                 className="ide-logger"
                 style={{
-                    height: this.state.panelHeight,
-                    minHeight: this.state.panelHeight - 1,
+                    height: panelHeight,
+                    minHeight: panelHeight - 1,
                     display: visible ? 'block' : 'none'
                 }}
             >
@@ -113,31 +137,31 @@ export default class Logger extends React.PureComponent<Props> {
                         activeKey={ active }
                         onChange={ ::this.handleTabChange }
                         className="logger-tabs"
-                    >
-                        <TabPane tab="General" key="general" />
-                        <TabPane tab="Selenium" key="selenium" />
-                        { variables && <TabPane tab="Variables" key="variables" /> }
-                        { repl && repl.active && <TabPane tab="REPL" key="repl" />}
-                    </Tabs>
-                    <Icon
-                        type="close"
+                        items={[
+                            { key: 'general', label: 'General' },
+                            { key: 'selenium', label: 'WebDriver' },
+                            ...(variables ? [{ key: 'variables', label: 'Variables' }] : []),
+                            ...(repl && repl.active ? [{ key: 'repl', label: 'REPL' }] : []),
+                        ]}
+                    />
+                    <CloseOutlined
                         className="logClose"
                         onClick={ () => this.props.onHide() }
                     />
                 </div>
                 {
-                    active !== 'variables' && active !== 'repl' && 
-                    <LogViewer logs={ activeLogs } category={ active } height={ panelHeight } />
+                    active !== 'variables' && active !== 'repl' &&
+                    <LogViewer logs={ activeLogs } category={ active } height={ viewerHeight } />
                 }
                 {
-                    active === 'variables' && 
-                    <VariablesViewer variables={variables} height={ panelHeight } />
+                    active === 'variables' &&
+                    <VariablesViewer variables={variables} height={ viewerHeight } />
                 }
                 {
                     active === 'repl' && repl.active &&
                     <ReplViewer
                         repl={ repl }
-                        height={ panelHeight } 
+                        height={ viewerHeight }
                         replClose={ replClose }
                         replSend={ replSend }
                     />

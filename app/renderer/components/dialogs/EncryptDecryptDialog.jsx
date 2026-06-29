@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
@@ -7,7 +7,8 @@
  * (at your option) any later version.
  */
 import React from 'react';
-import { Modal, Input, Button, Typography } from 'antd';
+import { Modal, Input, Button, Space, Typography } from 'antd';
+import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
 const { Paragraph, Text } = Typography;
 
 export default class EncryptDecryptDialog extends React.PureComponent<Props> {
@@ -23,7 +24,7 @@ export default class EncryptDecryptDialog extends React.PureComponent<Props> {
         this.setState({
             value: e.target.value
         });
-    }
+    };
 
     render() {
         const {
@@ -41,7 +42,7 @@ export default class EncryptDecryptDialog extends React.PureComponent<Props> {
         return (
             <Modal
                 title="Tools → Encrypt/Decrypt"
-                visible={ true }
+                open={ true }
                 footer={ null }
                 onCancel={ onCancel }
             >
@@ -57,13 +58,13 @@ export default class EncryptDecryptDialog extends React.PureComponent<Props> {
                         value={value}
                         onChange={this.onChange}
                     />
-                    <Button.Group
+                    <Space.Compact
                         style={{
                             margin: '20px 0px'
                         }}
                     >
                         <Button
-                            icon="lock"
+                            icon={<LockOutlined />}
                             onClick={ () => {
                                 onAction({
                                     value: value,
@@ -76,7 +77,7 @@ export default class EncryptDecryptDialog extends React.PureComponent<Props> {
                             Encrypt
                         </Button>
                         <Button
-                            icon="unlock"
+                            icon={<UnlockOutlined />}
                             onClick={ () => {
                                 onAction({
                                     value: value,
@@ -88,13 +89,13 @@ export default class EncryptDecryptDialog extends React.PureComponent<Props> {
                         >
                             Decrypt
                         </Button>
-                    </Button.Group>
+                    </Space.Compact>
                     {
                         typeof result === 'string' &&
                         <Paragraph
                             copyable
                             style={{
-                                width: '200px',
+                                width: '100%',
                                 textAlign: 'center'
                             }}
                         >

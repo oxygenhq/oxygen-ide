@@ -9,7 +9,7 @@
 
 // @flow
 import React, { Fragment } from 'react';
-import { Icon } from 'antd';
+import { InboxOutlined } from '@ant-design/icons';
 
 import MonacoEditor from '../../components/MonacoEditor/index.jsx';
 import '../../css/editor.scss';
@@ -89,17 +89,24 @@ export default class TextEditor extends React.Component<Props> {
             const currentActiveEditor = this.editors[activeFile];
             const isPrevEditorFileStillOpen = openFiles.some(x => x.path === prevActiveFile);
             // remove focus from previous active editor
-            if (prevActiveEditor && isPrevEditorFileStillOpen) {
-                prevActiveEditor.editor._modelData.hasRealView = false;
-                prevActiveEditor.editor._domElement.blur();
-            }            
+            if (prevActiveEditor && prevActiveEditor.editor && isPrevEditorFileStillOpen) {
+                // _modelData is an undocumented Monaco internal that may not be set yet
+                // (e.g. the editor hasn't finished mounting/attaching its model, as happens
+                // for .feature files while the Gherkin language is still being registered)
+                if (prevActiveEditor.editor._modelData) {
+                    prevActiveEditor.editor._modelData.hasRealView = false;
+                }
+                prevActiveEditor.editor._domElement && prevActiveEditor.editor._domElement.blur();
+            }
             // focus on the current editor
-            if (currentActiveEditor) {
-                currentActiveEditor.editor._modelData.hasRealView = true;
+            if (currentActiveEditor && currentActiveEditor.editor) {
+                if (currentActiveEditor.editor._modelData) {
+                    currentActiveEditor.editor._modelData.hasRealView = true;
+                }
                 currentActiveEditor.editor.focus();
-                currentActiveEditor.editor._domElement.focus();
+                currentActiveEditor.editor._domElement && currentActiveEditor.editor._domElement.focus();
                 currentActiveEditor.editor.setPosition(currentActiveEditor.editor.getPosition());
-            }            
+            }
         }
     }
 
@@ -114,7 +121,7 @@ export default class TextEditor extends React.Component<Props> {
 
     setFatureLanguageLoaded = () => {
         this.setState({ featureLanguageLoaded: true });
-    }
+    };
 
     onEditorCallTrigger(payload = {}) {
         const { activeFile } = this.props;
@@ -158,15 +165,15 @@ export default class TextEditor extends React.Component<Props> {
 
     onBreakpointsUpdate = (filePath, bps, fileName) => {
         this.props.onBreakpointsUpdate(filePath, bps, fileName);
-    }
+    };
 
     handleValueChange = (filePath, value, name) => {
         this.props.onContentUpdate(filePath, value, name);
-    }
+    };
 
     handleSelectionChange = (filePath, selectedText) => {
         // TODO: add here handler for selection-related actions
-    }
+    };
 
     render() {
         const { 
@@ -226,7 +233,7 @@ export default class TextEditor extends React.Component<Props> {
                 {(!activeFile || openFiles.length === 0) && (
                     <div className="noFilesPlaceholder">
                         <div>
-                            <Icon type="inbox" />
+                            <InboxOutlined />
                             <p>You have no active opened files</p>
                             <p>Open a folder first, then select a file or create a new file</p>
                             { process.platform === 'win32' || process.platform === 'linux' ?

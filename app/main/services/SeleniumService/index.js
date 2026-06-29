@@ -8,10 +8,12 @@
  */
 import path from 'path';
 import cp from 'child_process';
+import net from 'net';
 import detectPort from 'detect-port';
 import { app } from 'electron';
 import * as chromeFinder from './chrome-finder';
 import * as edgeFinder from './edge-finder';
+import * as firefoxFinder from './firefox-finder';
 import { exec } from 'teen_process';
 import fs from 'fs-extra';
 import tmp from 'tmp';
@@ -20,7 +22,7 @@ import { versions } from './chromedriver-versions.json';
 import { edgeVersions } from './edgedriver-versions.json';
 import fetch from 'node-fetch';
 import ServiceBase from '../ServiceBase';
-import glob from 'glob';
+import * as glob from 'glob';
 // import parser from 'xml2json';
 
 import cfg from '../../config.json';
@@ -32,6 +34,7 @@ const ON_SELENIUM_STOPPED = 'SELENIUM_STOPPED';
 const ON_CHROME_DRIVER_ERROR = 'ON_CHROME_DRIVER_ERROR';
 const ON_FINDED_CHROME_DRIVER_VERSION = 'ON_FINDED_CHROME_DRIVER_VERSION';
 const ON_EDGE_FINDED = 'ON_EDGE_FINDED';
+const ON_FIREFOX_FINDED = 'ON_FIREFOX_FINDED';
 const CHROMEDRIVER_FOLDER_START = 'chromedriver-';
 // chrome < 115
 const CHROMEDRIVER_PRE_115_API_URL = 'https://chromedriver.storage.googleapis.com';
@@ -39,66 +42,92 @@ const CHROMEDRIVER_PRE_115_API_URL = 'https://chromedriver.storage.googleapis.co
 const CHROMEDRIVER_API_URL = 'https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json';
 const CHROMEDRIVER_DOWNLOAD_URL = 'https://storage.googleapis.com/chrome-for-testing-public';
 
-// some info about edge drivers 
-// https://msedgewebdriverstorage.z22.web.core.windows.net/
-// https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver?delimiter=%2F&restype=container&comp=list&_=1606214015871&timeout=60000
-// https://msedgedriver.azureedge.net/87.0.626.0/edgedriver_win64.zip
-// https://msedgedriver.azureedge.net/87.0.626.0/edgedriver_win32.zip
-// https://msedgedriver.azureedge.net/89.0.711.0/edgedriver_mac64.zip
-
 const EDGE_FOLDER_START = 'edgedriver-';
 const ON_EDGE_DRIVER_ERROR = 'ON_EDGE_DRIVER_ERROR';
 const EDGE_BASE_URL = 'https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver';
-const EDGE_DOWNLOAD_DRIVER_URL = 'https://msedgedriver.azureedge.net';
+const EDGE_DOWNLOAD_DRIVER_URL = 'https://msedgedriver.microsoft.com';
+
+// maps testTarget values (app/renderer/store/test/reducer.js) to the driver
+// keys used internally by this service (driverProcs / driverPorts)
+export const TEST_TARGET_TO_DRIVER_KEY = {
+    chrome: 'chrome',
+    firefox: 'firefox',
+    MicrosoftEdge: 'edge',
+    MicrosoftEdgeIEMode: 'ie',
+};
+
+const DRIVER_BASE_PORTS = { chrome: 9515, edge: 9516, firefox: 9517, ie: 9518 };
+const DRIVER_BINARY_NAMES = {
+    chrome: 'chromedriver.exe',
+    edge: 'msedgedriver.exe',
+    firefox: 'geckodriver.exe',
+    ie: 'IEDriverServer_x86.exe',
+};
 
 export default class SeleniumService extends ServiceBase {
 
     constructor() {
         super();
 
-        this.seleniumProc = null;
-        this.availablePort = null;
+        this.driverProcs = {};          // { chrome, edge, firefox, ie } -> ChildProcess
+        this.driverPorts = {};          // { chrome, edge, firefox, ie } -> port number
+        this.resolvedDriverPaths = {};  // { chrome, edge, firefox, ie } -> local binary path
 
         this.downloadChromeDriver = this.downloadChromeDriver.bind(this);
         this.downloadEdgeDriver = this.downloadEdgeDriver.bind(this);
     }
 
+    // called once, at project-open time. Only resolves (detects/downloads) each
+    // browser's matching driver binary path — it does NOT spawn any driver
+    // process. Driver processes are spawned lazily, per test run, via
+    // startDriver(), so an installed-but-unused browser never gets a running
+    // driver process at all.
     async start() {
-        return await this._detectPortAndStart();
+        let cwd;
+        if (process.env.NODE_ENV === 'production') {
+            cwd = path.resolve(__dirname, process.env.RELEASE_BUILD ? '../../app.asar.unpacked/main/selenium' : 'selenium');
+        } else {
+            cwd = path.resolve(__dirname, '..', '..', 'selenium');
+        }
+
+        try {
+            await this.copyBundledDrivers(cwd);
+        } catch (e) {
+            console.warn('Failed to copy bundled drivers', e);
+        }
+
+        // Chrome/Firefox (and IE on Windows) are always listed in the target dropdown
+        // regardless of whether they're installed, but Edge is only added once detected —
+        // so it still needs an eager, driver-download-free presence check here
+        await this.detectEdgeBrowser();
+        await this.detectFirefoxBrowser();
+
+        return null;
     }
 
-    _detectPortAndStart() {
-        return detectPort(selSettings.port)
-            .then(availablePort => {
-                const seleniumPid = this._startProcess(availablePort);
-                this.availablePort = availablePort;
-                return seleniumPid;
-            })
-            .catch(err => {
-                const result = 'Unable to start Selenium';
-                console.log(result, err);
-                return null;
-            });
+    // called whenever the user picks a browser in the target dropdown, so driver
+    // detection/download only happens for browsers the user actually intends to use,
+    // instead of eagerly for every supported browser at project-open time
+    async checkDriver(testTarget) {
+        const driverKey = TEST_TARGET_TO_DRIVER_KEY[testTarget] || testTarget;
+        if (!DRIVER_BASE_PORTS[driverKey]) {
+            return null;
+        }
+        return this._resolveDriverPath(driverKey);
     }
 
     stop() {
-        if (this.seleniumProc) {
-            this.seleniumProc.kill();
-            // sending SIGTERM doesn't seem to kill on Windows
-            // so we do it through WMIC
-            this._killSelenium();
-            this.seleniumProc = null;
-        }
+        this._killDrivers();
     }
 
     async restart() {
         this.stop();
+        this.resolvedDriverPaths = {};
         await this.start();
     }
 
     dispose() {
-        this.stop();
-        this._killSelenium();
+        this._killDrivers();
     }
 
     _emitStoppedEvent(failed, msg) {
@@ -109,13 +138,13 @@ export default class SeleniumService extends ServiceBase {
         );
     }
 
-    _emitStartedEvent({port, browserTimeout, timeout}) {
-        console.log('_emitStartedEvent', port);
+    _emitStartedEvent({driverKey, port, browserTimeout}) {
+        console.log('_emitStartedEvent', driverKey, port);
 
         this.notify({
             type: ON_SELENIUM_STARTED,
+            driverKey: driverKey,
             port: port,
-            timeout: timeout,
             browserTimeout: browserTimeout
         });
     }
@@ -127,20 +156,75 @@ export default class SeleniumService extends ServiceBase {
         );
     }
 
-    _killSelenium() {
+    // kill all tracked driver processes directly, then best-effort clean up
+    // any orphaned driver processes left over from a previous crashed run
+    _killDrivers() {
+        for (const key of Object.keys(this.driverProcs)) {
+            const proc = this.driverProcs[key];
+            try {
+                if (proc && !proc.killed) {
+                    proc.kill();
+                }
+            } catch (e) {
+                console.warn(`Failed to kill ${key} driver process:`, e);
+            }
+        }
+        this.driverProcs = {};
+
         if (process.platform === 'win32') {
-            try {
-                const cmd = `wmic process where "CommandLine like '%java%-jar%${selSettings.jar}%-port ${this.availablePort}%'" Call Terminate`;
-                cp.execSync(cmd, { stdio: 'pipe' });
-            } catch (e) {
-                console.warn('Failed to kill selenium: ' + e);
+            this._killOrphansWindows();
+        }
+    }
+
+    // best-effort fallback for orphans left behind by a previous IDE crash
+    // (e.g. IDE process itself was killed before dispose() could run).
+    // Matched by binary name AND last-known port, so we don't strand-kill an
+    // unrelated driver instance the user might be running independently.
+    _killOrphansWindows() {
+        for (const key of Object.keys(DRIVER_BINARY_NAMES)) {
+            const port = this.driverPorts[key];
+            if (!port) {
+                continue;
             }
-        } else {
             try {
-                cp.execSync(`pkill -f "/java -jar.*-port ${this.availablePort}/"`, { stdio: 'pipe' });
+                const name = DRIVER_BINARY_NAMES[key];
+                const filter = `Name = '${name}' and CommandLine like '%${port}%'`;
+                const script = `Get-CimInstance Win32_Process -Filter "${filter}" | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }`;
+                // execSync routes the whole command through cmd.exe first, whose
+                // backslash-quote escaping is incompatible with PowerShell's own —
+                // the script arrives already mangled. spawnSync with an args array
+                // passes the script straight through, bypassing shell quoting entirely.
+                cp.spawnSync('powershell', ['-NoProfile', '-Command', script], { stdio: 'pipe' });
             } catch (e) {
-                // ignore. pkill returns 1 status if process doesn't exist
+                console.warn(`Failed to kill orphaned ${key} driver: ` + e);
             }
+        }
+    }
+
+    // compares the major (first dot-segment) version number of two version
+    // strings, e.g. "137.0.3296.93" vs "150.0.4078.48" -> false
+    _sameMajorVersion(versionA, versionB) {
+        if (!versionA || !versionB) {
+            return false;
+        }
+        return versionA.split('.')[0] === versionB.split('.')[0];
+    }
+
+    // lightweight browser-presence check, run eagerly at project-open time so Edge shows
+    // up in the browser-target dropdown at all. Unlike edgeStart() it never resolves or
+    // downloads a driver binary — that stays deferred until the user actually selects it
+    async detectEdgeBrowser() {
+        try {
+            const edgeDetails = await this.getEdgeVersion();
+            if (edgeDetails && edgeDetails.version) {
+                console.log('Found installed Edge browser version: ', edgeDetails.version);
+                this.notify({
+                    type: ON_EDGE_FINDED,
+                    path: edgeDetails.path
+                });
+            }
+        } catch (e) {
+            // Edge not installed / not detectable — nothing to add to the dropdown
         }
     }
 
@@ -180,8 +264,17 @@ export default class SeleniumService extends ServiceBase {
             if (edgeDriver) {
                 console.log('Using user placed EdgeDriver from ' + edgeDriver);
             } else {
-                // if no user placed driver then use, the latest bundled version
+                // if no user placed driver then use, the latest bundled version —
+                // but only if its major version actually matches the installed
+                // browser; otherwise this silently hands back a driver that's
+                // guaranteed to fail at session-creation time with a cryptic
+                // version-mismatch error instead of prompting the user to
+                // download the correct one
                 edgeDriver = await this.findLocalEdgeDriver(edgeVersions[0].driverVersion);
+                if (edgeDriver && !this._sameMajorVersion(edgeVersions[0].driverVersion, edgeVersion)) {
+                    console.warn(`Bundled EdgeDriver ${edgeVersions[0].driverVersion} does not match installed Edge ${edgeVersion}; discarding.`);
+                    edgeDriver = null;
+                }
                 if (edgeDriver) {
                     console.log('Using latest bundled EdgeDriver from ' + edgeDriver);
                 } else {
@@ -245,8 +338,17 @@ export default class SeleniumService extends ServiceBase {
             if (chromeDriverPath) {
                 console.log('Using user placed ChromeDriver from ' + chromeDriverPath);
             } else {
-                // if no user placed driver then use, the latest bundled version
+                // if no user placed driver then use, the latest bundled version —
+                // but only if its major version actually matches the installed
+                // browser; otherwise this silently hands back a driver that's
+                // guaranteed to fail at session-creation time with a cryptic
+                // version-mismatch error instead of prompting the user to
+                // download the correct one
                 chromeDriverPath = await this.findLocalChromeDriver(versions[0].driverVersion);
+                if (chromeDriverPath && !this._sameMajorVersion(versions[0].driverVersion, chromeVersion)) {
+                    console.warn(`Bundled ChromeDriver ${versions[0].driverVersion} does not match installed Chrome ${chromeVersion}; discarding.`);
+                    chromeDriverPath = null;
+                }
                 if (chromeDriverPath) {
                     console.log('Using latest bundled ChromeDriver from ' + chromeDriverPath);
                 } else {
@@ -260,121 +362,262 @@ export default class SeleniumService extends ServiceBase {
         return chromeDriverPath;
     }
 
-    async _startProcess(port) {
-        let cwd;
-        if (process.env.NODE_ENV === 'production') {
-            cwd = path.resolve(__dirname, process.env.RELEASE_BUILD ? '../../app.asar.unpacked/main/selenium' : 'selenium');
-        } else {
-            cwd = path.resolve(__dirname, '..', '..', 'selenium');
+    // Firefox is much less version-coupled to geckodriver than Chrome/Edge are to
+    // their drivers, so unlike chromeStart()/edgeStart() this does not attempt to
+    // download a version-matched geckodriver — it uses the bundled binary directly
+    // (mirrors the previous static-path behavior), only adding a Firefox-installed
+    // detection step for diagnostic parity/logging with chrome/edge.
+    // lightweight browser-presence check, run eagerly at project-open time so Firefox
+    // only shows up in the browser-target dropdown if it's actually installed. Unlike
+    // geckoStart() it never touches the (bundled) driver binary
+    async detectFirefoxBrowser() {
+        try {
+            const installations = firefoxFinder[process.platform] && firefoxFinder[process.platform]();
+            if (installations && installations.length > 0) {
+                console.log('Found Firefox at: ', installations);
+                this.notify({
+                    type: ON_FIREFOX_FINDED,
+                    path: installations[0]
+                });
+            }
+        } catch (e) {
+            console.warn('Failure detecting Firefox installation.', e);
         }
-
-        await this.copyBundledDrivers(cwd);
-
-        const edgeDriverPath = await this.edgeStart();
-        const chromeDriverPath = await this.chromeStart();
-
-        const selArgs = [selSettings.jar].concat(selSettings.args);
-    
-        selArgs.push('standalone');
-
-        let geckodriverPath = null;
-    
-        if (process.platform === 'win32') {
-            geckodriverPath = 'win32/geckodriver.exe';
-        } else if (process.platform === 'darwin') {
-            geckodriverPath = 'darwin/geckodriver';
-        } else {
-            geckodriverPath = 'linux/geckodriver';
-        }
-    
-        if (chromeDriverPath) {
-            selArgs.unshift(`-Dwebdriver.chrome.driver="${chromeDriverPath}"`);
-        }
-        if (edgeDriverPath) {
-            selArgs.unshift(`-Dwebdriver.edge.driver="${edgeDriverPath}"`);
-        }
-        selArgs.unshift(`-Dwebdriver.gecko.driver="${geckodriverPath}"`);
-    
-        if (process.platform === 'win32') {
-            selArgs.unshift('-Dwebdriver.ie.driver=win32/IEDriverServer_x86.exe');
-        }
-        selArgs.push('--port');
-        selArgs.push(port.toString());
-        selArgs.unshift('-jar');
-
-        selArgs.push('--session-timeout');
-        selArgs.push(selSettings.sessionTimeout);
-
-        selArgs.push('--override-max-sessions');
-        selArgs.push('true');
-
-        selArgs.push('--max-sessions');
-        selArgs.push(selSettings.maxSessions);
-        
-        console.log('Attempting to start Selenium process with the following args:', selArgs);
-        this.seleniumProc = cp.spawn('java', selArgs, { cwd, shell: true });
-
-        let seleniumPid = null;
-
-        if (this.seleniumProc && this.seleniumProc.pid) {
-            seleniumPid = this.seleniumProc.pid;
-        }
-
-        // FIXME: browserTimeout is not needed in Selenium 4 and should be cleaned up (also from oxygen-cli)
-        this._emitStartedEvent({
-            port: port,
-            browserTimeout: selSettings.browserTimeout,
-            timeout: selSettings.sessionTimeout
-        });
-
-        this._handleProcessEvents();
-
-        return seleniumPid;
     }
 
-    _handleProcessEvents() {
-        const proc = this.seleniumProc;
+    async geckoStart() {
+        try {
+            const installations = firefoxFinder[process.platform] && firefoxFinder[process.platform]();
+            if (installations && installations.length > 0) {
+                console.log('Found Firefox at: ', installations);
+                // geckodriver looks for firefox on the OS PATH / default install
+                // location and fails session creation if it's not there (or is
+                // installed somewhere non-standard, e.g. a portable/custom install);
+                // pass the detected binary path through so it can be supplied as
+                // moz:firefoxOptions.binary
+                this.notify({
+                    type: ON_FIREFOX_FINDED,
+                    path: installations[0]
+                });
+            } else {
+                console.warn('Firefox not found on this machine; geckodriver will still be started.');
+            }
+        } catch (e) {
+            console.warn('Failure detecting Firefox installation.', e);
+        }
+
+        const bin = process.platform === 'win32' ? 'geckodriver.exe' : 'geckodriver';
+        const geckoDriverPath = path.resolve(this.getDriversRootPath(), bin);
+        if (!fs.existsSync(geckoDriverPath)) {
+            console.warn('Bundled geckodriver not found at ' + geckoDriverPath);
+            return null;
+        }
+        return geckoDriverPath;
+    }
+
+    // IEDriverServer is a fixed bundled 32-bit binary, not tied to a "browser
+    // version" the way chromedriver/msedgedriver are, so no version-matching is
+    // needed. Windows-only, matching the existing _killIEWebdriver() gating in
+    // TestRunnerService.js.
+    async ieStart() {
+        if (process.platform !== 'win32') {
+            return null;
+        }
+        const ieDriverPath = path.resolve(this.getDriversRootPath(), 'IEDriverServer_x86.exe');
+        if (!fs.existsSync(ieDriverPath)) {
+            console.warn('Bundled IEDriverServer not found at ' + ieDriverPath);
+            return null;
+        }
+        return ieDriverPath;
+    }
+
+    // resolves (but does not spawn) the driver binary path for a given driver
+    // key, caching the result so repeated startDriver() calls for the same
+    // browser don't re-run version detection/download every time
+    async _resolveDriverPath(driverKey) {
+        if (this.resolvedDriverPaths[driverKey]) {
+            return this.resolvedDriverPaths[driverKey];
+        }
+        let resolved = null;
+        if (driverKey === 'chrome') {
+            resolved = await this.chromeStart();
+        } else if (driverKey === 'edge') {
+            resolved = await this.edgeStart();
+        } else if (driverKey === 'firefox') {
+            resolved = await this.geckoStart();
+        } else if (driverKey === 'ie') {
+            resolved = await this.ieStart();
+        }
+        this.resolvedDriverPaths[driverKey] = resolved;
+        return resolved;
+    }
+
+    // spawns the driver process for the given key only if it isn't already
+    // running, and returns the port it's listening on (or null on failure) —
+    // this is what makes driver processes start lazily, on first actual use,
+    // rather than all up front
+    async startDriver(driverKey) {
+        const existingProc = this.driverProcs[driverKey];
+        if (existingProc && !existingProc.killed && this.driverPorts[driverKey]) {
+            return this.driverPorts[driverKey];
+        }
+
+        const driverPath = await this._resolveDriverPath(driverKey);
+        if (!driverPath) {
+            console.warn(`No local driver binary available for "${driverKey}"`);
+            return null;
+        }
+
+        const port = await detectPort(DRIVER_BASE_PORTS[driverKey]);
+        const spawners = {
+            chrome: () => this._spawnChromeDriver(driverPath, port),
+            edge: () => this._spawnEdgeDriver(driverPath, port),
+            firefox: () => this._spawnGeckoDriver(driverPath, port),
+            ie: () => this._spawnIEDriver(driverPath, port),
+        };
+        const spawn = spawners[driverKey];
+        if (!spawn) {
+            return null;
+        }
+
+        const ready = await spawn();
+        if (!ready) {
+            return null;
+        }
+
+        this.driverPorts[driverKey] = port;
+        this._emitStartedEvent({ driverKey, port, browserTimeout: selSettings.browserTimeout });
+        return port;
+    }
+
+    // stops the driver process for a single browser, e.g. once a test run
+    // using it has finished
+    stopDriver(driverKey) {
+        const proc = this.driverProcs[driverKey];
+        if (proc && !proc.killed) {
+            try {
+                proc.kill();
+            } catch (e) {
+                console.warn(`Failed to kill ${driverKey} driver process:`, e);
+            }
+        }
+        delete this.driverProcs[driverKey];
+        delete this.driverPorts[driverKey];
+    }
+
+    async _spawnChromeDriver(driverPath, port) {
+        const proc = cp.spawn(driverPath, [`--port=${port}`, '--whitelisted-ips=', '--disable-dev-shm-usage']);
+        this.driverProcs.chrome = proc;
+        this._handleDriverProcessEvents(proc, 'chrome');
+        return await this._waitForStatusReady(port, 'chrome');
+    }
+
+    async _spawnEdgeDriver(driverPath, port) {
+        // msedgedriver is chromium-based and historically flag-compatible with
+        // chromedriver; verify against the bundled binary if issues arise.
+        const proc = cp.spawn(driverPath, [`--port=${port}`, '--whitelisted-ips=']);
+        this.driverProcs.edge = proc;
+        this._handleDriverProcessEvents(proc, 'edge');
+        return await this._waitForStatusReady(port, 'edge');
+    }
+
+    async _spawnGeckoDriver(driverPath, port) {
+        // geckodriver uses a space-separated --port flag, not --port=
+        const proc = cp.spawn(driverPath, ['--port', String(port)]);
+        this.driverProcs.firefox = proc;
+        this._handleDriverProcessEvents(proc, 'firefox');
+        return await this._waitForStatusReady(port, 'firefox');
+    }
+
+    async _spawnIEDriver(driverPath, port) {
+        // IEDriverServer uses the Windows CLI /port=X convention, not --port
+        const proc = cp.spawn(driverPath, [`/port=${port}`]);
+        this.driverProcs.ie = proc;
+        this._handleDriverProcessEvents(proc, 'ie');
+        // older IEDriverServer builds may not implement /status; fall back to a
+        // raw TCP-connect readiness check if the HTTP poll times out
+        const ready = await this._waitForStatusReady(port, 'ie', { maxRetries: 10, interval: 1000 });
+        if (ready) {
+            return true;
+        }
+        return await this._waitForTcpReady(port, 'ie');
+    }
+
+    // shared readiness poller: chromedriver/msedgedriver/geckodriver and modern
+    // IEDriverServer builds all implement the W3C WebDriver /status endpoint
+    // ({ value: { ready: bool } })
+    async _waitForStatusReady(port, driverKey, { maxRetries = 30, interval = 1000 } = {}) {
+        const url = `http://localhost:${port}/status`;
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                const res = await fetch(url, { timeout: 2000 });
+                if (res.ok) {
+                    const body = await res.json();
+                    if (body && body.value && body.value.ready) {
+                        return true;
+                    }
+                }
+            } catch (e) {
+                // not up yet, keep polling
+            }
+            await new Promise(resolve => setTimeout(resolve, interval));
+        }
+        console.warn(`${driverKey} driver did not respond to /status within ${maxRetries * interval}ms`);
+        return false;
+    }
+
+    // fallback readiness check for drivers whose /status endpoint isn't available:
+    // just wait until the port accepts a raw TCP connection
+    _waitForTcpReady(port, driverKey, { maxRetries = 30, interval = 1000 } = {}) {
+        return new Promise((resolve) => {
+            let attempt = 0;
+            const tryConnect = () => {
+                attempt++;
+                const socket = net.createConnection({ port, host: 'localhost' });
+                socket.once('connect', () => {
+                    socket.destroy();
+                    resolve(true);
+                });
+                socket.once('error', () => {
+                    socket.destroy();
+                    if (attempt >= maxRetries) {
+                        console.warn(`${driverKey} driver did not become reachable on port ${port} within ${maxRetries * interval}ms`);
+                        resolve(false);
+                        return;
+                    }
+                    setTimeout(tryConnect, interval);
+                });
+            };
+            tryConnect();
+        });
+    }
+
+    _handleDriverProcessEvents(proc, driverKey) {
         if (!proc) {
-            console.log('Selenium process was not started.');
+            console.log(`${driverKey} driver process was not started.`);
             return;
         }
-        // on 'error'
         proc.on('error', (e) => {
-            console.log('Cannot start Selenium process.', e);
-            // logGeneral.add('ERROR', 'Unable to find Java.
-            // Make sure Java is installed and has been added to the PATH environment variable.');
-            this._emitLogEvent(e.toString(), ServiceBase.SEVERITY_ERROR);
-            // 'ERROR: Unable to find Java. Make sure Java is installed and has been added to the PATH environment variable.'
+            console.log(`Cannot start ${driverKey} driver process.`, e);
+            this._emitLogEvent(`[${driverKey}] ${e.toString()}`, ServiceBase.SEVERITY_ERROR);
         });
-        // on stderr 'data'
-        proc.stderr.on('data', (data) => {
-            // FIXME: check why all logs from Selenium are written to srderr instead of stdout!!!
-            this._emitLogEvent(data.toString(), ServiceBase.SEVERITY_INFO);
+        proc.stderr && proc.stderr.on('data', (data) => {
+            this._emitLogEvent(`[${driverKey}] ${data.toString()}`, ServiceBase.SEVERITY_INFO);
         });
-        // on stdout 'data'
-        proc.stdout.on('data', (data) => {
-            this._emitLogEvent(data.toString());
+        proc.stdout && proc.stdout.on('data', (data) => {
+            this._emitLogEvent(`[${driverKey}] ${data.toString()}`);
         });
-        // on 'exit'
         proc.on('exit', (code) => {
-            console.log('Selenium process finished.');
-
-            if (code) {
-                this._emitLogEvent('Selenium process finished with code: '+ code);
-            } else {
-                this._emitLogEvent('Selenium process finished without any code');
-            }
+            console.log(`${driverKey} driver process finished.`, code);
+            delete this.driverProcs[driverKey];
+            delete this.driverPorts[driverKey];
 
             if (code === 1) {
-                // logGeneral.add('ERROR', 'Selenium couldn\'t be started.
-                // See the Selenium Server log for more details.');
-                const msg = 'ERROR: Selenium couldn\'t be started. See the Selenium Server log for more details.';
+                const msg = `ERROR: ${driverKey} driver couldn't be started. See the Selenium/driver log for more details.`;
                 this._emitStoppedEvent(true, msg);
-            }
-            else {
+            } else {
                 this._emitStoppedEvent();
             }
-            this.seleniumProc = null;
         });
     }
 
@@ -400,18 +643,14 @@ export default class SeleniumService extends ServiceBase {
         if (installations && installations.length > 0) {
             console.log('Found Edge at: ', installations);
             if (process.platform === 'win32') {
-                let {stdout,stderr} = await exec('wmic', [
-                        'datafile',
-                        'where',
-                        `name='${installations[0].replace(/\\/g, '\\\\')}'`,
-                        'get',
-                        'version',
-                        '/value'
+                let {stdout,stderr} = await exec('powershell', [
+                        '-NoProfile',
+                        '-Command',
+                        `(Get-Item -LiteralPath '${installations[0].replace(/'/g, '\'\'')}').VersionInfo.ProductVersion`
                     ]);
 
-                const dataCleaned = stdout.toString().trim().toLowerCase();
-                if (!stderr && dataCleaned.indexOf('version=') > -1) {
-                    const edgeVersion = dataCleaned.split('version=')[1].split('wmic')[0].replace(/\r?\n|\r/g, '');
+                const edgeVersion = stdout.toString().trim();
+                if (!stderr && edgeVersion) {
                     return {
                                 version: edgeVersion, //edgeVersion.split('.')[0],
                                 path: installations[0]
@@ -446,19 +685,14 @@ export default class SeleniumService extends ServiceBase {
         if (installations && installations.length > 0) {
             console.log('Found Chrome at: ', installations);
             if (process.platform === 'win32') {
-                let {stdout,stderr} = await exec('wmic',
-                    [
-                        'datafile',
-                        'where',
-                        `name='${installations[0].replace(/\\/g, '\\\\')}'`,
-                        'get',
-                        'version',
-                        '/value'
-                    ]);
+                let {stdout,stderr} = await exec('powershell', [
+                    '-NoProfile',
+                    '-Command',
+                    `(Get-Item -LiteralPath '${installations[0].replace(/'/g, '\'\'')}').VersionInfo.ProductVersion`
+                ]);
 
-                const dataCleaned = stdout.toString().trim().toLowerCase();
-                if (!stderr && dataCleaned.indexOf('version=') > -1) {
-                    const chromeVersion = dataCleaned.split('version=')[1].split('wmic')[0].replace(/\r?\n|\r/g, '');
+                const chromeVersion = stdout.toString().trim();
+                if (!stderr && chromeVersion) {
                     return chromeVersion;
                 } else {
                     throw new Error('Unable to get Chrome version');
@@ -516,7 +750,7 @@ export default class SeleniumService extends ServiceBase {
                     if (!res.ok) {
                         reject(new Error('Unable to get ChromeDriver version: ' + res.statusText));
                     }
-                    return res.buffer();
+                    return res.arrayBuffer().then(ab => Buffer.from(ab));
                 })
                 .then(body => {
                     const driverVersion = this.convertLastReleaseVersion(body);
@@ -544,7 +778,7 @@ export default class SeleniumService extends ServiceBase {
                     if (!res.ok) {
                         reject(new Error('Unable to get ChromeDriver version: ' + res.statusText));
                     }
-                    return res.buffer();
+                    return res.arrayBuffer().then(ab => Buffer.from(ab));
                 })
                 .then(body => {
                     let version;
@@ -583,7 +817,7 @@ export default class SeleniumService extends ServiceBase {
                     if (!res.ok) {
                         reject(new Error('Unable to get ChromeDriver versions JSON: ' + res.statusText));
                     }
-                    return res.buffer();
+                    return res.arrayBuffer().then(ab => Buffer.from(ab));
                 })
                 .then(body => {
                     var bodyStr = Buffer.from(body,'utf-8').toString();
@@ -674,7 +908,7 @@ export default class SeleniumService extends ServiceBase {
         return fs.readdirSync(source, { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name);
-    }
+    };
 
     // find path to exact chromedriver version
     // or to the user placed binary in the root folder if driverVersion is falsy
@@ -721,21 +955,17 @@ export default class SeleniumService extends ServiceBase {
         const segments = driverVersion.split('.');
         const globVersion = `${segments[0]}.${segments[1]}.${segments[2]}.*/chromedriver${process.platform === 'win32' ? '.*' : ''}`;
 
-        return new Promise((resolve, reject) => {
-            const approx = path.resolve(this.getDriversRootPath(), CHROMEDRIVER_FOLDER_START + globVersion);
-            glob(approx, (err, files) => {
-                if (err || files.length === 0) {
-                    resolve(null);
-                    return;
-                }
-                files.sort((a, b) => {
-                    var buidVerA = parseInt(path.basename(a).split('.')[3], 10);
-                    var buidVerB = parseInt(path.basename(b).split('.')[3], 10);
-                    return buidVerA - buidVerB;
-                });
-                resolve(files[files.length - 1]);
-            });
+        // glob treats backslash as an escape char, so the backslash-separated absolute
+        // path produced by path.resolve() on Windows never matches — normalize to '/'.
+        const approx = path.resolve(this.getDriversRootPath(), CHROMEDRIVER_FOLDER_START + globVersion).replace(/\\/g, '/');
+        const files = glob.sync(approx);
+        if (!files || files.length === 0) return null;
+        files.sort((a, b) => {
+            var buidVerA = parseInt(path.basename(a).split('.')[3], 10);
+            var buidVerB = parseInt(path.basename(b).split('.')[3], 10);
+            return buidVerA - buidVerB;
         });
+        return files[files.length - 1];
     }
 
     patchDriverVersion(orgDriverVersion) {
@@ -789,23 +1019,21 @@ export default class SeleniumService extends ServiceBase {
         }
         const segments = driverVersion.split('.');
         const globVersion = `${segments[0]}.${segments[1]}.${segments[2]}.*/msedgedriver${process.platform === 'win32' ? '.*' : ''}`;
-        return new Promise((resolve, reject) => {
-            const approx = path.resolve(this.getDriversRootPath(), EDGE_FOLDER_START + globVersion);
-            glob(approx, (err, files) => {
-                if (err || files.length === 0) {
-                    resolve(null);
-                    return;
-                }
-                files.sort((a, b) => {
-                    var aFolerName = path.basename(path.dirname(a));
-                    var bFolerName = path.basename(path.dirname(b));
-                    var buidVerA = parseInt(aFolerName.split('.')[3], 10);
-                    var buidVerB = parseInt(bFolerName.split('.')[3], 10);
-                    return buidVerA - buidVerB;
-                });
-                resolve(files[files.length - 1]);
+        {
+            // glob treats backslash as an escape char, so the backslash-separated absolute
+            // path produced by path.resolve() on Windows never matches — normalize to '/'.
+            const approx = path.resolve(this.getDriversRootPath(), EDGE_FOLDER_START + globVersion).replace(/\\/g, '/');
+            const files = glob.sync(approx);
+            if (!files || files.length === 0) return null;
+            files.sort((a, b) => {
+                var aFolerName = path.basename(path.dirname(a));
+                var bFolerName = path.basename(path.dirname(b));
+                var buidVerA = parseInt(aFolerName.split('.')[3], 10);
+                var buidVerB = parseInt(bFolerName.split('.')[3], 10);
+                return buidVerA - buidVerB;
             });
-        });
+            return files[files.length - 1];
+        }
     }
 
     fetchDriver(downloadUrl) {
@@ -817,11 +1045,7 @@ export default class SeleniumService extends ServiceBase {
                             return new Error('Unable to download Driver: ' + res.statusText);
                         }
 
-                        if (res && res.buffer) {
-                            return res.buffer();
-                        } else {
-                            return new Error('res.buffer is not defined');
-                        }
+                        return res.arrayBuffer().then(ab => Buffer.from(ab));
                     })
                     .then(buffer => {
                         if (buffer instanceof Error) {

@@ -98,8 +98,11 @@ export function* maybeNeedRemoveWatcherToFolder({ payload }) {
     }
 }
 
-export function* checkIfEnvFileChange(path) {    
+export function* checkIfEnvFileChange(path) {
     const rootPath = yield select(state => state.fs.rootPath);
+    if (!rootPath) {
+        return;
+    }
     const encConfigFilePath = pathLib.join(rootPath, `${OXYGEN_ENV_FILE_NAME}.js`);
 
     if (encConfigFilePath === path) {
@@ -246,7 +249,7 @@ function* unlinkFile(path) {
             let unlinkedFileContent = '';
             const pathSplit = path.split(pathLib.sep);
             
-            const newName = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
+            const newName = pathSplit[pathSplit.length - 1]+' (deleted from disk)';
 
             if (filesState && filesState[path] && filesState[path]['content']) {
                 unlinkedFileContent = filesState[path]['content'];
@@ -283,6 +286,10 @@ export function* treeLoadNodeChildren({ payload }) {
         }
         folder = response;
     }
+    if (!folder) {
+        yield put(fsActions.treeLoadNodeChildrenFailure(folderPath, 'Unable to read folder contents.'));
+        return;
+    }
     yield put(fsActions.treeLoadNodeChildrenSuccess(folderPath, folder.children));
 }
 
@@ -295,7 +302,11 @@ export function* treeOpenFolder({ payload }) {
         yield put(fsActions._treeOpenFolder_Failure(path, e.message));
         return;    
     }
-    const folder = yield select(state => state.fs.files[path]);  
+    const folder = yield select(state => state.fs.files[path]);
+    if (!folder) {
+        yield put(fsActions._treeOpenFolder_Failure(path, 'Unable to read folder contents.'));
+        return;
+    }
     yield put(fsActions._treeOpenFolder_Success(path, folder.children));
 
     const rootPath = yield select(state => state.fs.rootPath); 
@@ -418,7 +429,7 @@ export function* initializeSuccess() {
                                     
                                     const pathSplit = openFilePath.split(pathLib.sep);
                                     
-                                    const name = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
+                                    const name = pathSplit[pathSplit.length - 1]+' (deleted from disk)';
                                     
                                     const key = 'unknown';
     
@@ -485,7 +496,7 @@ export function* initializeSuccess() {
 
                                     const pathSplit = file.filePath.split(pathLib.sep);
                                     
-                                    const name = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
+                                    const name = pathSplit[pathSplit.length - 1]+' (deleted from disk)';
                                     
                                     const key = 'unknown';
     

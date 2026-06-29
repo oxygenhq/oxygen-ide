@@ -8,7 +8,7 @@
  */
 import ADB from 'appium-adb';
 import ServiceBase from './ServiceBase';
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/main';
 import { execSync } from 'child_process';
 import { exec } from 'teen_process';
 
@@ -66,9 +66,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
             const adb = await ADB.createADB();
             const adbVersion = adb.getAdbVersion();
             
-            Sentry.configureScope((scope) => {
-                scope.setUser({'abdVersion2': adbVersion});
-            });
+            Sentry.getCurrentScope().setUser({'abdVersion2': adbVersion});
 
         } catch (e) {            
             let message = 'not finded';
@@ -77,9 +75,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 message += ' ' + e.message;
             }
             
-            Sentry.configureScope((scope) => {
-                scope.setUser({'abdVersion2': message});
-            });
+            Sentry.getCurrentScope().setUser({'abdVersion2': message});
         }
         try {
 
@@ -87,33 +83,27 @@ export default class DeviceDiscoveryService extends ServiceBase {
             const execResult = execSync('adb version');
 
             if (execResult && execResult.toString) {
-                const result = execResult.toString().trim();    
+                const result = execResult.toString().trim();
                 if (result) {
-                    if (Sentry && Sentry.configureScope) {
-                        Sentry.configureScope((scope) => {
-                            scope.setUser({'abdVersion': result});
-                        });
+                    if (Sentry && Sentry.getCurrentScope) {
+                        Sentry.getCurrentScope().setUser({'abdVersion': result});
                     }
                 } else {
 
                     console.log('adb version');
                     console.log(execResult);
 
-                    if (Sentry && Sentry.configureScope) {
-                        Sentry.configureScope((scope) => {
-                            scope.setUser({'abdVersion': 'Unknown "adb version" result'});
-                        });
+                    if (Sentry && Sentry.getCurrentScope) {
+                        Sentry.getCurrentScope().setUser({'abdVersion': 'Unknown "adb version" result'});
                     }
                 }
             } else {
                 console.log('adb version');
                 console.log(execResult);
-                
 
-                if (Sentry && Sentry.configureScope) {
-                    Sentry.configureScope((scope) => {
-                        scope.setUser({'abdVersion': 'Unknown "adb version" result'});
-                    });
+
+                if (Sentry && Sentry.getCurrentScope) {
+                    Sentry.getCurrentScope().setUser({'abdVersion': 'Unknown "adb version" result'});
                 }
             }
         } catch (e) {
@@ -123,9 +113,7 @@ export default class DeviceDiscoveryService extends ServiceBase {
                 message += ' ' + e.message;
             }
 
-            Sentry.configureScope((scope) => {
-                scope.setUser({'abdVersion': message});
-            });
+            Sentry.getCurrentScope().setUser({'abdVersion': message});
         }
     }
 

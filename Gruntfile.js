@@ -66,7 +66,7 @@ module.exports = function(grunt) {
         var out;
 
         try {
-            out = cp.execSync('npm ls -s --prod=true --parseable');
+            out = cp.execSync('npm ls --omit=dev --parseable --all');
         } catch (e) {
             // npm ls will always throw because some deps are missing... we treat as a normal behavior
             grunt.log.writeln('Unable to get production dependencies list');
@@ -144,7 +144,7 @@ module.exports = function(grunt) {
                 files: [
                     { 
                         expand: true, 
-                        cwd: 'app/node_modules', src: prodDeps.concat(['!fibers/src/**',
+                        cwd: 'app/node_modules', src: prodDeps.concat([
                             '!oxygen-cli/build/ox_reporters/pdf/**',
                             '!oxygen-cli/build/ox_reporters/html/**',
                             '!**/obj/**',
@@ -163,7 +163,6 @@ module.exports = function(grunt) {
                         expand: true, 
                         cwd: 'app', src: ['dist/**',
                             'renderer/img/**',
-                            'main/selenium/*.jar',
                             'main/selenium/' + process.platform + '/**',
                             'renderer/app.html',
                             'main/recorder/**',

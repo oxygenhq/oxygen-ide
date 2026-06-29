@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2015-2018 CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
@@ -100,7 +100,7 @@ export default class ObjectElementOrContainerRemoveDialog extends React.PureComp
             <Modal
                 title="Confirm your actions"
                 okText="Delete"
-                visible={visible}
+                open={visible}
                 onOk={this.handleOk.bind(this)}
                 onCancel={onCancel}
             >

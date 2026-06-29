@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+﻿import React, { Fragment } from 'react';
 import { Modal, Button } from 'antd';
 import electron from 'electron';
 
@@ -11,20 +11,20 @@ export default class NeedInstallExtension extends React.PureComponent<Props> {
       if (this.props.onClose) {
           this.props.onClose();
       }
-  }
+  };
 
   processLink = () => {
       const oxygenUrl = 'https://chrome.google.com/webstore/detail/oxygen/ibbmgejonlmocgjnkmabigdgbolcomea';
       electron.shell.openExternal(oxygenUrl);
       this.close();
-  }
+  };
   
   render() {
       return (
           <Modal
               title="Tests Recording Support"
               width={400}
-              visible={true}
+              open={true}
               onCancel={this.close}
               footer={(
                   <Fragment>

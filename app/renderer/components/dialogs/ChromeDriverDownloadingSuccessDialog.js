@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+﻿import React, { Fragment } from 'react';
 import { Modal, Button } from 'antd';
 
 type Props = {
@@ -11,7 +11,7 @@ export default class ChromeDriverDownloadingSuccessDialog extends React.PureComp
         if (this.props.onClose) {
             this.props.onClose();
         }
-    }
+    };
 
     render() {
         return (
@@ -19,7 +19,7 @@ export default class ChromeDriverDownloadingSuccessDialog extends React.PureComp
                 className="hide-x-button"
                 success
                 width={490}
-                visible={true}
+                open={true}
                 footer={(
                     <Fragment>
                         <Button

@@ -33,10 +33,26 @@ export default function* root() {
         takeLatest(ActionTypes.TEST_EVENT_LINE_UPDATE, handleOnLineUpdate),
         takeLatest(ActionTypes.TEST_SET_PROVIDER, setTestProvider),
         takeLatest(ActionTypes.TEST_SET_MODE, setTestMode),
+        takeLatest(ActionTypes.TEST_SET_TARGET, checkDriverForTarget),
         takeLatest(ActionTypes.TEST_REPL_CLOSE, replClose),
         takeLatest(ActionTypes.TEST_REPL_SEND, replSend),
          
     ]);
+}
+
+// resolve (detect/download) the selected browser's driver only once the user
+// actually picks it in the target dropdown, instead of checking every
+// supported browser's driver eagerly at project-open time
+function* checkDriverForTarget({ payload }) {
+    const { value } = payload;
+    if (!value || typeof value !== 'string') {
+        return;
+    }
+    try {
+        yield call(services.mainIpc.call, 'SeleniumService', 'checkDriver', [value]);
+    } catch (e) {
+        console.warn('checkDriverForTarget error in saga', e);
+    }
 }
 
 function* setTestProvider({payload}) {
@@ -237,15 +253,9 @@ function* handleTestRunnerServiceEvent(event) {
 function* handleSeleniumServiceEvent(event) {
     if (event.type === 'SELENIUM_STARTED') {
         yield put(testActions.setSeleniumReady(true));
-        const { port = null, browserTimeout = null, timeout = null } = event;
-        if (port) {
-            yield put(testActions.setSeleniumPort(port));
-        }        
+        const { browserTimeout = null } = event;
         if (browserTimeout) {
             yield put(testActions.setSeleniumBrowserTimeout(browserTimeout));
-        }
-        if (timeout) {
-            yield put(testActions.setSeleniumTimeout(timeout));
         }
     }
     else if (event.type === 'SELENIUM_STOPPED') {

@@ -91,19 +91,19 @@ export default class FileExplorer extends React.Component<Props> {
             reject: reject,
         };
         this.props.treeLoadNodeChildren(nodeData, true);
-    })
+    });
 
     unWatchFolder = (folderPath) => {
         if (this.props.unWatchFolder) {
             this.props.unWatchFolder(folderPath);
         }
-    }
+    };
 
     watchFolder = (folderPath) => {
         if (this.props.watchFolder) {
             this.props.watchFolder(folderPath);
         }
-    }
+    };
 
     onSubjectChildrenLoaded = (e) => {
         if (this.loadingNodes.hasOwnProperty(e.path)) {
@@ -111,11 +111,11 @@ export default class FileExplorer extends React.Component<Props> {
             delete this.loadingNodes[e.path];
             loadingState.resolve();
         }
-    }
+    };
 
     onSelectNode = (selectedKeys, info) => {
         onSelectNode.apply(this, [selectedKeys, info]);
-    }
+    };
 
 
     onDrop = (info) => {
@@ -166,19 +166,19 @@ export default class FileExplorer extends React.Component<Props> {
                 }
             }
         }
-    }
+    };
 
     doRefreshScrollBottom = () => {
         this.setState({
             refreshScrollBottom: !this.state.refreshScrollBottom
         });
-    }
+    };
 
     doRefreshScrollTop = () => {
         this.setState({
             refreshScroll: !this.state.refreshScroll
         });
-    }
+    };
 
     render() {
         const { rootName, rootPath } = this.props;

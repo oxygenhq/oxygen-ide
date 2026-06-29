@@ -101,7 +101,7 @@ export default class SearchRow extends React.PureComponent<Props> {
            this.props.setSearchResults(searchResults);
            this.inputRef.current.focus();
        });
-   }
+   };
 
    clear = () => {
        this.setState({ 
@@ -111,7 +111,7 @@ export default class SearchRow extends React.PureComponent<Props> {
            this.props.setSearchResults([]);
            this.inputRef.current.focus();
        });
-   }
+   };
 
    render() {
        const { searchQuery, searchResults } = this.state;

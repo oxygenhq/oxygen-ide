@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
@@ -105,7 +105,7 @@ export default class FileCreateDialog extends React.PureComponent<Props> {
         this.setState({
             name: newName,
         });
-    }
+    };
 
     handleOk = () => {
         const { name, ext } = this.state;
@@ -125,7 +125,7 @@ export default class FileCreateDialog extends React.PureComponent<Props> {
         } else {
             this.props.onSubmit(name, this.props.type, this.props.path);
         }
-    }
+    };
 
     formSubmit = (e) => {
         if (e && e.preventDefault) {
@@ -133,7 +133,7 @@ export default class FileCreateDialog extends React.PureComponent<Props> {
         }
 
         this.handleOk();
-    }
+    };
 
     handleKeyPress = (e) => {
         const { name } = this.state;
@@ -141,7 +141,7 @@ export default class FileCreateDialog extends React.PureComponent<Props> {
         if (e.key === 'Enter' && !(!name || name.length === 0)) {
             this.handleOk();
         }
-    }
+    };
 
     render() {
         const {
@@ -183,7 +183,7 @@ export default class FileCreateDialog extends React.PureComponent<Props> {
                 <Modal
                     title={`Create New ${capitalizeFirst(type)}`}
                     width={700}
-                    visible={visible}
+                    open={visible}
                     onCancel={onCancel}
                     footer={(
                         <React.Fragment>

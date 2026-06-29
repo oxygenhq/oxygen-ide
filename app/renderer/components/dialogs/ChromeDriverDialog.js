@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+﻿import React, { Fragment } from 'react';
 import { Modal, Button } from 'antd';
 
 type Props = {
@@ -15,7 +15,7 @@ export default class ChromeDriverDialog extends React.PureComponent<Props> {
         if (this.props.onCancel) {
             this.props.onCancel();
         }
-    }
+    };
 
     download = () => {
         const { chromeVersion, onNoChromeDriverSubmit } = this.props;
@@ -27,7 +27,7 @@ export default class ChromeDriverDialog extends React.PureComponent<Props> {
                 this.props.onNoChromeDriverSubmit();
             }
         }
-    }
+    };
 
     render() {
 
@@ -38,7 +38,7 @@ export default class ChromeDriverDialog extends React.PureComponent<Props> {
                 title="ChromeDriver Error"
                 className="hide-x-button"
                 width={490}
-                visible={true}
+                open={true}
                 footer={(
                     <Fragment>
                         <Button

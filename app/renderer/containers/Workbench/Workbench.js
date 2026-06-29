@@ -8,10 +8,10 @@
  */
 // @flow
 import React, { Fragment } from 'react';
-import {Layout, Icon, Row, Col, message, notification } from 'antd';
+import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
+import {Layout, Row, Col, message, notification } from 'antd';
 import updateModals from '../../components/updateModals';
 // Dialogs
-import JavaDialog from '../../components/dialogs/JavaDialog.jsx';
 import XCodeDialog from '../../components/dialogs/XCodeDialog.jsx';
 import AndroidHomeErrorDialog from '../../components/dialogs/AndroidHomeErrorDialog.jsx';
 import FileRenameDialog from '../../components/dialogs/FileRenameDialog.jsx';
@@ -105,13 +105,11 @@ type Props = {
     startDownloadChromeDriver: Function,
     showDownloadChromeDriverError: Function,
     dialog: Object,
-    javaError: Object | undefined,
     xCodeError: Object | undefined,
     isAndroidHomeError: boolean | undefined,
     initialized: boolean,
     changeShowRecorderMessageValue: Function,
     canRecord: boolean,
-    cleanJavaError: Function,
     cleanXCodeError: Function,
     cleanAndroidHomeError: Function,
     objrepoPath: string | null,
@@ -218,7 +216,7 @@ export default class Workbench extends React.Component<Props> {
                 }
             }
         }
-    }
+    };
     
     keyupCallback = (e) => {
         //   if(e.key === 'Control'){
@@ -226,7 +224,7 @@ export default class Workbench extends React.Component<Props> {
         //       this.elem.removeEventListener('wheel',  this.wheelCallback , true);
         //       this.on = false;
         //   }
-    }
+    };
 
     //   wheelCallback = (e) => {
     //       e.stopPropagation();
@@ -441,7 +439,7 @@ export default class Workbench extends React.Component<Props> {
 
     needInstallExtensionOnClose = () => {
         this.props.hideDialog('DIALOG_NEED_ISTALL_EXTENSION');
-    }
+    };
 
     fileCreateDialog_onCancel() {
         this.props.hideDialog('DIALOG_FILE_CREATE');
@@ -525,66 +523,64 @@ export default class Workbench extends React.Component<Props> {
     chromeDrivers_onSubmit = (chromeDriverVersion) => {
         this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
         this.props.startDownloadChromeDriver(chromeDriverVersion);
-    }
+    };
 
     chromeDrivers_onCancel = () => {
         this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
-    }
+    };
 
     chromeDriversSuccess_onClose = () => {
         this.props.hideDialog('DIALOG_DOWNLOADING_CHROME_DRIVER_SUCCESS');
-    }
+    };
 
     chromeDriversFailed_onClose = () => {
         this.props.hideDialog('DIALOG_DOWNLOADING_CHROME_DRIVER_FAILED');
-    }
+    };
     
     chromeDrivers_onNoChromeDriverSubmit = () => {
         this.props.hideDialog('DIALOG_INCORECT_CHROME_DRIVER_VERSION');
         this.props.showDownloadChromeDriverError();
-    }
+    };
 
     edgeDrivers_onSubmit = (edgeDriverVersion) => {
         this.props.hideDialog('DIALOG_INCORECT_EDGE_DRIVER_VERSION');
         this.props.startDownloadEdgeDriver(edgeDriverVersion);
-    }
+    };
 
     edgeDrivers_onCancel = () => {
         this.props.hideDialog('DIALOG_INCORECT_EDGE_DRIVER_VERSION');
-    }
+    };
 
     edgeDriversSuccess_onClose = () => {
         this.props.hideDialog('DIALOG_DOWNLOADING_EDGE_DRIVER_SUCCESS');
-    }
+    };
 
     edgeDriversFailed_onClose = () => {
         this.props.hideDialog('DIALOG_DOWNLOADING_EDGE_DRIVER_FAILED');
-    }
+    };
     
     edgeDrivers_onNoEdgeDriverSubmit = () => {
         this.props.hideDialog('DIALOG_INCORECT_EDGE_DRIVER_VERSION');
         this.props.showDownloadEdgeDriverError();
-    }
+    };
 
     encryptDecryptDialogOnAction = (action) => {
         this.props.encryptDecryptDialogOnAction(action);
-    }
+    };
 
     encryptDecryptDialogOnCancel = () => {
         this.props.hideDialog('DIALOG_CRYPTO_ENCRYPT_DECRYPT');
-    }
+    };
     
     render() {
         const { 
-            test, 
-            settings = {}, 
-            dialog, 
-            javaError, 
-            xCodeError, 
+            test,
+            settings = {},
+            dialog,
+            xCodeError,
             isAndroidHomeError,
-            initialized, 
-            changeShowRecorderMessageValue, 
-            cleanJavaError, 
+            initialized,
+            changeShowRecorderMessageValue,
             cleanXCodeError,
             cleanAndroidHomeError,
             objrepoPath,
@@ -635,15 +631,8 @@ export default class Workbench extends React.Component<Props> {
 
         return (
             <div>
-                { 
-                    javaError && 
-                    <JavaDialog 
-                        clean={cleanJavaError}
-                        javaError={javaError}
-                    />  
-                }
-                { 
-                    xCodeError && 
+                {
+                    xCodeError &&
                     <XCodeDialog 
                         clean={cleanXCodeError}
                         xCodeError={xCodeError}
@@ -846,13 +835,10 @@ export default class Workbench extends React.Component<Props> {
                                 <Header className="tabs-container">
                                     <Row>
                                         <Col className="sidebar-trigger">                      
-                                            <Icon
-                                                title={!leftSidebarVisible ? 'Show tree' : 'Hide tree'}
-                                                className="trigger"
-                                                type={!leftSidebarVisible ? 'menu-unfold' : 'menu-fold'}
-                                                onClick={ () => ::this.toggleSidebarVisible('left') }
-                                                style={{ paddingLeft: 15, cursor: 'pointer' }}
-                                            />
+                                            { !leftSidebarVisible
+                                                ? <MenuUnfoldOutlined title="Show tree" className="trigger" onClick={ () => ::this.toggleSidebarVisible('left') } style={{ paddingLeft: 15, cursor: 'pointer' }} />
+                                                : <MenuFoldOutlined title="Hide tree" className="trigger" onClick={ () => ::this.toggleSidebarVisible('left') } style={{ paddingLeft: 15, cursor: 'pointer' }} />
+                                            }
                                         </Col>
                                         <Col className="tabs-bar-container">
                                             <Tabs 
@@ -863,13 +849,10 @@ export default class Workbench extends React.Component<Props> {
                                         {
                                             objrepoPath && editorActiveFile && editorActiveFilePossibleRepoPath && objrepoPath === editorActiveFilePossibleRepoPath &&
                                             <Col className="sidebar-trigger">                      
-                                                <Icon
-                                                    title={!rightSidebarVisible ? 'Show Object Repository' : 'Hide Object Repository'}
-                                                    className="trigger"
-                                                    type={!rightSidebarVisible ? 'menu-unfold' : 'menu-fold'}
-                                                    onClick={ () => ::this.toggleSidebarVisible('right') }
-                                                    style={{ paddingLeft: 15, cursor: 'pointer', transform: 'rotate(180deg)' }}
-                                                />
+                                                { !rightSidebarVisible
+                                                    ? <MenuUnfoldOutlined title="Show Object Repository" className="trigger" onClick={ () => ::this.toggleSidebarVisible('right') } style={{ paddingLeft: 15, cursor: 'pointer', transform: 'rotate(180deg)' }} />
+                                                    : <MenuFoldOutlined title="Hide Object Repository" className="trigger" onClick={ () => ::this.toggleSidebarVisible('right') } style={{ paddingLeft: 15, cursor: 'pointer', transform: 'rotate(180deg)' }} />
+                                                }
                                             </Col>
                                         }
                                     </Row>

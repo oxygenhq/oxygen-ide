@@ -12,7 +12,8 @@ import moment from 'moment';
 import detectPort from 'detect-port';
 import ServiceBase from './ServiceBase';
 import cp from 'child_process';
-import { FAILED } from 'oxygen-cli/build/model/status';
+import { TEST_TARGET_TO_DRIVER_KEY } from './SeleniumService';
+const FAILED = 'failed'; // was: import { FAILED } from 'oxygen-cli/build/model/status'
 
 // Events
 const EVENT_LOG_ENTRY = 'LOG_ENTRY';
@@ -41,6 +42,8 @@ export default class TestRunnerService extends ServiceBase {
         this.reporter = null;
         this.mainFilePath = null;
         this.currentTransactionName = null;
+        this.currentDriverKey = null; // driver started for the in-progress web test, if any
+        this.lastTestFailed = false;
     }
     
     async start(mainFilePath, breakpoints, runtimeSettings, runSettings) {
@@ -50,7 +53,9 @@ export default class TestRunnerService extends ServiceBase {
         }
         this.isRunning = true;
         this.isStopping = false;
-        const framework = runtimeSettings.framework || 'oxygen';        
+        this.currentDriverKey = null;
+        this.lastTestFailed = false;
+        const framework = runtimeSettings.framework || 'oxygen';
         // store mainFilePath for later, so when we receive LINE_UPDATE event from Oxygen, 
         // we can bubble it up and include the file name in addition to line number (Oxygen sends only a line number)
         this.mainFilePath = mainFilePath;
@@ -73,7 +78,6 @@ export default class TestRunnerService extends ServiceBase {
             testMode,
             testTarget,
             testProvider,
-            seleniumPort,
             seleniumBrowserTimeout,
             seleniumTimeout,
             seleniumPid,
@@ -81,7 +85,8 @@ export default class TestRunnerService extends ServiceBase {
             testName,
             rootPath,
             oxConfigFile,
-            edgePath
+            edgePath,
+            firefoxPath
         } = testConfig;
         let testsuite = null;
 
@@ -160,6 +165,31 @@ export default class TestRunnerService extends ServiceBase {
                         deviceName: testTarget
                     }
                 };
+                // responsive mode always drives Chrome via mobile emulation —
+                // start (or reuse) the local chromedriver, same as regular web mode
+                if (!options.seleniumUrl) {
+                    const seleniumService = this.getService('SeleniumService');
+                    let driverPort = null;
+                    try {
+                        driverPort = seleniumService && await seleniumService.startDriver('chrome');
+                    } catch (e) {
+                        console.warn('Failed to start chrome driver', e);
+                    }
+                    if (!driverPort) {
+                        const e = new Error(
+                            'Unable to start the local WebDriver for Chrome. ' +
+                            'The matching driver may not be installed — check the Selenium log.'
+                        );
+                        this._emitLogEvent(SEVERITY_ERROR, `Test failed: ${e.message}`);
+                        this._emitTestEnded(null, e);
+                        this.isRunning = false; // nothing was launched yet, so just unset local vars
+                        this.runner = null;
+                        this.mainFilePath = null;
+                        return;
+                    }
+                    this.currentDriverKey = 'chrome';
+                    options.seleniumUrl = `http://localhost:${driverPort}`;
+                }
             } else if (testMode === 'mob') {
                 options.mode = 'mob';
                 let deviceName = null;
@@ -180,7 +210,32 @@ export default class TestRunnerService extends ServiceBase {
             } else if (testMode === 'web') {
                 options.mode = 'web';
                 if (!options.seleniumUrl) {
-                    options.seleniumUrl = `http://localhost:${seleniumPort}/wd/hub`;
+                    const driverKey = TEST_TARGET_TO_DRIVER_KEY[testTarget] || 'chrome';
+                    const seleniumService = this.getService('SeleniumService');
+                    let driverPort = null;
+                    try {
+                        driverPort = seleniumService && await seleniumService.startDriver(driverKey);
+                    } catch (e) {
+                        console.warn(`Failed to start ${driverKey} driver`, e);
+                    }
+                    if (!driverPort) {
+                        const e = new Error(
+                            `Unable to start the local WebDriver for "${testTarget}". ` +
+                            'The matching driver may not be installed — check the Selenium log.'
+                        );
+                        this._emitLogEvent(SEVERITY_ERROR, `Test failed: ${e.message}`);
+                        this._emitTestEnded(null, e);
+                        this.isRunning = false; // nothing was launched yet, so just unset local vars
+                        this.runner = null;
+                        this.mainFilePath = null;
+                        return;
+                    }
+                    // this test run "owns" this driver process — stop it once the
+                    // test finishes (see the finally block in start())
+                    this.currentDriverKey = driverKey;
+                    // native drivers serve WebDriver protocol at their root path —
+                    // no /wd/hub (that suffix was specific to the Selenium hub)
+                    options.seleniumUrl = `http://localhost:${driverPort}`;
                 }
                 options.browserName = testTarget;
                 // @FIXME: this option should be exposed in reports settings
@@ -191,6 +246,13 @@ export default class TestRunnerService extends ServiceBase {
                     caps['se:ieOptions'] = {
                         'ie.edgechromium': true,
                         'ie.edgepath': edgePath
+                    };
+                } else if (testTarget === 'firefox' && firefoxPath) {
+                    // geckodriver only looks for Firefox on the OS PATH / default
+                    // install location, and fails session creation if it's
+                    // installed somewhere else — point it at the detected binary
+                    caps['moz:firefoxOptions'] = {
+                        binary: firefoxPath
                     };
                 }
             }
@@ -353,6 +415,16 @@ export default class TestRunnerService extends ServiceBase {
         }      
         finally {
             this.isRunning = false;
+            if (this.currentDriverKey) {
+                // driver is only stopped when the test did not fail, so a failed
+                // browser session stays open for inspection/debugging, matching
+                // the existing chrome/edge cleanup behavior in oxygen-cli
+                const seleniumService = this.getService('SeleniumService');
+                if (seleniumService && !this.lastTestFailed) {
+                    seleniumService.stopDriver(this.currentDriverKey);
+                }
+                this.currentDriverKey = null;
+            }
             // dispose Oxygen Runner and mark the state as not running, before updating the UI
             await this.dispose();
         }
@@ -512,8 +584,9 @@ export default class TestRunnerService extends ServiceBase {
 
     _emitTestEnded(result, error, noLog = false) {
         this.finished = true;
+        const status = result && result.status ? result.status.toUpperCase() : 'FAILED';
+        this.lastTestFailed = status === 'FAILED';
         if (!noLog) {
-            const status = result && result.status ? result.status.toUpperCase() : 'FAILED';
             let duration = result && result.duration/1000;
 
             if (duration) {
@@ -728,6 +801,9 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
     }
 
     _handleBreakpointError(breakpointError) {
+        if (!breakpointError) {
+            return;
+        }
         const {
             message,
             lineNumber,
@@ -753,30 +829,31 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
     }
 
     _handleBreakpoint(breakpoint) {
-        const { lineNumber, fileName, variables, resolved } = breakpoint;
+        // the debugger can emit 'breakpoint' with a null payload (e.g. when it fails to
+        // capture call frames for the paused context), but execution is genuinely paused
+        // either way — if we don't notify the GUI, isPaused never becomes true and the
+        // Continue button never appears, leaving the test stuck forever. Fall back to
+        // safe defaults so the user can still resume, even without line/file to highlight.
+        const { lineNumber, fileName, variables, resolved } = breakpoint || {};
         // if no fileName is received from the debugger (not suppose to happen), assume we are in the main script file
         const editorFile = fileName ? fileName : this.mainFilePath;
         // if we are in the main script file, adjust line number according to script boilerplate offset
         // if we are in the secondary file (loaded via `require`) add 1 since BP indices are 0-based.
-        let editorLine = lineNumber + 1;
-        
-        const time = moment.utc().valueOf();
-        
-        /*console.log('--- debug _handleBreakpoint ---');
-        console.log('line', editorLine);
-        console.log('file', editorFile);
-        console.log('resolved', resolved);
-        console.log('--- debug ---');*/
+        const editorLine = typeof lineNumber === 'number' ? lineNumber + 1 : null;
 
-        // make sure to mark breakpoint line with current line mark
-        this.notify({
-            type: EVENT_LINE_UPDATE,
-            time,
-            file: editorFile,
-            line: editorLine,
-            // alway open the tab (make it active) in which breakpoint occured
-            primary: true,
-        });
+        const time = moment.utc().valueOf();
+
+        // make sure to mark breakpoint line with current line mark (only if we know the line)
+        if (editorLine !== null) {
+            this.notify({
+                type: EVENT_LINE_UPDATE,
+                time,
+                file: editorFile,
+                line: editorLine,
+                // alway open the tab (make it active) in which breakpoint occured
+                primary: true,
+            });
+        }
 
         // notify GUI that we hit a breakpoint
         this.notify({
@@ -784,7 +861,7 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
             time,
             file: editorFile,
             line: editorLine,
-            variables: variables
+            variables: variables || []
         });
 
         if (resolved) {

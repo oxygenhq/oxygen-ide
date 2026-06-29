@@ -1,4 +1,4 @@
-//@flow
+﻿//@flow
 import React, { Fragment } from 'react';
 import { Modal, Button, Checkbox } from 'antd';
 import electron from 'electron';
@@ -21,13 +21,13 @@ export default class WorkingChromeDialog extends React.Component<Props> {
 
     handleOk = () => {
         this.handleCancel();
-    }
+    };
 
     handleCancel = () => {
         if (this.props.hide) {
             this.props.hide();
         }
-    }
+    };
 
   
     processLink = (event) => {
@@ -36,7 +36,7 @@ export default class WorkingChromeDialog extends React.Component<Props> {
         }
         const docsUrl = 'http://docs.oxygenhq.org';
         electron.shell.openExternal(docsUrl);
-    }
+    };
 
     onChange = (e) => {
         const { changeShowRecorderMessageValue } = this.props;
@@ -50,7 +50,7 @@ export default class WorkingChromeDialog extends React.Component<Props> {
                 changeShowRecorderMessageValue(checked);
             }
         });
-    }
+    };
 
     render() {
 
@@ -78,7 +78,7 @@ export default class WorkingChromeDialog extends React.Component<Props> {
         return (
             <Modal
                 title="Recording started"
-                visible={true}
+                open={true}
                 onCancel={this.handleCancel}
                 footer={
                     <Fragment>

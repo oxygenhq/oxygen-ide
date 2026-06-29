@@ -555,20 +555,27 @@ export function markParams (editor, value) {
 
     const allMarkers = getAllMarkers(editor);
 
-    const decoratorsToRemove = [
-        ...allMarkers.filter((item) => {
+    // deltaDecorations' first argument must be an array of decoration ID strings, not the
+    // decoration objects themselves (see IModel.deltaDecorations(oldDecorations: string[], ...)
+    // in monaco's own type defs) — passing objects doesn't throw, since this isn't
+    // TypeScript-checked at runtime, but it silently fails to remove anything, and because
+    // Monaco's decorations are "sticky" by default (they grow to absorb text typed right after
+    // their end offset), a stale never-removed decoration can end up expanding to cover text
+    // that was typed well after it was created.
+    const decoratorsToRemove = decoratorsToFlat(
+        allMarkers.filter((item) => {
             if (
                 item &&
-                item.options && 
+                item.options &&
                 item.options.inlineClassName &&
                 typeof item.options.inlineClassName === 'string'
             ) {
-                return item.options.inlineClassName === PARAM_DECORATION_CLASS_NAME;  
+                return item.options.inlineClassName === PARAM_DECORATION_CLASS_NAME;
             } else {
                 return false;
             }
-        }),
-    ];
+        })
+    );
 
     if (splitResult && splitResult.length > 0) {
         splitResult.map((inputItem, idx) => {
@@ -603,5 +610,104 @@ export function markParams (editor, value) {
 
     if (editor) {
         editor.deltaDecorations(decoratorsToRemove, decorations);
+    }
+}
+
+const TRANSACTION_DECORATION_CLASS_NAME = 'oxTransactionDecoration';
+
+// highlights the whole "web.transaction(...)"/"mob.transaction(...)" call as a decoration
+// instead of via a custom Monarch token (see the removed "ox.transaction" token in
+// tokenizers/javascript.js) — a decoration is a purely visual overlay applied on top of
+// whatever the editor's own tokenizer produced, so covering the full call (including the
+// transaction-name argument) here is safe and can't reintroduce the old bidi bug: decorations
+// don't merge into or otherwise affect Monaco's token-level bidi grouping/isolation the way
+// sharing a single "ox.transaction" token type for the whole call used to (Hebrew/Arabic
+// transaction names were getting their surrounding punctuation mirrored/reordered because the
+// whole call, quotes included, was one RTL-tainted token span).
+export function markTransactions(editor, value) {
+    if (!value) {
+        return;
+    }
+
+    const splitResult = value.split('\n');
+    // matches up to the first closing paren so it doesn't over-run onto unrelated code if the
+    // transaction name itself happens to contain ')' or ';'
+    const regex = /(web|mob)\.transaction\([^)]*\);?/g;
+    const decorations = [];
+
+    // deltaDecorations' first argument must be an array of decoration ID strings, not the
+    // decoration objects themselves — see the identical note in markParams above (this is the
+    // same fix, missed here originally by copying that existing pattern verbatim).
+    const allMarkers = getAllMarkers(editor);
+    const decoratorsToRemove = decoratorsToFlat(
+        allMarkers.filter((item) => {
+            return (
+                item &&
+                item.options &&
+                item.options.inlineClassName &&
+                typeof item.options.inlineClassName === 'string' &&
+                item.options.inlineClassName === TRANSACTION_DECORATION_CLASS_NAME
+            );
+        })
+    );
+
+    // tokenize the whole document in one call (rather than line-by-line) so the tokenizer's
+    // state carries over between lines — this is required to correctly detect lines that are
+    // inside a multi-line "/* ... */" block comment, since a block comment's continuation lines
+    // contain no marker of their own that identifies them as "inside a comment" in isolation.
+    const tokensByLine = monaco.editor.tokenize(value, 'javascript');
+
+    splitResult.forEach((line, idx) => {
+        regex.lastIndex = 0;
+        let match;
+        while ((match = regex.exec(line)) !== null) {
+            // the regex is a plain text scan with no idea whether this match is actually live
+            // code — "// web.transaction('x')" matches it exactly as readily as a real call.
+            // Ask the editor's own tokenizer what's actually at this position and skip it if
+            // it's inside a comment (or, incidentally, a string — e.g. someone's transaction
+            // name literally containing the text "web.transaction(...)").
+            if (!isCodeTokenAt(tokensByLine, idx, match.index)) {
+                continue;
+            }
+            const lineNumber = idx + 1;
+            const start = match.index + 1; // Monaco columns are 1-based
+            const end = start + match[0].length;
+            decorations.push({
+                range: new monaco.Range(lineNumber, start, lineNumber, end),
+                options: {
+                    inlineClassName: TRANSACTION_DECORATION_CLASS_NAME
+                }
+            });
+        }
+    });
+
+    if (editor) {
+        editor.deltaDecorations(decoratorsToRemove, decorations);
+    }
+}
+
+// true if the character at `offset` on line `lineIdx` (0-based) is tokenized as plain code —
+// i.e. not part of a comment or string literal, per the editor's own JavaScript tokenizer.
+// `tokensByLine` must come from tokenizing the *entire* document text in one call (not just
+// this one line) so that state — e.g. "currently inside a /* */ block comment" — correctly
+// carries over from preceding lines.
+function isCodeTokenAt(tokensByLine, lineIdx, offset) {
+    try {
+        const lineTokens = (tokensByLine && tokensByLine[lineIdx]) || [];
+        let currentType = null;
+        for (const token of lineTokens) {
+            if (token.offset > offset) {
+                break;
+            }
+            currentType = token.type;
+        }
+        // default to "is code" when no token was found at this offset (e.g. tokenize()
+        // returned nothing usable) rather than silently hiding a legitimate transaction —
+        // only actually EXCLUDE when a comment/string token is positively identified
+        return !currentType || (!currentType.startsWith('comment') && !currentType.startsWith('string'));
+    } catch (e) {
+        // if tokenizing fails for any reason, fall back to highlighting — matches prior
+        // behavior rather than silently dropping a legitimate transaction highlight
+        return true;
     }
 }

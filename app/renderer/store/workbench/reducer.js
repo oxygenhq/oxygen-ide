@@ -27,17 +27,6 @@ export default (state = defaultState, action, dispatch) => {
         };
     }
 
-    case ActionTypes.WB_SET_JAVA_ERROR:
-        return {
-            ...state,
-            javaError: error || true
-        };
-    case ActionTypes.WB_CLEAN_JAVA_ERROR: {
-        let newState = { ...state };
-        delete newState.javaError;
-        return newState;
-    }
-
     case ActionTypes.WB_SET_XCODE_ERROR:
         return {
             ...state,

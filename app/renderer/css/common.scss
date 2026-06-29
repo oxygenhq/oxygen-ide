@@ -1,4 +1,5 @@
-@import 'vars';
+@use 'sass:math';
+@use 'vars' as *;
 
 .show-on-hover-path-path {
   display: none;
@@ -47,6 +48,11 @@
 	font-style: oblique;
 }
 
+.oxTransactionDecoration {
+	color: #314496 !important;
+	font-weight: bold;
+}
+
 $base: 12;
 $r: 1;
 
@@ -55,8 +61,8 @@ $r: 1;
     width: #{( $size - $base )*$r+10}px !important;
     height: #{( $size - $base )*$r+10}px !important;
     left: 3px !important;
-    top: #{1.58*$size/2}px;
-    margin-top: -#{(( $size - $base )*$r+10)/2}px;
+    top: #{math.div(1.58*$size, 2)}px;
+    margin-top: -#{math.div(( $size - $base )*$r+10, 2)}px;
   }
 }
 
@@ -84,7 +90,7 @@ $b: 0.25;
     border-top: #{( $size - $base )*$b + $base*$bbase}px solid transparent;
     border-bottom: #{( $size - $base )*$b + $base*$bbase}px solid transparent;
     left: #{( $size - $base ) * 2.75 + $base*3.5}px !important;
-    top: #{1.58*$size/2}px;
+    top: #{math.div(1.58*$size, 2)}px;
     margin-top: -#{( $size - $base )*$b+$base*$bbase}px;
   }
 }
@@ -195,16 +201,43 @@ $b: 0.25;
 
 .videoWrapper {
 	position: relative;
-	padding-bottom: 56.25%; /* 16:9 */
-	padding-top: 25px;
-	height: 0;
+	width: 560px;
+	height: 315px;
 }
-.videoWrapper iframe {
+.videoWrapper a {
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
+	display: block;
+}
+.videoWrapper .videoThumbnail {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.videoWrapper .videoPlayOverlay {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 68px;
+	height: 48px;
+	background-color: rgba(0, 0, 0, 0.7);
+	border-radius: 10px;
+	pointer-events: none;
+
+	&:before {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 54%;
+		transform: translate(-50%, -50%);
+		border-style: solid;
+		border-width: 12px 0 12px 20px;
+		border-color: transparent transparent transparent #fff;
+	}
 }
 
 .landing-container {

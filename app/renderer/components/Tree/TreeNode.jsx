@@ -12,7 +12,7 @@ import classNames from 'classnames';
 import Animate from 'rc-animate';
 import toArray from 'rc-util/lib/Children/toArray';
 import { polyfill } from 'react-lifecycles-compat';
-import { nodeContextTypes } from './contextTypes';
+import { TreeContext } from './contextTypes';
 import {
     getNodeChildren,
     getDataAndAria,
@@ -65,10 +65,6 @@ class TreeNode extends React.Component {
         hideIcon: PropTypes.bool,
     };
 
-    static contextTypes = nodeContextTypes;
-
-    static childContextTypes = nodeContextTypes;
-
     static defaultProps = {
         title: defaultTitle,
     };
@@ -81,15 +77,6 @@ class TreeNode extends React.Component {
         };
     }
 
-    getChildContext() {
-        return {
-            ...this.context,
-            rcTreeNode: {
-                // onUpCheckConduct: this.onUpCheckConduct,
-            },
-        };
-    }
-
     // Isomorphic needn't load data in server side
     componentDidMount() {
         this.syncLoadData(this.props);
@@ -98,6 +85,8 @@ class TreeNode extends React.Component {
     componentDidUpdate() {
         this.syncLoadData(this.props);
     }
+
+    static contextType = TreeContext;
 
     onSelectorClick = (e) => {
         // Click trigger before select/check operation
@@ -177,7 +166,7 @@ class TreeNode extends React.Component {
         if (onDrag) {
             onDrag(event.clientY);
         }
-    }
+    };
 
     onDragEnter = (e) => {
         const { rcTree: { onNodeDragEnter } } = this.context;
@@ -402,7 +391,7 @@ class TreeNode extends React.Component {
         if (this.props.onIconContextMenu) {
             this.props.onIconContextMenu(e);
         }
-    }
+    };
 
     // Icon + Title
     renderSelector = () => {

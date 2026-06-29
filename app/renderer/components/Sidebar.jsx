@@ -62,20 +62,20 @@ export default class Sidebar extends React.Component<Props> {
                 this.setState({ dragFlag: false }, this.props.onResize(MIN_SIZE));
             }
         }
-    }
+    };
 
     onMouseUpHandler = () => {
         if (this.state.dragFlag) {
             this.setState({ dragFlag: false, sideClass: 'restore-animation' });
         }
-    }
+    };
 
     onDragging = () => {
         this.setState({
             dragFlag: true,
             sideClass: 'prevent-animation',
         });
-    }
+    };
 
     render() {
         const { align = 'left' } = this.props;

@@ -43,6 +43,11 @@ export const storeEdgeBinaryPath = (path) => ({
     payload: { path },
 });
 
+export const storeFirefoxBinaryPath = (path) => ({
+    type: types.STORE_FIREFOX_BINARY_PATH,
+    payload: { path },
+});
+
 export const showDownloadEdgeDriverError = () => ({
     type: types.DIALOG_SHOW_DOWNLOADING_EDGE_DRIVER_FAILED,
     payload: {  },

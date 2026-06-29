@@ -6,7 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-import uuidv4 from 'uuid/v4';
 import { all, put, select, takeLatest, call } from 'redux-saga/effects';
 import { putAndTake } from '../../helpers/saga';
 import pathHelper from 'path';
@@ -338,31 +337,9 @@ export function* handleServiceEvents({ payload }) {
 
     if (service === 'UpdateService') {
         yield handleUpdateServiceEvent(event);
-    } else if (service === 'JavaService') {
-        if (event && event.type) {
-            if (event.type === 'JAVA_NOT_FOUND') {
-                yield handleJavaNotFound(event);
-            } else if (event.type === 'JAVA_BAD_VERSION') {
-                yield handleJavaBadVersion(event);
-            }
-        }
     } else if (service === 'CryptoService') {
         yield handleCryptoServiceEvent(event);
     }
-}
-
-export function* handleJavaNotFound() {
-    yield put(wbActions.setJavaError({
-        reason: 'not-found'
-    }));
-}
-
-export function* handleJavaBadVersion({ payload }) {
-    const { version } = payload;
-    yield put(wbActions.setJavaError({
-        reason: 'bad-version',
-        version: version
-    }));
 }
 
 function* handleUpdateServiceEvent(event) {
@@ -429,7 +406,7 @@ export function* initialize() {
             yield put(setUserIdToSentry(appSettings.cache.settings.uuid));
             
         } else {
-            const uuid = uuidv4();
+            const uuid = crypto.randomUUID();
             yield call(services.mainIpc.call, 'AnalyticsService', 'createUser', [uuid]);
             yield put(settingsActions.createUser(uuid));
             yield put(setUserIdToSentry(uuid));
@@ -456,7 +433,7 @@ export function* initialize() {
     } else {
         yield put(settingsActions.changeCacheUsed(true));
 
-        const uuid = uuidv4();
+        const uuid = crypto.randomUUID();
 
         yield call(services.mainIpc.call, 'AnalyticsService', 'createUser', [uuid]);
         yield put(settingsActions.createUser(uuid));
@@ -466,13 +443,6 @@ export function* initialize() {
         if (appSettings) {
             appSettings.cacheUsed = true;
         }
-    }
-
-    try {
-        yield call(services.mainIpc.call, 'JavaService', 'checkJavaVersion');
-    } catch (error) {
-        console.warn('Failure checking Java', error);
-        yield put(reportError(error));
     }
 
     // start Selenium server
@@ -1089,8 +1059,8 @@ export function* closeFile({ payload }) {
     // prompt user if file has been modified and unsaved
     if (file && force == false && file.modified && file.modified == true) {
         const answer = yield call(confirm, {
-            okText: 'Yes',
-            cancelText: 'No',
+            okText: 'Close without saving',
+            cancelText: 'Cancel',
             title: `Are you sure you want to close unsaved file ${file.name}?`
         });
 
@@ -1103,7 +1073,7 @@ export function* closeFile({ payload }) {
         const pathSplit = path.split(pathHelper.sep);
 
         if (pathSplit && pathSplit.length) {
-            const newName = pathSplit[pathSplit.length - 1]+'(deleted from disk)';
+            const newName = pathSplit[pathSplit.length - 1]+' (deleted from disk)';
             
             yield put(tabActions.renameTab(path, 'unknown', newName));
             yield put(editorActions.renameFile(path, newName, true));
@@ -1670,6 +1640,7 @@ export function* showDeleteFileDialog({ payload }) {
         const answer = yield call(confirm, {
             okText: 'Yes',
             cancelText: 'No',
+            okButtonProps: { danger: true },
             title: `Are you sure you want to delete '${treeActiveFile.name}'?`
         });
 

@@ -3,12 +3,17 @@
 // DMG creation part based on https://github.com/rakuten-frontend/grunt-appdmg
 
 var path = require('path');
-var appdmg = require('appdmg');
-var chalk = require('chalk');
+var chalk = require('chalk').default;
 var cp = require('child_process');
 
 module.exports = function (grunt) {
     grunt.registerMultiTask('installer-dmg', 'Generate notarized DMG-images for Mac OSX', function () {
+        // appdmg is a macOS-only optionalDependency (native module) and won't be
+        // installed on other platforms. This task is only ever added to Gruntfile's
+        // defaultTasks on darwin, so requiring it lazily here keeps `grunt.loadTasks`
+        // (which unconditionally requires every file in this directory) from failing
+        // on Windows/Linux.
+        var appdmg = require('appdmg');
         var options = this.options();
         var done = this.async();
 

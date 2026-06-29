@@ -10,14 +10,16 @@ export default class Landing extends React.PureComponent {
       if (event) {
           event.preventDefault();
 
-          if (event.target instanceof HTMLAnchorElement) {
-              const url = event.target.getAttribute('href');
+          // use currentTarget (the <a> the handler is bound to), not target, since
+          // target can be a child element (e.g. the video thumbnail <img>)
+          if (event.currentTarget instanceof HTMLAnchorElement) {
+              const url = event.currentTarget.getAttribute('href');
               electron.shell.openExternal(url);
           } else {
-              console.log('bad event.target', event.target);
+              console.log('bad event.currentTarget', event.currentTarget);
           }
       }
-  }
+  };
 
   render() {
       return (
@@ -28,7 +30,16 @@ export default class Landing extends React.PureComponent {
                   <p className="landing-text">To read an online guide of Oxygen click <a href="http://docs.oxygenhq.org/getting-started-web/introduction" onClick={this.processLink}>here</a></p>
                   <p className="landing-text">To learn about Cloudbeat click <a href="http://cloudbeat.io/" onClick={this.processLink}>here</a></p>
                   <div className="videoWrapper">
-                      <iframe width="560" height="315" src="https://www.youtube.com/embed/xIuLpEGdE-k" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                      { /* the video owner disallows embedding (YouTube iframe error 152), so
+                         open it in the system browser instead, same as the links above */ }
+                      <a href="https://www.youtube.com/watch?v=xIuLpEGdE-k" onClick={this.processLink}>
+                          <img
+                              className="videoThumbnail"
+                              src="https://img.youtube.com/vi/xIuLpEGdE-k/hqdefault.jpg"
+                              alt="Watch video on YouTube"
+                          />
+                          <span className="videoPlayOverlay" />
+                      </a>
                   </div>
               </div>
           </div>

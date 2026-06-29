@@ -11,15 +11,15 @@ import fs from 'fs';
 import fsExtra from 'fs-extra';
 import beautify from 'js-beautify';
 import path from 'path';
-import rimraf from 'rimraf';
-import junk from 'junk';
+import { rimraf } from 'rimraf';
+import { isJunk } from 'junk';
 import chokidar from 'chokidar';
 import { webContents } from 'electron';
 import ServiceBase from './ServiceBase';
 import fileFolderSorter from '../helpers/fileFolderSorter';
 import isUnixHiddenPath from '../helpers/isUnixHiddenPath';
 import isWinHiddenPath from '../helpers/isWinHiddenPath';
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/main';
 
 const FS_ERRORS = {
     EACCES: 'Permission denied',
@@ -159,13 +159,16 @@ export default class FileService extends ServiceBase {
             }
 
             this.chokidarWatcher = chokidar.watch(saveWatchFolders, {
-                ignored: ['**/node_modules/**/*', '**/node_modules/**/**/*', '**/.git/**/*', '*.gz'],
+                // chokidar 4+ dropped glob-pattern support for `ignored` — must be a function, regex, or exact path
+                ignored: (watchedPath) => {
+                    const segments = watchedPath.split(path.sep);
+                    return segments.includes('node_modules') || segments.includes('.git') || watchedPath.endsWith('.gz');
+                },
                 ignoreInitial: true,
                 ignorePermissionErrors: true,
                 followSymlinks: true,
                 interval: 1000,
                 binaryInterval: 1000,
-                useFsEvents: false,
                 usePolling: true,
                 depth: 0
             }).on('all', (event, eventPath, third) => {
@@ -212,7 +215,7 @@ export default class FileService extends ServiceBase {
                         Sentry.captureException(e);
                         return result;
                     }
-                    if (stats.isSymbolicLink() || junk.is(filePath) 
+                    if (stats.isSymbolicLink() || isJunk(filePath)
                         || isUnixHiddenPath(fileName)
                         || isWinHiddenPath(fileName)) {
                         return result;
@@ -227,7 +230,8 @@ export default class FileService extends ServiceBase {
                 children: children,
             };
         } catch (e) {
-            //ignore
+            console.warn(`getFolderContent failed for "${folderPath}":`, e);
+            Sentry.captureException(e);
         }
     }
 
@@ -245,7 +249,13 @@ export default class FileService extends ServiceBase {
                 ext: path.extname(filePath),
             };
         } catch (e) {
-            //ignore
+            // this is routinely called speculatively (e.g. probing whether an
+            // optional ".repo.js" companion file exists next to a page object) —
+            // a missing file is an expected outcome here, not a real failure
+            if (e.code !== 'ENOENT') {
+                console.warn(`getFileInfo failed for "${filePath}":`, e);
+                Sentry.captureException(e);
+            }
         }
     }
 
@@ -362,16 +372,11 @@ export default class FileService extends ServiceBase {
         if (!fsPath) {
             throw new Error('Invalid arguments.');
         }
-        return new Promise((resolve, reject) => {
-            rimraf(fsPath, (error) => {
-                if (error) {
-                    reject(this._humanizeErrorCode(error));
-                }
-                else {
-                    resolve();
-                }
+        return rimraf(fsPath)
+            .then(() => undefined)
+            .catch((error) => {
+                throw this._humanizeErrorCode(error);
             });
-        });
     }
 
     createFolder(parentPath, name) {

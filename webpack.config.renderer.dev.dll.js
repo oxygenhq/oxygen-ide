@@ -15,7 +15,7 @@ CheckNodeEnv('development');
 const dist = path.resolve(process.cwd(), 'dll');
 const publicPath = dist+'/';
 
-export default merge.smart(baseConfig, {
+export default merge(baseConfig, {
     mode: 'development',
 
     context: process.cwd(),
@@ -24,7 +24,10 @@ export default merge.smart(baseConfig, {
 
     target: 'electron-renderer',
 
-    externals: ['fsevents', 'crypto-browserify'],
+    // without this, webpack5 infers externalsType from output.libraryTarget ('var' below),
+    // emitting `module.exports = somePackage;` (raw global ref) instead of a require() call
+    externalsType: 'commonjs2',
+    externals: ['fsevents', 'crypto-browserify', /^@sentry\//, 'winston', /^winston-/, 'appium-adb', /^appium-/],
 
     /**
    * Use `module` from `webpack.config.renderer.dev.js`
@@ -49,18 +52,16 @@ export default merge.smart(baseConfig, {
             },
             {
                 test: /\.(js|jsx)?$/,
-                exclude: [/node_modules\/(?!node-gyp)/, /app\/node_modules/],
+                exclude: [/node_modules[\\/](?!node-gyp)/, /app\/node_modules/],
                 use: {
                     loader: 'babel-loader',
                     options: {
                         cacheDirectory: true,
                         plugins: [
-                            // Here, we include babel plugins that are only required for the
-                            // renderer process. The 'transform-*' plugins must be included
-                            // before react-hot-loader/babel
                             ['@babel/plugin-proposal-class-properties', { 'loose': true }],
+                            ['@babel/plugin-proposal-private-methods', { 'loose': true }],
+                            ['@babel/plugin-proposal-private-property-in-object', { 'loose': true }],
                             '@babel/plugin-transform-classes',
-                            'react-hot-loader/babel'
                         ],
                     }
                 }
@@ -112,7 +113,7 @@ export default merge.smart(baseConfig, {
             },
             {
                 test: /node_modules[/\\]*monaco-editor[/\\]*esm.*\.ttf$/,
-                use: ['file-loader']
+                type: 'asset/resource',
             },
 
             // doesn't contains module keyword
@@ -164,56 +165,36 @@ export default merge.smart(baseConfig, {
             // WOFF Font
             {
                 test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        limit: 10000,
-                        mimetype: 'application/font-woff',
-                    }
-                },
+                type: 'asset',
+                parser: { dataUrlCondition: { maxSize: 10000 } },
             },
             // WOFF2 Font
             {
                 test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        limit: 10000,
-                        mimetype: 'application/font-woff',
-                    }
-                }
+                type: 'asset',
+                parser: { dataUrlCondition: { maxSize: 10000 } },
             },
             // TTF Font
             {
                 test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        limit: 10000,
-                        mimetype: 'application/octet-stream'
-                    }
-                }
+                type: 'asset',
+                parser: { dataUrlCondition: { maxSize: 10000 } },
             },
             // EOT Font
             {
                 test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-                use: 'file-loader',
+                type: 'asset/resource',
             },
             // SVG Font
             {
                 test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        limit: 10000,
-                        mimetype: 'image/svg+xml',
-                    }
-                }
+                type: 'asset',
+                parser: { dataUrlCondition: { maxSize: 10000 } },
             },
             // Common Image Formats
             {
                 test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
-                use: 'url-loader',
+                type: 'asset/inline',
             }
         ]
     },
@@ -228,6 +209,10 @@ export default merge.smart(baseConfig, {
           && dependency !== 'react-icons'
           && dependency !== 'adbkit'
           && dependency !== 'antd'
+          && dependency !== 'mixpanel'
+          && dependency !== 'fs-extra'
+          && dependency !== 'browserstack-local'
+          && dependency !== 'teen_process'
                 )
         )
     },
@@ -237,7 +222,8 @@ export default merge.smart(baseConfig, {
         path: dist,
         publicPath: publicPath,
         filename: '[name].dev.dll.js',
-        libraryTarget: 'var'
+        libraryTarget: 'var',
+        hashFunction: 'sha256'
     },
 
     plugins: [
@@ -245,6 +231,10 @@ export default merge.smart(baseConfig, {
             path: path.join(dist, '[name].json'),
             name: '[name]',
         }),
+
+        // node-gyp's Find-VisualStudio.cs is a PowerShell/C# helper invoked out-of-process,
+        // never require()'d — webpack 5 fails parsing it as JS via node-gyp's require.context
+        new webpack.IgnorePlugin({ resourceRegExp: /\.cs$/, contextRegExp: /node-gyp/ }),
 
         /**
      * Create global constants which can be configured at compile time.

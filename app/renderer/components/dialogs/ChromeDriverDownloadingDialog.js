@@ -1,5 +1,6 @@
-import React from 'react';
-import { Modal, Icon } from 'antd';
+﻿import React from 'react';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Modal } from 'antd';
 
 export default class ChromeDriverDownloadingDialog extends React.PureComponent {
     render() {
@@ -7,11 +8,11 @@ export default class ChromeDriverDownloadingDialog extends React.PureComponent {
             <Modal
                 className="hide-x-button"
                 width={490}
-                visible={true}
+                open={true}
                 footer={null}
             >
                 <div style={{textAlign: 'center'}}>
-                    <Icon type="loading" style={{ fontSize: 24 }} spin />
+                    <LoadingOutlined style={{ fontSize: 24 }} spin />
                     <p style={{marginTop: '15px'}}>Downloading ChromeDriver ...</p>
                 </div>
             </Modal>

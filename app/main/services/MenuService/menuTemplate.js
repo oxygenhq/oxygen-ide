@@ -8,7 +8,7 @@
  */
 import * as Const from '../../../const';
 import { app } from 'electron';
-import * as Sentry from '@sentry/electron';
+import * as Sentry from '@sentry/electron/main';
 /**
  * @param  {Function} cmdHandler - function that will handle menu command
  * @param  {Object} settings - a set of settings for selected menu items
