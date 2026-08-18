@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+    <Fragment>
+        <!--
+            All of the app's built output (from dist\temp, bound via -b appfiles=<path> on the
+            wix build command line) is harvested here as installed files/components, except
+            oxygenide.exe itself, which is authored by hand below so a Windows Firewall exception
+            (fw:FirewallException) can be attached to it — Files-harvested entries can't carry
+            per-file authoring, per WiX's own docs for the element.
+
+            Note the two different path-resolution rules in play here: the "appfiles" bind path
+            used by <Files> (a real bind path, used for harvesting) resolves relative to *this*
+            file's own directory, so its value on the command line must be
+            "..\..\dist\temp" — but File/@Source below is plain attribute text substitution
+            followed by ordinary source-file resolution, which resolves relative to wix.exe's
+            working directory (the repo root) instead, so it's given as a repo-root-relative
+            literal rather than reusing the !(bindpath.appfiles) macro.
+        -->
+        <ComponentGroup Id="ApplicationFiles" Directory="INSTALLFOLDER">
+            <Files Include="!(bindpath.appfiles)\**">
+                <Exclude Files="!(bindpath.appfiles)\oxygenide.exe" />
+            </Files>
+            <Component Guid="*" Directory="INSTALLFOLDER">
+                <File Id="oxygenide.exe" Source="dist\temp\oxygenide.exe" KeyPath="yes">
+                    <fw:FirewallException Id="oxygenide.exe" Name="Oxygen IDE" IgnoreFailure="yes" Scope="localSubnet" />
+                </File>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

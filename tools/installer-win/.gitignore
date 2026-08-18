@@ -1,4 +1,4 @@
 *.wixobj
-files.wxs
+*.wixpdb
 ie_addon.wxs
 .DS_Store

@@ -51,48 +51,33 @@ module.exports = function(grunt) {
                 n = 100;
             }
             version = x + '.' + y + '.' + (10000 + parseInt(z) * 100 + parseInt(n));
-            
-            cp.execFileSync('heat', 
-                [ 'dir', 'dist\\temp',
-                    '-o', wixRoot + 'files.wxs',
-                    '-scom',
-                    '-frag',
-                    '-srd',
-                    '-sreg',
-                    '-gg',
-                    '-cg', 'ApplicationFiles',
-                    '-dr', 'INSTALLFOLDER',
-                    '-t', wixRoot + 'files.xslt'],
-                { stdio : 'inherit'});
-                            
-            cp.execFileSync('candle', 
-                [ '-arch', arch,
-                    '-dVersion=' + version,
-                    '-ext', 'WixFirewallExtension',
-                    '-ext', 'WixUtilExtension',
-                    '-o', wixRoot + 'config.wixobj',
-                    wixRoot + 'config.wxs'],
-                { stdio : 'inherit'});
-                            
-            cp.execFileSync('candle', 
-                [ '-arch', arch,
-                    '-ext', 'WixFirewallExtension',
-                    '-o', wixRoot + 'files.wixobj',
-                    wixRoot + 'files.wxs'],
-                { stdio : 'inherit'});
-                            
-            cp.execFileSync('light', 
-                [ '-ext', 'WixNetFxExtension',
-                    '-ext', 'WixUIExtension',
-                    '-ext', 'WixFirewallExtension',
-                    '-ext', 'WixUtilExtension',
-                    '-spdb',
-                    '-sice:ICE60',
-                    '-b', 'dist\\temp',
+
+            // WiX v5's unified CLI replaces the old heat+candle+light pipeline with a single
+            // build step. Harvesting (formerly heat, driven by files.xslt) is now done at build
+            // time by the <Files> element in files.wxs itself, bound to dist\temp via the named
+            // "appfiles" bind path below.
+            //
+            // This runs with cwd left at the repo root, same as the rest of this build tooling.
+            // Two different path-resolution rules are in play, though: the "appfiles" bind path
+            // is a real bind path used by files.wxs's <Files> harvesting, which WiX always
+            // resolves relative to the .wxs file that uses it (tools\installer-win) regardless of
+            // cwd — hence "..\\..\\dist\\temp" here — whereas config.wxs/files.wxs's other
+            // relative references (WixVariable, Icon, File/@Source) are plain attribute text
+            // resolved relative to wix.exe's own working directory (the repo root), and are
+            // authored accordingly inside those files. See the comments in files.wxs/config.wxs.
+            cp.execFileSync('wix',
+                [ 'build',
+                    '-arch', arch,
+                    '-d', 'Version=' + version,
+                    '-b', 'appfiles=..\\..\\dist\\temp',
+                    '-ext', 'WixToolset.Firewall.wixext',
+                    '-ext', 'WixToolset.UI.wixext',
+                    '-ext', 'WixToolset.Util.wixext',
+                    '-pdbtype', 'none',
                     '-o', 'dist\\oxygen-' + cfg.version + '-win-' + cfg.arch + '.msi',
-                    wixRoot + 'config.wixobj',
-                    wixRoot + 'files.wixobj'],
-                { stdio : 'inherit'});
+                    wixRoot + 'config.wxs',
+                    wixRoot + 'files.wxs'],
+                { stdio : 'inherit' });
         }
     });
 };
