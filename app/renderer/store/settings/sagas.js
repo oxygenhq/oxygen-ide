@@ -114,9 +114,16 @@ export function* testUpdateBreakpoints({ payload }) {
             // the file where breackpoints changed in files, where test runs
 
             yield put(testActions.waitUpdateBreakpoints(true));
-            yield call(services.mainIpc.call, 'TestRunnerService', 'updateBreakpoints', [ breakpoints, path ]);
-            yield put(testActions.waitUpdateBreakpoints(false));
-            
+            try {
+                yield call(services.mainIpc.call, 'TestRunnerService', 'updateBreakpoints', [ breakpoints, path ]);
+            } finally {
+                // must always clear this, even if the IPC call rejects (e.g. the test runner
+                // process was killed mid-call via a force-stop) — otherwise every future
+                // breakpoint click is silently ignored (see the waitUpdateBreakpoints guard in
+                // MonacoEditor/index.jsx) until the app is restarted.
+                yield put(testActions.waitUpdateBreakpoints(false));
+            }
+
         }
     }
 }
