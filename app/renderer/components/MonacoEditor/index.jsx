@@ -69,7 +69,17 @@ const MONACO_DEFAULT_OPTIONS = {
         delay: 900
     },
     // disable highlighting all other occurrences of the word under the caret
-    occurrencesHighlight: 'off'
+    occurrencesHighlight: 'off',
+    // this app doesn't register any CodeActionProviders, so the "lightbulb" quick-fix icon only
+    // ever shows suggestions from the inherited JS/TS language service (e.g. "add missing
+    // import") that aren't meaningful for standalone Oxygen test scripts — and repositioning it
+    // is a known source of "Cannot read properties of undefined (reading 'setPosition')" crashes
+    // inside Monaco's own contentWidgets/lightBulbWidget internals when the widget gets disposed
+    // mid-update (e.g. from rapid breakpoint-decoration updates). Disabling it removes the crash
+    // entirely rather than chasing the race inside Monaco's minified core.
+    lightbulb: {
+        enabled: 'off'
+    }
 };
 
 type Props = {
