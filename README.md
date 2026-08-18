@@ -9,7 +9,7 @@
 
 #### Windows:
 * WiX Toolset v5 installed (`wix.exe` and the Firewall/UI/Util extensions added via `wix extension add`) and added to the %PATH%.
-* Python 3 (latest) and Visual Studio Build Tools 2019 installed (to install manually: `winget install Microsoft.VisualStudio.2019.BuildTools`). Run `npm config set msvs_version 2019 --global` afterwards to set `msvs_version`.
+* Python 3 (latest) and Visual Studio Build Tools 2022 installed (to install manually: `winget install Microsoft.VisualStudio.2022.BuildTools`), with the "Desktop development with C++" workload.
 * [Optional. Required for DB support] Windows SDK
 * GTK and libjpeg-turbo https://github.com/Automattic/node-canvas/wiki/Installation:-Windows
 
