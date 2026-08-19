@@ -535,9 +535,15 @@ export default class MonacoEditor extends React.Component<Props> {
                 element.className.includes('line-numbers') &&
                 language !== 'feature'
             ) {
-                // select the entire line if the user clicks on line number panel
+                // a gutter click's native mousedown isn't prevented by default, so any tiny
+                // mouse movement between mousedown and mouseup (easy to trigger unintentionally)
+                // starts a normal text-selection drag in the editor. Prevent that up front.
+                e.event.preventDefault();
+                e.event.stopPropagation();
+
                 const ln = position.lineNumber;
-                editor.setSelection(new monaco.Selection(1, 2, 1, 2));
+
+                editor.setSelection(new monaco.Selection(ln, 1, ln, 1));
                 editor.focus();
 
                 const marker = helpers.getBreakpointMarker(editor, ln);
