@@ -33,6 +33,13 @@ const SEVERITY_ERROR = 'ERROR';
 const SEVERITY_INFO = 'INFO';
 const SEVERITY_PASSED = 'PASSED';
 
+// how long a graceful stop waits for runner.dispose() (which asks the worker process to close
+// its WebDriver session, release cloud-grid slots, etc. via IPC) before giving up and moving on
+// to a force-kill anyway. dispose() can hang indefinitely — e.g. the worker process can't process
+// that IPC message while its JS event loop is halted at a debugger breakpoint pause — so a plain
+// "Stop" must not wait on it forever.
+const GRACEFUL_STOP_TIMEOUT_MS = 2500;
+
 export default class TestRunnerService extends ServiceBase {
     constructor() {
         super();
@@ -463,7 +470,7 @@ export default class TestRunnerService extends ServiceBase {
                 }
 
                 if (!force) {
-                    await this.runner.dispose('CANCELED');
+                    await this._disposeWithTimeout(this.runner, 'CANCELED');
                 }
                 await this.runner.kill('CANCELED');
 
@@ -478,7 +485,26 @@ export default class TestRunnerService extends ServiceBase {
         return 'stoped';
     }
 
-    async updateBreakpoints(breakpoints, filePath) {        
+    // races runner.dispose() against a timeout so a hung dispose() (e.g. the worker can't
+    // process the IPC message while paused at a breakpoint) can't block stop() forever — a normal,
+    // fast dispose still returns immediately, only a stuck one is capped. Either way stop()
+    // proceeds to kill() right after this returns. The dispose() call itself is left running in
+    // the background rather than aborted if it's the timeout that wins the race, in case it
+    // completes on its own and closes the WebDriver session/cloud-grid slot cleanly before the
+    // kill actually lands; its result is irrelevant by that point, so any eventual rejection
+    // (e.g. once the process gets killed out from under it) is swallowed to avoid an unhandled
+    // rejection.
+    async _disposeWithTimeout(runner, status) {
+        const disposePromise = runner.dispose(status).catch(() => {});
+        let timeoutHandle;
+        const timeoutPromise = new Promise((resolve) => {
+            timeoutHandle = setTimeout(resolve, GRACEFUL_STOP_TIMEOUT_MS);
+        });
+        await Promise.race([disposePromise, timeoutPromise]);
+        clearTimeout(timeoutHandle);
+    }
+
+    async updateBreakpoints(breakpoints, filePath) {
         if (this.runner && breakpoints && filePath) {
             return await this.runner.updateBreakpoints(breakpoints, filePath);
         } else {

@@ -18,7 +18,6 @@ const defaultState = {
     isSeleniumReady: false,     // indicates if built-in Selenium server has been successfully started
     isAppiumReady: false,       // indicates if built-in Appium server has been successfully started
     isStopingTest: false,       // indicates if a test is currently stoping
-    isStopingTestForce: false,  // indicates if a test is currently stoping in force mode
     breakpoints: {},            // holds all user-defined breakpoints per file, shall include file name and line number
     disabledBreakpoints: {},
     resolvedBreakpoints: {},
@@ -82,7 +81,6 @@ export default (state = defaultState, action) => {
         fileName,
         variables,
         seleniumPid,
-        force,
         msg,
         cmd
     } = payload;
@@ -137,6 +135,14 @@ export default (state = defaultState, action) => {
             ...state,
             isRunning: false,
             isPaused: false,
+            // isStopingTest is otherwise only cleared by the stopTest saga's own success/failure
+            // action, which depends on the "stop" IPC call to TestRunnerService resolving — but
+            // that call can hang indefinitely (dispose() awaits a response from the worker
+            // process, which can't respond while paused at a breakpoint). The test can end via
+            // this separate event (the runner's own end/exit) regardless of whether that "stop"
+            // call ever resolves, so clear the "stopping" UI state here too — otherwise the Stop
+            // button stays stuck on "Stopping…" forever even after the test has actually finished.
+            isStopingTest: false,
             variables: null
         };
     // TEST_EVENT_BREAKPOINT
@@ -151,14 +157,12 @@ export default (state = defaultState, action) => {
     case ActionTypes.TEST_STOP:
         return {
             ...state,
-            isStopingTest: true,
-            isStopingTestForce: force
+            isStopingTest: true
         };
     case success(ActionTypes.TEST_STOP):
         return {
             ...state,
             isStopingTest: false,
-            isStopingTestForce: false,
             isRunning: false,
             isPaused: false,
             variables: null
@@ -167,7 +171,6 @@ export default (state = defaultState, action) => {
         return {
             ...state,
             isStopingTest: false,
-            isStopingTestForce: false,
             isRunning: false,
             isPaused: false,
             variables: null

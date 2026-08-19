@@ -487,27 +487,15 @@ export default class Toolbar extends React.Component<Props> {
 
                 {
                     this._isVisible(Controls.TEST_STOPING) &&
-                    <React.Fragment>
-                        <button
-                            className="control button stop"
-                            style={ getOpacity(this._isEnabled(Controls.TEST_STOPING)) }
-                            title="Stopping…"
-                            disabled
-                        >
-                            <CloseCircleFilled title="Terminate Test" />
-                            <span>Stopping…</span>
-                        </button>
-
-                        <button
-                            className="control button stop"
-                            style={ getOpacity(this._isEnabled(Controls.TEST_FORCE_STOP)) }
-                            onClick={ () => ::this.handleClickEvent(Controls.TEST_FORCE_STOP) }
-                            title="Stop"
-                        >
-                            <CloseCircleFilled title="Terminate Test" />
-                            <span>Force Stop</span>
-                        </button>
-                    </React.Fragment>
+                    <button
+                        className="control button stop"
+                        style={ getOpacity(this._isEnabled(Controls.TEST_STOPING)) }
+                        title="Stopping…"
+                        disabled
+                    >
+                        <CloseCircleFilled title="Terminate Test" />
+                        <span>Stopping…</span>
+                    </button>
                 }
 
                 {/* { this._isVisible(Controls.TEST_REPL_START) && (
