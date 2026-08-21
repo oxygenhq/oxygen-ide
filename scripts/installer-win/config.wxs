@@ -133,9 +133,9 @@
         <!-- these paths are relative to wix.exe's working directory (the repo root, where
              npm run package invokes it), NOT to this .wxs file — unlike WiX v3, WixVariable/Icon
              SourceFile resolution in v5 doesn't fall back to the source file's own directory. -->
-        <WixVariable Id="WixUILicenseRtf" Value="tools\installer-win\LICENSE.rtf" />
-        <WixVariable Id="WixUIBannerBmp" Value="tools\installer-win\banner.bmp" />
-        <WixVariable Id="WixUIDialogBmp" Value="tools\installer-win\dialog.bmp" />
+        <WixVariable Id="WixUILicenseRtf" Value="scripts\installer-win\LICENSE.rtf" />
+        <WixVariable Id="WixUIBannerBmp" Value="scripts\installer-win\banner.bmp" />
+        <WixVariable Id="WixUIDialogBmp" Value="scripts\installer-win\dialog.bmp" />
         <Icon Id="app.ico" SourceFile="resources\app.ico" />
         <Property Id="ARPPRODUCTICON" Value="app.ico" />
         <Property Id="MSIFASTINSTALL" Value="3" />
