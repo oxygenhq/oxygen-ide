@@ -56,7 +56,7 @@ export default class EdgeDriverDialog extends React.PureComponent<Props> {
                 )}
             >
                 <div>
-                    <p>{'Edge requires matching version of EdgeDriver. Currently installed EdgeDriver is outdated.'}</p> 
+                    <p>{'Edge requires matching version of EdgeDriver. Current EdgeDriver is either outdated or missing.'}</p>
                     <p>{`Click Download to download the appropriate driver ${ edgeVersion ? `for Edge ${edgeVersion}.` : ''} `}</p>
                 </div>
             </Modal>

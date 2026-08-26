@@ -24,12 +24,10 @@ module.exports = function(grunt) {
     if (process.platform === 'linux') {
         defaultTasks.push('copy:linux');
         // temporary fix before Grunt v0.5 https://github.com/gruntjs/grunt/issues/615
-        defaultTasks.push('chmod:chromedriver');
         defaultTasks.push('chmod:geckodriver');
     } else if (process.platform === 'darwin') {
         defaultTasks.push('copy:osx');
         // temporary fix before Grunt v0.5 https://github.com/gruntjs/grunt/issues/615
-        defaultTasks.push('chmod:chromedriver');
         defaultTasks.push('chmod:geckodriver');
         defaultTasks.push('chmod:oxygendarwin');
     }
@@ -229,11 +227,6 @@ module.exports = function(grunt) {
         chmod: {
             options: {
                 mode: '775'
-            },
-            chromedriver: {
-                src: [process.platform === 'linux' ? 
-                    OUTDIR + RESOURCES + '/app/main/selenium/linux/**/chromedriver' :
-                    OUTDIR + RESOURCES + '/app/main/selenium/darwin/**/chromedriver']
             },
             geckodriver: {
                 src: [process.platform === 'linux' ? 

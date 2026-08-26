@@ -56,7 +56,7 @@ export default class ChromeDriverDialog extends React.PureComponent<Props> {
                 )}
             >
                 <div>
-                    <p>{'Chrome requires matching version of ChromeDriver. Currently installed ChromeDriver is outdated.'}</p> 
+                    <p>{'Chrome requires matching version of ChromeDriver. Current ChromeDriver is either outdated or missing.'}</p>
                     <p>{`Click Download to download the appropriate driver ${ chromeVersion ? `for Chrome ${chromeVersion}.` : ''} `}</p>
                 </div>
             </Modal>

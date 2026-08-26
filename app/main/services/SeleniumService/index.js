@@ -18,8 +18,6 @@ import { exec } from 'teen_process';
 import fs from 'fs-extra';
 import tmp from 'tmp';
 import extract from 'extract-zip';
-import { versions } from './chromedriver-versions.json';
-import { edgeVersions } from './edgedriver-versions.json';
 import fetch from 'node-fetch';
 import ServiceBase from '../ServiceBase';
 import * as glob from 'glob';
@@ -205,15 +203,6 @@ export default class SeleniumService extends ServiceBase {
         }
     }
 
-    // compares the major (first dot-segment) version number of two version
-    // strings, e.g. "137.0.3296.93" vs "150.0.4078.48" -> false
-    _sameMajorVersion(versionA, versionB) {
-        if (!versionA || !versionB) {
-            return false;
-        }
-        return versionA.split('.')[0] === versionB.split('.')[0];
-    }
-
     // lightweight browser-presence check, run eagerly at project-open time so Edge shows
     // up in the browser-target dropdown at all. Unlike edgeStart() it never resolves or
     // downloads a driver binary — that stays deferred until the user actually selects it
@@ -267,28 +256,15 @@ export default class SeleniumService extends ServiceBase {
             edgeDriver = await this.getEdgeDriverBinPathExact();
             if (edgeDriver) {
                 console.log('Using user placed EdgeDriver from ' + edgeDriver);
-            } else {
-                // if no user placed driver then use, the latest bundled version —
-                // but only if its major version actually matches the installed
-                // browser; otherwise this silently hands back a driver that's
-                // guaranteed to fail at session-creation time with a cryptic
-                // version-mismatch error instead of prompting the user to
-                // download the correct one
-                edgeDriver = await this.findLocalEdgeDriver(edgeVersions[0].driverVersion);
-                if (edgeDriver && !this._sameMajorVersion(edgeVersions[0].driverVersion, edgeVersion)) {
-                    console.warn(`Bundled EdgeDriver ${edgeVersions[0].driverVersion} does not match installed Edge ${edgeVersion}; discarding.`);
-                    edgeDriver = null;
-                }
-                if (edgeDriver) {
-                    console.log('Using latest bundled EdgeDriver from ' + edgeDriver);
-                } else {
-                    if (edgeVersion) {
-                        this.notify({
-                            type: ON_EDGE_DRIVER_ERROR,
-                            edgeVersion: edgeVersion
-                        });
-                    }
-                }
+            } else if (edgeVersion) {
+                // EdgeDriver is neither bundled with the IDE nor placed by the user — resolve and
+                // download the matching version. Prompt the user instead if that resolution
+                // itself fails (e.g. no internet access), rather than falling back to a
+                // possibly-mismatched driver.
+                this.notify({
+                    type: ON_EDGE_DRIVER_ERROR,
+                    edgeVersion: edgeVersion
+                });
             }
         }
         return edgeDriver;
@@ -342,25 +318,14 @@ export default class SeleniumService extends ServiceBase {
             if (chromeDriverPath) {
                 console.log('Using user placed ChromeDriver from ' + chromeDriverPath);
             } else {
-                // if no user placed driver then use, the latest bundled version —
-                // but only if its major version actually matches the installed
-                // browser; otherwise this silently hands back a driver that's
-                // guaranteed to fail at session-creation time with a cryptic
-                // version-mismatch error instead of prompting the user to
-                // download the correct one
-                chromeDriverPath = await this.findLocalChromeDriver(versions[0].driverVersion);
-                if (chromeDriverPath && !this._sameMajorVersion(versions[0].driverVersion, chromeVersion)) {
-                    console.warn(`Bundled ChromeDriver ${versions[0].driverVersion} does not match installed Chrome ${chromeVersion}; discarding.`);
-                    chromeDriverPath = null;
-                }
-                if (chromeDriverPath) {
-                    console.log('Using latest bundled ChromeDriver from ' + chromeDriverPath);
-                } else {
-                    this.notify({
-                        type: ON_CHROME_DRIVER_ERROR,
-                        chromeVersion: chromeVersion
-                    });
-                }
+                // ChromeDriver is neither bundled with the IDE nor placed by the user — resolve
+                // and download the matching version. Prompt the user instead if that resolution
+                // itself fails (e.g. no internet access), rather than falling back to a
+                // possibly-mismatched driver.
+                this.notify({
+                    type: ON_CHROME_DRIVER_ERROR,
+                    chromeVersion: chromeVersion
+                });
             }
         }
         return chromeDriverPath;
@@ -752,15 +717,6 @@ export default class SeleniumService extends ServiceBase {
 
     getEdgeDriverVersion(edgeVersion) {
         return new Promise((resolve, reject) => {
-            // try getting the version from a local version map file
-            for (var version of edgeVersions) {
-                if (version.edgeMin <= edgeVersion && version.edgeMax >= edgeVersion) {
-                    resolve(version.driverVersion);
-                    return;
-                }
-            }
-            
-            // try getting the version online
             let lastPart = 'MACOS';
 
             if (process.platform === 'win32') {
@@ -786,15 +742,6 @@ export default class SeleniumService extends ServiceBase {
 
     getChromeDriverPre115Version(chromeMajorVersion) {
         return new Promise((resolve, reject) => {
-            // try getting the version from a local version map file
-            for (var version of versions) {
-                if (version.chromeMin <= chromeMajorVersion && version.chromeMax >= chromeMajorVersion) {
-                    resolve(version.driverVersion);
-                    return;
-                }
-            }
-
-            // try getting the version online
             const versionUrl = `${CHROMEDRIVER_PRE_115_API_URL}/LATEST_RELEASE_${chromeMajorVersion}`;
             console.log('Getting ChromeDriver version from ' + versionUrl);
             return fetch(versionUrl)
@@ -826,15 +773,6 @@ export default class SeleniumService extends ServiceBase {
     // starting with v115 chrome has different api for driver downloads
     getChromeDriverVersion(chromeVersion) {
         return new Promise((resolve, reject) => {
-            // try getting the version from a local version map file
-            for (var version of versions) {
-                if (version.chromeMin <= chromeVersion && version.chromeMax >= chromeVersion) {
-                    resolve(version.driverVersion);
-                    return;
-                }
-            }
-
-            // try getting the version online
             console.log(`Getting ChromeDriver 115+ version JSON ${CHROMEDRIVER_API_URL}`);
             return fetch(CHROMEDRIVER_API_URL)
                 .then(res => {

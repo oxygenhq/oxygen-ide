@@ -7,6 +7,12 @@ type Props = {
     path: string
 };
 
+const pathStyle = {
+    background: 'rgba(150, 150, 150, 0.2)',
+    padding: '1px 4px',
+    borderRadius: 3
+};
+
 export default class ChromeDriverDownloadingFailedDialog extends React.PureComponent<Props> {
 
     close = () => {
@@ -53,8 +59,14 @@ export default class ChromeDriverDownloadingFailedDialog extends React.PureCompo
                 <div>
                     <p>{'Download the appropriate driver for your version of Chrome from'} <a href='https://googlechromelabs.github.io/chrome-for-testing' onClick={this.processLink}>here.</a></p>
                     <p>{'Extract the archive.'}</p>
-                    <p>{`Place the ChromeDriver executable directly into ${path} or into ${path + require('path').sep}chromedriver-{versionname} folder where {versionname} is the driver's version.`}</p>
-                    <p>{'If you encounter security related problems on Mac, see'} <a href='https://www.macworld.co.uk/how-to/mac-app-unidentified-developer-3669596/' onClick={this.processLink}>link</a></p>
+                    <p>
+                        {'Place the ChromeDriver executable directly into:'}<br/>
+                        <code style={pathStyle}>{path}</code>
+                        <br/><br/>
+                        {'or into a version-specific subfolder:'}<br/>
+                        <code style={pathStyle}>{`${path}${require('path').sep}chromedriver-{versionname}`}</code>
+                        {' (where {versionname} is the driver\'s version).'}
+                    </p>
                     <p>{'Restart Oxygen IDE afterwards for the changes to take effect. '}</p>
 
                 </div>
