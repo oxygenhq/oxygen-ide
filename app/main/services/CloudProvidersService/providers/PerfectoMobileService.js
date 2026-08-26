@@ -1,6 +1,14 @@
 import CloudProviderBase from '../CloudProviderBase';
 import fetch from 'node-fetch';
-import parser from 'xml2json';
+import { XMLParser } from 'fast-xml-parser';
+
+// force a single <handset> to still parse as a one-element array, matching
+// the Array.isArray() handling below
+const xmlParser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: '',
+    isArray: (name) => name === 'handset'
+});
 
 export default class PerfectoMobileService extends CloudProviderBase {
     constructor(settings) {
@@ -88,7 +96,7 @@ export default class PerfectoMobileService extends CloudProviderBase {
 
         const devicesXml = await this.getDevices();
 
-        const devicesJson = parser.toJson(devicesXml, {object: true});
+        const devicesJson = xmlParser.parse(devicesXml);
         
         if (
             devicesJson &&

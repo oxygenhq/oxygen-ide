@@ -21,7 +21,6 @@ import extract from 'extract-zip';
 import fetch from 'node-fetch';
 import ServiceBase from '../ServiceBase';
 import * as glob from 'glob';
-// import parser from 'xml2json';
 
 import cfg from '../../config.json';
 const selSettings = cfg.selenium;
