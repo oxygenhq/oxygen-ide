@@ -51,8 +51,11 @@ export default class TestRunnerService extends ServiceBase {
         this.currentTransactionName = null;
         this.currentDriverKey = null; // driver started for the in-progress web test, if any
         this.lastTestFailed = false;
+        // bumped on every start() call; lets a run's finally block detect a newer run has
+        // already begun and avoid clobbering its driver state (see runGeneration check below).
+        this._runGeneration = 0;
     }
-    
+
     async start(mainFilePath, breakpoints, runtimeSettings, runSettings) {
         let processingError;
         if (this.runner) {
@@ -62,6 +65,7 @@ export default class TestRunnerService extends ServiceBase {
         this.isStopping = false;
         this.currentDriverKey = null;
         this.lastTestFailed = false;
+        const runGeneration = ++this._runGeneration;
         const framework = runtimeSettings.framework || 'oxygen';
         // store mainFilePath for later, so when we receive LINE_UPDATE event from Oxygen, 
         // we can bubble it up and include the file name in addition to line number (Oxygen sends only a line number)
@@ -422,13 +426,15 @@ export default class TestRunnerService extends ServiceBase {
         }      
         finally {
             this.isRunning = false;
-            if (this.currentDriverKey) {
+            // skip if a newer run has already started and claimed currentDriverKey for itself
+            // (stop() can null this.runner before this finally block gets to run)
+            if (this.currentDriverKey && runGeneration === this._runGeneration) {
                 // driver is only stopped when the test did not fail, so a failed
                 // browser session stays open for inspection/debugging, matching
                 // the existing chrome/edge cleanup behavior in oxygen-cli
                 const seleniumService = this.getService('SeleniumService');
                 if (seleniumService && !this.lastTestFailed) {
-                    seleniumService.stopDriver(this.currentDriverKey);
+                    await seleniumService.stopDriver(this.currentDriverKey);
                 }
                 this.currentDriverKey = null;
             }
@@ -438,6 +444,9 @@ export default class TestRunnerService extends ServiceBase {
     }
 
     async stop(force = false) {
+        // Deliberately does NOT stop the Selenium driver — a manual Stop is treated like a failed
+        // test (see lastTestFailed in start()'s finally), leaving the browser open for inspection.
+        // The next start() reuses it (health-checked) or respawns if it's no longer alive.
         if (!force) {
             this.notify({
                 type: EVENT_LOG_ENTRY,
@@ -480,7 +489,7 @@ export default class TestRunnerService extends ServiceBase {
             catch (e) {
                 console.error('Dispose failed', e);
                 // ignore any errors
-            }        
+            }
         }
         return 'stoped';
     }

@@ -72,6 +72,10 @@ export default class SeleniumService extends ServiceBase {
         this.driverProcs = {};          // { chrome, edge, firefox, ie } -> ChildProcess
         this.driverPorts = {};          // { chrome, edge, firefox, ie } -> port number
         this.resolvedDriverPaths = {};  // { chrome, edge, firefox, ie } -> local binary path
+        // { chrome, edge, firefox, ie } -> most recently used port. Each fresh spawn picks a
+        // new port so the HTTP client never reuses a pooled keep-alive socket that was talking
+        // to the previous (now-dead) process on that port.
+        this.lastDriverPorts = {};
 
         this.downloadChromeDriver = this.downloadChromeDriver.bind(this);
         this.downloadEdgeDriver = this.downloadEdgeDriver.bind(this);
@@ -459,7 +463,15 @@ export default class SeleniumService extends ServiceBase {
     async startDriver(driverKey) {
         const existingProc = this.driverProcs[driverKey];
         if (existingProc && !existingProc.killed && this.driverPorts[driverKey]) {
-            return this.driverPorts[driverKey];
+            // A reused driver may have sat idle since an earlier failed run and could be dead
+            // without `killed` reflecting it (e.g. its browser crashed underneath it) — health
+            // check before handing it back.
+            const alive = await this._waitForStatusReady(this.driverPorts[driverKey], driverKey, { maxRetries: 1, interval: 0 });
+            if (alive) {
+                return this.driverPorts[driverKey];
+            }
+            console.warn(`Reused ${driverKey} driver on port ${this.driverPorts[driverKey]} failed a health check — restarting it.`);
+            await this.stopDriver(driverKey);
         }
 
         const driverPath = await this._resolveDriverPath(driverKey);
@@ -468,7 +480,13 @@ export default class SeleniumService extends ServiceBase {
             return null;
         }
 
-        const port = await detectPort(DRIVER_BASE_PORTS[driverKey]);
+        const basePort = DRIVER_BASE_PORTS[driverKey];
+        const lastPort = this.lastDriverPorts[driverKey];
+        // start above the last-used port (see lastDriverPorts); wrap back to base after drifting
+        // far enough to avoid climbing indefinitely over a long session.
+        const searchFrom = (lastPort && lastPort < basePort + 500) ? lastPort + 1 : basePort;
+        const port = await detectPort(searchFrom);
+        this.lastDriverPorts[driverKey] = port;
         const spawners = {
             chrome: () => this._spawnChromeDriver(driverPath, port),
             edge: () => this._spawnEdgeDriver(driverPath, port),
@@ -492,11 +510,17 @@ export default class SeleniumService extends ServiceBase {
 
     // stops the driver process for a single browser, e.g. once a test run
     // using it has finished
-    stopDriver(driverKey) {
+    async stopDriver(driverKey) {
         const proc = this.driverProcs[driverKey];
         if (proc && !proc.killed) {
             try {
-                proc.kill();
+                if (process.platform === 'win32' && typeof proc.pid === 'number') {
+                    // proc.kill() on Windows is TerminateProcess — it only kills the driver, not
+                    // the browser it spawned as a child, orphaning it. Kill the whole tree instead.
+                    await exec('taskkill', ['/PID', String(proc.pid), '/T', '/F']);
+                } else {
+                    proc.kill();
+                }
             } catch (e) {
                 console.warn(`Failed to kill ${driverKey} driver process:`, e);
             }
