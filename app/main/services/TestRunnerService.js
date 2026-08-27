@@ -189,7 +189,7 @@ export default class TestRunnerService extends ServiceBase {
                     if (!driverPort) {
                         const e = new Error(
                             'Unable to start the local WebDriver for Chrome. ' +
-                            'The matching driver may not be installed — check the Selenium log.'
+                            'The matching driver may not be installed — check the WebDriver log.'
                         );
                         this._emitLogEvent(SEVERITY_ERROR, `Test failed: ${e.message}`);
                         this._emitTestEnded(null, e);
@@ -232,7 +232,7 @@ export default class TestRunnerService extends ServiceBase {
                     if (!driverPort) {
                         const e = new Error(
                             `Unable to start the local WebDriver for "${testTarget}". ` +
-                            'The matching driver may not be installed — check the Selenium log.'
+                            'The matching driver may not be installed — check the WebDriver log.'
                         );
                         this._emitLogEvent(SEVERITY_ERROR, `Test failed: ${e.message}`);
                         this._emitTestEnded(null, e);
