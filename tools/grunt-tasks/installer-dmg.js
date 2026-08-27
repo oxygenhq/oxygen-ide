@@ -27,9 +27,16 @@ module.exports = function (grunt) {
 
         var appPath = path.resolve(options.contents[1].path);
         var signIdentity = grunt.config.get('installer-dmg').target['sign-identity'];
-        var signNested = cp.spawnSync('python', ['sign-recursively.py', 'sign', signIdentity, appPath], { cwd: __dirname, stdio: 'inherit' });
-        if (signNested.status !== 0) {
+        var signNested = cp.spawnSync('python3', ['sign-recursively.py', 'sign', signIdentity, appPath], { cwd: __dirname, stdio: 'inherit' });
+        if (signNested.error) {
+            grunt.log.error('Failed to run sign-recursively.py: ' + signNested.error.message);
             done(false);
+            return;
+        }
+        if (signNested.status !== 0) {
+            grunt.log.error('Code signing failed with exit code ' + signNested.status);
+            done(false);
+            return;
         }
         grunt.log.writeln();
 

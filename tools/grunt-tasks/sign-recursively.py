@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 Code-signs all nested binaries inside an app bundle in an inside-out manner.
@@ -17,14 +17,14 @@ def is_probably_binary(path):
     return (len(ext)==0) and os.access(path, os.X_OK) and not os.path.islink(path)
 
 def is_definitely_binary(path):
-    return 'Mach-O' in sp.check_output(['file', '--brief', path])
+    return 'Mach-O' in sp.check_output(['file', '--brief', path]).decode()
 
 def get_signing_path(path):
     m = re.match('.*/(.*)\.framework/Versions/./(.*)', path)
     if m and (m.lastindex==2) and m.group(1)==m.group(2):
         #This is the main binary of a framework. Sign the framework version instead.
         path = path[:-(len(m.group(1))+1)]
-    print path
+    print(path)
     if path.endswith('Oxygen.app/Contents/MacOS/Oxygen'):
         # This is the main binary of the app bundle. Exclude it since it needs to be signed last
         path = None
@@ -42,20 +42,20 @@ def get_signable_binaries(path):
 def code_sign_nested(identity, path, dryrun):
     signables = get_signable_binaries(path)
     if len(signables)==0:
-        print "No signable binaries found."
+        print("No signable binaries found.")
         exit(1)
-    cmd = sp.check_output if not dryrun else lambda x: ' '.join(x)
+    cmd = (lambda x: sp.check_output(x).decode()) if not dryrun else (lambda x: ' '.join(x))
     try:
         for bin in signables:
-            print cmd(['codesign']+CODE_SIGN_OPTS+[identity, bin])
+            print(cmd(['codesign']+CODE_SIGN_OPTS+[identity, bin]))
     except sp.CalledProcessError:
-        print 'Code signing failed.'
+        print('Code signing failed.')
         exit(1)
-    print '%s completed successfully.'%('Code signing' if not dryrun else 'Dry run')
+    print('%s completed successfully.'%('Code signing' if not dryrun else 'Dry run'))
 
 def main():
     if (len(sys.argv)!=4) or (sys.argv[1] not in ('sign', 'list')):
-        print 'Usage: %s sign/list signing_identity app_path'%os.path.basename(__file__)
+        print('Usage: %s sign/list signing_identity app_path'%os.path.basename(__file__))
         exit(1)
     cs_identity, app_path = sys.argv[2:]
     code_sign_nested(cs_identity, app_path, dryrun=(sys.argv[1]=='list'))
