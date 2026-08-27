@@ -16,7 +16,7 @@ module.exports = function(grunt) {
             var cfg = grunt.config.get('compress')[name];
 
             var output = fs.createWriteStream(cfg.dest);
-            var archive = archiver('zip', {
+            var archive = new archiver.ZipArchive({
                 zlib: { level: 9 }
             });
 
