@@ -707,8 +707,38 @@ Cucumber file ${cucumberFile} line ${cucumberLine}`;
 
         this.notify({
             type: EVENT_TEST_ENDED,
-            result: result,
+            result: this._toIpcSafe(result),
         });
+    }
+
+    // result.context.vars carries whatever the user's test script stored via `vars.foo = ...`
+    // (see OxygenWorker.js) completely unsanitized - a webdriverio element handle, a driver
+    // reference, or any other non-plain value there makes the whole result object fail
+    // Electron's structured-clone serialization when sent over IPC, silently dropping this
+    // TEST_ENDED event and leaving the UI stuck (see WebContents.send's "Failed to serialize
+    // arguments" error). Round-tripping through JSON strips anything IPC can't carry anyway
+    // (functions, undefined, driver-object internals) while keeping the plain report data
+    // intact; the circular-reference guard covers values a driver/element proxy is likely to
+    // contain that plain JSON.stringify would otherwise throw on.
+    _toIpcSafe(value) {
+        if (value === null || typeof value !== 'object') {
+            return value;
+        }
+        const seen = new WeakSet();
+        try {
+            return JSON.parse(JSON.stringify(value, (key, val) => {
+                if (typeof val === 'object' && val !== null) {
+                    if (seen.has(val)) {
+                        return '[Circular]';
+                    }
+                    seen.add(val);
+                }
+                return val;
+            }));
+        } catch (e) {
+            console.warn('Failed to sanitize test result for IPC, sending null instead:', e);
+            return null;
+        }
     }
 
     _emitLogEvent(severity, message) {
