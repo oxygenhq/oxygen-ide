@@ -75,9 +75,9 @@ module.exports = function (grunt) {
                 var notarize = cp.spawnSync('xcrun', [
                     'notarytool',
                     'submit',
-                    '--apple-id', process.env.APPLE_ID_USR,
-                    '--password', process.env.APPLE_ID_PWD,
-                    '--team-id', process.env.APPLE_ID_TEAM, 
+                    '--key', process.env.APPLE_API_KEY_PATH,
+                    '--key-id', process.env.APPLE_API_KEY_ID,
+                    '--issuer', process.env.APPLE_API_ISSUER_ID,
                     path.resolve(filePair.dest)
                 ]);
                 if (notarize.status !== 0) {
@@ -124,9 +124,9 @@ module.exports = function (grunt) {
                 var notarizeCheck = cp.spawnSync('xcrun', [
                     'notarytool',
                     'info',
-                    '--apple-id', process.env.APPLE_ID_USR,
-                    '--password', process.env.APPLE_ID_PWD,
-                    '--team-id', process.env.APPLE_ID_TEAM, 
+                    '--key', process.env.APPLE_API_KEY_PATH,
+                    '--key-id', process.env.APPLE_API_KEY_ID,
+                    '--issuer', process.env.APPLE_API_ISSUER_ID,
                     uuid
                 ]);
                 if (notarizeCheck.status !== 0) {

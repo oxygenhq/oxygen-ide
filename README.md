@@ -25,8 +25,17 @@ RedHat/CentOS - `sudo dnf install unixODBC unixODBC-devel`
 * Minimum supported macOS version is macOS 12 (Monterey).
 * GTK and libjpeg-turbo https://github.com/Automattic/node-canvas/wiki/Installation:-Mac-OS-X
 * [Optional. Required for DB support] unixodbc binaries and development libraries: `brew install unixodbc`
-* [Optional. Required for notarization when packaging release builds] Set following two environment variables to your Apple ID and password:
+* [Optional. Required for notarization when packaging release builds] Set the following environment variables to an App Store Connect API key (see "Getting an App Store Connect API key" below):
    ```
-   export APPLE_ID_USR=YOUR_APPLE_ID
-   export APPLE_ID_PWD=APPLE_PASSWORD
+   export APPLE_API_KEY_PATH=/path/to/AuthKey_XXXXXXXXXX.p8
+   export APPLE_API_KEY_ID=XXXXXXXXXX
+   export APPLE_API_ISSUER_ID=YOUR_ISSUER_ID
    ```
+
+##### Getting an App Store Connect API key
+1. Sign in at [appstoreconnect.apple.com](https://appstoreconnect.apple.com) with an account that has the Admin or Developer role on the team that owns the signing identity.
+2. Go to **Users and Access** > **Integrations** tab > **Team Keys**.
+3. Click the **+** button, give the key a name, and set its access to **Developer** (the minimum role notarization needs).
+4. Download the generated `.p8` file immediately — Apple only lets you download it once. Store it somewhere safe on the build machine and point `APPLE_API_KEY_PATH` at it.
+5. Note the **Key ID** shown next to the key in the list — that's `APPLE_API_KEY_ID`.
+6. Note the **Issuer ID** shown at the top of the Integrations page — that's `APPLE_API_ISSUER_ID`.
