@@ -21,7 +21,8 @@ RedHat/CentOS - https://github.com/Automattic/node-canvas/wiki/Installation:-Fed
 Debian/Ubuntu - `sudo apt-get install unixodbc unixodbc-dev`  
 RedHat/CentOS - `sudo dnf install unixODBC unixODBC-devel`
 
-#### OS X
+#### macOS
+* Minimum supported macOS version is macOS 12 (Monterey).
 * GTK and libjpeg-turbo https://github.com/Automattic/node-canvas/wiki/Installation:-Mac-OS-X
 * [Optional. Required for DB support] unixodbc binaries and development libraries: `brew install unixodbc`
 * [Optional. Required for notarization when packaging release builds] Set following two environment variables to your Apple ID and password:
