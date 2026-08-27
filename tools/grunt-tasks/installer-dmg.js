@@ -81,13 +81,16 @@ module.exports = function (grunt) {
                     path.resolve(filePair.dest)
                 ]);
                 if (notarize.status !== 0) {
+                    grunt.log.error('Notarization submission failed:\n' + notarize.output);
                     done(false);
+                    return;
                 }
 
                 var uuidMatch = /\n *id: (.+?)\n/g.exec(notarize.output);
                 if (!uuidMatch) {
                     grunt.log.error('Failed to find request UUID in output:\n' + notarize.output);
                     done(false);
+                    return;
                 }
                 var uuid = uuidMatch[1];
                 grunt.log.writeln('Request UUID: ' + uuid);
@@ -129,6 +132,7 @@ module.exports = function (grunt) {
                 if (notarizeCheck.status !== 0) {
                     grunt.log.error('Failure checking for notarization status:\n' + notarizeCheck.output);
                     done(false);
+                    return;
                 }
 
                 var notarizationInfo = parseNotarizationInfo(notarizeCheck.output);
@@ -146,6 +150,7 @@ module.exports = function (grunt) {
                     if (stapler.status !== 0) {
                         grunt.log.error('Failure stapling the ticket:\n' + stapler.output);
                         done(false);
+                        return;
                     }
                     done();
                 } else {
