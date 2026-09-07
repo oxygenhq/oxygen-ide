@@ -55,7 +55,7 @@ const EDITOR_ACTION_REPLACE = 'editor.action.startFindReplaceAction';
 const MONACO_DEFAULT_OPTIONS = {
     fontSize: '12pt',
     lineHeight: 19,
-    fontFamily: 'Fira Code',
+    fontFamily: 'consolas',
     fontLigatures: true,
     automaticLayout: true,
     minimap: {
