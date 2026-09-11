@@ -17,9 +17,9 @@
     "@sentry/electron": "7.16.0",
     "appium-adb": "15.0.9",
     "chokidar": "5.0.0",
-    "fast-xml-parser": "5.11.0",
-    "mixpanel": "0.23.0",
-    "oxygen-cli": "2.0.0-beta.3",
+    "fast-xml-parser": "5.11.1",
+    "mixpanel": "0.24.0",
+    "oxygen-cli": "2.0.0-beta.7",
     "rimraf": "6.1.3"
   }
 }
