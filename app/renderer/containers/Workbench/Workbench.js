@@ -259,6 +259,24 @@ export default class Workbench extends React.Component<Props> {
         this.props.updateBreakpoints(filePath, breakpoints, name);
     }
 
+    handleClearAllBreakpoints() {
+        // reuse updateBreakpoints (the same action a single gutter click dispatches) for every
+        // file that currently has any - it already does everything clearing needs: the reducer
+        // drops that file's entries, MonacoEditor reacts to the now-empty breakpoints prop by
+        // removing its own markers (see the componentDidUpdate diff added there), and the
+        // settings saga forwards the change to the running test process when one is paused/
+        // running, so a live debug session's breakpoints get cleared too - not just the UI.
+        const { breakpoints } = this.props.test;
+        if (!breakpoints) {
+            return;
+        }
+        Object.keys(breakpoints).forEach((filePath) => {
+            if (Array.isArray(breakpoints[filePath]) && breakpoints[filePath].length > 0) {
+                this.props.updateBreakpoints(filePath, [], null);
+            }
+        });
+    }
+
     handleSidebarResize(sidebar, newSize) {
         this.props.setSidebarSize(sidebar, newSize);
     }
@@ -296,6 +314,9 @@ export default class Workbench extends React.Component<Props> {
         }
         else if (ctrlId === Controls.TEST_REPL_START) {
             this.props.replStart();
+        }
+        else if (ctrlId === Controls.TEST_CLEAR_BREAKPOINTS) {
+            this.handleClearAllBreakpoints();
         }
         else if (ctrlId === Controls.TEST_CONTINUE) {
             this.props.continueTest();
@@ -394,6 +415,10 @@ export default class Workbench extends React.Component<Props> {
             },
             [Controls.TEST_REPL_START]: {
                 visible: isRunning && !isPaused && canStart,
+            },
+            [Controls.TEST_CLEAR_BREAKPOINTS]: {
+                visible: !!test.breakpoints &&
+                    Object.keys(test.breakpoints).some((path) => Array.isArray(test.breakpoints[path]) && test.breakpoints[path].length > 0),
             },
         };
     }

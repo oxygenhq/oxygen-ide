@@ -11,7 +11,7 @@ import {
     FileAddOutlined, FolderAddOutlined, FolderOpenOutlined, SaveOutlined,
     GlobalOutlined, MobileOutlined, ScanOutlined,
     PlayCircleFilled, PlaySquareFilled, ForwardOutlined, CloseCircleFilled,
-    SettingOutlined
+    SettingOutlined, ClearOutlined
 } from '@ant-design/icons';
 import { Select, Input, TreeSelect, Tooltip } from 'antd';
 import React, { Fragment } from 'react';
@@ -497,6 +497,15 @@ export default class Toolbar extends React.Component<Props> {
                         <span>Stopping…</span>
                     </button>
                 }
+
+                { this._isVisible(Controls.TEST_CLEAR_BREAKPOINTS) && (
+                    <ClearOutlined
+                        className="control button"
+                        style={ getOpacity(this._isEnabled(Controls.TEST_CLEAR_BREAKPOINTS)) }
+                        onClick={ () => ::this.handleClickEvent(Controls.TEST_CLEAR_BREAKPOINTS) }
+                        title="Clear All Breakpoints"
+                    />
+                )}
 
                 {/* { this._isVisible(Controls.TEST_REPL_START) && (
                     <button

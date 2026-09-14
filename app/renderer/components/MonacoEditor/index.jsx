@@ -209,6 +209,22 @@ export default class MonacoEditor extends React.Component<Props> {
             }
         }
 
+        // breakpoints normally only ever grows here in response to the user's own gutter
+        // clicks, which write straight to the editor's own decorations first and only reach
+        // this prop afterwards (see onBreakpointsUpdate below) - so it was never wired up to
+        // remove markers when it shrinks or is externally cleared (e.g. a "Clear All
+        // Breakpoints" action). Reconcile the editor's own markers down to whatever lines are
+        // still in props here, so that path works too - this only ever removes, it never adds,
+        // so it can't race with or duplicate the gutter-click flow.
+        if (this.editor && deepDiff(prevProps.breakpoints, this.props.breakpoints)) {
+            const currentLines = Array.isArray(this.props.breakpoints) ? this.props.breakpoints : [];
+            helpers.getBreakpointMarkers(this.editor).forEach((marker) => {
+                if (!currentLines.includes(helpers.getMarkerLine(marker))) {
+                    helpers.removeBreakpointMarker(this.editor, marker);
+                }
+            });
+        }
+
         if (deepDiff(prevProps.disabledBreakpoints, this.props.disabledBreakpoints)) {
             helpers.makeBreakpointsHollowCircle(this.editor, this.props.disabledBreakpoints);
         }
@@ -321,6 +337,7 @@ export default class MonacoEditor extends React.Component<Props> {
             diffProps.fontSize !== this.props.fontSize,
             waitUpdateBreakpoints:
             diffProps.waitUpdateBreakpoints !== this.props.waitUpdateBreakpoints,
+            breakpoints: !!deepDiff(diffProps.breakpoints, this.props.breakpoints),
             disabledBreakpoints: !!deepDiff(diffProps.disabledBreakpoints, this.props.disabledBreakpoints),
             resolvedBreakpoints: !!deepDiff(diffProps.resolvedBreakpoints, this.props.resolvedBreakpoints)
         };
