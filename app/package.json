@@ -19,7 +19,7 @@
     "chokidar": "5.0.0",
     "fast-xml-parser": "5.11.1",
     "mixpanel": "0.24.0",
-    "oxygen-cli": "2.0.0-beta.7",
+    "oxygen-cli": "2.0.0-beta.8",
     "rimraf": "6.1.3"
   }
 }
