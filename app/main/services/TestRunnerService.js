@@ -540,17 +540,24 @@ export default class TestRunnerService extends ServiceBase {
         if (process.platform !== 'win32') {
             return false;
         }
-        try {
-            // eslint-disable-next-line quotes
-            cp.execSync(`WMIC PROCESS WHERE "COMMANDLINE LIKE '%iexplore.exe%'" CALL TERMINATE`);
-            // eslint-disable-next-line quotes
-            cp.execSync(`WMIC PROCESS WHERE "COMMANDLINE LIKE '%win32\\\\IEDriverServer_x86.exe%'" CALL TERMINATE`);
-            return true;
+
+        let allSucceeded = true;
+        for (const imageName of ['iexplore.exe', 'IEDriverServer_x86.exe', 'IEDriverServer.exe']) {
+            try {
+                cp.execSync(`taskkill /F /IM ${imageName}`);
+            }
+            catch (e) {
+                // taskkill exits non-zero when no matching process is running, which is the
+                // routine case - this runs before every IE test, whether or not a stray
+                // process actually exists - so only surface anything genuinely unexpected.
+                const notFound = e.status === 128 || (e.stderr && e.stderr.toString().includes('not found'));
+                if (!notFound) {
+                    console.error(`Unable to kill ${imageName}:`, e);
+                    allSucceeded = false;
+                }
+            }
         }
-        catch (e) {
-            console.error('Unable to kill IE webdriver:', e);
-            return false;
-        }
+        return allSucceeded;
     }
 
     async _launchTest(opts, caps) {
