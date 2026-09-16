@@ -221,7 +221,18 @@ export default class TestRunnerService extends ServiceBase {
             } else if (testMode === 'web') {
                 options.mode = 'web';
                 if (!options.seleniumUrl) {
-                    const driverKey = TEST_TARGET_TO_DRIVER_KEY[testTarget] || 'chrome';
+                    // TEST_TARGET_TO_DRIVER_KEY only maps testTarget values whose driver key
+                    // differs from the testTarget itself (e.g. MicrosoftEdgeIEMode -> ie) - for
+                    // everything else (chrome, firefox, and plain 'ie' for classic Internet
+                    // Explorer) the testTarget value already IS the driver key. Defaulting to
+                    // 'chrome' here instead of testTarget meant selecting plain "Internet
+                    // Explorer" (testTarget 'ie', absent from the map since its key equals its
+                    // value) silently started chromedriver instead of IEDriverServer - the
+                    // capabilities sent afterwards still correctly said browserName: 'ie', so
+                    // chromedriver rejected the session with "No matching capabilities found"
+                    // rather than anything pointing at the real cause. Match the same fallback
+                    // SeleniumService.checkDriver() already uses correctly.
+                    const driverKey = TEST_TARGET_TO_DRIVER_KEY[testTarget] || testTarget;
                     const seleniumService = this.getService('SeleniumService');
                     let driverPort = null;
                     try {
