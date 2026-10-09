@@ -1,7 +1,7 @@
 {
   "name": "oxygenide",
   "productName": "Oxygen IDE",
-  "version": "1.99.2",
+  "version": "1.99.4",
   "description": "IDE for Oxygen automation framework.",
   "type": "commonjs",
   "scripts": {
