@@ -16,7 +16,7 @@
   flex-flow: column nowrap;
   height: 100%;
   // padding-top: 5px;
-  background-color: white;
+  background-color: var(--ox-editor-bg);
 
   > div {
     display: flex;

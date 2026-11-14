@@ -25,6 +25,7 @@ import MainProcess from './MainProcess';
 import * as Sentry from '@sentry/electron/main';
 import fs from 'fs';
 import path from 'path';
+import { applySavedTheme, getWindowBackgroundColor } from './helpers/theme';
 import packageJson from '../../package.json';
 
 console.log('Version: ', packageJson.version);
@@ -91,8 +92,11 @@ app.on('window-all-closed', () => {
 
 app.on('ready', async () => {
     remoteMain.initialize();
+    // must happen before the window is created so it opens in the saved light/dark theme
+    applySavedTheme();
     mainWindow = new BrowserWindow({
         show: false,
+        backgroundColor: getWindowBackgroundColor(),
         width: 1024,
         height: 728,
         webPreferences: {

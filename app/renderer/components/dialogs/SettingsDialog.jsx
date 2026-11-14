@@ -12,6 +12,7 @@ import GeneralSettings from './GeneralSettings';
 import CloudProvidersSettings from './CloudProvidersSettings';
 import IntegrationsSettings from './IntegrationsSettings';
 import RunSettings from './RunSettings';
+import AppearanceSettings from './AppearanceSettings.jsx';
 
 const DEFAULT_STATE = {
     tabKey: 1,
@@ -28,6 +29,8 @@ type Props = {
     generalSettings: Object | undefined,
     projectSettings: Object | undefined,
     integrations: Object | undefined,
+    theme: string | undefined,
+    onThemeChange: (theme: string) => void,
     onSubmit: () => void,
     onCancel: () => void
 };
@@ -112,6 +115,8 @@ export default class SettingsDialog extends React.PureComponent<Props> {
             integrations,
             cloudProviders,
             runSettings,
+            theme,
+            onThemeChange,
             visible,
             onCancel,
         } = this.props;
@@ -173,6 +178,16 @@ export default class SettingsDialog extends React.PureComponent<Props> {
                                     ref={node => (this.RunSettings = node)}
                                     runSettings={ runSettings }
                                     visible={ visible }
+                                />
+                            ),
+                        },
+                        {
+                            key: '5',
+                            label: 'Appearance',
+                            children: (
+                                <AppearanceSettings
+                                    theme={ theme }
+                                    onThemeChange={ onThemeChange }
                                 />
                             ),
                         },

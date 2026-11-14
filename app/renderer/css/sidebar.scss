@@ -76,7 +76,7 @@
 .ant-tree li {
   span.ant-tree-node-content-wrapper {
     > span.ant-tree-title {
-      color: rgb(190, 190, 190) !important;
+      color: var(--ox-tree-title) !important;
     }
   }
   &.file {
@@ -99,7 +99,7 @@
     }
     span.ant-tree-node-selected {
       > span.ant-tree-title {
-        color: #fff !important;
+        color: var(--ox-tree-title-selected) !important;
       }
     }
   }

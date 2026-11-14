@@ -26,6 +26,13 @@ html {
   box-sizing: border-box;
 }
 
+// antd's reset.css sets no page colors, so light mode uses the browser defaults (black on white).
+// The dark theme has to spell them out (see css/theme.scss for the palette).
+:root[data-theme='dark'] body {
+  color: var(--ox-text);
+  background-color: var(--ox-surface);
+}
+
 #root > div > .ant-row {
   height: calc(100vh - 43px);
 }

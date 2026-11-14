@@ -2,8 +2,8 @@
 
 .list {
   .list-item {
-    border-bottom: 1px #dcdcdc solid;
-    background-color: white;
+    border-bottom: 1px var(--ox-border-list) solid;
+    background-color: var(--ox-surface);
 
     .item-value-wrap {
       padding: 5px 5px;
@@ -21,13 +21,13 @@
     }
 
     .item-value-wrap.selected {
-      background: #DAD8D0;
+      background: var(--ox-list-selected-bg);
     }
     
     input.item-value-editing {
       padding: 3px 4px;
       width: 100%;
-      color: darkblue;
+      color: var(--ox-input-edit-text);
       /*.ant-input:focus {
         border-color: #40a9ff;
         outline: 0;*/

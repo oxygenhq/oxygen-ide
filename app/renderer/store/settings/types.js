@@ -16,6 +16,7 @@ export const EDITOR_ZOOM_IN = 'EDITOR_ZOOM_IN';
 export const EDITOR_ZOOM_OUT = 'EDITOR_ZOOM_OUT';
 export const EDITOR_ZOOM_TO_DEFAULT = 'EDITOR_ZOOM_TO_DEFAULT';
 export const EDITOR_SET_ZOOM = 'EDITOR_SET_ZOOM';
+export const SET_THEME = 'SET_THEME';
 export const SHOW_LANDING = 'SHOW_LANDING';
 export const HIDE_LANDING = 'HIDE_LANDING';
 export const TMP_ADD_FILE = 'TMP_ADD_FILE';

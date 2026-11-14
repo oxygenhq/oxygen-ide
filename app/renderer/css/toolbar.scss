@@ -3,7 +3,7 @@
 .appTollbar {
   background-image: url("../img/tb-background.png");
   background-repeat: repeat-x;
-  background-color:rgba(0, 0, 0, 0.2);
+  background-color: var(--ox-toolbar-bg-color);
   border-top: 1px solid $appTollbarBorder;
   border-bottom: 1px solid $appTollbarBorder;
   height: 43px;
@@ -12,6 +12,11 @@
   align-items: center;
   padding-left: 10px;
   -webkit-user-select: none;
+}
+
+// the toolbar texture is a light image; the dark theme uses a plain background instead
+:root[data-theme='dark'] .appTollbar {
+  background-image: none;
 }
 
 .appTollbar .control {
@@ -70,11 +75,11 @@
 }
 
 .appTollbar .control.selectable.active {
-  background-color: #fff;
+  background-color: var(--ox-toolbar-active-bg);
 }
 .appTollbar .control.selectable.active.green-bg,
 .tabs-bar-wrapper .tabItemElem.green-bg {
-  background-color: #e8f5e9;
+  background-color: var(--ox-toolbar-green-bg);
 }
 
 .appTollbar button.control.button {

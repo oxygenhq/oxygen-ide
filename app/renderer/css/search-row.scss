@@ -2,7 +2,7 @@
 
  .search-row {
   padding: 5px;
-  background: #f2f2f2;
+  background: var(--ox-panel-body-bg);
   border-right: solid 1px $panelBorderColor;
   border-left: solid 1px $panelBorderColor;
   border-bottom: solid 1px $panelBorderColor;
@@ -35,6 +35,6 @@
 
 .add-to-root-row {
   padding: 5px;
-  background: #f2f2f2;
+  background: var(--ox-panel-body-bg);
   border-left: solid 1px $panelBorderColor;
 }

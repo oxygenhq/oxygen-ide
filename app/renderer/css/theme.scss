@@ -1,0 +1,147 @@
+/*
+ * Copyright (C) 2015-present CloudBeat Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+/*
+ * Colors that change between the light and the dark theme.
+ *
+ * Every themed color in the IDE's own stylesheets is a custom property defined here:
+ *  - :root holds the light values (they are the IDE's original colors);
+ *  - :root[data-theme='dark'] overrides them. data-theme is set on <html> by app.html (before first
+ *    paint) and then kept in sync by components/ThemeProvider.jsx.
+ * To add a themed color: define it in both blocks, then use var(--ox-...) (or a $variable from
+ * _vars.scss) in the stylesheet. antd components are themed separately, through its ConfigProvider.
+ */
+:root {
+  color-scheme: light;
+
+  // text
+  --ox-text: #000000;
+  --ox-text-strong: #000000;
+  --ox-text-panel-header: #444444;
+  --ox-text-panel: #333333;
+  --ox-text-muted: #666666;
+
+  // surfaces
+  --ox-surface: #ffffff;
+  --ox-editor-bg: #ffffff;
+  --ox-light: #fafafa;
+  --ox-light-bg: rgb(216, 218, 219);
+  --ox-panel-header-bg: #e6e6e6;
+  --ox-panel-body-bg: #f2f2f2;
+  --ox-panel-border: #d0d0d0;
+  --ox-sidebar-bg: #f2f2f2;
+  --ox-initializing-bg: #f1f1f1;
+  --ox-list-selected-bg: #dad8d0;
+  --ox-list-hover-bg: rgba(218, 216, 208, 0.5);
+  --ox-highlight-bg: yellow;
+
+  // borders
+  --ox-border-list: #dcdcdc;
+  --ox-border-property: #e4e4e4;
+  --ox-border-form: #e9e9e9;
+
+  // accents
+  --ox-success: rgb(54, 197, 137);
+  --ox-danger: rgb(224, 99, 49);
+  --ox-active: rgb(15, 125, 168);
+  --ox-hover: #198cea;
+
+  // navigation (legacy aside nav)
+  --ox-aside-link: rgb(43, 49, 56);
+  --ox-aside-selected-bg: rgb(43, 49, 56);
+  --ox-aside-link-hover: rgb(108, 120, 134);
+
+  // toolbar
+  --ox-toolbar-bg-color: rgba(0, 0, 0, 0.2);
+  --ox-toolbar-border: #aaaaaa;
+  --ox-toolbar-separator: #aeaeae;
+  --ox-toolbar-stop: rgba(0, 0, 0, 0.65);
+  --ox-toolbar-active-bg: #ffffff;
+  --ox-toolbar-green-bg: #e8f5e9;
+
+  // logger
+  --ox-logger-bg: #fdfdfb;
+  --ox-logger-text: rgba(0, 0, 0, 0.65);
+  --ox-logger-tab-text: #666666;
+  --ox-log-error: #a8071a;
+
+  // file tree
+  --ox-tree-title: rgb(190, 190, 190);
+  --ox-tree-title-selected: #ffffff;
+  --ox-filter-node: #a60000;
+
+  // editor decorations and inline values
+  --ox-param-decoration: #09885a;
+  --ox-transaction-decoration: #314496;
+  --ox-input-edit-text: darkblue;
+  --ox-variable-name: #0000ff;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  // text
+  --ox-text: rgba(255, 255, 255, 0.85);
+  --ox-text-strong: #ffffff;
+  --ox-text-panel-header: rgba(255, 255, 255, 0.85);
+  --ox-text-panel: rgba(255, 255, 255, 0.85);
+  --ox-text-muted: rgba(255, 255, 255, 0.55);
+
+  // surfaces (the editor matches Monaco's vs-dark background)
+  --ox-surface: #141414;
+  --ox-editor-bg: #1e1e1e;
+  --ox-light: #1e1e1e;
+  --ox-light-bg: #2a2d2e;
+  --ox-panel-header-bg: #262626;
+  --ox-panel-body-bg: #1a1a1a;
+  --ox-panel-border: #3a3a3a;
+  --ox-sidebar-bg: #1a1a1a;
+  --ox-initializing-bg: #1a1a1a;
+  --ox-list-selected-bg: #37373d;
+  --ox-list-hover-bg: rgba(255, 255, 255, 0.08);
+  --ox-highlight-bg: #5c4f00;
+
+  // borders
+  --ox-border-list: #303030;
+  --ox-border-property: #303030;
+  --ox-border-form: #303030;
+
+  // accents
+  --ox-active: rgb(79, 172, 214);
+  --ox-hover: #4da3ff;
+
+  // navigation (legacy aside nav)
+  --ox-aside-link: rgb(190, 196, 204);
+  --ox-aside-selected-bg: rgb(64, 70, 78);
+  --ox-aside-link-hover: rgb(80, 88, 98);
+
+  // toolbar
+  --ox-toolbar-bg-color: #242424;
+  --ox-toolbar-border: #3f3f3f;
+  --ox-toolbar-separator: #505050;
+  --ox-toolbar-stop: rgba(255, 255, 255, 0.65);
+  --ox-toolbar-active-bg: #3a3a3a;
+  --ox-toolbar-green-bg: #1f3d2b;
+
+  // logger
+  --ox-logger-bg: #141414;
+  --ox-logger-text: rgba(255, 255, 255, 0.85);
+  --ox-logger-tab-text: rgba(255, 255, 255, 0.65);
+  --ox-log-error: #ff7875;
+
+  // file tree
+  --ox-tree-title: rgba(255, 255, 255, 0.75);
+  --ox-tree-title-selected: #ffffff;
+  --ox-filter-node: #ff7875;
+
+  // editor decorations and inline values
+  --ox-param-decoration: #4ec9a0;
+  --ox-transaction-decoration: #8ab4f8;
+  --ox-input-edit-text: #9cdcfe;
+  --ox-variable-name: #6cb6ff;
+}

@@ -4,6 +4,17 @@
     <meta charset="utf-8">
     <title>Oxygen IDE</title>
     <script>
+      // Pick light/dark before anything paints. The main process has already applied the saved
+      // choice to nativeTheme, which is what this media query reflects. ThemeProvider
+      // (components/ThemeProvider.jsx) takes over once React has rendered.
+      (function() {
+        try {
+          var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        } catch (e) { /* default (light) styling applies */ }
+      }());
+    </script>
+    <script>
       (function() {
         if (!process.env.HOT) {
           const link = document.createElement('link');

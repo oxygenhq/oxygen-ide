@@ -32,24 +32,24 @@
 }
 
 .breakpointStyle.hollowCircle {
-  background: white;
+  background: var(--ox-editor-bg);
   border: 1.25px solid #e06331
 }
 
 .breakpointStyle.resolwedCircle {
-  background: white;
+  background: var(--ox-editor-bg);
   border: 4px double #e06331;
 }
 
 .paramDecoration {
-	color: #09885a !important;
+	color: var(--ox-param-decoration) !important;
 	cursor: pointer;
 	text-decoration: underline;
 	font-style: oblique;
 }
 
 .oxTransactionDecoration {
-	color: #314496 !important;
+	color: var(--ox-transaction-decoration) !important;
 	font-weight: bold;
 }
 
@@ -263,7 +263,7 @@ $b: 0.25;
 }
 
 .initializing-container {
-  background: #f1f1f1;
+  background: var(--ox-initializing-bg);
   height: 100%;
   width: 100%;
   text-align: center;

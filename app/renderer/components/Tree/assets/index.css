@@ -10,7 +10,7 @@
   outline: 0;
 }
 .rc-tree li .draggable {
-  color: #333;
+  color: var(--ox-text-panel);
   -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;
@@ -21,11 +21,11 @@
   -webkit-user-drag: element;
 }
 .rc-tree li.drag-over, .ul-drag-over {
-  background-color: #DAD8D0;
+  background-color: var(--ox-list-selected-bg);
 }
 
 .rc-tree li.filter-node > .rc-tree-node-content-wrapper {
-  color: #a60000!important;
+  color: var(--ox-filter-node)!important;
   font-weight: bold!important;
 }
 .rc-tree li ul {
@@ -44,7 +44,7 @@
 }
 
 .rc-tree li .rc-tree-node-content-wrapper:hover {
-  background-color: rgba(218, 216, 208, 0.5);
+  background-color: var(--ox-list-hover-bg);
   padding: 1px 5px !important;
   margin: 0px -5px !important;
 }
@@ -183,7 +183,7 @@
   cursor: not-allowed;
 }
 .rc-tree-node-selected {
-  background-color: #DAD8D0;
+  background-color: var(--ox-list-selected-bg);
   margin: 0px -5px !important;
   padding: 1px 5px !important;
   opacity: 1;
@@ -210,4 +210,13 @@
 .rc-tree-icon__customize {
   margin-right: 2px;
   vertical-align: top;
+}
+
+/* The tree's icons are dark glyphs drawn for a light background; lift them in the dark theme. */
+:root[data-theme='dark'] .rc-tree-icon__open,
+:root[data-theme='dark'] .rc-tree-icon__close,
+:root[data-theme='dark'] .rc-tree-icon__docu,
+:root[data-theme='dark'] .rc-tree li span.rc-tree-switcher.rc-tree-switcher_open,
+:root[data-theme='dark'] .rc-tree li span.rc-tree-switcher.rc-tree-switcher_close {
+  filter: invert(0.85);
 }

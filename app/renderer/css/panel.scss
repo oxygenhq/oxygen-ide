@@ -15,7 +15,7 @@
   font-stretch: normal;
   line-height: normal;
   letter-spacing: normal;
-  color: #444444;
+  color: var(--ox-text-panel-header);
   border-bottom: solid 1px $panelBorderColor;
   border-top: solid 1px $panelBorderColor;
   border-right: solid 1px $panelBorderColor;
@@ -43,7 +43,7 @@
   font-stretch: normal;
   line-height: normal;
   letter-spacing: normal;
-  color: #333333;
+  color: var(--ox-text-panel);
   /*height: calc(100vh - 73px);*/
   height:calc(100% - 30px);
   height:-moz-calc(100% - 30px);

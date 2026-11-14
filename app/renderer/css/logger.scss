@@ -102,7 +102,7 @@
       font-style: normal;
       font-stretch: normal;
       letter-spacing: normal;
-      color: #666666;
+      color: var(--ox-logger-tab-text);
     }
     .ant-tabs-tab {
       padding: 6px 16px !important;
@@ -113,7 +113,7 @@
       border-left: 1px solid $panelBorderColor;
     }
     .ant-tabs-tab.ant-tabs-tab-active {
-      background-color: white;
+      background-color: var(--ox-surface);
     }
     .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
       color: $active !important;
@@ -151,7 +151,7 @@
   opacity: 0.4;
   display: inline-block;
   margin-left: auto;
-  color: #000;
+  color: var(--ox-text-strong);
   cursor: pointer;
 }
 

@@ -50,7 +50,7 @@ function renderTreeNodes(nodes, searchResults) {
         if (searchResults.indexOf(theTitle) > -1) {
             highLight = true;
         }
-        const highLightStyle = highLight ? { backgroundColor: 'yellow' } :  {};
+        const highLightStyle = highLight ? { backgroundColor: 'var(--ox-highlight-bg)' } :  {};
 
         if (element.type === 'object') {
             theTitle = (

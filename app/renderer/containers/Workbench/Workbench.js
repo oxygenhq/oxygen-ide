@@ -119,6 +119,7 @@ type Props = {
     waitChromeExtension: boolean,
     stopWaitChromeExtension: Function,
     updateGeneralSettings: Function,
+    setTheme: Function,
     showDownloadEdgeDriverError: Function,
     startDownloadEdgeDriver: Function,
     replStart: Function,
@@ -788,6 +789,8 @@ export default class Workbench extends React.Component<Props> {
                                 integrations={ integrations }
                                 runSettings={ runSettings }
                                 generalSettings={ generalSettings }
+                                theme={ this.props.settings && this.props.settings.theme }
+                                onThemeChange={ this.props.setTheme }
                                 onSubmit={ ::this.settingsDialog_onSubmit }
                                 onCancel={ ::this.settingsDialog_onCancel } 
                             />

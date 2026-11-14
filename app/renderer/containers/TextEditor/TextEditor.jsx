@@ -15,6 +15,7 @@ import MonacoEditor from '../../components/MonacoEditor/index.jsx';
 import '../../css/editor.scss';
 
 import SupportedExtensions from '../../helpers/file-extensions';
+import { ThemeContext, EDITOR_THEME_DARK, EDITOR_THEME_LIGHT } from '../../helpers/theme';
 import editorSubjects from '../../store/editor/subjects';
 import fileSubjects from '../../store/fs/subjects';
 import Landing from '../../components/Landing';
@@ -119,6 +120,9 @@ export default class TextEditor extends React.Component<Props> {
         }
     }
 
+    // provides { isDark }, see components/ThemeProvider
+    static contextType = ThemeContext;
+
     setFatureLanguageLoaded = () => {
         this.setState({ featureLanguageLoaded: true });
     };
@@ -188,6 +192,7 @@ export default class TextEditor extends React.Component<Props> {
             featureLanguageLoaded
         } = this.state;
         const self = this;
+        const editorTheme = this.context && this.context.isDark ? EDITOR_THEME_DARK : EDITOR_THEME_LIGHT;
 
         if (activeFile === 'welcome') {
             return (<Landing/>);
@@ -215,6 +220,7 @@ export default class TextEditor extends React.Component<Props> {
                             visible={getVisible(file, activeFile, activeFileName)}
                             editorReadOnly={editorReadOnly}
                             fontSize={fontSize}
+                            theme={editorTheme}
                             breakpoints={file.breakpoints || []}
                             disabledBreakpoints={file.disabledBreakpoints || []}
                             resolvedBreakpoints={file.resolvedBreakpoints || []}                            

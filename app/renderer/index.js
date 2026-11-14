@@ -17,6 +17,7 @@ import 'antd/dist/reset.css';
 import App from './containers/App';
 import importConfigureStore from './store/configureStore';
 import { configureServices } from './services';
+import './css/theme.scss';
 import './app.global.scss';
 import packageJson from '../../package.json';
 

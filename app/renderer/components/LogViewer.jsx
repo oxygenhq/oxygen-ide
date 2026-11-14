@@ -36,11 +36,11 @@ const LogLines = React.memo(function LogLines({ lines }: LogLinesProps) {
         <>
             {
                 lines.map((line, index) => {
-                    let color = 'rgba(0, 0, 0, 0.65)';
+                    let color = 'var(--ox-logger-text)';
 
                     if (line && line.severity) {
                         if (line.severity === 'ERROR') {
-                            color = '#a8071a';
+                            color = 'var(--ox-log-error)';
                         }
 
                         if (line.severity === 'PASSED') {

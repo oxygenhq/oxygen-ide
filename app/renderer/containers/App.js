@@ -10,6 +10,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import Workbench from './Workbench';
+import ThemeProvider from '../components/ThemeProvider.jsx';
 
 type Props = {
   store: {},
@@ -20,7 +21,9 @@ export default class App extends React.Component<Props> {
     render() {
         return (
             <Provider store={this.props.store}>
-                <Workbench />
+                <ThemeProvider>
+                    <Workbench />
+                </ThemeProvider>
             </Provider>
         );
     }

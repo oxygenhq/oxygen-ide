@@ -11,6 +11,7 @@ import appSettings from 'electron-settings';
 import { spawn  } from 'child_process';
 import ServiceBase from './ServiceBase';
 import { moduleRequire } from 'oxygen-cli';
+import { setThemeSource } from '../helpers/theme';
 var path = require('path');
 
 const { dialog } = electron;
@@ -202,6 +203,10 @@ export default class ElectronService extends ServiceBase {
     getSettings() {
         const settings = appSettings.getSync('appSettings');
         return settings;
+    }
+
+    setThemeSource(theme) {
+        return setThemeSource(theme);
     }
 
     setTitle(title) {

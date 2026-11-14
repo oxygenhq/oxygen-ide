@@ -128,6 +128,8 @@ const defaultState = {
     cacheUsed: false,
     showLanding: false,
     fontSize: 12,
+    // 'light' | 'dark' | 'system' (follow the operating system)
+    theme: 'system',
     navbar: {
         visible: false,
     },
@@ -156,6 +158,7 @@ export default (state = defaultState, action) => {
         target,
         settings,
         zoom,
+        theme,
         cache,
         uuid,
         providers, 
@@ -256,6 +259,18 @@ export default (state = defaultState, action) => {
             return { 
                 ...state,
                 fontSize: zoom
+            };
+        } else {
+            return state;
+        }
+    }
+
+    // SET_THEME
+    case types.SET_THEME: {
+        if (theme === 'light' || theme === 'dark' || theme === 'system') {
+            return {
+                ...state,
+                theme
             };
         } else {
             return state;

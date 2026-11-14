@@ -483,6 +483,13 @@ export default class MonacoEditor extends React.Component<Props> {
                 colors: {}
             });
 
+            monaco.editor.defineTheme('oxygen-theme-dark', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [],
+                colors: {}
+            });
+
             this.editor = monaco.editor.create(this.editorContainer, {
                 value,
                 language,

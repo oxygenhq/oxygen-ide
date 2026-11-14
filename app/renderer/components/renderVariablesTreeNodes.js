@@ -20,7 +20,7 @@ function renderVariablesTreeNodes(nodes, parentIndex) {
         
         let theTitle = (
             <Fragment>
-                <span style={{color: '#0000ff'}}>{element.name}</span>
+                <span style={{color: 'var(--ox-variable-name)'}}>{element.name}</span>
                 :
                 {' '}
                 {

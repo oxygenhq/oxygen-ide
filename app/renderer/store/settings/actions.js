@@ -104,6 +104,12 @@ export const setZoom = (zoom) => ({
     payload: { zoom }
 });
 
+/* theme: 'light' | 'dark' | 'system' */
+export const setTheme = (theme) => ({
+    type: types.SET_THEME,
+    payload: { theme }
+});
+
 export const setSidebarVisible= (sidebar, visible) => ({
     type: types.SIDEBAR_SET_VISIBLE,
     payload: { target: sidebar, value: visible },
