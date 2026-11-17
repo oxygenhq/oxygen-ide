@@ -41,6 +41,7 @@ import * as testActions from '../test/actions';
 import * as dialogActions from '../dialog/actions';
 import * as recorderActions from '../recorder/actions';
 import * as settingsActions from '../settings/actions';
+import * as searchActions from '../search/actions';
 import { reportError, setUserIdToSentry } from '../sentry/actions';
 import * as orActions from '../obj-repo/actions';
 
@@ -132,6 +133,13 @@ export function* handleMainMenuEvents({ payload }) {
     }
     else if (cmd === Const.MENU_CMD_REPLACE) {
         yield editorSubjects['EDITOR.TRIGGER'].next({ trigger: 'replace' });
+    }
+    else if (
+        cmd === Const.MENU_CMD_FIND_IN_FILES ||
+        cmd === Const.MENU_CMD_REPLACE_IN_FILES ||
+        cmd === Const.MENU_CMD_FIND_IN_FOLDER
+    ) {
+        yield showFindInFiles(cmd);
     }
     else if (cmd === Const.MENU_CMD_HELP_CHECK_UPDATES) {
         yield services.mainIpc.call('UpdateService', 'start', [true]);
@@ -1502,6 +1510,36 @@ export function* showRemoveObjectElementOrContainerDialog({ type }) {
     } else {
         console.warn('no path');
     }
+}
+
+/**
+ * Opens the "Find in Files" panel. The search is done in the folder selected in the File Explorer
+ * (the parent folder if a file is selected), or in the whole project when nothing is selected.
+ */
+export function* showFindInFiles(cmd) {
+    const rootPath = (yield select(state => state.fs.rootPath)) || null;
+    const activeNode = (yield select(state => state.fs.tree.activeNode)) || null;
+    let folder = rootPath;
+
+    if (activeNode) {
+        const { response } = yield getOrFetchFileInfo(activeNode);
+        if (response) {
+            folder = (response.type === 'folder' ? response.path : response.parentPath) || rootPath;
+        }
+    }
+
+    if (!folder) {
+        notification['error']({
+            message: 'Open a folder first',
+            description: 'Select a folder in the File Explorer to search in.'
+        });
+        return;
+    }
+
+    yield put(searchActions.showSearch({
+        folder,
+        showReplace: cmd === Const.MENU_CMD_REPLACE_IN_FILES
+    }));
 }
 
 export function* showNewFileDialogInFolder() {

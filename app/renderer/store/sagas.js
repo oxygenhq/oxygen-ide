@@ -17,6 +17,7 @@ import settings from './settings/sagas';
 import objrepo from './obj-repo/sagas';
 import dealog from './dialog/sagas';
 import tabs from './tabs/sagas';
+import search from './search/sagas';
 
 // services
 import ServicesSingleton from '../services';
@@ -36,6 +37,7 @@ export default function* root() {
         fork(objrepo),
         fork(dealog),
         fork(tabs),
+        fork(search),
     ];
     // check if any service has saga functions as well
     if (services && Object.keys(services).length > 0) {

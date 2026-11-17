@@ -67,6 +67,9 @@ export default class TextEditor extends React.Component<Props> {
         // subscribe to the relevant subjects
         this.subscriptions['EDITOR.TRIGGER'] = editorSubjects['EDITOR.TRIGGER'].subscribe(::this.onEditorCallTrigger);
         this.subscriptions['FILE.RENAMED'] = fileSubjects['FILE.RENAMED'].subscribe(::this.onFileRenamed);
+        this.subscriptions['EDITOR.REVEAL'] = editorSubjects['EDITOR.REVEAL'].subscribe(::this.onEditorReveal);
+        // timer of the pending "reveal" request, see onEditorReveal
+        this.revealTimer = null;
         // keeps references to all open editors
         this.editors = {};
         this.lastTrigger = null;
@@ -118,6 +121,10 @@ export default class TextEditor extends React.Component<Props> {
         if (this.subscriptions['FILE.RENAMED']) {
             this.subscriptions['FILE.RENAMED'].unsubscribe();
         }
+        if (this.subscriptions['EDITOR.REVEAL']) {
+            this.subscriptions['EDITOR.REVEAL'].unsubscribe();
+        }
+        clearTimeout(this.revealTimer);
     }
 
     // provides { isDark }, see components/ThemeProvider
@@ -152,6 +159,25 @@ export default class TextEditor extends React.Component<Props> {
             editor.trigger(trigger);
             this.lastTrigger = trigger;
         }
+    }
+
+    // selects a range in the file and scrolls to it (used by "Find in Files")
+    onEditorReveal(payload = {}) {
+        const { path, line, column, length } = payload;
+        clearTimeout(this.revealTimer);
+        // a file that has just been opened gets its Monaco editor created asynchronously, so retry for a short while
+        let attemptsLeft = 40;
+        const tryReveal = () => {
+            const editorRef = this.editors[path];
+            if (editorRef && editorRef.revealRange && editorRef.revealRange(line, column, length)) {
+                return;
+            }
+            if (--attemptsLeft > 0) {
+                this.revealTimer = setTimeout(tryReveal, 50);
+            }
+        };
+        // give React a moment to show the editor of the (just activated) tab, the editor can not scroll while it is hidden
+        this.revealTimer = setTimeout(tryReveal, 30);
     }
 
     onFileRenamed(payload = {}) {

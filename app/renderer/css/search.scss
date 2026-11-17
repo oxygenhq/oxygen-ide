@@ -1,0 +1,246 @@
+/*
+ * Find in Files panel
+ */
+@use 'vars' as *;
+
+.ide-search {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+  background: var(--ox-surface);
+  color: var(--ox-text);
+  border-top: 1px solid $panelBorderColor;
+  font-size: 12px;
+
+  .dragline {
+    height: 10px;
+    background: transparent;
+    position: absolute;
+    top: -5px;
+    left: 0;
+    z-index: 9;
+    display: block;
+    width: 100%;
+    border: none;
+    cursor: row-resize;
+    outline: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .search-header {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    -webkit-user-select: none;
+    padding: 4px 10px;
+    border-left: none !important;
+    border-right: none !important;
+  }
+
+  .search-title {
+    font-weight: bold;
+  }
+
+  .search-scope {
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
+    min-width: 0;
+    color: var(--ox-text-muted);
+  }
+
+  .search-scope-label {
+    margin-right: 4px;
+  }
+
+  .search-scope-folder {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ox-text-strong);
+    margin-right: 6px;
+  }
+
+  .search-action {
+    cursor: pointer;
+    opacity: 0.6;
+    margin-left: 6px;
+  }
+
+  .search-action:hover {
+    opacity: 1;
+    color: $hover;
+  }
+
+  .search-form {
+    flex: 0 0 auto;
+    padding: 6px 10px 2px 4px;
+  }
+
+  .find-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+
+    > .ant-input-affix-wrapper,
+    > .ant-input {
+      flex: 1 1 0;
+      min-width: 0;
+      margin-right: 6px;
+    }
+
+    > .ant-input:last-child {
+      margin-right: 0;
+    }
+  }
+
+  .search-expander {
+    flex: 0 0 22px;
+    width: 22px;
+    text-align: center;
+    font-size: 10px;
+    cursor: pointer;
+    color: var(--ox-text-muted);
+  }
+
+  .search-toggles {
+    display: flex;
+    align-items: center;
+  }
+
+  .search-toggle {
+    margin-left: 2px;
+    padding: 0 3px;
+    min-width: 20px;
+    height: 18px;
+    line-height: 16px;
+    font-family: "Fira Code", monospace;
+    font-size: 11px;
+    color: var(--ox-text);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .search-toggle:hover {
+    border-color: $panelBorderColor;
+  }
+
+  .search-toggle.active {
+    color: #ffffff;
+    background: $active;
+    border-color: $active;
+  }
+
+  .search-status {
+    flex: 0 0 auto;
+    padding: 2px 10px 4px 26px;
+    color: var(--ox-text-muted);
+  }
+
+  .search-status.search-error {
+    color: $danger;
+  }
+
+  .search-status.search-notice {
+    color: $success;
+  }
+
+  .search-results {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    padding-bottom: 6px;
+  }
+
+  .search-file-header {
+    display: flex;
+    align-items: center;
+    padding: 2px 10px 2px 6px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    white-space: nowrap;
+  }
+
+  .search-file-header:hover,
+  .search-match:hover {
+    background: var(--ox-list-hover-bg);
+  }
+
+  .search-chevron {
+    flex: 0 0 auto;
+    margin-right: 6px;
+    font-size: 9px;
+    color: var(--ox-text-muted);
+  }
+
+  .search-file-name {
+    flex: 0 0 auto;
+    color: var(--ox-text-strong);
+  }
+
+  .search-file-folder {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin-left: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--ox-text-muted);
+  }
+
+  .search-count {
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding: 0 6px;
+    min-width: 18px;
+    text-align: center;
+    border-radius: 9px;
+    color: var(--ox-text-strong);
+    background: var(--ox-panel-header-bg);
+  }
+
+  .search-file-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    width: 0;
+    overflow: hidden;
+  }
+
+  .search-file-header:hover .search-file-actions {
+    width: auto;
+    margin-left: 6px;
+    overflow: visible;
+  }
+
+  .search-match {
+    display: flex;
+    padding: 1px 10px 1px 28px;
+    cursor: pointer;
+    white-space: pre;
+    font-family: "Fira Code", monospace;
+  }
+
+  .search-match-line {
+    flex: 0 0 40px;
+    padding-right: 8px;
+    text-align: right;
+    color: var(--ox-text-muted);
+  }
+
+  .search-match-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  mark {
+    padding: 0;
+    color: inherit;
+    background: var(--ox-highlight-bg);
+  }
+}

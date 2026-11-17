@@ -22,6 +22,13 @@ const CONTEXT_MENU_FILE_EXPLORER_FOLDER = [
         type: 'separator',
     },
     {
+        label: 'Find in Folder...',
+        cmd: Const.MENU_CMD_FIND_IN_FOLDER,
+    },
+    {
+        type: 'separator',
+    },
+    {
         label: 'Rename',
         cmd: Const.MENU_CMD_RENAME_FOLDER,
     },

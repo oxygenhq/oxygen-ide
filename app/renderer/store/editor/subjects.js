@@ -10,8 +10,11 @@ import { Subject } from 'rxjs';
 
 let editorTriggerSubject = new Subject();
 let editorEventSubject = new Subject();
+// asks the editor to select a range of the file and scroll to it, payload: { path, line, column, length }
+let editorRevealSubject = new Subject();
 
 export default {
     'EDITOR.TRIGGER': editorTriggerSubject,
     'EDITOR.EVENT': editorEventSubject,
+    'EDITOR.REVEAL': editorRevealSubject,
 };

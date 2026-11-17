@@ -124,6 +124,11 @@ const configureStore = (initialState?: counterStateType) => {
             return;
         }
 
+        // the state of the "Find in Files" panel is not saved
+        if (action && action.type.startsWith('SEARCH_')) {
+            return;
+        }
+
         if (action && action.type === 'LOGGER_SET_VISIBLE') {
             // add to save cache
         } else if (action && action.type.startsWith('LOGGER_')) {

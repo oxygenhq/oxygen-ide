@@ -404,6 +404,25 @@ export default class MonacoEditor extends React.Component<Props> {
         }
     }
 
+    /**
+     * Selects the range and scrolls the editor to it. Returns false if the editor is not ready yet.
+     */
+    revealRange(line, column, length) {
+        if (!this.editor || !this.editor.getModel()) {
+            return false;
+        }
+        const model = this.editor.getModel();
+        if (!Number.isInteger(line) || line < 1 || line > model.getLineCount()) {
+            return true;
+        }
+        const startColumn = Math.max(1, column || 1);
+        const range = new monaco.Range(line, startColumn, line, startColumn + Math.max(0, length || 0));
+        this.editor.setSelection(range);
+        this.editor.revealRangeInCenterIfOutsideViewport(range);
+        this.editor.focus();
+        return true;
+    }
+
     async liftOff() {
         try {
             const { featureLanguageLoaded, setFatureLanguageLoaded } = this.props;

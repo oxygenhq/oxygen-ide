@@ -146,6 +146,17 @@ export default (cmdHandler, settings) => {
                 label: '&Replace',
                 accelerator: 'CommandOrControl+H',
                 click() { cmdHandler(Const.MENU_CMD_REPLACE); }
+            },
+            { type: 'separator' },
+            {
+                label: 'Find in &Files',
+                accelerator: 'CommandOrControl+Shift+F',
+                click() { cmdHandler(Const.MENU_CMD_FIND_IN_FILES); }
+            },
+            {
+                label: 'Replace in F&iles',
+                accelerator: 'CommandOrControl+Shift+H',
+                click() { cmdHandler(Const.MENU_CMD_REPLACE_IN_FILES); }
             }
         ]
     });

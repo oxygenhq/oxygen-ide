@@ -20,6 +20,7 @@ import CloudProvidersService from './CloudProvidersService';
 import IntegrationProvidersService from './IntegrationsService';
 import ProjectService from './ProjectService';
 import CryptoService from './CryptoService';
+import SearchService from './SearchService';
 
 
 export default {
@@ -36,5 +37,6 @@ export default {
     CloudProvidersService,
     IntegrationProvidersService,
     ProjectService,
-    CryptoService
+    CryptoService,
+    SearchService
 };

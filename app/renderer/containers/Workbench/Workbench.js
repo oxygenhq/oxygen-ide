@@ -41,6 +41,7 @@ import TextEditor from '../TextEditor';
 import Tabs from '../Tabs';
 import FileExplorer from '../FileExplorer';
 import Logger from '../Logger';
+import SearchPanel from '../SearchPanel';
 import Toolbar from '../../components/Toolbar/index.jsx';
 import Navbar from '../../components/Navbar.jsx';
 import Sidebar from '../../components/Sidebar.jsx';
@@ -885,6 +886,7 @@ export default class Workbench extends React.Component<Props> {
                                             onContentUpdate={::this.handleFileContentUpdate}
                                         />
                                     </div>
+                                    <SearchPanel />
                                     <Logger
                                         visible={loggerVisible}
                                         onHide={::this.logger_onHide}
