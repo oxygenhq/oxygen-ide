@@ -4,6 +4,7 @@
 @use 'vars' as *;
 
 .ide-search {
+  flex: 0 0 auto;
   position: relative;
   display: flex;
   flex-direction: column;

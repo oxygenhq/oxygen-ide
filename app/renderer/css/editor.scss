@@ -15,6 +15,9 @@
   display: flex;
   flex-flow: column nowrap;
   height: 100%;
+  // let the column shrink below the size of its content, otherwise the editor (which keeps its old
+  // pixel size for a moment after a resize) pushes the bottom panels out of place while they are being dragged
+  min-height: 0;
   // padding-top: 5px;
   background-color: var(--ox-editor-bg);
 
@@ -23,6 +26,12 @@
     height: 100%;
     overflow: auto;
   }
+}
+
+// the editor takes all the space the bottom panels (Find in Files, Logger) leave
+#editors-container-wrap {
+  flex: 1 1 0;
+  min-height: 0;
 }
 
 .regularSizeClass {
