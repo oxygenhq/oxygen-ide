@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v2.0.0 (2026-xx-xx)
+## v2.0.0 (2026-11-17)
 
 #### :boom: Breaking Change
 * Update oxygen-cli from v1.43.0 to v2.1.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
