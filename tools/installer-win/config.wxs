@@ -113,16 +113,33 @@
             <ComponentRef Id="IEExt" />
         </Feature>
 
+        <!-- DISABLED: the Chrome extension is not offered by the installer anymore. Level="0" means the feature is never
+             installed and Display="hidden" removes it from the feature selection dialog. To bring it back, set Level="1"
+             and remove Display="hidden". -->
         <Feature Id="ChromeExt"
                  Title="Chrome Extension"
-                 Level="1"
+                 Level="0"
+                 Display="hidden"
                  AllowAdvertise="no"
                  Description="Enables recording support for Chrome.">
             <ComponentRef Id="ChromeExt" />
         </Feature>
 
+        <!-- There is nothing for the user to choose on the "Custom Setup" (feature tree) page: "Common" is hidden and
+             required, and the Chrome extension feature is disabled (see above). So that page is skipped, and the Change
+             button of the repair/remove page is disabled, as it would lead to the same empty page.
+             To bring the page back, remove the two Publish elements below and the ARPNOMODIFY property. -->
+        <Property Id="ARPNOMODIFY" Value="1" />
+
         <UI>
             <ui:WixUI Id="WixUI_FeatureTree" />
+
+            <!-- Navigation of the built-in dialog set is overridden with a higher Order than the built-in rules,
+                 so the rule that sends the user to CustomizeDlg is superseded. -->
+            <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2"
+                Condition="LicenseAccepted = &quot;1&quot;" />
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" Order="4"
+                Condition="NOT Installed" />
             <Publish Dialog="ExitDialog"
                 Control="Finish"
                 Event="DoAction"
