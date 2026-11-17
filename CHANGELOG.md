@@ -1,5 +1,35 @@
 # CHANGELOG
 
+## v2.0.0 (2026-xx-xx)
+
+#### :boom: Breaking Change
+* Update oxygen-cli from v1.43.0 to v2.1.0. See [Oxygen ChangeLog](https://github.com/oxygenhq/oxygen/blob/master/CHANGELOG.md).
+* Drop Selenium and the bundled ChromeDriver/EdgeDriver. Browser drivers are now managed automatically.
+* The `proxy` module is no longer available in tests (it was removed from Oxygen 2.1.0). Use `web.network` commands to collect network traffic of browser tests.
+* The MSI installer no longer offers installation of the Chrome extension.
+
+#### :tada: New Feature
+* Add dark mode. Select *Light*, *Dark* or *Same as system* in *Settings > Appearance*.
+* Add search and replace in all files of the selected folder: *Search > Find in Files* (Ctrl+Shift+F), *Search > Replace in Files* (Ctrl+Shift+H) and *Find in Folder...* in the File Explorer's folder context menu.
+* Add button for clearing all breakpoints.
+
+#### :beetle: Bug Fix
+* Fix issues with setting breakpoints, and editor's text getting highlighted when placing a breakpoint.
+* Fix failure when trying to kill Internet Explorer, and fix test execution in Internet Explorer.
+* Fix serialization of test results passed between the IDE's processes.
+* Better handling of `xctrace list` errors and a longer timeout of iOS app installation.
+* Fix the bottom panels jumping when a panel is resized or the window is resized.
+* Fix Linux build and a build failure caused by `node-expat` on macOS.
+
+#### :nail_care: Polish
+* Stop a running test behind the scenes instead of showing a separate "force stop" button.
+* Disable Monaco editor's code action lightbulb.
+
+#### :house: Internal
+* Update Electron to v39.
+* Use WiX Toolset v5 for the Windows installer.
+* Use an App Store Connect API key for macOS notarization.
+
 ## v1.39.0 (2025-11-21)
 
 #### :house: Internal
